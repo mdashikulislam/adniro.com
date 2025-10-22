@@ -1,0 +1,1117 @@
+name: Listings
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/postTypes
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List listing types'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"1":{"id":1,"name":"INDIVIDUAL","label":"Individual"},"2":{"id":2,"name":"PROFESSIONAL","label":"Professional"}}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/postTypes/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get listing type'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The listing type's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"id":1,"name":"INDIVIDUAL","label":"Individual"}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/reportTypes
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List report types'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"data":[{"id":5,"name":"Other"},{"id":4,"name":"Wrong category"},{"id":3,"name":"Spam"},{"id":2,"name":"Duplicate"},{"id":1,"name":"Fraud"}]}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/reportTypes/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get report type'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The report type's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"id":1,"name":"Fraud"}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/posts
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List listings'
+      description: |-
+        Note: The main picture of the listings is fetched via a 'picture' attribute (added as fake column),
+        that provide default picture as image placeholder when the listing has no pictures.
+        In addition, for performance reasons, default picture is also provided when the 'pictures' table is not embed in the endpoint.
+        So you need to embed the picture table like: /api/posts?embed=pictures to retrieve right main picture data.
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      op:
+        name: op
+        description: 'Type of listings list (optional) - Possible value: search,premium,latest,free,premiumFirst,similar.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      postId:
+        name: postId
+        description: "Base Listing's ID to get similar listings (optional) - Mandatory to get similar listings (when op=similar)."
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      distance:
+        name: distance
+        description: "Distance to get similar listings (optional) - Also optional when the type of similar listings is based on the current listing's category. Mandatory when the type of similar listings is based on the current listing's location. So, its usage is limited to get similar listings (when op=similar) based on the current listing's location."
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      belongLoggedUser:
+        name: belongLoggedUser
+        description: 'Force users to be logged to get data that belongs to him. Authentication token needs to be sent in the header, and the "op" parameter needs to be null or unset - Possible value: 0 or 1.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pendingApproval:
+        name: pendingApproval
+        description: 'To list a user''s listings in pending approval. Authentication token needs to be sent in the header, and the "op" parameter needs to be null or unset - Possible value: 0 or 1.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      archived:
+        name: archived
+        description: 'To list a user''s archived listings. Authentication token needs to be sent in the header, and the "op" parameter need be null or unset - Possible value: 0 or 1.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      embed:
+        name: embed
+        description: 'Comma-separated list of the post relationships for Eager Loading - Possible values: user,category,parent,postType,city,currency,savedByLoggedUser,pictures,payment,package.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      sort:
+        name: sort
+        description: 'The sorting parameter (Order by DESC with the given column. Use "-" as prefix to order by ASC). Possible values: created_at.'
+        required: false
+        example: created_at
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      perPage:
+        name: perPage
+        description: 'Items per page. Can be defined globally from the admin settings. Cannot be exceeded 100.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      op: null
+      postId: null
+      distance: null
+      belongLoggedUser: true
+      pendingApproval: true
+      archived: true
+      embed: null
+      sort: created_at
+      perPage: 2
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"success":false,"message":"Unauthorized","result":null}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/posts/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get listing'
+      description: |-
+        Note: The main picture of the listing is fetched via a 'picture' attribute (added as fake column),
+        that provide default picture as image placeholder when the listing has no pictures.
+        In addition, for performance reasons, default picture is also provided when the 'pictures' table is not embed in the endpoint.
+        So you need to embed the picture table like: /api/posts/1?embed=pictures to retrieve right main picture data.
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The post/listing's ID."
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 2
+    queryParameters:
+      unactivatedIncluded:
+        name: unactivatedIncluded
+        description: 'Include or not unactivated entries - Possible value: 0 or 1.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      belongLoggedUser:
+        name: belongLoggedUser
+        description: 'Force users to be logged to get data that belongs to him - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      noCache:
+        name: noCache
+        description: 'Disable the cache for this request - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      embed:
+        name: embed
+        description: 'Comma-separated list of the post relationships for Eager Loading - Possible values: user,category,parent,postType,city,currency,savedByLoggedUser,pictures,payment,package,fieldsValues.'
+        required: false
+        example: 'user,postType'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      detailed:
+        name: detailed
+        description: "Allow getting the listing's details with all its relationships (No need to set the 'embed' parameter)."
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      unactivatedIncluded: true
+      belongLoggedUser: false
+      noCache: false
+      embed: 'user,postType'
+      detailed: false
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"id":2,"country_code":"US","user_id":2,"payment_id":null,"category_id":22,"post_type_id":2,"title":"HomePod red","description":"Qui ipsum mollitia sit alias aut perspiciatis. Corrupti in rem et est ipsam voluptatem. Et harum dicta saepe animi tenetur. Fugit aut voluptatem nobis possimus ipsum sit eaque.","tags":["est","doloremque","laudantium"],"price":"57415.00","currency_code":null,"negotiable":0,"contact_name":"Admin Demo","address":null,"city_id":49311,"lat":36.3,"lon":-119.21,"create_from_ip":"4.9.254.3","latest_update_ip":null,"visits":41,"auth_field":"email","email":"admin@domain.tld","phone":"+10540102569","phone_national":"0540102569","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-06-24T17:38:45.000000Z","phone_verified_at":"2025-06-24T17:38:45.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":0,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-06-24T17:38:45.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-05-29T23:55:39.000000Z","updated_at":"2025-09-08T10:06:26.000000Z","reference":"GWpmbk5ezJn","slug":"homepod-red","url":"https:\/\/demo.laraclassifier.local\/homepod-red\/GWpmbk5ezJn","excerpt":"Qui ipsum mollitia sit alias aut perspiciatis. Corrupti in rem et est ipsam voluptatem. Et harum dic...","phone_intl":"0540102569","created_at_formatted":"3 months ago","updated_at_formatted":"Sep 8th, 2025 at 06:06","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/2\/thumbnails\/800x800-a7591871e7d8d1de0f705c4a915a7edf.jpg","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/rectangle\/16\/us.png","count_pictures":0,"price_label":"Price:","price_formatted":"$57,415","visits_formatted":"41 views","distance_info":null,"picture":{"id":7,"post_id":2,"file_path":"files\/us\/2\/bc5d103fa9d2fbd383c0e1fa72905f5e.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/816x460-bc5d103fa9d2fbd383c0e1fa72905f5e.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/120x90-bc5d103fa9d2fbd383c0e1fa72905f5e.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/320x240-bc5d103fa9d2fbd383c0e1fa72905f5e.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/816x460-bc5d103fa9d2fbd383c0e1fa72905f5e.jpg"}},"user":{"id":2,"name":"Admin Demo","username":"admin","two_factor_enabled":false,"two_factor_method":"email","updated_at":"2025-09-08T09:29:18.000000Z","original_updated_at":"2025-09-08 09:29:18","original_last_activity":"2025-09-08 08:00:59","created_at_formatted":"5 months ago","photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/2\/thumbnails\/800x800-a7591871e7d8d1de0f705c4a915a7edf.jpg","p_is_online":false,"country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/rectangle\/16\/us.png"},"postType":{"id":2,"name":"PROFESSIONAL","label":"Professional"},"rating_cache":0,"rating_count":0},"extra":{"fieldsValues":[]}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/posts
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Store listing'
+      description: |-
+        For both types of listing's creation (Single step or Multi steps).
+        Note: The field 'admin_code' is only available when the listing's country's 'admin_type' column is set to 1 or 2.
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      category_id:
+        name: category_id
+        description: "The category's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      title:
+        name: title
+        description: "The listing's title."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      description:
+        name: description
+        description: "The listing's description."
+        required: true
+        example: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      contact_name:
+        name: contact_name
+        description: "The listing's author name."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      auth_field:
+        name: auth_field
+        description: "The user's auth field ('email' or 'phone')."
+        required: true
+        example: email
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone:
+        name: phone
+        description: "The listing's author mobile number (Required when 'auth_field' value is 'phone')."
+        required: false
+        example: '+17656766467'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_country:
+        name: phone_country
+        description: "The user's phone number's country code (Required when the 'phone' field is filled)."
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      city_id:
+        name: city_id
+        description: "The city's ID."
+        required: true
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      accept_terms:
+        name: accept_terms
+        description: 'Accept the website terms and conditions.'
+        required: true
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      pictures:
+        name: pictures
+        description: "The listing's pictures."
+        required: true
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: "The listing's author email address (Required when 'auth_field' value is 'email')."
+        required: false
+        example: john.doe@domain.tld
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: "The code of the user's country."
+        required: true
+        example: US
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      post_type_id:
+        name: post_type_id
+        description: "The listing type's ID."
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      admin_code:
+        name: admin_code
+        description: "The administrative division's code."
+        required: false
+        example: '0'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      price:
+        name: price
+        description: 'The price.'
+        required: true
+        example: 5000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      negotiable:
+        name: negotiable
+        description: 'Negotiable price or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_hidden:
+        name: phone_hidden
+        description: 'Mobile phone number will be hidden in public or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      create_from_ip:
+        name: create_from_ip
+        description: "The listing's author IP address."
+        required: false
+        example: 127.0.0.1
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      accept_marketing_offers:
+        name: accept_marketing_offers
+        description: 'Accept to receive marketing offers or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_permanent:
+        name: is_permanent
+        description: 'Is it permanent post or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      tags:
+        name: tags
+        description: 'Comma-separated tags list.'
+        required: false
+        example: 'car,automotive,tesla,cyber,truck'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      package_id:
+        name: package_id
+        description: "The package's ID."
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      payment_method_id:
+        name: payment_method_id
+        description: "The payment method's ID (required when the selected package's price is > 0)."
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      captcha_key:
+        name: captcha_key
+        description: 'Key generated by the CAPTCHA endpoint calling (Required when the CAPTCHA verification is enabled from the Admin panel).'
+        required: false
+        example: consectetur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      category_id: 1
+      title: 'John Doe'
+      description: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+      contact_name: 'John Doe'
+      auth_field: email
+      phone: '+17656766467'
+      phone_country: null
+      city_id: 5
+      accept_terms: false
+      email: john.doe@domain.tld
+      country_code: US
+      post_type_id: 1
+      admin_code: '0'
+      price: 5000
+      negotiable: false
+      phone_hidden: false
+      create_from_ip: 127.0.0.1
+      accept_marketing_offers: false
+      is_permanent: false
+      tags: 'car,automotive,tesla,cyber,truck'
+      package_id: 2
+      payment_method_id: 5
+      captcha_key: consectetur
+    fileParameters:
+      pictures:
+        - null
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer kE4bvh6P5daDfga81e6cZV3'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/posts/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update listing'
+      description: |-
+        Note: The fields 'pictures', 'package_id' and 'payment_method_id' are only available with the single step listing edition.
+        The field 'admin_code' is only available when the listing's country's 'admin_type' column is set to 1 or 2.
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The post/listing's ID."
+        required: true
+        example: 15
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 15
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      category_id:
+        name: category_id
+        description: "The category's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      title:
+        name: title
+        description: "The listing's title."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      description:
+        name: description
+        description: "The listing's description."
+        required: true
+        example: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      contact_name:
+        name: contact_name
+        description: "The listing's author name."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      auth_field:
+        name: auth_field
+        description: "The user's auth field ('email' or 'phone')."
+        required: true
+        example: email
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone:
+        name: phone
+        description: "The listing's author mobile number (Required when 'auth_field' value is 'phone')."
+        required: false
+        example: '+17656766467'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_country:
+        name: phone_country
+        description: "The user's phone number's country code (Required when the 'phone' field is filled)."
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      city_id:
+        name: city_id
+        description: "The city's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      accept_terms:
+        name: accept_terms
+        description: 'Accept the website terms and conditions.'
+        required: true
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: "The listing's author email address (Required when 'auth_field' value is 'email')."
+        required: false
+        example: john.doe@domain.tld
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: "The code of the user's country."
+        required: true
+        example: US
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      post_type_id:
+        name: post_type_id
+        description: "The listing type's ID."
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      admin_code:
+        name: admin_code
+        description: "The administrative division's code."
+        required: false
+        example: '0'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      price:
+        name: price
+        description: 'The price.'
+        required: true
+        example: 5000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      negotiable:
+        name: negotiable
+        description: 'Negotiable price or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_hidden:
+        name: phone_hidden
+        description: 'Mobile phone number will be hidden in public or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      latest_update_ip:
+        name: latest_update_ip
+        description: "The listing's author IP address."
+        required: false
+        example: 127.0.0.1
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      accept_marketing_offers:
+        name: accept_marketing_offers
+        description: 'Accept to receive marketing offers or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_permanent:
+        name: is_permanent
+        description: 'Is it permanent post or no.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      tags:
+        name: tags
+        description: 'Comma-separated tags list.'
+        required: false
+        example: 'car,automotive,tesla,cyber,truck'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      pictures:
+        name: pictures
+        description: "The listing's pictures."
+        required: true
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      package_id:
+        name: package_id
+        description: "The package's ID."
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      payment_method_id:
+        name: payment_method_id
+        description: "The payment method's ID (Required when the selected package's price is > 0)."
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      category_id: 1
+      title: 'John Doe'
+      description: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+      contact_name: 'John Doe'
+      auth_field: email
+      phone: '+17656766467'
+      phone_country: null
+      city_id: 1
+      accept_terms: false
+      email: john.doe@domain.tld
+      country_code: US
+      post_type_id: 1
+      admin_code: '0'
+      price: 5000
+      negotiable: false
+      phone_hidden: false
+      latest_update_ip: 127.0.0.1
+      accept_marketing_offers: false
+      is_permanent: true
+      tags: 'car,automotive,tesla,cyber,truck'
+      package_id: 2
+      payment_method_id: 5
+    fileParameters:
+      pictures:
+        - null
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer bvaVZehc186aDkE6gd4f53P'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/posts/{ids}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete listing(s)'
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      ids:
+        name: ids
+        description: 'The ID or comma-separated IDs list of listing(s).'
+        required: true
+        example: '111111,222222,333333'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      ids: '111111,222222,333333'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer k13edgfDcb668aP4ZhEvaV5'
+    controller: null
+    method: null
+    route: null
+    custom: []

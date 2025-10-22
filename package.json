@@ -1,0 +1,37 @@
+{
+	"private": true,
+	"scripts": {
+		"build-assets": "npx mix --mix-config=webpack.mix.js",
+		"build-rtl-assets": "npx mix --mix-config=webpack.mix.rtl.js",
+		"combine-assets": "npx mix --mix-config=webpack.mix.combine.js",
+		"build-assets-prod": "npx mix --production --mix-config=webpack.mix.js",
+		"build-rtl-assets-prod": "npx mix --production --mix-config=webpack.mix.rtl.js",
+		"combine-assets-prod": "npx mix --production --mix-config=webpack.mix.combine.js",
+		"dev": "npm run build-assets && npm run build-rtl-assets && npm run combine-assets",
+		"development": "mix",
+		"watch": "mix watch",
+		"watch-poll": "mix watch -- --watch-options-poll=1000",
+		"hot": "mix watch --hot",
+		"prod": "npm run build-assets-prod && npm run build-rtl-assets-prod && npm run combine-assets-prod",
+		"production": "mix --production"
+	},
+	"devDependencies": {
+		"@pnotify/confirm": "^5.2.0",
+		"@pnotify/core": "^5.2.0",
+		"@pnotify/font-awesome5": "^5.2.0",
+		"@pnotify/font-awesome5-fix": "^5.2.0",
+		"cross-env": "^7.0",
+		"jquery": "^3.3.1",
+		"laravel-mix": "^6.0.49",
+		"lodash": "^4.17.21",
+		"postcss": "^8.5.6",
+		"postcss-loader": "^8.1.1",
+		"resolve-url-loader": "^5.0.0",
+		"rtlcss": "^4.3.0",
+		"sass": "^1.83.0",
+		"sass-loader": "^16.0.4"
+	},
+	"dependencies": {
+		"tiny-slider": "^2.9.4"
+	}
+}

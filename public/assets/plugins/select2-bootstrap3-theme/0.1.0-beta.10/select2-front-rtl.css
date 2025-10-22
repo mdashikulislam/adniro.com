@@ -1,0 +1,44 @@
+
+/* Select box */
+.select2-container {
+	/*min-width: 200px !important;*/
+	padding: 0;
+}
+
+.select2-container--default .select2-selection--single {
+	position: relative;
+	height: 40px;
+	padding: 6px;
+}
+
+/* Select arrow (Icon) */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	position: absolute;
+	height: 35px;
+}
+
+/* Opened */
+.select2-container--default .select2-selection--single, .select2-dropdown {
+	background-color: #fff;
+	border: 1px solid #ddd;
+}
+
+.select2-container--default .select2-selection--single {
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	color: #555;
+}
+
+.select2-dropdown {
+	box-shadow: 0 4px 3px #ededed;
+	padding: 8px;
+}
+
+.select2-results__option {
+	padding: 8px 10px;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+	background-color: #fafafa;
+	color: #555;
+}

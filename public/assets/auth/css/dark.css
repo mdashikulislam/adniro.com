@@ -1,0 +1,310 @@
+/*
+=================================================
+  Dark Theme Styles
+=================================================
+*/
+
+[data-bs-theme="dark"] {
+	color-scheme: dark;
+	
+	/* Root Variables for Dark Theme */
+	--bs-body-bg: #1a1d21;
+	--bs-body-bg-rgb: 26, 29, 33;
+	--bs-body-color: #dee2e6;
+	--bs-body-color-rgb: 222, 226, 230;
+	--bs-heading-color: #ffffff;
+	--bs-emphasis-color: #ffffff;
+	--bs-secondary-bg: #2c3034;
+	--bs-secondary-bg-rgb: 44, 48, 52;
+	--bs-tertiary-bg: #343a40;
+	--bs-tertiary-bg-rgb: 52, 58, 64;
+	--bs-link-color: var(--bs-themecolor);
+	--bs-link-color-rgb: var(--bs-themecolor-rgb);
+	--bs-link-hover-color: var(--bs-themehovercolor);
+	--bs-link-hover-color-rgb: var(--bs-themehovercolor-rgb);
+	--bs-border-color: #495057;
+	--bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+	
+	/* Primary Button and Emphasis */
+	--bs-primary-bg-subtle: #2e4a66;
+	--bs-primary-border-subtle: #426998;
+	--bs-primary-text-emphasis: #a8c7e7;
+}
+
+/* =================================== */
+/*  1. Basic Style
+/* =================================== */
+body, html {
+	background-color: var(--bs-body-bg);
+}
+
+/* Preloader */
+[data-bs-theme="dark"] .preloader {
+	background-color: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .preloader .lds-ellipsis div {
+	background: var(--bs-themecolor);
+}
+
+/* =================================== */
+/*  2. Helpers Classes
+/* =================================== */
+[data-bs-theme="dark"] .auth-login-register .shadow-md {
+	-webkit-box-shadow: 0 0 50px -35px rgba(255, 255, 255, 0.1) !important;
+	box-shadow: 0 0 50px -35px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Background Light (Inverted for Dark Theme) */
+[data-bs-theme="dark"] .auth-login-register .bg-light-1 {
+	background-color: #343a40 !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .bg-light-2 {
+	background-color: #2c3034 !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .bg-light-3 {
+	background-color: #212529 !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .bg-light-4 {
+	background-color: #1a1d21 !important;
+}
+
+/* HR */
+[data-bs-theme="dark"] .auth-login-register hr {
+	border-color: var(--bs-border-color-translucent);
+}
+
+/* =================================== */
+/*  4. Elements
+/* =================================== */
+/* 4.1 Hero Background */
+[data-bs-theme="dark"] .auth-login-register .hero-wrap .hero-mask {
+	background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* 4.2 Nav */
+[data-bs-theme="dark"] .auth-login-register .nav .nav-item .nav-link:not(.active) {
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .auth-login-register .nav:not(.nav-pills) .nav-item .nav-link.active,
+[data-bs-theme="dark"] .auth-login-register .nav:not(.nav-pills) .nav-item .nav-link:hover {
+	color: var(--bs-themecolor);
+}
+
+[data-bs-theme="dark"] .auth-login-register .nav.nav-separator .nav-item + .nav-item .nav-link:after {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-bs-theme="dark"] .auth-login-register .nav-pills .nav-link:not(.active) {
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .auth-login-register .nav-pills .nav-link:not(.active):hover {
+	color: var(--bs-themecolor);
+}
+
+[data-bs-theme="dark"] .auth-login-register .nav-pills .nav-link.active,
+[data-bs-theme="dark"] .auth-login-register .nav-pills.nav-light .nav-link.active,
+[data-bs-theme="dark"] .auth-login-register .nav-pills .show > .nav-link {
+	background-color: var(--bs-themecolor);
+	color: #fff;
+}
+
+/* 4.4 Video Play Button */
+[data-bs-theme="dark"] .auth-login-register .btn-video-play {
+	background: #343a40;
+	color: #fff;
+}
+
+[data-bs-theme="dark"] .auth-login-register .btn-video-play:hover {
+	-webkit-box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+	box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+/* =================================== */
+/*  5. Social Icons
+/* =================================== */
+[data-bs-theme="dark"] .auth-login-register .social-icons li a {
+	background-color: rgba(255, 255, 255, 0.1);
+	color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .auth-login-register .social-icons li:hover a {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =================================== */
+/*  6. Extras
+/* =================================== */
+/* 6.1 Form */
+[data-bs-theme="dark"] .auth-login-register .form-control:not(.is-invalid):not(.invalid):not(.is-valid) {
+	border-color: var(--bs-border-color);
+	background-color: var(--bs-secondary-bg);
+	color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-check-input:not(:checked):not(.is-invalid):not(.invalid):not(.is-valid) {
+	border-color: var(--bs-border-color);
+	background-color: var(--bs-secondary-bg);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control.bg-light {
+	background-color: #343a40 !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control.border-light {
+	border-color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control:focus {
+	-webkit-box-shadow: 0 0 5px rgba(128, 189, 255, 0.3);
+	box-shadow: 0 0 5px rgba(128, 189, 255, 0.3);
+	border-color: var(--bs-themecolor) !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .input-group-text {
+	border-color: var(--bs-border-color);
+	background-color: #343a40;
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control::-webkit-input-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control:-moz-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control::-moz-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-control:-ms-input-placeholder,
+[data-bs-theme="dark"] .auth-login-register .form-control::-ms-input-placeholder {
+	color: #6c757d;
+}
+
+/* 6.2 Form Dark */
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control {
+	border-color: #495057;
+	background: #2c3034;
+	color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control:focus {
+	border-color: var(--bs-themecolor) !important;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control::-webkit-input-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control:-moz-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control::-moz-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control:-ms-input-placeholder,
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-control::-ms-input-placeholder {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .icon-group .icon-inside {
+	color: #6c757d;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-dark .form-check-input:not(:checked) {
+	background-color: #2c3034;
+	border-color: #495057;
+}
+
+/* 6.3 Form Border */
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control::-webkit-input-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control:-moz-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control::-moz-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control:-ms-input-placeholder,
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control::-ms-input-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border .form-control:focus {
+	border-bottom-color: var(--bs-themecolor);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border .icon-group .icon-inside {
+	color: rgba(255, 255, 255, 0.4);
+}
+
+/* 6.4 Form Border Light */
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control::-webkit-input-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control:-moz-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control::-moz-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control:-ms-input-placeholder,
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control::-ms-input-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border-light .form-control:focus {
+	border-bottom-color: var(--bs-themecolor);
+}
+
+[data-bs-theme="dark"] .auth-login-register .form-border-light .icon-group .icon-inside {
+	color: rgba(255, 255, 255, 0.4);
+}
+
+/* 6.6 Buttons */
+[data-bs-theme="dark"] .auth-login-register .btn:not(.btn-link) {
+	-webkit-box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+	box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .auth-login-register .btn:not(.btn-link):hover {
+	-webkit-box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+	box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Styles Switcher */
+[data-bs-theme="dark"] #styles-switcher {
+	background: #2c3034;
+	color: #dee2e6;
+}
+
+[data-bs-theme="dark"] #styles-switcher .switcher-toggle {
+	background: #495057;
+}

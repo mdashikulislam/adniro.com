@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'male' => 'איש',
+    'female' => 'נשים',
+    'other' => 'אַחֵר',
+    'mr' => 'אדון.',
+    'mrs' => 'גברת',
+    'mx' => 'Mx.',
+    'individual' => 'אִישִׁי',
+    'professional' => 'מקצועי',
+    'user_individual' => 'אִישִׁי',
+    'user_professional' => 'מקצועי',
+    'africa' => 'אַפְרִיקָה',
+    'antarctica' => 'אנטארקטיקה',
+    'asia' => 'אַסְיָה',
+    'europe' => 'אֵירוֹפָּה',
+    'north_america' => 'צפון אמריקה',
+    'oceania' => 'אוקיאניה',
+    'south_america' => 'דרום אמריקה',
+    'theme_light' => 'Light',
+    'theme_dark' => 'Dark',
+    'theme_system' => 'System',
+    'theme_auto' => 'Auto',
+];

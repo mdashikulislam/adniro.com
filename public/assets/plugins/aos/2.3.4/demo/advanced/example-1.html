@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>AOS.js Animation Showcase</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+	<style>
+		body {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			overflow-x: hidden;
+		}
+		
+		.hero {
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			text-align: center;
+		}
+		
+		.hero h1 {
+			font-size: 4rem;
+			font-weight: 700;
+			text-shadow: 2px 2px 20px rgba(0,0,0,0.3);
+		}
+		
+		.demo-section {
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			padding: 80px 0;
+		}
+		
+		.content-card {
+			background: white;
+			border-radius: 20px;
+			padding: 40px;
+			box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+		}
+		
+		.icon-box {
+			width: 80px;
+			height: 80px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-radius: 15px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 2rem;
+			color: white;
+			margin-bottom: 20px;
+		}
+		
+		.feature-card {
+			background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			color: white;
+			padding: 30px;
+			border-radius: 15px;
+			height: 100%;
+			transition: transform 0.3s ease;
+		}
+		
+		.feature-card:hover {
+			transform: translateY(-10px);
+		}
+		
+		.image-card {
+			background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			color: white;
+			padding: 60px 30px;
+			border-radius: 20px;
+			text-align: center;
+			font-size: 1.5rem;
+			font-weight: 600;
+		}
+		
+		.stat-box {
+			background: rgba(255, 255, 255, 0.15);
+			backdrop-filter: blur(10px);
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-radius: 15px;
+			padding: 30px;
+			text-align: center;
+			color: white;
+		}
+		
+		.stat-box h3 {
+			font-size: 3rem;
+			font-weight: 700;
+			margin: 0;
+		}
+		
+		.code-example {
+			background: #2d2d2d;
+			color: #f8f8f2;
+			padding: 20px;
+			border-radius: 10px;
+			margin: 20px 0;
+			font-family: 'Courier New', monospace;
+			font-size: 0.9rem;
+			overflow-x: auto;
+		}
+		
+		.badge-custom {
+			background: rgba(255, 255, 255, 0.2);
+			color: white;
+			padding: 8px 16px;
+			border-radius: 20px;
+			font-size: 0.85rem;
+			display: inline-block;
+			margin: 5px;
+		}
+		
+		.scroll-indicator {
+			position: absolute;
+			bottom: 30px;
+			left: 50%;
+			transform: translateX(-50%);
+			animation: bounce 2s infinite;
+		}
+		
+		@keyframes bounce {
+			0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+			40% { transform: translateX(-50%) translateY(-20px); }
+			60% { transform: translateX(-50%) translateY(-10px); }
+		}
+		
+		.progress-indicator {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 0%;
+			height: 4px;
+			background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+			z-index: 9999;
+			transition: width 0.1s ease;
+		}
+		
+		.timeline {
+			position: relative;
+			padding: 20px 0;
+		}
+		
+		.timeline-item {
+			position: relative;
+			padding-left: 60px;
+			margin-bottom: 40px;
+		}
+		
+		.timeline-item::before {
+			content: '';
+			position: absolute;
+			left: 20px;
+			top: 0;
+			bottom: -40px;
+			width: 2px;
+			background: rgba(255, 255, 255, 0.3);
+		}
+		
+		.timeline-item:last-child::before {
+			display: none;
+		}
+		
+		.timeline-dot {
+			position: absolute;
+			left: 10px;
+			top: 0;
+			width: 20px;
+			height: 20px;
+			border-radius: 50%;
+			background: white;
+			border: 4px solid #667eea;
+		}
+	</style>
+</head>
+<body>
+<div class="progress-indicator" id="progressBar"></div>
+
+<!-- Hero Section -->
+<section class="hero">
+	<div class="container">
+		<h1 data-aos="zoom-in" data-aos-duration="1000">AOS.js Showcase</h1>
+		<p class="lead" data-aos="fade-up" data-aos-delay="200">Animate On Scroll Library</p>
+		<div data-aos="fade-up" data-aos-delay="400">
+			<span class="badge-custom">50+ Animations</span>
+			<span class="badge-custom">Easy Setup</span>
+			<span class="badge-custom">Lightweight</span>
+		</div>
+		<div class="scroll-indicator">
+			<svg width="30" height="50" viewBox="0 0 30 50" fill="none">
+				<rect x="1" y="1" width="28" height="48" rx="14" stroke="white" stroke-width="2"/>
+				<circle cx="15" cy="15" r="4" fill="white">
+					<animate attributeName="cy" from="15" to="35" dur="1.5s" repeatCount="indefinite"/>
+				</circle>
+			</svg>
+		</div>
+	</div>
+</section>
+
+<!-- Basic Fade Animations -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="fade-down">Basic Fade Animations</h2>
+		<div class="row g-4">
+			<div class="col-md-6">
+				<div class="content-card" data-aos="fade-up" data-aos-duration="800">
+					<div class="icon-box">↑</div>
+					<h3>Fade Up</h3>
+					<p>Classic animation - elements fade in from below.</p>
+					<div class="code-example">data-aos="fade-up"</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="content-card" data-aos="fade-down" data-aos-duration="800">
+					<div class="icon-box">↓</div>
+					<h3>Fade Down</h3>
+					<p>Elements fade in from above.</p>
+					<div class="code-example">data-aos="fade-down"</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="content-card" data-aos="fade-left" data-aos-duration="800">
+					<div class="icon-box">←</div>
+					<h3>Fade Left</h3>
+					<p>Elements slide in from the right.</p>
+					<div class="code-example">data-aos="fade-left"</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="content-card" data-aos="fade-right" data-aos-duration="800">
+					<div class="icon-box">→</div>
+					<h3>Fade Right</h3>
+					<p>Elements slide in from the left.</p>
+					<div class="code-example">data-aos="fade-right"</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Flip Animations -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="flip-up">Flip Animations</h2>
+		<div class="row g-4">
+			<div class="col-md-3">
+				<div class="image-card" data-aos="flip-left" data-aos-duration="1000">
+					Flip Left
+					<div class="code-example mt-3">data-aos="flip-left"</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="image-card" data-aos="flip-right" data-aos-duration="1000" data-aos-delay="100">
+					Flip Right
+					<div class="code-example mt-3">data-aos="flip-right"</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="image-card" data-aos="flip-up" data-aos-duration="1000" data-aos-delay="200">
+					Flip Up
+					<div class="code-example mt-3">data-aos="flip-up"</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="image-card" data-aos="flip-down" data-aos-duration="1000" data-aos-delay="300">
+					Flip Down
+					<div class="code-example mt-3">data-aos="flip-down"</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Zoom Animations -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="zoom-in">Zoom Animations</h2>
+		<div class="row g-4">
+			<div class="col-md-4">
+				<div class="content-card" data-aos="zoom-in" data-aos-duration="1000">
+					<div class="icon-box">⊕</div>
+					<h3>Zoom In</h3>
+					<p>Element scales up from center.</p>
+					<div class="code-example">data-aos="zoom-in"</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="content-card" data-aos="zoom-in-up" data-aos-duration="1000">
+					<div class="icon-box">↗</div>
+					<h3>Zoom In Up</h3>
+					<p>Scales up while moving from below.</p>
+					<div class="code-example">data-aos="zoom-in-up"</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="content-card" data-aos="zoom-out" data-aos-duration="1000">
+					<div class="icon-box">⊖</div>
+					<h3>Zoom Out</h3>
+					<p>Element scales down from larger size.</p>
+					<div class="code-example">data-aos="zoom-out"</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Advanced: Easing & Delay -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="fade-up">Advanced: Easing & Delays</h2>
+		<div class="row g-4">
+			<div class="col-md-4">
+				<div class="feature-card"
+				     data-aos="fade-up"
+				     data-aos-easing="ease-in-back"
+				     data-aos-duration="1000">
+					<h4>Ease In Back</h4>
+					<p>Animation with a slight pull-back effect before entering.</p>
+					<div class="code-example">data-aos-easing="ease-in-back"</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="feature-card"
+				     data-aos="fade-up"
+				     data-aos-easing="ease-out-cubic"
+				     data-aos-duration="1000"
+				     data-aos-delay="200">
+					<h4>Ease Out Cubic + Delay</h4>
+					<p>Smooth cubic easing with 200ms delay.</p>
+					<div class="code-example">data-aos-delay="200"</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="feature-card"
+				     data-aos="fade-up"
+				     data-aos-easing="ease-in-out-sine"
+				     data-aos-duration="1500"
+				     data-aos-delay="400">
+					<h4>Long Duration</h4>
+					<p>Slow, graceful animation over 1.5 seconds.</p>
+					<div class="code-example">data-aos-duration="1500"</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Staggered Animation -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="fade-up">Staggered Effects</h2>
+		<div class="row g-4">
+			<div class="col-md-3">
+				<div class="stat-box" data-aos="fade-up" data-aos-delay="0">
+					<h3>50+</h3>
+					<p>Animations</p>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="stat-box" data-aos="fade-up" data-aos-delay="100">
+					<h3>13KB</h3>
+					<p>Gzipped Size</p>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="stat-box" data-aos="fade-up" data-aos-delay="200">
+					<h3>100%</h3>
+					<p>CSS Driven</p>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="stat-box" data-aos="fade-up" data-aos-delay="300">
+					<h3>19K+</h3>
+					<p>GitHub Stars</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Slide Animations -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="slide-up">Slide Animations</h2>
+		<div class="row g-4">
+			<div class="col-md-6">
+				<div class="content-card" data-aos="slide-right" data-aos-duration="1000">
+					<h3>Slide Right</h3>
+					<p>Element slides in from outside the viewport on the left.</p>
+					<div class="code-example">data-aos="slide-right"</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="content-card" data-aos="slide-left" data-aos-duration="1000">
+					<h3>Slide Left</h3>
+					<p>Element slides in from outside the viewport on the right.</p>
+					<div class="code-example">data-aos="slide-left"</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Timeline Example -->
+<section class="demo-section">
+	<div class="container">
+		<h2 class="text-white text-center mb-5" data-aos="fade-up">Timeline with AOS</h2>
+		<div class="timeline">
+			<div class="timeline-item" data-aos="fade-right" data-aos-duration="800">
+				<div class="timeline-dot"></div>
+				<div class="content-card">
+					<h4>Step 1: Installation</h4>
+					<p>Install via npm or include CDN links in your HTML.</p>
+					<div class="code-example">npm install aos --save</div>
+				</div>
+			</div>
+			<div class="timeline-item" data-aos="fade-right" data-aos-duration="800" data-aos-delay="100">
+				<div class="timeline-dot"></div>
+				<div class="content-card">
+					<h4>Step 2: Initialize</h4>
+					<p>Initialize AOS in your JavaScript file.</p>
+					<div class="code-example">AOS.init();</div>
+				</div>
+			</div>
+			<div class="timeline-item" data-aos="fade-right" data-aos-duration="800" data-aos-delay="200">
+				<div class="timeline-dot"></div>
+				<div class="content-card">
+					<h4>Step 3: Add Attributes</h4>
+					<p>Add data-aos attributes to your HTML elements.</p>
+					<div class="code-example">&lt;div data-aos="fade-up"&gt;&lt;/div&gt;</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Configuration Example -->
+<section class="demo-section">
+	<div class="container">
+		<div class="content-card" data-aos="zoom-in" data-aos-duration="1000">
+			<h2 class="text-center mb-4">Global Configuration</h2>
+			<p class="lead text-center">You can configure AOS globally on initialization:</p>
+			<div class="code-example">
+				AOS.init({
+				offset: 200,        // offset from original trigger point
+				duration: 600,      // animation duration in ms
+				easing: 'ease-in-sine',  // easing function
+				delay: 100,         // delay before animation starts
+				once: false,        // whether animation should fire once
+				mirror: false,      // animate out while scrolling past
+				anchorPlacement: 'top-bottom' // trigger point
+				});
+			</div>
+			<p class="mt-4"><strong>Popular Options:</strong></p>
+			<ul>
+				<li><code>once: true</code> - Animate only once (don't reverse)</li>
+				<li><code>mirror: true</code> - Animate out when scrolling past</li>
+				<li><code>offset: 120</code> - Trigger 120px before element enters viewport</li>
+				<li><code>disable: 'mobile'</code> - Disable on mobile devices</li>
+			</ul>
+		</div>
+	</div>
+</section>
+
+<!-- Final CTA -->
+<section class="demo-section">
+	<div class="container text-center">
+		<div class="content-card" data-aos="flip-up" data-aos-duration="1000">
+			<h2>Ready to Use AOS.js?</h2>
+			<p class="lead">Simple, powerful, and flexible scroll animations</p>
+			<p>Mix animations, delays, durations, and easing to create unique experiences!</p>
+			<div class="mt-4">
+				<span class="badge-custom">data-aos="fade-up"</span>
+				<span class="badge-custom">data-aos="zoom-in"</span>
+				<span class="badge-custom">data-aos="flip-left"</span>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+	// Initialize AOS
+	AOS.init({
+		duration: 800,
+		offset: 100,
+		once: false,
+		mirror: true
+	});
+	
+	// Progress bar
+	window.addEventListener('scroll', () => {
+		const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+		const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+		const scrolled = (winScroll / height) * 100;
+		document.getElementById('progressBar').style.width = scrolled + '%';
+	});
+</script>
+</body>
+</html>

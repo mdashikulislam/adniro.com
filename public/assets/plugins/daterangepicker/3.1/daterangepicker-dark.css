@@ -1,0 +1,152 @@
+/* Darker Daterange Picker */
+
+[data-bs-theme="dark"] .daterangepicker td.off,
+[data-bs-theme="dark"] .daterangepicker td.off.in-range,
+[data-bs-theme="dark"] .daterangepicker td.off.start-date,
+[data-bs-theme="dark"] .daterangepicker td.off.end-date,
+
+[data-theme="dark"] .daterangepicker td.off,
+[data-theme="dark"] .daterangepicker td.off.in-range,
+[data-theme="dark"] .daterangepicker td.off.start-date,
+[data-theme="dark"] .daterangepicker td.off.end-date,
+
+html[theme="dark"] .daterangepicker td.off,
+html[theme="dark"] .daterangepicker td.off.in-range,
+html[theme="dark"] .daterangepicker td.off.start-date,
+html[theme="dark"] .daterangepicker td.off.end-date {
+	background-color: transparent;
+	color: rgba(200, 200, 200, 0.5);
+}
+
+[data-bs-theme="dark"] .daterangepicker,
+[data-theme="dark"] .daterangepicker,
+html[theme="dark"] .daterangepicker {
+	background-color: inherit;
+	color: #ebf4f0;
+}
+
+[data-bs-theme="dark"] .daterangepicker .calendar-table,
+[data-theme="dark"] .daterangepicker .calendar-table,
+html[theme="dark"] .daterangepicker .calendar-table {
+	background-color: transparent;
+}
+
+[data-bs-theme="dark"] .datepicker.dropdown-menu table,
+[data-theme="dark"] .datepicker.dropdown-menu table,
+html[theme="dark"] .datepicker.dropdown-menu table {
+	background-color: transparent;
+}
+
+[data-bs-theme="dark"] .daterangepicker td.active,
+[data-bs-theme="dark"] .daterangepicker td.active:hover,
+
+[data-theme="dark"] .daterangepicker td.active,
+[data-theme="dark"] .daterangepicker td.active:hover,
+
+html[theme="dark"] .daterangepicker td.active,
+html[theme="dark"] .daterangepicker td.active:hover {
+	background-color: transparent;
+	color: #ebf4f8;
+}
+
+[data-bs-theme="dark"] .daterangepicker td.in-range,
+[data-theme="dark"] .daterangepicker td.in-range,
+html[theme="dark"] .daterangepicker td.in-range {
+	background-color: rgba(37, 47, 57, 0.9);
+	color: #ebf4f8;
+}
+
+[data-bs-theme="dark"] .btn-success,
+[data-theme="dark"] .btn-success,
+html[theme="dark"] .btn-success {
+	color: #fff;
+	background-color: inherit;
+	border-color: rgba(5, 150, 1, 0.8);
+}
+
+[data-bs-theme="dark"] .btn-success.disabled,
+[data-bs-theme="dark"] .btn-success[disabled],
+[data-bs-theme="dark"] fieldset[disabled] .btn-success,
+[data-bs-theme="dark"] .btn-success.disabled:hover,
+[data-bs-theme="dark"] .btn-success[disabled]:hover,
+[data-bs-theme="dark"] fieldset[disabled] .btn-success:hover,
+[data-bs-theme="dark"] .btn-success.disabled:focus,
+[data-bs-theme="dark"] .btn-success[disabled]:focus,
+[data-bs-theme="dark"] fieldset[disabled] .btn-success:focus,
+[data-bs-theme="dark"] .btn-success.disabled.focus,
+[data-bs-theme="dark"] .btn-success[disabled].focus,
+[data-bs-theme="dark"] fieldset[disabled] .btn-success.focus,
+[data-bs-theme="dark"] .btn-success.disabled:active,
+[data-bs-theme="dark"] .btn-success[disabled]:active,
+[data-bs-theme="dark"] fieldset[disabled] .btn-success:active,
+[data-bs-theme="dark"] .btn-success.disabled.active,
+[data-bs-theme="dark"] .btn-success[disabled].active,
+[data-bs-theme="dark"] fieldset[disabled] .btn-success.active,
+
+[data-theme="dark"] .btn-success.disabled,
+[data-theme="dark"] .btn-success[disabled],
+[data-theme="dark"] fieldset[disabled] .btn-success,
+[data-theme="dark"] .btn-success.disabled:hover,
+[data-theme="dark"] .btn-success[disabled]:hover,
+[data-theme="dark"] fieldset[disabled] .btn-success:hover,
+[data-theme="dark"] .btn-success.disabled:focus,
+[data-theme="dark"] .btn-success[disabled]:focus,
+[data-theme="dark"] fieldset[disabled] .btn-success:focus,
+[data-theme="dark"] .btn-success.disabled.focus,
+[data-theme="dark"] .btn-success[disabled].focus,
+[data-theme="dark"] fieldset[disabled] .btn-success.focus,
+[data-theme="dark"] .btn-success.disabled:active,
+[data-theme="dark"] .btn-success[disabled]:active,
+[data-theme="dark"] fieldset[disabled] .btn-success:active,
+[data-theme="dark"] .btn-success.disabled.active,
+[data-theme="dark"] .btn-success[disabled].active,
+[data-theme="dark"] fieldset[disabled] .btn-success.active,
+
+html[theme="dark"] .btn-success.disabled,
+html[theme="dark"] .btn-success[disabled],
+html[theme="dark"] fieldset[disabled] .btn-success,
+html[theme="dark"] .btn-success.disabled:hover,
+html[theme="dark"] .btn-success[disabled]:hover,
+html[theme="dark"] fieldset[disabled] .btn-success:hover,
+html[theme="dark"] .btn-success.disabled:focus,
+html[theme="dark"] .btn-success[disabled]:focus,
+html[theme="dark"] fieldset[disabled] .btn-success:focus,
+html[theme="dark"] .btn-success.disabled.focus,
+html[theme="dark"] .btn-success[disabled].focus,
+html[theme="dark"] fieldset[disabled] .btn-success.focus,
+html[theme="dark"] .btn-success.disabled:active,
+html[theme="dark"] .btn-success[disabled]:active,
+html[theme="dark"] fieldset[disabled] .btn-success:active,
+html[theme="dark"] .btn-success.disabled.active,
+html[theme="dark"] .btn-success[disabled].active,
+html[theme="dark"] fieldset[disabled] .btn-success.active {
+	color: #fff;
+	background-color: inherit;
+	border-color: rgba(5, 150, 1, 0.1);
+}
+
+[data-bs-theme="dark"] .btn-default,
+[data-theme="dark"] .btn-default,
+html[theme="dark"] .btn-default {
+	color: #fff;
+	background-color: inherit;
+	border-color: rgba(255, 255, 255, 0.6);
+}
+
+[data-bs-theme="dark"] .daterangepicker select.monthselect,
+[data-theme="dark"] .daterangepicker select.monthselect,
+html[theme="dark"] .daterangepicker select.monthselect {
+	color: rgba(37, 47, 57, 0.9);
+}
+
+[data-bs-theme="dark"] .daterangepicker select.yearselect,
+[data-theme="dark"] .daterangepicker select.yearselect,
+html[theme="dark"] .daterangepicker select.yearselect {
+	color: rgba(37, 47, 57, 0.9);
+}
+
+[data-bs-theme="dark"] .daterangepicker .input-mini,
+[data-theme="dark"] .daterangepicker .input-mini,
+html[theme="dark"] .daterangepicker .input-mini {
+	color: #ebf4f8;
+}

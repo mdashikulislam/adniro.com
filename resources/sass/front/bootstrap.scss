@@ -1,0 +1,78 @@
+/*
+ * Bootstrap Customization
+ */
+
+// Customize theme colors
+$primary: #4682B4; // #0d6efd; #4682B4; #346699;
+$secondary: #6c757d;
+$success: #198754;
+$info: #186dde; // #0dcaf0; #186dde;
+$warning: #ffc107;
+$danger: #ef5350; // #dc3545; #ef5350
+$light: #f8f9fa;
+$dark: #212529;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #d63384;
+
+// Extend the theme-colors map
+$theme-colors: (
+		"primary": $primary,
+		"secondary": $secondary,
+		"success": $success,
+		"info": $info,
+		"warning": $warning,
+		"danger": $danger,
+		"light": $light,
+		"dark": $dark,
+		"indigo": $indigo,
+		"purple": $purple,
+		"pink": $pink
+);
+$custom-colors: (
+		"indigo": $indigo,
+		"purple": $purple,
+		"pink": $pink
+);
+$theme-colors: map-merge($custom-colors, $theme-colors);
+
+// The contrast ratio to reach against white, to determine if color changes from "light" to "dark".
+// Acceptable values for WCAG 2.2 are 3, 4.5 and 7.
+// See https://www.w3.org/TR/WCAG/#contrast-minimum
+// Default value: 4.5
+// Lower this value to force white text, or set it higher like 4.5 or 7 if you want to keep black text
+$min-contrast-ratio: 3;
+
+// Links
+$link-decoration: none;
+
+// Import Bootstrap SCSS
+@import "../../../public/assets/bootstrap/5.3.7/scss/bootstrap";
+
+// Create highlight button variant & its outline version
+$highlight: #f6d80f;
+
+.btn-highlight {
+	@include button-variant(
+			$background: $highlight,
+			$border: $highlight,
+			$color: $gray-900, // Text color - using black for better contrast on yellow
+			$hover-background: lighten($highlight, 20%),
+			$hover-border: $highlight,
+			$hover-color: $gray-900,
+			$active-background: lighten($highlight, 25%),
+			$active-border: $highlight,
+			$active-color: $gray-900
+	);
+}
+
+// Outline version of the highlight button
+.btn-outline-highlight {
+	@include button-outline-variant(
+			$color: $highlight,
+			$color-hover: $gray-900,
+			$active-background: $highlight,
+			$active-border: $highlight,
+			$active-color: $gray-900
+	);
+}

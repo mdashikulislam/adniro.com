@@ -1,0 +1,37 @@
+[data-bs-theme="dark"] {
+	--iti-border-color: #5b5b5b;
+	--iti-dialcode-color: #999999;
+	--iti-dropdown-bg: #0d1117;
+	--iti-arrow-color: #aaaaaa;
+	--iti-hover-color: #30363d;
+}
+
+/* intl-tel-input : Full-width input */
+.iti {
+	width: 100%;
+}
+
+/* intl-tel-input : Country search input */
+.iti__search-input {
+	padding: 10px 15px;
+}
+
+/* intl-tel-input : Bootstrap */
+.iti__selected-country-primary {
+	border-radius: 6px 0 0 6px;
+}
+
+/* intl-tel-input : Bootstrap input-group */
+.input-group .iti .form-control {
+	border-radius: 6px 0 0 6px;
+}
+.input-group .iti {
+	width: 75%;
+}
+.input-group .iti-group-text {
+	width: 25%;
+}
+.input-group .iti .form-control.is-invalid,
+.was-validated .input-group .iti .form-control:invalid {
+	z-index: 0;
+}

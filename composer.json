@@ -1,0 +1,177 @@
+{
+	"name": "laraclassifier/laraclassifier",
+	"type": "project",
+	"description": "Classified Ads Web Application.",
+	"keywords": [
+		"ads",
+		"classified",
+		"cms",
+		"laravel",
+		"php"
+	],
+	"license": "Envato",
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/mayeulak/EloquentDataTable"
+		},
+		{
+			"type": "vcs",
+			"url": "https://github.com/mayeulak/guzzle6-adapter"
+		}
+	],
+	"require": {
+		"php": "^8.2",
+		"ext-bcmath": "*",
+		"ext-curl": "*",
+		"ext-fileinfo": "*",
+		"ext-json": "*",
+		"ext-pdo": "*",
+		"aws/aws-sdk-php": "~3.0",
+		"chriskonnertz/open-graph": "~2",
+		"cocur/slugify": "^4.3",
+		"cviebrock/eloquent-sluggable": "^12.0",
+		"fakerphp/faker": "^1.23",
+		"geoip2/geoip2": "^3.0",
+		"giggsey/libphonenumber-for-php": "^8.13",
+		"guzzlehttp/guzzle": "^7.4",
+		"hashids/hashids": "^5.0.2",
+		"intervention/image": "^3.11",
+		"intervention/image-laravel": "^1.5",
+		"jaybizzle/crawler-detect": "^1.3",
+		"jaybizzle/laravel-crawler-detect": "^1.3",
+		"lab404/laravel-impersonate": "^1.7.7",
+		"laravel-notification-channels/twilio": "^4.1",
+		"laravel/framework": "^12.0",
+		"laravel/sanctum": "^4.0",
+		"laravel/socialite": "^5.18",
+		"laravel/tinker": "^2.10.1",
+		"laravel/vonage-notification-channel": "^3.3",
+		"league/flysystem-aws-s3-v3": "^3.29",
+		"league/flysystem-ftp": "^3.29",
+		"league/flysystem-sftp-v3": "^3.29",
+		"livecontrol/eloquent-datatable": "dev-master",
+		"mailersend/laravel-driver": "^2.8",
+		"mayeulak/breadcrumbs": "^1.0",
+		"mews/purifier": "^3.4",
+		"paypal/paypal-checkout-sdk": "^1.0",
+		"predis/predis": "^2.3",
+		"resend/resend-php": "^0.12.0",
+		"spatie/flysystem-dropbox": "^3.0",
+		"spatie/laravel-backup": "^9.2",
+		"spatie/laravel-cookie-consent": "^3.3",
+		"spatie/laravel-feed": "^4.4",
+		"spatie/laravel-html": "^3.11",
+		"spatie/laravel-permission": "^6.16",
+		"spatie/laravel-ray": "^1.40",
+		"spatie/laravel-translatable": "^6.11",
+		"symfony/brevo-mailer": "^7.2",
+		"symfony/http-client": "^7.2",
+		"symfony/mailgun-mailer": "^7.2",
+		"symfony/postmark-mailer": "^7.2",
+		"vemcogroup/laravel-sparkpost-driver": "^5.1",
+		"watson/sitemap": "^5.4"
+	},
+	"require-dev": {
+		"barryvdh/laravel-debugbar": "^3.15",
+		"knuckleswtf/scribe": "^5.1",
+		"laravel/pail": "^1.2.2",
+		"laravel/pint": "^1.21",
+		"laravel/sail": "^1.41",
+		"mockery/mockery": "^1.6",
+		"nunomaduro/collision": "^8.6",
+		"phpunit/phpunit": "^11.5.3",
+		"spatie/laravel-ignition": "^2.9"
+	},
+	"autoload": {
+		"files": [
+			"app/Helpers/Common/Functions/php.php",
+			"app/Helpers/Common/Functions/laravel.php",
+			"app/Helpers/Common/Functions/casting.php",
+			"app/Helpers/Common/Functions/image.php",
+			"app/Helpers/Common/Functions/phone.php",
+			"app/Helpers/Common/Functions/referrer.php",
+			"app/Helpers/Common/Functions/helpers.php",
+			"app/Helpers/Common/Functions/wordpress.php",
+			"app/Services/Auth/App/Helpers/Functions/core.php",
+			"app/Services/Auth/App/Helpers/Functions/settings.php",
+			"app/Helpers/Services/Functions/install.php",
+			"app/Helpers/Services/Functions/admin.php",
+			"app/Helpers/Services/Functions/api.php",
+			"app/Helpers/Services/Functions/core.php",
+			"app/Helpers/Services/Functions/plugin.php",
+			"packages/larapen/captcha/src/helpers.php",
+			"packages/larapen/recaptcha/src/app/Helpers/functions.php"
+		],
+		"psr-4": {
+			"App\\": "app/",
+			"Database\\Factories\\": "database/factories/",
+			"Database\\Seeders\\": "database/seeders/",
+			"extras\\": "extras/",
+			"Larapen\\LaravelMetaTags\\": "packages/larapen/laravel-meta-tags/src/",
+			"Larapen\\Honeypot\\": "packages/larapen/honeypot/src/",
+			"Larapen\\Captcha\\": "packages/larapen/captcha/src/",
+			"Larapen\\ReCaptcha\\": "packages/larapen/recaptcha/src/",
+			"Larapen\\Feed\\": "packages/spatie/laravel-feed/src/",
+			"Larapen\\Impersonate\\": "packages/lab404/laravel-impersonate/src/",
+			"Larapen\\LaravelDistance\\": "packages/larapen/laravel-distance/src/",
+			"Larapen\\TextToImage\\": "packages/larapen/texttoimage/src/",
+			"LarapenIlluminate\\": "packages/laravel/framework/src/Illuminate/"
+		},
+		"exclude-from-classmap": [
+			"extras/plugins/adyen/app/Helpers/adyen-php",
+			"extras/plugins/flutterwave/app/Helpers/flutterwave-php",
+			"extras/plugins/iyzico/app/Helpers/iyzipay-php",
+			"extras/plugins/paystack/app/Helpers/paystack-php",
+			"extras/plugins/payu/app/Helpers/openpayu_php",
+			"extras/plugins/razorpay/app/Helpers/razorpay-php",
+			"extras/plugins/stripe/app/Helpers/stripe-php",
+			"extras/plugins/twocheckout/app/Helpers/2checkout-php"
+		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+			"@php artisan package:discover --ansi"
+		],
+		"post-update-cmd": [
+			"@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+		],
+		"post-root-package-install": [
+			"@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+		],
+		"post-create-project-cmd": [
+			"@php artisan key:generate --ansi",
+			"@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+			"@php artisan migrate --graceful --ansi"
+		],
+		"dev": [
+			"Composer\\Config::disableProcessTimeout",
+			"npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
+		]
+	},
+	"extra": {
+		"laravel": {
+			"dont-discover": [
+				"lab404/laravel-impersonate",
+				"spatie/laravel-feed"
+			]
+		}
+	},
+	"config": {
+		"optimize-autoloader": true,
+		"preferred-install": "dist",
+		"sort-packages": true,
+		"allow-plugins": {
+			"pestphp/pest-plugin": true,
+			"php-http/discovery": true
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true
+}

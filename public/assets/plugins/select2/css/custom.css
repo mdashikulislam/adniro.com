@@ -1,0 +1,76 @@
+/* Fix the z-index value for the mobile sidebar version */
+@media (max-width: 767px) {
+	.select2-dropdown {
+		z-index: 1960;
+	}
+}
+
+.select2-container {
+	/*min-width: 200px !important;*/
+	padding: 0;
+}
+
+.select2-container--default .select2-selection--single {
+	position: relative;
+	height: 40px;
+	padding: 6px;
+}
+
+/* Select arrow (Icon) */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	position: absolute;
+	height: 35px;
+}
+
+/* Opened */
+.select2-container--default .select2-selection--single, .select2-dropdown {
+	background-color: #fff;
+	border: 1px solid #ddd;
+}
+
+.select2-container--default .select2-selection--single {
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	color: #555;
+}
+
+.select2-dropdown {
+	box-shadow: 0 4px 3px #ededed;
+	padding: 8px;
+}
+
+.select2-results__option {
+	padding: 8px 10px;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+	background-color: #fafafa;
+	color: #555;
+}
+
+.search-row .select2-container--default .select2-selection--single {
+	font-size: 16px;
+}
+.serp-search-bar .select2-container--default .select2-selection--single {
+	height: 45px;
+	padding: 8px;
+}
+.serp-search-bar .select2-container--default .select2-selection--single .select2-selection__arrow {
+	height: 40px;
+}
+.serp-search-bar .select2-container--default .select2-selection--single {
+	font-size: 16px;
+}
+
+.select2-container--default.is-invalid .select2-selection--multiple.is-invalid {
+	border-color: #dc3545;
+}
+
+.select2-container--default.is-invalid.select2-container--focus {
+	border-color: #dc3545;
+	box-shadow: 0 1px 0 #dc3545, 0 -1px 0 #dc3545, -1px 0 0 #dc3545, 1px 0 0 #dc3545;
+}
+
+.is-invalid .select2-selection {
+	border-color: #dc3545 !important;
+}

@@ -1,0 +1,209 @@
+name: Verification
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: 'api/auth/verify/{entityMetadataKey}/{entityId}/resend/email'
+    metadata:
+      groupName: Verification
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Email: Re-send link'
+      description: 'Re-send email verification link to the user'
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      entityMetadataKey:
+        name: entityMetadataKey
+        description: "The slug of the entity to verify ('users' or 'posts')."
+        required: true
+        example: users
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      entityId:
+        name: entityId
+        description: 'The entity/model identifier (ID).'
+        required: true
+        example: 3
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      entityMetadataKey: users
+      entityId: 3
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":false,"message":"Your Email address is already verified.","result":{"id":3,"name":"User Demo","username":"demouser","two_factor_enabled":false,"two_factor_method":"email","updated_at":"2025-09-08T09:29:18.000000Z","original_updated_at":"2025-09-08 09:29:18","original_last_activity":null,"created_at_formatted":"Mar 12th, 2025 at 21:40","photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/3\/thumbnails\/800x800-651c4b74b2627fd5476097c28e5cebf7.jpg","p_is_online":false,"country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/rectangle\/16\/us.png"},"extra":{"isUnverifiedField":false,"fieldVerificationSent":false,"resendUrl":"https:\/\/demo.laraclassifier.local\/auth\/verify\/users\/3\/resend\/email","field":"email","fieldValue":"user@domain.tld","fieldHiddenValue":"us**********tld","resendLocked":false}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/auth/verify/{entityMetadataKey}/{entityId}/resend/sms'
+    metadata:
+      groupName: Verification
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'SMS: Re-send code'
+      description: 'Re-send mobile phone verification token by SMS'
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      entityMetadataKey:
+        name: entityMetadataKey
+        description: "The slug of the entity to verify ('users' or 'posts')."
+        required: true
+        example: users
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      entityId:
+        name: entityId
+        description: 'The entity/model identifier (ID).'
+        required: true
+        example: 3
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      entityMetadataKey: users
+      entityId: 3
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":false,"message":"Your Phone Number is already verified.","result":{"id":3,"name":"User Demo","username":"demouser","two_factor_enabled":false,"two_factor_method":"email","updated_at":"2025-09-08T09:29:18.000000Z","original_updated_at":"2025-09-08 09:29:18","original_last_activity":null,"created_at_formatted":"Mar 12th, 2025 at 21:40","photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/3\/thumbnails\/800x800-651c4b74b2627fd5476097c28e5cebf7.jpg","p_is_online":false,"country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/rectangle\/16\/us.png"},"extra":{"isUnverifiedField":false,"fieldVerificationSent":false,"resendUrl":"https:\/\/demo.laraclassifier.local\/api\/auth\/verify\/users\/3\/resend\/sms","field":"phone","fieldValue":"+11098598087","fieldHiddenValue":"+1*******087","resendLocked":false}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/auth/verify/{entityMetadataKey}/{field}/{token?}'
+    metadata:
+      groupName: Verification
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: Verification
+      description: "Verify the user's email address or mobile phone number"
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      entityMetadataKey:
+        name: entityMetadataKey
+        description: "The slug of the entity to verify ('users' or 'posts')."
+        required: true
+        example: users
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      field:
+        name: field
+        description: 'The field to verify.'
+        required: true
+        example: email
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      token:
+        name: token
+        description: 'The verification token.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      entityMetadataKey: users
+      field: email
+      token: null
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 400
+        content: '{"success":false,"message":"The verification token or code is missing.","result":null}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

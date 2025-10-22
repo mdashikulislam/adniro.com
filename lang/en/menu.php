@@ -1,0 +1,72 @@
+<?php
+
+return [
+	
+	'menu'  => 'Menu',
+	'menus' => 'Menus',
+	
+	'location'    => 'Location',
+	'name'        => 'Name',
+	'description' => 'Description',
+	
+	'menu_item'         => 'Menu Item',
+	'menu_items'        => 'Menu Items',
+	'menu_items_of'     => 'Items of :menu',
+	'sub_menu_item'     => 'Sub-Menu Item',
+	'sub_menu_items'    => 'Sub-Menu Items',
+	'sub_menu_items_of' => 'Sub-items of :menuItem',
+	
+	'parent'                       => 'Parent Menu Item',
+	'type'                         => 'Menu Item Type',
+	'icon'                         => 'Icon',
+	'label'                        => 'Display Label',
+	'label_hint'                   => 'Note: The <code>{user.name}</code> placeholder can be used to retrieve the logged-in users name.',
+	'url_type'                     => 'URL Type',
+	'route_name'                   => 'Route Name',
+	'route_parameters'             => 'Route Parameters',
+	'route_parameters_name'        => 'Parameter Name',
+	'route_parameters_value'       => 'Parameter Value',
+	'route_parameters_index_name'  => 'Route Parameter #:index Name',
+	'route_parameters_index_value' => 'Route Parameter #:index Value',
+	'url'                          => 'URL',
+	'target'                       => 'Link Target',
+	'btn_class'                    => 'Button CSS Class',
+	'btn_class_hint'               => 'Use Bootstrap CSS classes for the button color.',
+	'btn_outline'                  => 'Use Outline Button',
+	'conditions'                   => 'Conditions',
+	'conditions_type'              => 'Condition Type',
+	'conditions_value'             => 'Condition Value',
+	'conditions_index_type'        => 'Condition #:index Type',
+	'conditions_index_value'       => 'Condition #:index Value',
+	'html_attributes'              => 'HTML Attributes',
+	'html_attributes_name'         => 'Attribute Name',
+	'html_attributes_value'        => 'Attribute Value',
+	'html_attributes_index_name'   => 'HTML Attribute #:index Name',
+	'html_attributes_index_value'  => 'HTML Attribute #:index Value',
+	'css_class'                    => 'CSS Classes',
+	'roles'                        => 'Roles',
+	'roles_name'                   => 'Role',
+	'roles_index_name'             => 'Role #:index',
+	'permissions'                  => 'Permissions',
+	'permissions_name'             => 'Permission',
+	'permissions_index_name'       => 'Permission #:index',
+	'active'                       => 'Active',
+	'active_status'                => 'Active Status',
+	
+	'nofollow'      => 'Nofollow Link',
+	'nofollow_hint' => 'Add a <code>rel="nofollow"</code> attribute to the link tag. More information <a href="https://en.wikipedia.org/wiki/Nofollow" target="_blank">here</a>.',
+	
+	'for_auth_users'      => 'For authenticated users',
+	'for_guest_users'     => 'For guest users',
+	'for_impersonating'   => 'For impersonating',
+	'for_authentic_users' => 'For authentic users',
+	
+	'visible' => 'Visible',
+	'public'  => 'Public',
+	
+	'reset_all_menus'                  => 'Reset all menus',
+	'reset_all_menu_items'             => 'Reset all the :menu items',
+	'menus_restored_successfully'      => 'Menus restored successfully',
+	'menu_items_restored_successfully' => 'Menu items restored successfully',
+
+];

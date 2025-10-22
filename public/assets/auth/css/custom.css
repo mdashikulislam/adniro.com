@@ -1,0 +1,61 @@
+/* CUSTOM CSS */
+
+a {
+	text-decoration: none;
+}
+
+/* required & sup (#ff0000) */
+.form-group.required > sup,
+.form-label > sup,
+.col-form-label > sup,
+.form-check-label > sup,
+label > sup {
+	color: #ff0000;
+}
+
+/* is-invalid (#dc3545 | #f85359) */
+.form-group .col-form-label.is-invalid {
+	color: #dc3545;
+}
+
+.form-group .control-label.is-invalid {
+	color: #dc3545;
+}
+
+div:not(.input-group) > .form-control.is-invalid,
+.select2-container--default.is-invalid .select2-selection--multiple.is-invalid {
+	border-color: #dc3545;
+}
+
+div:not(.input-group) > .form-control.is-invalid:focus,
+.select2-container--default.is-invalid.select2-container--focus {
+	border-color: #dc3545;
+	box-shadow: 0 1px 0 #dc3545, 0 -1px 0 #dc3545, -1px 0 0 #dc3545, 1px 0 0 #dc3545;
+}
+
+.input-group.is-invalid {
+	border: 1px solid #dc3545;
+	border-radius: 6px;
+}
+
+.input-group.is-invalid:focus-within {
+	box-shadow: 0 1px 0 #dc3545, 0 -1px 0 #dc3545, -1px 0 0 #dc3545, 1px 0 0 #dc3545;
+}
+
+.is-invalid .select2-selection {
+	border-color: #dc3545 !important;
+}
+
+label.is-invalid,
+.form-label.is-invalid {
+	color: #dc3545 !important;
+}
+
+.form-text.is-invalid {
+	color: #dc3545 !important;
+}
+
+.is-invalid .g-recaptcha iframe,
+.has-error .g-recaptcha iframe {
+	border: 1px solid #f85359 !important;
+}

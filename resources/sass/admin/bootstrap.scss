@@ -1,0 +1,97 @@
+/*
+ * Bootstrap Customization for the Admin Panel
+ */
+
+// Customize theme colors
+$primary: #7460ee; // #0d6efd; #7460ee;
+$secondary: #6c757d;
+$success: #0acc95; // #198754; #0acc95;
+$info: #186dde; // #0dcaf0; #186dde;
+$warning: #ffc107;
+$danger: #ef5350; // #dc3545; #ef5350;
+$light: #f8f9fa;
+$dark: #212529;
+$orange: #fb8c00;
+
+// Extend the theme-colors map
+$theme-colors: (
+		"primary": $primary,
+		"secondary": $secondary,
+		"success": $success,
+		"info": $info,
+		"warning": $warning,
+		"danger": $danger,
+		"light": $light,
+		"dark": $dark
+);
+$custom-colors: (
+		"orange": $orange
+);
+$theme-colors: map-merge($custom-colors, $theme-colors);
+
+// Links
+$link-decoration: none;
+
+// Override default heading sizes
+$h1-font-size: 2.25rem; // 2.5rem,
+$h2-font-size: 1.5rem; // 2rem,
+$h3-font-size: 1.3125rem; // 1.75rem,
+$h4-font-size: 1.125rem; // 1.5rem,
+$h5-font-size: 1rem; // 1.25rem,
+$h6-font-size: .875rem; // 1rem
+
+// Define xs button variables
+$btn-padding-y-xs: 0.25rem;
+$btn-padding-x-xs: 0.5rem;
+$btn-font-size-xs: 0.6rem;
+$btn-border-radius-xs: 0.2rem;
+
+// Import Bootstrap SCSS
+@import "../../../public/assets/bootstrap/5.3.7/scss/bootstrap";
+
+// Create highlight button variant & its outline version
+$highlight: #f6d80f;
+
+.btn-highlight {
+	@include button-variant(
+			$background: $highlight,
+			$border: $highlight,
+			$color: $gray-900, // Text color - using black for better contrast on yellow
+			$hover-background: lighten($highlight, 20%),
+			$hover-border: $highlight,
+			$hover-color: $gray-900,
+			$active-background: lighten($highlight, 25%),
+			$active-border: $highlight,
+			$active-color: $gray-900
+	);
+}
+
+// Outline version of the highlight button
+.btn-outline-highlight {
+	@include button-outline-variant(
+			$color: $highlight,
+			$color-hover: $gray-900,
+			$active-background: $highlight,
+			$active-border: $highlight,
+			$active-color: $gray-900
+	);
+}
+
+// Add .btn-xs to Bootstrap button styles
+// Custom btn-xs class using Bootstrap mixin
+.btn-xs {
+	@include button-size(
+					$btn-padding-y-xs,
+					$btn-padding-x-xs,
+					$btn-font-size-xs,
+					$btn-border-radius-xs
+	);
+}
+
+// Force white text on success & danger buttons
+.btn-success, .btn-danger {
+	--bs-btn-color: #fff;
+	--bs-btn-hover-color: #fff;
+	--bs-btn-active-color: #fff;
+	--bs-btn-disabled-color: #fff;
+}

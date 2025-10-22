@@ -1,0 +1,20 @@
+/*
+ * Animations
+ */
+@keyframes slide-in-down {
+	0% {
+		transform: translateY(-100%);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+@keyframes zoom-bg-image {
+	0% {
+		background-size: 100%;
+	}
+	100% {
+		background-size: 120%;
+	}
+}

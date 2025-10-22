@@ -1,0 +1,440 @@
+/*
+ * =======================================================
+ * TABLE OF CONTENTS
+ * =======================================================
+ * 1. Root
+ * 2. Typography
+ * 3. Web Page Progress Bar
+ * 4. Navbar: Logo & Flag Icon
+ * 5. Hero & Parallax Effect
+ * 6. Price Tag
+ * 7. Customize Default Values
+ * 8. Utilities
+ * 9. Pagination Bar
+ * 10. Reset Content from WYSIWYG
+ * =======================================================
+ */
+
+/* ======================================================= */
+/* Root
+/* ======================================================= */
+html {
+	font-family: sans-serif;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	-ms-overflow-style: scrollbar;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+body {
+	margin: 0;
+	font-family: "Roboto", sans-serif;
+	font-size: .9rem;
+	font-weight: normal;
+	height: 100%;
+}
+
+header .navbar {
+	min-height: 65px;
+	z-index: 1030; /* inspired by: .fixed-top */
+}
+
+main {
+	/* https://getbootstrap.com/docs/5.3/components/navbar/#placement */
+	/* padding-top: 65px; */
+}
+
+/* ======================================================= */
+/* Typography
+/* ======================================================= */
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Roboto Condensed", sans-serif;
+	font-optical-sizing: auto;
+}
+
+.ff-roboto {
+	font-family: "Roboto", sans-serif;
+}
+
+.ff-roboto-condensed {
+	font-family: "Roboto Condensed", sans-serif;
+}
+
+.ff-inter {
+	font-family: "Inter", sans-serif;
+}
+
+.ff-lexend {
+	font-family: "Lexend", sans-serif;
+}
+
+.ff-manrope {
+	font-family: "Manrope", sans-serif;
+}
+
+.ff-montserrat {
+	font-family: "Montserrat", sans-serif;
+}
+
+.ff-open-sans {
+	font-family: "Open Sans", sans-serif;
+}
+
+.ff-quicksand {
+	font-family: "Quicksand", sans-serif;
+}
+
+.ff-raleway {
+	font-family: "Raleway", sans-serif;
+}
+
+.card-header h1, .card-header h2, .card-header h3, .card-header h4, .card-header h5, .card-header h6,
+.modal-header h1, .modal-header h2, .modal-header h3, .modal-header h4, .modal-header h5, .modal-header h6,
+footer h1, footer h2, footer h3, footer h4, footer h5, footer h6 {
+	font-family: "Roboto Condensed", sans-serif;
+}
+
+.text-shadow {
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, .1);
+}
+
+a {
+	text-decoration: none;
+}
+
+hr {
+	height: 1px;
+	background-color: var(--bs-border-color);
+	opacity: .5;
+	border: none;
+}
+
+/* ======================================================= */
+/* Navbar: Logo & Flag Icon
+/* ======================================================= */
+html[data-bs-theme="dark"] .navbar .logo img.light-logo,
+header[data-bs-theme="dark"] .navbar .logo img.light-logo {
+	display: block;
+}
+
+html[data-bs-theme="dark"] .navbar .logo img.dark-logo,
+header[data-bs-theme="dark"] .navbar .logo img.dark-logo {
+	display: none;
+}
+
+html:not([data-bs-theme="dark"]) .navbar .logo img.light-logo,
+header:not([data-bs-theme="dark"]) .navbar .logo img.light-logo {
+	display: none;
+}
+
+html:not([data-bs-theme="dark"]) .navbar .logo img.dark-logo,
+header:not([data-bs-theme="dark"]) .navbar .logo img.dark-logo {
+	display: block;
+}
+
+.logo, .logo-title {
+	font-family: "Open Sans Condensed", Helvetica, Arial, sans-serif;
+}
+
+.flag-menu .flag-icon {
+	width: 24px;
+	height: auto;
+}
+
+/* ======================================================= */
+/* Hero & Parallax Effect
+/* ======================================================= */
+.hero-wrap {
+	min-height: 450px;
+	height: 450px;
+}
+
+/* Create the parallax scrolling effect */
+.parallax {
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+/* ======================================================= */
+/* Animations
+/* ======================================================= */
+/* Navbar smooth apparition */
+.navbar-sticky {
+	transform: translateY(-100%);
+	opacity: 0;
+	transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.navbar-stuck {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+/* Favourite & Premium Badge Animation */
+.item-list .make-favorite span {
+	width: 0;
+	font-size: 0;
+	-webkit-transition: all 0.25s ease;
+	-moz-transition: all 0.25s ease;
+	-o-transition: all 0.25s ease;
+	transition: all 0.25s ease;
+}
+
+.item-list:hover .make-favorite span {
+	width: auto;
+	font-size: var(--bs-btn-font-size);
+}
+
+/* ======================================================= */
+/* Price Tag
+/* ======================================================= */
+.p-price-tag {
+	background: rgba(var(--bs-primary-rgb), .75);
+	border-radius: 3px 0 0 3px;
+	color: #fff;
+	font-size: 20px;
+	min-width: 100px;
+	padding: 5px 15px;
+	position: absolute;
+	right: -10px;
+	text-align: center;
+	font-weight: bold;
+	top: 10%;
+	z-index: 90;
+}
+
+.p-price-tag:before {
+	content: '';
+	position: absolute;
+	height: 0;
+	width: 0;
+	top: 100%;
+	right: 0;
+	border-top: 10px solid var(--bs-primary);
+	border-right: 10px solid transparent;
+}
+
+@media (max-width: 479px) {
+	.p-price-tag {
+		font-size: 18px;
+		line-height: 28px;
+		min-width: 90px;
+		top: 10%;
+	}
+}
+
+h1.p-price-tag span {
+	float: right;
+}
+
+/* ======================================================= */
+/* Customize Default Values
+/* ======================================================= */
+label {
+	font-weight: 500;
+}
+
+/* https://getbootstrap.com/docs/5.3/components/buttons/#sizes */
+.btn-xs {
+	--bs-btn-padding-y: .25rem;
+	--bs-btn-padding-x: .5rem;
+	--bs-btn-font-size: .75rem;
+}
+
+/* ======================================================= */
+/* Utilities
+/* ======================================================= */
+.hover-bg-tertiary:hover {
+	background-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-bg-opacity)) !important;
+}
+
+.hover-shadow:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ======================================================= */
+/* Carousel
+/* ======================================================= */
+.featured-list-slider .item {
+	width: 236px; /* 236 */
+	height: 340px; /* 340|356 */
+}
+
+/* ======================================================= */
+/* Reset Content from WYSIWYG
+/* ======================================================= */
+.from-wysiwyg table {
+	width: 100%;
+	border: 1px solid #d4d4d4;
+}
+
+.from-wysiwyg th, .from-wysiwyg td {
+	padding: 5px;
+	border-right: 1px solid #d4d4d4;
+}
+
+.from-wysiwyg th {
+	background-color: #f5f5f5;
+}
+
+.from-wysiwyg tr {
+	border-bottom: 1px solid #d4d4d4;
+}
+
+/* ======================================================= */
+/* Fix for Google Adsense Responsive Ads
+/* ======================================================= */
+.ads-parent-responsive {
+	width: 100%;
+	display: inline-block;
+}
+
+.ads-slot-responsive {
+	width: 728px;
+	height: 90px;
+}
+
+@media (min-width: 240px) {
+	.ads-slot-responsive {
+		width: 100%;
+		height: 90px;
+	}
+}
+
+@media (min-width: 320px) {
+	.ads-slot-responsive {
+		width: 100%;
+		height: 90px;
+	}
+}
+
+@media (max-width: 766px) {
+	.ads-slot-responsive {
+		width: 100%;
+		height: 90px;
+	}
+}
+
+@media (min-width: 767px) {
+	.ads-slot-responsive {
+		width: 100%;
+		height: 90px;
+	}
+}
+
+.container.ads-parent-responsive {
+	padding-right: 0;
+	padding-left: 0;
+}
+
+/* ======================================================= */
+/* Cookie Consent
+/* ======================================================= */
+.cookie-consent {
+	font-size: 14px;
+	padding: 16px;
+	background: rgba(var(--bs-tertiary-bg-rgb), var(--bs-bg-opacity));
+	text-align: center;
+	position: fixed;
+	width: 100%;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	z-index: 1000;
+}
+
+.cookie-consent__message {
+	display: inline-block;
+	color: var(--bs-dark-text-emphasis);
+}
+
+.cookie-consent__message p {
+	margin: 0;
+}
+
+.cookie-consent-btn {
+	font-weight: bold;
+	margin: 0 5px;
+	padding: 8px 16px;
+	color: #fff2e0;
+	background-color: var(--bs-secondary);
+	border: 0;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(var(--bs-secondary-rgb), 0.15);
+}
+
+.cookie-consent__agree {
+	background-color: var(--bs-primary);
+	box-shadow: 0 2px 5px rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.cookie-consent__agree:hover {
+	background-color: rgba(var(--bs-primary-rgb), .75);
+}
+
+.cookie-consent__disagree {
+	background-color: var(--bs-danger);
+	box-shadow: 0 2px 5px rgba(var(--bs-danger-rgb), 0.15);
+}
+
+.cookie-consent__disagree:hover {
+	background-color: rgba(var(--bs-danger-rgb), .75);
+}
+
+.cookie-consent__agree:active, .cookie-consent__disagree:active {
+	top: 1px;
+}
+
+/* ======================================================= */
+/* Fix for Facebook Comments
+/* ======================================================= */
+.fb-comments, .fb-comments iframe[style],
+.fb-like-box, .fb-like-box iframe[style] {
+	width: 100% !important;
+}
+
+.fb-comments span, .fb-comments iframe span[style],
+.fb-like-box span, .fb-like-box iframe span[style] {
+	width: 100% !important;
+}
+
+/* ======================================================= */
+/* intl-tel-input
+/* ======================================================= */
+.iti {
+	width: 100%;
+}
+
+.input-group .iti .form-control {
+	border-radius: 6px 0 0 6px;
+}
+
+.input-group .iti {
+	width: 75%;
+}
+
+.input-group .iti-group-text {
+	width: 25%;
+}
+
+.input-group .iti .form-control.is-invalid,
+.was-validated .input-group .iti .form-control:invalid {
+	z-index: 0;
+}
+
+/* ======================================================= */
+/* Swal Alert
+/* ======================================================= */
+.swal2-container {
+	z-index: 20000 !important;
+}
+
+/* ======================================================= */
+/* Temporary CSS
+/* ======================================================= */
+/* fileinput JS error in <ul> */
+#uploadError.alert-danger ul {
+	margin-bottom: 0;
+}
