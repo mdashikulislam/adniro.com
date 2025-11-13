@@ -58,7 +58,6 @@ class StyleSetting extends BaseSetting
 		$defaultValue = [
 			'skin'       => 'default',
 			'page_width' => '1200',
-			
 			'admin_logo_bg'          => 'skin3',
 			'admin_navbar_bg'        => 'skin6',
 			'admin_sidebar_type'     => 'full',
@@ -424,16 +423,6 @@ class StyleSetting extends BaseSetting
 			'label'   => trans('admin.admin_header_position_label'),
 			'type'    => 'checkbox_switch',
 			'hint'    => trans('admin.admin_header_position_hint'),
-			'wrapper' => [
-				'class' => 'col-md-6',
-			],
-			'tab'     => $tabName,
-		];
-		$fields[] = [
-			'name'    => 'admin_boxed_layout',
-			'label'   => trans('admin.admin_boxed_layout_label'),
-			'type'    => 'checkbox_switch',
-			'hint'    => trans('admin.admin_boxed_layout_hint'),
 			'wrapper' => [
 				'class' => 'col-md-6',
 			],

@@ -5,7 +5,7 @@
 <form role="form" novalidate>
 	
     {{-- Show the inputs --}}
-	<div class="container px-0 mb-0">
+	<div class="container-fluid px-0 mb-0">
 		<div class="row">
 			{{-- See if we're using tabs --}}
 			@if ($xPanel->tabsEnabled() && count($xPanel->getTabs()) > 0)

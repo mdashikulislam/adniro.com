@@ -41,7 +41,7 @@
 @section('content')
     <div class="flex-row d-flex justify-content-center">
         @php
-            $colMd = config('settings.style.admin_boxed_layout') == '1' ? ' col-md-12' : ' col-md-10';
+            $colMd = ' col-md-12';
         @endphp
         <div class="col-sm-12{{ $colMd }}">
             @if ($xPanel->hasAccess('list'))
