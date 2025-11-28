@@ -1,37 +1,78 @@
-User-agent: *
+# -----------------------------------------
+# Content Permission Signals (Cloudflare Managed)
+# -----------------------------------------
+User-Agent: *
+Content-Signal: search=yes,ai-train=no
+
+# -----------------------------------------
+# SEO / General Crawler Rules
+# -----------------------------------------
 Allow: /
 
-User-agent: *
+# Block Sensitive / Internal Paths
 Disallow: /admin/
-Disallow: /assets/
-Disallow: /css/
-Disallow: /js/
+Disallow: /auth/connect/
 Disallow: /vendor/
+Disallow: /mix-manifest.json
 Disallow: /main.php
 Disallow: /index.php
-Disallow: /mix-manifest.json
+
+# Prevent Duplicate Multilingual URL Variations
+Disallow: /locale/
+
+# Prevent Duplicate Pages via Query Parameters
 Disallow: /*?display=*
-Disallow: /locale/en
-Disallow: /locale/fr
-Disallow: /locale/es
-Disallow: /locale/ar
-Disallow: /locale/pt
-Disallow: /locale/de
-Disallow: /locale/it
-Disallow: /locale/tr
-Disallow: /locale/ru
-Disallow: /locale/hi
-Disallow: /locale/bn
-Disallow: /locale/zh
-Disallow: /locale/ja
-Disallow: /locale/he
-Disallow: /locale/th
-Disallow: /locale/ro
-Disallow: /locale/ka
-Disallow: /auth/connect/facebook
-Disallow: /auth/connect/linkedin
-Disallow: /auth/connect/twitter
-Disallow: /auth/connect/google
 
+# Allow All Assets for Rendering (IMPORTANT for SEO)
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+Allow: /images/
+Allow: /uploads/
 
-Sitemap: https://127.0.0.1:8000/us/sitemaps.xml
+# -----------------------------------------
+# Block AI Model Training Bots (No SEO Impact)
+# -----------------------------------------
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# -----------------------------------------
+# XML Sitemaps (Multi-Country SEO Indexing)
+# -----------------------------------------
+Sitemap: https://www.adniro.com/au/sitemaps.xml
+Sitemap: https://www.adniro.com/bd/sitemaps.xml
+Sitemap: https://www.adniro.com/ca/sitemaps.xml
+Sitemap: https://www.adniro.com/eg/sitemaps.xml
+Sitemap: https://www.adniro.com/fr/sitemaps.xml
+Sitemap: https://www.adniro.com/de/sitemaps.xml
+Sitemap: https://www.adniro.com/in/sitemaps.xml
+Sitemap: https://www.adniro.com/it/sitemaps.xml
+Sitemap: https://www.adniro.com/ng/sitemaps.xml
+Sitemap: https://www.adniro.com/pk/sitemaps.xml
+Sitemap: https://www.adniro.com/ru/sitemaps.xml
+Sitemap: https://www.adniro.com/sa/sitemaps.xml
+Sitemap: https://www.adniro.com/es/sitemaps.xml
+Sitemap: https://www.adniro.com/ae/sitemaps.xml
+Sitemap: https://www.adniro.com/gb/sitemaps.xml
+Sitemap: https://www.adniro.com/us/sitemaps.xml
