@@ -1,42 +1,26 @@
-# -----------------------------------------
-# Content Permission Signals (Cloudflare Managed)
-# -----------------------------------------
 User-Agent: *
 Content-Signal: search=yes,ai-train=no
-
-# -----------------------------------------
-# SEO / General Crawler Rules
-# -----------------------------------------
 Allow: /
 
-# Block Sensitive / Internal Paths
+User-agent: *
+Allow: /
+
 Disallow: /admin/
 Disallow: /auth/connect/
 Disallow: /vendor/
-Disallow: /mix-manifest.json
+Disallow: /mix-manifest.json/
 Disallow: /main.php
 Disallow: /index.php
-
-# Prevent Duplicate Multilingual URL Variations
 Disallow: /locale/
-
-# Prevent Duplicate Pages via Query Parameters
 Disallow: /*?display=*
 
-# Allow All Assets for Rendering (IMPORTANT for SEO)
 Allow: /css/
 Allow: /js/
 Allow: /assets/
 Allow: /images/
 Allow: /uploads/
 
-# -----------------------------------------
-# Block AI Model Training Bots (No SEO Impact)
-# -----------------------------------------
 User-agent: GPTBot
-Disallow: /
-
-User-agent: ClaudeBot
 Disallow: /
 
 User-agent: Google-Extended
@@ -48,6 +32,9 @@ Disallow: /
 User-agent: Applebot-Extended
 Disallow: /
 
+User-agent: ClaudeBot
+Disallow: /
+
 User-agent: Bytespider
 Disallow: /
 
@@ -57,9 +44,6 @@ Disallow: /
 User-agent: meta-externalagent
 Disallow: /
 
-# -----------------------------------------
-# XML Sitemaps (Multi-Country SEO Indexing)
-# -----------------------------------------
 Sitemap: https://www.adniro.com/au/sitemaps.xml
 Sitemap: https://www.adniro.com/bd/sitemaps.xml
 Sitemap: https://www.adniro.com/ca/sitemaps.xml
