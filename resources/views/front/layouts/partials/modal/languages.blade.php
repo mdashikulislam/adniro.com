@@ -55,7 +55,7 @@
 								$checkBox .= '&nbsp;';
 								
 								// Get the language flag
-								$langFlag = '<img src="' . getCountryFlagUrl($langFlagCountry) . '">&nbsp;';
+								$langFlag = '<img alt="'.$langName.'" src="' . getCountryFlagUrl($langFlagCountry) . '">&nbsp;';
 								$langFlag .= '&nbsp;';
 								
 								// Get the language prefix

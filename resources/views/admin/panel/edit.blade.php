@@ -4,18 +4,18 @@
     use App\Http\Controllers\Web\Admin\Panel\Library\Panel;
 	use App\Models\Page;
 	use Illuminate\Database\Eloquent\Model;
-	
+
     /** @var Panel $xPanel */
     $xPanel ??= null;
-	
+
 	/** @var Model $entry */
 	$entry ??= null;
-	
+
 	/** @var Page $model (for example) */
 	$model = $xPanel->model;
-	
+
     $editUri = $xPanel->getUrl($entry->getKey() . '/edit');
-    
+
     $modelTable = $xPanel->getModel()->getTable();
     $settingsTables = ['settings', 'sections', 'domain_settings', 'domain_sections'];
     $isSettingsModel = in_array($modelTable, $settingsTables);
@@ -29,7 +29,6 @@
                 <small>{{ trans('admin.edit') }} {!! $xPanel->entityName !!}</small>
             </h2>
         </div>
-        
         <div class="col-md-7 col-12 align-self-center d-none d-md-flex justify-content-end">
             <ol class="breadcrumb mb-0 p-0 bg-transparent">
                 <li class="breadcrumb-item">
@@ -53,7 +52,7 @@
 @section('content')
     <div class="flex-row d-flex justify-content-center">
         @php
-            $colMd = config('settings.style.admin_boxed_layout') == '1' ? ' col-md-12' : ' col-md-9';
+            $colMd = ' col-md-12';
 			$settingsClass = $isSettingsModel ? ' settings-edition' : '';
         @endphp
         <div class="col-sm-12{{ $colMd }}">
@@ -96,10 +95,10 @@
                     @endif
                 </div>
             </div>
-            
+
             {{-- Show the errors, if any --}}
             @include('admin.panel.inc.grouped_errors')
-            
+
             @php
                 $updateUrl = $xPanel->getUrl($entry->getKey());
             @endphp
@@ -109,7 +108,7 @@
                 {{ html()->form('PUT', $updateUrl)->attribute('novalidate', true)->open() }}
             @endif
             <div class="card rounded-0 border-0 border-top border-primary{{ $settingsClass }}">
-                
+
                 @if ($isNotSettingsModel)
                     <div class="card-header border-bottom-0">
                         <h3 class="mb-0">{{ trans('admin.edit') }}</h3>
@@ -137,7 +136,7 @@
                 <div class="card-footer px-0 border-top">
                     @include('admin.panel.inc.form_save_buttons')
                 </div>
-            
+
             </div>
             {{ html()->form()->close() }}
         </div>

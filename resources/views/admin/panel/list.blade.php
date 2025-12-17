@@ -36,7 +36,6 @@
 @section('content')
 	<div class="row">
 		<div class="col-12">
-			
 			@if (isTranslatableModel($xPanel->model))
 				<div class="card mb-3">
 					<div class="card-body">
@@ -52,7 +51,6 @@
 					</div>
 				</div>
 			@endif
-			
 			<div class="card border-0">
 				@php
 					$topStack = 'top';

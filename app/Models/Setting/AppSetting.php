@@ -84,7 +84,6 @@ class AppSetting extends BaseSetting
 		// Required keys & values
 		// If $value exists and these keys don't exist, then set their default values
 		$defaultValue = [
-			'purchase_code'                          => env('PURCHASE_CODE', ''),
 			'name'                                   => config('app.name'),
 			'logo'                                   => config('larapen.media.logo'),
 			'logo_dark'                              => config('larapen.media.logo-dark'),
@@ -189,15 +188,7 @@ class AppSetting extends BaseSetting
 				'tab'   => $tabName,
 			];
 		}
-		$fields[] = [
-			'name'  => 'purchase_code',
-			'label' => trans('admin.Purchase Code'),
-			'type'  => 'text',
-			'hint'  => trans('admin.find_my_purchase_code', [
-				'purchaseCodeFindingUrl' => config('larapen.core.purchaseCodeFindingUrl'),
-			]),
-			'tab'   => $tabName,
-		];
+
 		$fields[] = [
 			'name'    => 'name',
 			'label'   => trans('admin.App Name'),

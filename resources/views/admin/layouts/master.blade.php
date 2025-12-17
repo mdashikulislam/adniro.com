@@ -95,7 +95,7 @@
                         @if (config('settings.footer.powered_by_text'))
                             {{ trans('admin.powered_by') }} {!! config('settings.footer.powered_by_text') !!}
                         @else
-                            {{ trans('admin.powered_by') }} <a target="_blank" href="https://bedigit.com">BeDigit</a>
+                            {{ trans('admin.powered_by') }} <a target="_blank" href="https://www.adniro.com">Adniro</a>
                         @endif
                     </div>
                 @endif
