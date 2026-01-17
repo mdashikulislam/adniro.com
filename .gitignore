@@ -24,3 +24,4 @@ ads.txt
 php.ini
 .user.ini
 /storage/backups
+public/robots.txt
