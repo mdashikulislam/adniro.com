@@ -76,9 +76,12 @@
 			<div class="row">
 				<div class="col-12">
 					<div class="page-title-wrapper py-3 px-4 bg-white border rounded shadow-sm text-center">
-						<h1 class="h3 mb-2 fw-bold text-dark">
-							<i class="bi bi-search me-2 text-primary"></i>{{ $h1Title }}
-						</h1>
+						<div class="d-flex justify-content-center align-items-center">
+							<i style="font-size: 22px" class="bi  bi-search me-2 text-primary"></i>
+							<h1 class="h4  fw-bold m-0 p-0 text-dark">
+								{{ $h1Title }}
+							</h1>
+						</div>
 					</div>
 				</div>
 			</div>
