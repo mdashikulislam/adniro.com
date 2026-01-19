@@ -171,41 +171,43 @@ class Category extends BaseModel
 		);
 	}
 
-    protected function iconClass(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value) {
-                $defaultIconClass = 'fa-solid fa-folder';
+	protected function iconClass(): Attribute
+	{
+		return Attribute::make(
+			get: function ($value) {
+				$defaultIconClass = 'bi bi-folder-fill';
 
-                if (empty($value)) {
-                    return $defaultIconClass;
-                }
-                $iClassesArray = cache()->remember('category_icons_list', 86400, function () {
-                    $defaultFontIconSet = config('larapen.core.defaultFontIconSet', 'bootstrap');
-                    $filePath = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.path');
-                    if (!file_exists($filePath)) return [];
-                    $buffer = file_get_contents($filePath);
-                    $ifVersion = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.version');
-                    $ifVersion = str_replace('.', '\.', $ifVersion);
-                    $versionQuoted = preg_quote($ifVersion, '#');
-                    if (preg_match('#version:\s*' . $versionQuoted . '\s*,[^i]{0,1000}icons:\s*\[([^\]]+)\]#', $buffer, $matches)) {
-                        $raw = $matches[1];
-                        $raw = str_replace(["'", "\n", "\t"], '', $raw);
-                        return preg_split('/\s*,\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
-                    }
-                    return [];
-                });
+				if (empty($value)) {
+					return $defaultIconClass;
+				}
 
-                if (!empty($iClassesArray)) {
-                    if (!in_array($value, $iClassesArray)) {
-                        return $defaultIconClass;
-                    }
-                }
+				$defaultFontIconSet = config('larapen.core.defaultFontIconSet', 'bootstrap');
 
-                return $value;
-            },
-        );
-    }
+				// This part will be removed at: 2022-10-14
+				$filePath = config("larapen.core.fontIconSet.{$defaultFontIconSet}.path");
+				$buffer = file_get_contents($filePath);
+
+				$ifVersion = config("larapen.core.fontIconSet.{$defaultFontIconSet}.version");
+				$ifVersion = str_replace('.', '\.', $ifVersion);
+
+				$matches = [];
+				preg_match('#version:[^\']+\'' . $ifVersion . '\',[^i]+icons:[^\[]*\[([^]]+)]#s', $buffer, $matches);
+				$iClasses = $matches[1] ?? '';
+				$iClasses = str_replace("'", '', $iClasses);
+				$iClasses = preg_replace('#[\n\t]*#', '', $iClasses);
+
+				$iClassesArray = array_map('trim', explode(',', $iClasses));
+
+				if (!empty($iClassesArray)) {
+					if (!in_array($value, $iClassesArray)) {
+						return $defaultIconClass;
+					}
+				}
+
+				return $value;
+			},
+		);
+	}
 	
 	protected function description(): Attribute
 	{
@@ -317,20 +319,33 @@ class Category extends BaseModel
 		
 		// If the Category contains a skinnable icon,
 		// Change it by the selected skin icon.
-		if (str_contains($value, 'app/categories/') && !str_contains($value, '/custom/')) {
-			$pattern = '/app\/categories\/[^\/]+\//iu';
-			$replacement = "app/categories/{$skin}/";
-			$value = preg_replace($pattern, $replacement, $value);
-		}
+        if (is_array($value)) {
+            $value = $value[app()->getLocale()]
+                ?? reset($value)
+                ?? null;
+        }
+        if (!is_string($value) || $value === '') {
+            return $value;
+        }
+        if (is_string($value)
+            && str_contains($value, 'app/categories/')
+            && !str_contains($value, '/custom/')
+        ) {
+            $pattern = '/app\/categories\/[^\/]+\//iu';
+            $replacement = "app/categories/{$skin}/";
+            $value = preg_replace($pattern, $replacement, $value);
+        }
 		
 		// (Optional)
 		// If the Category contains a skinnable default icon,
 		// Change it by the selected skin default icon.
-		if (str_contains($value, 'app/default/categories/fa-folder-')) {
-			$pattern = '/app\/default\/categories\/fa-folder-[^.]+\./iu';
-			$replacement = "app/default/categories/fa-folder-{$skin}.";
-			$value = preg_replace($pattern, $replacement, $value);
-		}
+        if (is_string($value)
+            && str_contains($value, 'app/default/categories/fa-folder-')
+        ) {
+            $pattern = '/app\/default\/categories\/fa-folder-[^.]+\./iu';
+            $replacement = "app/default/categories/fa-folder-{$skin}.";
+            $value = preg_replace($pattern, $replacement, $value);
+        }
 		
 		if (!$disk->exists($value)) {
 			if ($disk->exists($defaultSkinnedIcon)) {
