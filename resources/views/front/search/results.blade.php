@@ -26,6 +26,64 @@
 @section('content')
 	<div class="main-container">
 		@include('front.search.partials.breadcrumbs')
+		
+		{{-- SEO H1 Title --}}
+		@php
+			$cat ??= null;
+			$city ??= null;
+			$admin ??= null;
+			$h1Title = '';
+			
+			// Build unique H1 title based on page type
+			if (!empty($city)) {
+				// City page
+				if (!empty($cat)) {
+					// Category + City
+					$h1Title = data_get($cat, 'name') . ' ' . t('in') . ' ' . data_get($city, 'name');
+					if (!empty(data_get($cat, 'parent'))) {
+						$h1Title = data_get($cat, 'name') . ' ' . t('in') . ' ' . data_get($city, 'name') . ' - ' . data_get($cat, 'parent.name');
+					}
+				} else {
+					// City only
+					$h1Title = t('all_listings') . ' ' . t('in') . ' ' . data_get($city, 'name') . ', ' . config('country.name');
+				}
+			} elseif (!empty($admin)) {
+				// State/Region page
+				if (!empty($cat)) {
+					// Category + State
+					$h1Title = data_get($cat, 'name') . ' ' . t('in') . ' ' . data_get($admin, 'name');
+				} else {
+					// State only
+					$h1Title = t('all_listings') . ' ' . t('in') . ' ' . data_get($admin, 'name') . ', ' . config('country.name');
+				}
+			} elseif (!empty($cat)) {
+				// Category page (no location)
+				if (!empty(data_get($cat, 'parent'))) {
+					$h1Title = data_get($cat, 'name') . ' - ' . data_get($cat, 'parent.name') . ' ' . t('in') . ' ' . config('country.name');
+				} else {
+					$h1Title = data_get($cat, 'name') . ' ' . t('in') . ' ' . config('country.name');
+				}
+			} elseif (request()->filled('q')) {
+				// Search query page
+				$h1Title = t('Search Results for') . ': "' . request()->query('q') . '"';
+			} else {
+				// Default general search page
+				$h1Title = t('all_listings') . ' ' . t('in') . ' ' . config('country.name');
+			}
+		@endphp
+
+		<div class="container mb-3">
+			<div class="row">
+				<div class="col-12">
+					<div class="page-title-wrapper py-3 px-4 bg-white border rounded shadow-sm text-center">
+						<h1 class="h3 mb-2 fw-bold text-dark">
+							<i class="bi bi-search me-2 text-primary"></i>{{ $h1Title }}
+						</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 		@if (config('settings.listings_list.show_cats_in_top'))
 			@if (!empty($cats))
 				<div class="container mb-2 {{ $hideOnXsOrLower }}">
@@ -129,7 +187,7 @@
 									<h4 class="mb-0 fs-6 breadcrumb-list clearfix">
 										{!! (isset($htmlTitle)) ? $htmlTitle : '' !!}
 									</h4>
-									
+
 									@if (!empty(request()->all()))
 										<div>
 											<a class="{{ linkClass() }}" href="{!! urlGen()->searchWithoutQuery() !!}">
