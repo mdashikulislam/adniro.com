@@ -1,17 +1,3 @@
-{{--
- * LaraClassifier - Classified Ads Web Application
- * Copyright (c) BeDigit. All Rights Reserved
- *
- * Website: https://laraclassifier.com
- * Author: Mayeul Akpovi (BeDigit - https://bedigit.com)
- *
- * LICENSE
- * -------
- * This software is provided under a license agreement and may only be used or copied
- * in accordance with its terms, including the inclusion of the above copyright notice.
- * As this software is sold exclusively on CodeCanyon,
- * please review the full license details here: https://codecanyon.net/licenses/standard
---}}
 @php
 	$htmlLang = getLangTag(config('app.locale'));
 	$langDirection = config('lang.direction');
@@ -34,7 +20,7 @@
 	<link rel="shortcut icon" href="{{ config('settings.app.favicon_url') }}">
 	<title>{!! MetaTag::get('title') !!}</title>
 	{!! MetaTag::tag('description') !!}{!! MetaTag::tag('keywords') !!}
-	<link rel="canonical" href="{{ request()->fullUrl() }}"/>
+	<link rel="canonical" href="{{ url()->current() }}"/>
 	{{-- Specify a default target for all hyperlinks and forms on the page --}}
 	<base target="_top"/>
 	@if (isset($post))
