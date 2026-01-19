@@ -171,45 +171,64 @@ class Category extends BaseModel
 		);
 	}
 
-	protected function iconClass(): Attribute
-	{
-		return Attribute::make(
-			get: function ($value) {
-				$defaultIconClass = 'bi bi-folder-fill';
+    protected function iconClass(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
 
-				if (empty($value)) {
-					return $defaultIconClass;
-				}
+                $defaultIconClass = 'fa-solid fa-folder';
 
-				$defaultFontIconSet = config('larapen.core.defaultFontIconSet', 'bootstrap');
+                // ✅ Normalize spatie translated value
+                if (is_array($value)) {
+                    $value = $value[app()->getLocale()]
+                        ?? reset($value)
+                        ?? null;
+                }
 
-				// This part will be removed at: 2022-10-14
-				$filePath = config("larapen.core.fontIconSet.{$defaultFontIconSet}.path");
-				$buffer = file_get_contents($filePath);
+                if (!is_string($value) || trim($value) === '') {
+                    return $defaultIconClass;
+                }
 
-				$ifVersion = config("larapen.core.fontIconSet.{$defaultFontIconSet}.version");
-				$ifVersion = str_replace('.', '\.', $ifVersion);
+                $defaultFontIconSet = config('larapen.core.defaultFontIconSet', 'bootstrap');
 
-				$matches = [];
-				preg_match('#version:[^\']+\'' . $ifVersion . '\',[^i]+icons:[^\[]*\[([^]]+)]#s', $buffer, $matches);
-				$iClasses = $matches[1] ?? '';
-				$iClasses = str_replace("'", '', $iClasses);
-				$iClasses = preg_replace('#[\n\t]*#', '', $iClasses);
+                // Load icon file
+                $filePath = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.path');
 
-				$iClassesArray = array_map('trim', explode(',', $iClasses));
+                if (!is_file($filePath)) {
+                    return $defaultIconClass;
+                }
 
-				if (!empty($iClassesArray)) {
-					if (!in_array($value, $iClassesArray)) {
-						return $defaultIconClass;
-					}
-				}
+                $buffer = file_get_contents($filePath);
 
-				return $value;
-			},
-		);
-	}
-	
-	protected function description(): Attribute
+                $ifVersion = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.version');
+                $versionQuoted = preg_quote($ifVersion, '#');
+
+                $matches = [];
+
+                if (
+                    preg_match(
+                        '#version:\s*' . $versionQuoted . '\s*,[^i]{0,1000}icons:\s*\[([^\]]+)\]#',
+                        $buffer,
+                        $matches
+                    )
+                ) {
+                    $raw = str_replace(["'", "\n", "\t"], '', $matches[1]);
+                    $iClassesArray = preg_split('/\s*,\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
+                } else {
+                    $iClassesArray = [];
+                }
+
+                if (!empty($iClassesArray) && !in_array($value, $iClassesArray, true)) {
+                    return $defaultIconClass;
+                }
+
+                return $value;
+            }
+        );
+    }
+
+
+    protected function description(): Attribute
 	{
 		return Attribute::make(
 			get: function ($value) {
