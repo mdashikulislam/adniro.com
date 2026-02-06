@@ -140,18 +140,18 @@ class CategoryController extends BaseController
         // SEO: noindex
         $noIndexCitiesPermalinkPages = (
             config('settings.seo.no_index_cities')
-            && currentRouteActionContains('Search\CityController')
+            && routeActionHas('Search\CityController')
         );
         // Filters (and Orders) on Listings Pages (Except Pagination)
         $noIndexFiltersOnEntriesPages = (
             config('settings.seo.no_index_filters_orders')
-            && currentRouteActionContains('Search\\')
+            && routeActionHas('Search\\')
             && !empty(request()->except(['page']))
         );
         // "No result" Pages (Empty Searches Results Pages)
         $noIndexNoResultPages = (
             config('settings.seo.no_index_no_result')
-            && currentRouteActionContains('Search\\')
+            && routeActionHas('Search\\')
             && empty(data_get($apiResult, 'data'))
         );
 
