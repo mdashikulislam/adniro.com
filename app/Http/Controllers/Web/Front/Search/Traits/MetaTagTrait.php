@@ -16,6 +16,8 @@
 
 namespace App\Http\Controllers\Web\Front\Search\Traits;
 
+use Illuminate\Support\Facades\Route;
+
 trait MetaTagTrait
 {
 	/**
@@ -139,7 +141,12 @@ trait MetaTagTrait
 				}
 			}
 		}
-		
+        $exceptRoute = ['searchByCategoryCity', 'searchByCategorySubCategoryCity'];
+        $routeName = Route::currentRouteName();
+
+        if (!empty($routeName) && in_array($routeName, $exceptRoute)) {
+            [$title, $description, $keywords] =  $this->applyCategoryLocationValue($category, $location, $fallbackTitle, $fallbackDescription);
+        }
 		// Country
 		$fallbackTitle .= ', ' . config('country.name');
 		
@@ -153,7 +160,28 @@ trait MetaTagTrait
 		
 		return array_values($metaTag);
 	}
-	
+    private function applyCategoryLocationValue($cat,$location,&$fallbackTitle, &$fallbackDescription):array
+    {
+        if (empty($cat)) {
+            return [$fallbackTitle,$fallbackDescription,$fallbackTitle];
+        }
+        [$title, $description, $keywords] = [$fallbackTitle,$fallbackDescription,$fallbackTitle];
+        if (!empty($cat)){
+            $title = str_replace('{category.name}', data_get($cat, 'name'), data_get($cat, 'seo_title'));
+            $description = str_replace('{category.name}', data_get($cat, 'name'), data_get($cat, 'seo_description'));
+            $keywords = str_replace('{category.name}', mb_strtolower(data_get($cat, 'name')), data_get($cat, 'seo_keywords'));
+        }
+        if (!empty($location)) {
+            $title = str_replace('{location.name}', data_get($location, 'name'), $title);
+            $title = str_replace('{location.name.in}', 'in '.data_get($location, 'name'), $title);
+            $description = str_replace('{location.name}', data_get($location, 'name'), $description);
+            $description = str_replace('{location.name.in}', 'in '.data_get($location, 'name'), $description);
+            $keywords = str_replace('{location.name}', mb_strtolower(data_get($location, 'name')), $keywords);
+            $keywords = str_replace('{location.name.in}', 'in '.mb_strtolower(data_get($location, 'name')), $keywords);
+        }
+
+        return [$title,$description,$keywords];
+    }
 	/* PRIVATE METHODS */
 	
 	private function applyCategoryValue($cat, &$title, &$description, &$keywords, &$fallbackTitle, &$fallbackDescription): void
