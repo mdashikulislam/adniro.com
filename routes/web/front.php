@@ -258,6 +258,9 @@ if (!$isDomainmappingAvailable) {
 			Route::get('{countryCode}/sitemaps/categories.xml', 'getCategoriesSitemapByCountry')->name('xml.sitemaps.categories');
 			Route::get('{countryCode}/sitemaps/cities.xml', 'getCitiesSitemapByCountry')->name('xml.sitemaps.cities');
 			Route::get('{countryCode}/sitemaps/posts.xml', 'getListingsSitemapByCountry')->name('xml.sitemaps.listings');
+            Route::get('{countryCode}/sitemaps/category/location.xml', 'getSitemapCategoryLocationByCountry');
+            Route::get('{countryCode}/sitemaps/category/{catSlug}.xml', 'getCategoriesSitemapLocationByCountry');
+            Route::get('{countryCode}/sitemaps/category/{catSlug}/{subCatSlug}.xml', 'getCategoriesSitemapLocationByCountry');
 		});
 }
 
@@ -292,3 +295,9 @@ Route::namespace('Search')
         Route::get(dynamicRoute('routes.searchByCategoryCity'), [CategoryController::class, 'searchByCategoryCity'])->name('searchByCategoryCity');
         Route::get(dynamicRoute('routes.searchByCategorySubCategoryCity'), [CategoryController::class, 'searchByCategorySubCategoryCity'])->name('searchByCategorySubCategoryCity');
 	});
+if (!$isDomainmappingAvailable) {
+    Route::controller(HomeController::class)->group(function ($router) {
+        $router->pattern('countryCode', getCountryCodeRoutePattern());
+        $router->get('{countryCode}', 'countryBasedIndex');
+    });
+}

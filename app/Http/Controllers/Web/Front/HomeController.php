@@ -19,7 +19,7 @@ namespace App\Http\Controllers\Web\Front;
 use App\Services\SectionService;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
 use Throwable;
-
+use App\Helpers\Services\Localization\Country as CountryHelper;
 class HomeController extends FrontController
 {
 	protected SectionService $sectionService;
@@ -44,7 +44,6 @@ class HomeController extends FrontController
 		
 		$message = data_get($data, 'message');
 		$sections = (array)data_get($data, 'result.data');
-		
 		// Customize the sections for Blade
 		$sections = collect($sections)
 			->map(function ($item) {
@@ -117,4 +116,52 @@ class HomeController extends FrontController
 		}
 		view()->share('og', $this->og);
 	}
+
+    public function countryBasedIndex($countryCode = null)
+    {
+        $countryCode = $countryCode ?? config('country.code');
+        if ($countryCode != config('country.code')) {
+            $countryObj = new CountryHelper();
+            $countryObj->setCountryByCode($countryCode,true);
+        }
+        $data = getServiceData($this->sectionService->getSections());
+
+        $message = data_get($data, 'message');
+        $sections = (array)data_get($data, 'result.data');
+        // Customize the sections for Blade
+        $sections = collect($sections)
+            ->map(function ($item) {
+                $belongsTo = $item['belongs_to'] ?? '';
+                $name = $item['name'] ?? '';
+
+                $item['optionName'] = str($name)
+                    ->lower()
+                    ->camel()
+                    ->append('Options')
+                    ->toString();
+
+                $item['view'] = str($name)
+                    ->slug()
+                    ->prepend('front.sections.' . $belongsTo . '.')
+                    ->toString();
+
+                return $item;
+            })
+            ->toArray();
+
+        // Share sections' options in views,
+        // that requires to be accessible everywhere in the app's views (including the master view).
+        foreach ($sections as $section) {
+            $optionName = data_get($section, 'optionName');
+            $options = (array)data_get($section, 'options');
+            view()->share($optionName, $options);
+        }
+
+        $isFromHome = routeActionHas('HomeController');
+
+        // Get SEO
+        $searchFormOptions = data_get($sections, 'search_form.options') ?? [];
+        $this->setSeo($searchFormOptions);
+        return view('front.index', compact('sections', 'isFromHome'));
+    }
 }

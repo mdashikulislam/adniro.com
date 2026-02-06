@@ -361,4 +361,32 @@ class Language
 		
 		return Country::getCountryInfo($countryCode);
 	}
+    public function setLanguageByCode($lang)
+    {
+        $locale = config('app.locale');
+        if (!empty($lang)) {
+            $langCode = $lang;
+        } else {
+            $langCode = config('appLang.code');
+        }
+
+        try {
+            // Get the Language details
+            $lang = self::$languages->has($langCode) ? self::$languages->get($langCode) : [];
+            $lang = collect($lang);
+        } catch (Throwable $e) {
+            $lang = $this->fromConfig();
+        }
+        if ($lang->isNotEmpty()) {
+            config()->set('lang.code', $lang->get('code'));
+            config()->set('lang.locale', $lang->get('locale'));
+            config()->set('lang.iso_locale', $lang->get('iso_locale'));
+            config()->set('lang.tag', $lang->get('tag'));
+            config()->set('lang.direction', $lang->get('direction'));
+            config()->set('lang.russian_pluralization', $lang->get('russian_pluralization'));
+            config()->set('lang.date_format', $lang->get('date_format'));
+            config()->set('lang.datetime_format', $lang->get('datetime_format'));
+            app()->setLocale(config('lang.code'));
+        }
+    }
 }

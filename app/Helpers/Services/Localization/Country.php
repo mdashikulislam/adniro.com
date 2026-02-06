@@ -20,6 +20,7 @@ use App\Enums\Continent;
 use App\Helpers\Common\Arr;
 use App\Helpers\Common\Cookie;
 use App\Helpers\Common\GeoIP;
+use App\Helpers\Services\Localization\Language as LanguageHelper;
 use App\Http\Controllers\Web\Front\HomeController;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Edit\PostController as MultiStepsEditPostController;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\SingleStep\EditController as SingleStepEditPostController;
@@ -886,4 +887,48 @@ class Country
 		} catch (Throwable $e) {
 		}
 	}
+    public  function setCountryByCode($countryCode,$languageEnable = false)
+    {
+        if (empty($countryCode)) {
+            return;
+        }
+        if ($this->isAvailableCountry($countryCode)){
+            $country = self::getCountryInfo($countryCode);
+            if ($country->isNotEmpty() && $country->has('code')) {
+                config()->set('country.locale', config('app.locale'));
+                config()->set('country.lang', []);
+                if ($country->has('lang')) {
+                    $countryLang = $country->get('lang');
+                    if ($countryLang instanceof Collection) {
+                        if ($countryLang->has('code')) {
+                            config()->set('country.locale', $countryLang->get('code'));
+                        }
+                        config()->set('country.lang', $countryLang->toArray());
+                    }
+                }
+                config()->set('country.locale', config('app.locale'));
+                config()->set('country.code', $country->get('code'));
+                config()->set('country.icode', $country->get('icode'));
+                config()->set('country.iso3', $country->get('iso3'));
+                config()->set('country.name', $country->get('name'));
+                config()->set('country.currency', $country->get('currency_code'));
+                config()->set('country.phone', $country->get('phone'));
+                config()->set('country.languages', $country->get('languages'));
+                config()->set('country.time_zone', $country->has('time_zone') ? $country->get('time_zone') : config('app.timezone'));
+                config()->set('country.date_format', $country->has('date_format') ? $country->get('date_format') : null);
+                config()->set('country.datetime_format', $country->has('datetime_format') ? $country->get('datetime_format') : null);
+                config()->set('country.admin_type', $country->get('admin_type'));
+                config()->set('country.flag_url', $country->get('flag_url'));
+                config()->set('country.flag24_url', $country->get('flag24_url'));
+                config()->set('country.flag32_url', $country->get('flag32_url'));
+                config()->set('country.background_image_url', $country->get('background_image_url'));
+                if ($languageEnable && $country->has('lang')) {
+                    $langObj = new LanguageHelper();
+                    $langObj->setLanguageByCode($country->get('lang')['code']);
+                }
+            }
+
+        }
+    }
+
 }

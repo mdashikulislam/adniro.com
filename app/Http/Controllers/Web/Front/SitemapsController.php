@@ -31,6 +31,7 @@ use App\Models\Post;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Watson\Sitemap\Facades\Sitemap;
 
 class SitemapsController extends FrontController
@@ -108,12 +109,12 @@ class SitemapsController extends FrontController
 		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/pages.xml'));
 		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'));
 		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'));
-		
-		$countPosts = Post::verified()->inCountry($country['code'])->count();
+        Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'));
+
+        $countPosts = Post::verified()->inCountry($country['code'])->count();
 		if ($countPosts > 0) {
 			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/posts.xml'));
 		}
-		
 		return Sitemap::index();
 	}
 	
@@ -141,15 +142,15 @@ class SitemapsController extends FrontController
 		}
 		
 		$url = url('/');
-		$url = urlBuilder($url)->setParameters($params)->toString();
+		$url = urlBuilder($url)->toString();
 		Sitemap::addTag($url, $this->defaultDate, 'daily', '1.0');
 		
 		$url = urlGen()->sitemap($country['icode']);
-		$url = urlBuilder($url)->setParameters($params)->toString();
+		$url = urlBuilder($url)->toString();
 		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.5');
 		
 		$url = urlGen()->search([], false, $country['icode']);
-		$url = urlBuilder($url)->setParameters($params)->toString();
+		$url = urlBuilder($url)->toString();
 		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.6');
 		
 		// Cache Parameters
@@ -373,4 +374,89 @@ class SitemapsController extends FrontController
 		
 		return $tab;
 	}
+    public function getLocationsSitemapDetailsByCountry(string $countryCode = null,$citySLug = null, $cityId = null):mixed
+    {
+        if (empty($countryCode)) {
+            $countryCode = config('country.code');
+        }
+        // Get Country Settings
+        $country = $this->getCountrySettings($countryCode);
+        if (empty($country)) {
+            return Sitemap::render();
+        }
+        $cacheId = 'categories.' . $country['locale'] . '.all';
+        $cats = cache()->remember($cacheId, $this->cacheExpiration, function () use ($country) {
+            return Category::query()->with(['parent'])->orderBy('lft')->get();
+        });
+
+        if ($cats->count() > 0) {
+            $cats = collect($cats)->keyBy('id');
+            foreach ($cats as $cat) {
+                $url = urlGen()->category($cat, $country['icode']);
+                $url = $url.'/'.$citySLug.'/'.$cityId;
+                Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+            }
+        }
+        return Sitemap::render();
+    }
+    public function getCategoriesSitemapLocationByCountry(string $countryCode = null, $catSlug, $subCatSlug = null)
+    {
+        $countryCode = $countryCode ?? config('country.code');
+        $country = $this->getCountrySettings($countryCode);
+        if (empty($country)) {
+            return Sitemap::render();
+        }
+        $cacheId = 'cities.' . $country['icode'] . '.all';
+        $cacheExpiration = $this->cacheExpiration ?? 3600;
+        $cities = Cache::remember($cacheId, $cacheExpiration, function () use ($country) {
+            return City::query()
+                ->inCountry($country['icode'])
+                ->orderByDesc('population')
+                ->orderBy('name')
+                ->get();
+        });
+
+        $basePath = $this->isDomainmappingAvailable ? '' : $country['icode'] . '/';
+        $basePath .= 'category/' . $catSlug;
+        if (!empty($subCatSlug)) {
+            $basePath .= '/' . $subCatSlug;
+        }
+        foreach ($cities as $city) {
+            $citySlug = slugify($city->name);
+            $url = url("{$basePath}/{$citySlug}/{$city->id}");
+            Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+        }
+        return Sitemap::render();
+    }
+    public function getSitemapCategoryLocationByCountry(string $countryCode = null)
+    {
+        if (empty($countryCode)) {
+            $countryCode = config('country.code');
+        }
+        $country = $this->getCountrySettings($countryCode);
+        if (empty($country)) {
+            return Sitemap::render();
+        }
+        $cacheId = 'categories.' .$country['icode'] . '.all';
+        $cats = cache()->remember($cacheId, $this->cacheExpiration, function () use ($country) {
+            return Category::query()->orderBy('lft')->get();
+        });
+        $basePath = $country['icode'] . '/';
+        if ($this->isDomainmappingAvailable) {
+            $basePath = '';
+        }
+        if ($cats->count() > 0) {
+            foreach ($cats as $cat) {
+                $url = '';
+                if (!empty($cat->parent)) {
+                    $catUrl = trim(strtolower((string)$cat->parent->slug)) . '/' . trim(strtolower((string)$cat->slug));
+                } else {
+                    $catUrl = trim(strtolower((string)$cat->slug));
+                }
+                $url = $basePath.'sitemaps/category/'.$catUrl.'.xml';
+                Sitemap::addSitemap(dmUrl(collect($country), $url));
+            }
+        }
+        return Sitemap::index();
+    }
 }
