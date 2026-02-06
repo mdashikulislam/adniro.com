@@ -103,4 +103,135 @@ class CategoryController extends BaseController
 			)
 		);
 	}
+
+    public function searchByCategoryCity($countryCode,$catSlug,$citySlug,$cityId)
+    {
+        if (!isMultiCountriesUrlsEnabled()) {
+            $cityId = $citySlug;
+            $citySlug = $catSlug;
+            $catSlug = $countryCode;
+        }
+        // Get Posts
+        $queryParams = [
+            'op' => 'search',
+            'c'  => $catSlug,
+            'l'  => $cityId,
+        ];
+        $queryParams = array_merge(request()->all(), $queryParams);
+        $data = getServiceData($this->postService->getEntries($queryParams));
+        $apiMessage = data_get($data, 'message');
+        $apiResult = data_get($data, 'result');
+        $apiExtra = data_get($data, 'extra');
+        $preSearch = data_get($apiExtra, 'preSearch');
+        $this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
+        // Get Titles
+        $this->getBreadcrumb($preSearch);
+        $this->getHtmlTitle($preSearch);
+        // Meta Tags
+        [$title, $description, $keywords] = $this->getMetaTag($preSearch);
+        MetaTag::set('title', $title);
+        MetaTag::set('description', $description);
+        MetaTag::set('keywords', $keywords);
+        try {
+            $this->og->title($title)->description($description)->type('website');
+        } catch (\Throwable $e) {
+        }
+        view()->share('og', $this->og);
+        // SEO: noindex
+        $noIndexCitiesPermalinkPages = (
+            config('settings.seo.no_index_cities')
+            && currentRouteActionContains('Search\CityController')
+        );
+        // Filters (and Orders) on Listings Pages (Except Pagination)
+        $noIndexFiltersOnEntriesPages = (
+            config('settings.seo.no_index_filters_orders')
+            && currentRouteActionContains('Search\\')
+            && !empty(request()->except(['page']))
+        );
+        // "No result" Pages (Empty Searches Results Pages)
+        $noIndexNoResultPages = (
+            config('settings.seo.no_index_no_result')
+            && currentRouteActionContains('Search\\')
+            && empty(data_get($apiResult, 'data'))
+        );
+
+        return view(
+            'front.search.results',
+            compact(
+                'apiMessage',
+                'apiResult',
+                'apiExtra',
+                'noIndexCitiesPermalinkPages',
+                'noIndexFiltersOnEntriesPages',
+                'noIndexNoResultPages'
+            )
+        );
+    }
+    public function searchByCategorySubCategoryCity($countryCode,$catSlug = null,$subCategorySlug = null,$citySlug = null,$cityId = null)
+    {
+        if (!isMultiCountriesUrlsEnabled()) {
+            $cityId = $citySlug;
+            $citySlug = $subCategorySlug;
+            $subCategorySlug = $catSlug;
+            $catSlug = $countryCode;
+        }
+        // Get Posts
+        $queryParams = [
+            'op' => 'search',
+            'c'  => $catSlug,
+            'sc' => $subCategorySlug,
+            'l'  => $cityId,
+        ];
+
+        $queryParams = array_merge(request()->all(), $queryParams);
+        $data = getServiceData($this->postService->getEntries($queryParams));
+        $apiMessage = data_get($data, 'message');
+        $apiResult = data_get($data, 'result');
+        $apiExtra = data_get($data, 'extra');
+        $preSearch = data_get($apiExtra, 'preSearch');
+        $this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
+        // Get Titles
+        $this->getBreadcrumb($preSearch);
+        $this->getHtmlTitle($preSearch);
+
+        // Meta Tags
+        [$title, $description, $keywords] = $this->getMetaTag($preSearch);
+        MetaTag::set('title', $title);
+        MetaTag::set('description', $description);
+        MetaTag::set('keywords', $keywords);
+        try {
+            $this->og->title($title)->description($description)->type('website');
+        } catch (\Throwable $e) {
+        }
+        view()->share('og', $this->og);
+        // SEO: noindex
+        $noIndexCitiesPermalinkPages = (
+            config('settings.seo.no_index_cities')
+            && routeActionHas('Search\CityController')
+        );
+        // Filters (and Orders) on Listings Pages (Except Pagination)
+        $noIndexFiltersOnEntriesPages = (
+            config('settings.seo.no_index_filters_orders')
+            && routeActionHas('Search\\')
+            && !empty(request()->except(['page']))
+        );
+        // "No result" Pages (Empty Searches Results Pages)
+        $noIndexNoResultPages = (
+            config('settings.seo.no_index_no_result')
+            && routeActionHas('Search\\')
+            && empty(data_get($apiResult, 'data'))
+        );
+
+        return view(
+            'front.search.results',
+            compact(
+                'apiMessage',
+                'apiResult',
+                'apiExtra',
+                'noIndexCitiesPermalinkPages',
+                'noIndexFiltersOnEntriesPages',
+                'noIndexNoResultPages'
+            )
+        );
+    }
 }

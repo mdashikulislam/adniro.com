@@ -148,7 +148,7 @@ trait SearchTrait
 		// Search base permalink + category queries string
 		$locationExists = (!empty($city) && isset($city->id));
 		$filterByExists = request()->filled('filterBy');
-		if ($locationExists || $filterByExists) {
+		if ($filterByExists) {
 			$params = [];
 			$params['c'] = $cat->id;
 			if (!empty($cat->parent)) {
@@ -176,8 +176,8 @@ trait SearchTrait
 				$countryCodePath = strtolower($countryCode) . '/';
 			}
 		}
-		
-		if (isset($cat->slug)) {
+
+        if (isset($cat->slug) && empty($city->id)) {
 			if ($findParent && !empty($cat->parent)) {
 				$path = str_replace(
 					['{countryCode}/', '{catSlug}', '{subCatSlug}'],
@@ -192,7 +192,26 @@ trait SearchTrait
 				->setParameters(request()->only($this->searchQueryKeys))
 				->removeParameters($paramsToRemove)
 				->toString();
-		} else {
+		}elseif (isset($city->id) && isset($cat->slug)){
+            if ($findParent && !empty($cat->parent)) {
+                $path = str_replace(
+                    ['{countryCode}/', '{catSlug}', '{subCatSlug}'],
+                    ['', $cat->parent->slug, $cat->slug],
+                    config('routes.searchPostsBySubCat')
+                );
+            } else {
+
+                $path = str_replace(['{countryCode}/', '{catSlug}'], ['', $cat->slug], config('routes.searchPostsByCat'));
+
+            }
+            $citySLug = !empty($city->slug) ? $city->slug : slugify($city->name);
+            $url = url($countryCodePath . $path.'/'.$citySLug.'/'.$city->id);
+            $url = urlBuilder($url)
+                ->setParameters(request()->only($this->searchQueryKeys))
+                ->removeParameters($paramsToRemove)
+                ->toString();
+
+        } else {
 			$url = urlBuilder($this->search())
 				->removeParameters($paramsToRemove)
 				->toString();
@@ -212,7 +231,6 @@ trait SearchTrait
 		if (empty($city)) {
 			return null;
 		}
-		
 		$city = is_array($city) ? Arr::toObject($city) : $city;
 		$cat = is_array($cat) ? Arr::toObject($cat) : $cat;
 		
@@ -221,7 +239,7 @@ trait SearchTrait
 		// Search base permalink + location queries string
 		$categoryExists = (!empty($cat) && isset($cat->id));
 		$filterByExists = request()->filled('filterBy');
-		if ($categoryExists || $filterByExists) {
+		if ( $filterByExists) {
 			$params = [];
 			$params['l'] = $city->id;
 			if ($categoryExists) {
@@ -252,9 +270,8 @@ trait SearchTrait
 				$countryCodePath = strtolower($countryCode) . '/';
 			}
 		}
-		
-		if (isset($city->id, $city->name)) {
-			$path = str_replace(
+        if (isset($city->id, $city->name) && empty($cat->id)){
+            $path = str_replace(
 				['{countryCode}/', '{city}', '{id}'],
 				['', ($city->slug ?? slugify($city->name)), $city->id],
 				config('routes.searchPostsByCity')
@@ -269,7 +286,39 @@ trait SearchTrait
 				->setParameters(request()->only($this->searchQueryKeys))
 				->removeParameters($paramsToRemove)
 				->toString();
-		} else {
+		}elseif (isset($city->id, $city->name) && !empty($cat->id) && is_null($cat->parent_id) ){
+            $path = str_replace(
+                ['{countryCode}/','{catSlug}', '{city}', '{id}'],
+                ['', $cat->slug,($city->slug ?? slugify($city->name)), $city->id],
+                config('routes.searchByCategoryCity')
+            );
+            $path = $countryCodePath . $path;
+            if (isAdminPanel()) {
+                $url = dmUrl($city->country_code, $path);
+            } else {
+                $url = url($path);
+            }
+            $url = urlBuilder($url)
+                ->setParameters(request()->only($this->searchQueryKeys))
+                ->removeParameters($paramsToRemove)
+                ->toString();
+        }elseif (isset($city->id, $city->name) && !empty($cat->id) && !is_null($cat->parent_id)){
+            $path = str_replace(
+                ['{countryCode}/','{catSlug}', '{subCatSlug}','{city}', '{id}'],
+                ['', $cat->parent->slug,$cat->slug,($city->slug ?? slugify($city->name)), $city->id],
+                config('routes.searchByCategorySubCategoryCity')
+            );
+            $path = $countryCodePath . $path;
+            if (isAdminPanel()) {
+                $url = dmUrl($city->country_code, $path);
+            } else {
+                $url = url($path);
+            }
+            $url = urlBuilder($url)
+                ->setParameters(request()->only($this->searchQueryKeys))
+                ->removeParameters($paramsToRemove)
+                ->toString();
+        } else {
 			$url = '/';
 		}
 		

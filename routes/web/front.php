@@ -289,4 +289,6 @@ Route::namespace('Search')
 		Route::get(dynamicRoute('routes.searchPostsByCity'), [CityController::class, 'index'])->name('browse.listings.byCity');
 		Route::get(dynamicRoute('routes.searchPostsBySubCat'), [CategoryController::class, 'index'])->name('browse.listings.bySubCategory');
 		Route::get(dynamicRoute('routes.searchPostsByCat'), [CategoryController::class, 'index'])->name('browse.listings.byCategory');
+        Route::get(dynamicRoute('routes.searchByCategoryCity'), [CategoryController::class, 'searchByCategoryCity'])->name('searchByCategoryCity');
+        Route::get(dynamicRoute('routes.searchByCategorySubCategoryCity'), [CategoryController::class, 'searchByCategorySubCategoryCity'])->name('searchByCategorySubCategoryCity');
 	});

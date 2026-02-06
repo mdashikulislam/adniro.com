@@ -213,7 +213,7 @@ class SitemapsController extends FrontController
 			
 			foreach ($cats as $cat) {
 				$url = urlGen()->category($cat, $country['icode']);
-				Sitemap::addTag($url, $this->defaultDate, 'weekly', '0.8');
+				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
 			}
 		}
 		
@@ -261,7 +261,7 @@ class SitemapsController extends FrontController
 			foreach ($cities as $city) {
 				$city->name = trim(head(explode('/', $city->name)));
 				$url = urlGen()->city($city, $country['icode']);
-				Sitemap::addTag($url, $this->defaultDate, 'weekly', '0.7');
+				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
 			}
 		}
 		

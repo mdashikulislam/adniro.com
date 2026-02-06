@@ -16,4 +16,9 @@ return [
     'countries' => 'countries',
     'contact' => 'contact',
     'pricing' => 'pricing',
+    'searchByCategoryCity'=>'{countryCode}/category/{catSlug}/{city}/{id}',
+    'searchByCategorySubCategoryCity'=>'{countryCode}/category/{catSlug}/{subCatSlug}/{city}/{id}',
+    'sitemapCategory'=>'{countryCode}/sitemap/categories',
+    'sitemapCategorySubCategoryCity' => '{countryCode}/category/{catSlug}/{subCatSlug}',
+    'sitemapCategoryCity'=>'{countryCode}/sitemap/category/{catSlug}',
 ];
