@@ -32,11 +32,7 @@ trait MetaTagTrait
 		$cityId = request()->input('l');
 		$stateName = request()->input('r');
 		$isStateRequested = (!empty($stateName) && empty($cityId));
-		
-		// ...
-		
 		$metaTag = [];
-		
 		[$title, $description, $keywords] = getMetaTag('search');
 		
 		// Get pre-search data
@@ -101,7 +97,22 @@ trait MetaTagTrait
 				}
 			}
 		}
-		
+		if(!empty($category) && !empty($location)){
+            [$title, $description, $keywords] = getMetaTag('searchCategoryLocation');
+            $this->applyCategoryLocationValue($category, $location, $fallbackTitle, $fallbackDescription);
+            if (!empty($category)) {
+                $this->applyCategoryValue($category, $title, $description, $keywords, $fallbackTitle, $fallbackDescription);
+            }
+            if (!empty($location)) {
+                $this->applyLocationValue($location, $title, $description, $keywords, $fallbackTitle, $fallbackDescription);
+            }
+            if (!empty($user)) {
+                $this->applyUserValue($user, $title, $description, $keywords, $fallbackTitle, $fallbackDescription);
+            }
+            if (!empty($tag)) {
+                $this->applyTagValue($tag, $title, $description, $keywords, $fallbackTitle, $fallbackDescription);
+            }
+        }
 		// User
 		if (!empty($user)) {
 			[$title, $description, $keywords] = getMetaTag('searchProfile');
@@ -141,12 +152,8 @@ trait MetaTagTrait
 				}
 			}
 		}
-        $exceptRoute = ['searchByCategoryCity', 'searchByCategorySubCategoryCity'];
-        $routeName = Route::currentRouteName();
 
-        if (!empty($routeName) && in_array($routeName, $exceptRoute)) {
-            [$title, $description, $keywords] =  $this->applyCategoryLocationValue($category, $location, $fallbackTitle, $fallbackDescription);
-        }
+
 		// Country
 		$fallbackTitle .= ', ' . config('country.name');
 		

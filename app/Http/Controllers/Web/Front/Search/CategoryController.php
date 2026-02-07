@@ -59,7 +59,6 @@ class CategoryController extends BaseController
 		// Get Titles
 		$this->getBreadcrumb($preSearch);
 		$this->getHtmlTitle($preSearch);
-		
 		// Meta Tags
 		[$title, $description, $keywords] = $this->getMetaTag($preSearch);
 		MetaTag::set('title', $title);
@@ -196,6 +195,7 @@ class CategoryController extends BaseController
 
         // Meta Tags
         [$title, $description, $keywords] = $this->getMetaTag($preSearch);
+
         MetaTag::set('title', $title);
         MetaTag::set('description', $description);
         MetaTag::set('keywords', $keywords);

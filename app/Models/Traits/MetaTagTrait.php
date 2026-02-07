@@ -45,6 +45,7 @@ trait MetaTagTrait
 			'search'         => 'Search (Default)',
 			'searchCategory' => 'Search (Category)',
 			'searchLocation' => 'Search (Location)',
+			'searchCategoryLocation' => 'Search (Category & Location)',
 			'searchProfile'  => 'Search (Profile)',
 			'searchTag'      => 'Search (Tag)',
 			'listingDetails' => 'Listing Details',

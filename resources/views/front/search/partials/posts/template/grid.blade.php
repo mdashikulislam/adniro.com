@@ -9,7 +9,12 @@
 	$cat ??= null;
 	
 	$defaultCols = 4;
-	$lgCols = (int)config('settings.listings_list.grid_view_cols', $defaultCols);
+    $customCols ??=0;
+    if ($customCols > 0) {
+		$lgCols = $customCols;
+	}else{
+        $lgCols = (int)config('settings.listings_list.grid_view_cols', $defaultCols);
+	}
 	$lgCols = Number::clamp($lgCols, min: 2, max: 4);
 	$mdCols = ($lgCols >= 3) ? 3 : $lgCols;
 	$smCols = ($lgCols >= 2) ? 2 : $lgCols;

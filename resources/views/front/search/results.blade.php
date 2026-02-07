@@ -291,7 +291,7 @@
 									@elseif ($selectedDisplayMode == 'compact-view')
 										@include('front.search.partials.posts.template.compact')
 									@else
-										@include('front.search.partials.posts.template.grid')
+										@include('front.search.partials.posts.template.grid',['customCols' => 3])
 									@endif
 								</div>
 							</div>
