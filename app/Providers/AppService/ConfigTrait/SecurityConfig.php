@@ -124,5 +124,19 @@ trait SecurityConfig
 			config()->set('recaptcha.secret_key', env('RECAPTCHA_SECRET_KEY', $secretKey));
 			config()->set('recaptcha.skip_ip', $skipIpsArr);
 		}
+		
+		// Cloudflare Turnstile
+		if (data_get($settings, 'captcha') == 'turnstile') {
+			$siteKey = data_get($settings, 'turnstile_site_key');
+			$secretKey = data_get($settings, 'turnstile_secret_key');
+			
+			$skipIps = env('TURNSTILE_SKIP_IPS', data_get($settings, 'turnstile_skip_ips', ''));
+			$skipIpsArr = preg_split('#[:,;\s]+#ui', $skipIps);
+			$skipIpsArr = array_filter(array_map('trim', $skipIpsArr));
+			
+			config()->set('settings.security.turnstile_site_key', env('TURNSTILE_SITE_KEY', $siteKey));
+			config()->set('settings.security.turnstile_secret_key', env('TURNSTILE_SECRET_KEY', $secretKey));
+			config()->set('settings.security.turnstile_skip_ip', $skipIpsArr);
+		}
 	}
 }
