@@ -37,6 +37,13 @@ trait HasCaptchaInput
 					$rules['g-recaptcha-response'] = ['recaptcha'];
 				}
 			}
+		} elseif (config('settings.security.captcha') == 'turnstile') {
+			// Cloudflare Turnstile
+			if (config('settings.security.turnstile_site_key') && config('settings.security.turnstile_secret_key')) {
+				if (!isFromApi()) {
+					$rules['cf-turnstile-response'] = [new \App\Rules\TurnstileRule()];
+				}
+			}
 		} else {
 			// CAPTCHA
 			if (config('captcha.option') && !empty(config('captcha.option'))) {

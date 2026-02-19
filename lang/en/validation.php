@@ -140,6 +140,7 @@ return [
 	// Packages Rules
 	'captcha'      => 'The :attribute field is not correct.',
 	'recaptcha'    => 'The :attribute field is not correct.',
+	'turnstile'    => 'The :attribute field is not correct.',
 	'phone'        => 'The :attribute field contains an invalid number.',
 	'phone_number' => 'The phone number is not valid.',
 	
@@ -275,6 +276,7 @@ return [
 		'password'              => 'password',
 		'password_confirmation' => 'password confirmation',
 		'g-recaptcha-response'  => 'captcha',
+		'cf-turnstile-response' => 'captcha',
 		'accept_terms'          => 'terms',
 		'category'              => 'category',
 		'category_id'           => 'category',
