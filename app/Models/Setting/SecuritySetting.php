@@ -36,6 +36,8 @@ class SecuritySetting extends BaseSetting
 			'recaptcha_version'              => 'v2',
 			'recaptcha_v2_site_key'          => $value['recaptcha_public_key'] ?? null, // from old saved value
 			'recaptcha_v2_secret_key'        => $value['recaptcha_private_key'] ?? null, // from old saved value
+			'turnstile_site_key'             => null,
+			'turnstile_secret_key'           => null,
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -190,6 +192,7 @@ class SecuritySetting extends BaseSetting
 				'inverse'   => 'Simple Captcha (Inverse)',
 				'custom'    => 'Simple Captcha (Custom)',
 				'recaptcha' => 'Google reCAPTCHA',
+				'turnstile' => 'Cloudflare Turnstile',
 			],
 			'hint'    => trans('admin.captcha_hint'),
 			'wrapper' => [
@@ -519,6 +522,46 @@ class SecuritySetting extends BaseSetting
 			'hint'    => trans('admin.recaptcha_skip_ips_hint'),
 			'wrapper' => [
 				'class' => 'col-md-12 recaptcha',
+			],
+			'tab'     => $tabName,
+		];
+		
+		// ==========
+		
+		$fields[] = [
+			'name'    => 'turnstile_sep_info',
+			'type'    => 'custom_html',
+			'value'   => trans('admin.turnstile_sep_info_value'),
+			'wrapper' => [
+				'class' => 'col-md-12 turnstile',
+			],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'turnstile_site_key',
+			'label'   => trans('admin.turnstile_site_key_label'),
+			'type'    => 'text',
+			'wrapper' => [
+				'class' => 'col-md-12 turnstile',
+			],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'turnstile_secret_key',
+			'label'   => trans('admin.turnstile_secret_key_label'),
+			'type'    => 'text',
+			'wrapper' => [
+				'class' => 'col-md-12 turnstile',
+			],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'turnstile_skip_ips',
+			'label'   => trans('admin.turnstile_skip_ips_label'),
+			'type'    => 'textarea',
+			'hint'    => trans('admin.turnstile_skip_ips_hint'),
+			'wrapper' => [
+				'class' => 'col-md-12 turnstile',
 			],
 			'tab'     => $tabName,
 		];

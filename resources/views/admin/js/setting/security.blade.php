@@ -62,7 +62,7 @@
 		let captchaElValue = captchaEl.value;
 		
 		if (captchaElValue === "") {
-			setElementsVisibility("hide", [".s-captcha", ".recaptcha"]);
+			setElementsVisibility("hide", [".s-captcha", ".recaptcha", ".turnstile"]);
 		}
 		if (
 			captchaElValue === "default"
@@ -71,19 +71,23 @@
 			|| captchaElValue === "mini"
 			|| captchaElValue === "inverse"
 		) {
-			setElementsVisibility("hide", [".recaptcha", ".s-captcha-custom"]);
+			setElementsVisibility("hide", [".recaptcha", ".turnstile", ".s-captcha-custom"]);
 			setElementsVisibility("show", ".s-captcha:not(.s-captcha-custom)");
 		}
 		if (captchaElValue === "custom") {
-			setElementsVisibility("hide", ".recaptcha");
+			setElementsVisibility("hide", [".recaptcha", ".turnstile"]);
 			setElementsVisibility("show", ".s-captcha");
 		}
 		if (captchaElValue === "recaptcha") {
-			setElementsVisibility("hide", ".s-captcha");
+			setElementsVisibility("hide", [".s-captcha", ".turnstile"]);
 			setElementsVisibility("show", ".recaptcha");
 			
 			let recaptchaVersionEl = document.querySelector(recaptchaVersionElSelector);
 			getReCaptchaFields(recaptchaVersionEl);
+		}
+		if (captchaElValue === "turnstile") {
+			setElementsVisibility("hide", [".s-captcha", ".recaptcha"]);
+			setElementsVisibility("show", ".turnstile");
 		}
 	}
 	
