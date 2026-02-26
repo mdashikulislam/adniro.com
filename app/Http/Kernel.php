@@ -131,6 +131,7 @@ class Kernel
 			'no.http.cache'           => \App\Http\Middleware\NoHttpCache::class,
 			'only.ajax'               => \App\Http\Middleware\OnlyAjax::class,
 			'listing.form.type.check' => \App\Http\Middleware\ListingFormType::class,
+            'custom.cache.header'     =>\App\Http\Middleware\CustomCacheHeaderMiddleware::class,
 		]);
 		
 		/*

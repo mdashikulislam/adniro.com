@@ -66,7 +66,7 @@ Route::middleware(['auth'])
 
 // HOMEPAGE
 if (!doesCountriesPageCanBeHomepage()) {
-	Route::get('/', [HomeController::class, 'index'])->name('homepage');
+	Route::middleware('custom.cache.header')->get('/', [HomeController::class, 'index'])->name('homepage');
 	Route::get(dynamicRoute('routes.countries'), CountriesController::class)->name('country.list');
 } else {
 	Route::get('/', CountriesController::class)->name('country.list.as.homepage');
@@ -196,7 +196,7 @@ Route::namespace('Post')
 		Route::controller(ShowController::class)
 			->group(function ($router) {
 				$router->pattern('id', '[0-9]+');
-				Route::get(dynamicRoute('routes.post'), 'index');
+				Route::middleware('custom.cache.header')->get(dynamicRoute('routes.post'), 'index');
 				Route::post('posts/{id}/phone', 'getPhone');
 			});
 		
@@ -267,6 +267,7 @@ if (!$isDomainmappingAvailable) {
 
 // PAGES
 Route::namespace('Page')
+    ->middleware('custom.cache.header')
 	->group(function ($router) {
 		Route::get(dynamicRoute('routes.pricing'), [PricingController::class, 'index'])->name('pricing');
 		Route::get(dynamicRoute('routes.pageBySlug'), [PageController::class, 'show'])->name('page.show')->where('slug', '[^/]*');
@@ -278,10 +279,11 @@ Route::namespace('Page')
 	});
 
 // SITEMAP (HTML)
-Route::get(dynamicRoute('routes.sitemap'), SitemapController::class)->name('sitemap');
+Route::middleware('custom.cache.header')->get(dynamicRoute('routes.sitemap'), SitemapController::class)->name('sitemap');
 
 // SEARCH
 Route::namespace('Search')
+    ->middleware('custom.cache.header')
 	->group(function ($router) {
 		$router->pattern('id', '[0-9]+');
 		$router->pattern('username', '[a-zA-Z0-9]+');
@@ -296,7 +298,7 @@ Route::namespace('Search')
         Route::get(dynamicRoute('routes.searchByCategorySubCategoryCity'), [CategoryController::class, 'searchByCategorySubCategoryCity'])->name('searchByCategorySubCategoryCity');
 	});
 if (!$isDomainmappingAvailable) {
-    Route::controller(HomeController::class)->group(function ($router) {
+    Route::middleware('custom.cache.header')->controller(HomeController::class)->group(function ($router) {
         $router->pattern('countryCode', getCountryCodeRoutePattern());
         $router->get('{countryCode}', 'countryBasedIndex');
     });
