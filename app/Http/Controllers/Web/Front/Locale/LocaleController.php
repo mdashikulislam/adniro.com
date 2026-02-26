@@ -32,11 +32,11 @@ class LocaleController extends FrontController
 	 */
 	public function setLocale(string $langCode): RedirectResponse
 	{
+
 		// Check if the system supports the selected Language Code
 		if (!isAvailableLang($langCode)) {
 			$message = t('language_not_supported', ['code' => $langCode]);
 			flash($message)->error();
-			
 			return redirect()->back()->withHeaders(config('larapen.core.noCacheHeaders'));
 		}
 		
@@ -46,7 +46,7 @@ class LocaleController extends FrontController
 		
 		// Save the Language Code
 		$this->saveLang($langCode, $langCanBeSaved);
-		
+
 		// After the Language Operation is done, ...
 		
 		// If the next path (URI) is filled (using the '?from=' parameter,
@@ -73,12 +73,15 @@ class LocaleController extends FrontController
 			}
 			
 			$nextUrl = request()->root() . '/' . $queryString;
-			
-			if (config('settings.localization.auto_detect_language') == 'from_country') {
-				$nextUrl = $this->removeCountrySelectionParameter($nextUrl);
-			}
-			
-			return redirect()->to($nextUrl);
+//			if (config('settings.localization.auto_detect_language') == 'from_country') {
+//				$nextUrl = $this->removeCountrySelectionParameter($nextUrl);
+//			}
+            $nextUrl = $this->removeCountrySelectionParameter($nextUrl);
+            return redirect()->to($nextUrl)->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
 		} else {
 			$previousUrl = url()->previous();
 			if (config('settings.localization.auto_detect_language') == 'from_country') {
@@ -105,7 +108,7 @@ class LocaleController extends FrontController
 			}
 			
 			$previousUrl = !empty($previousUrl) ? $previousUrl : '/';
-			
+
 			return redirect()->to($previousUrl);
 		}
 	}
