@@ -203,12 +203,12 @@
         $cityName = '';
         $randomCities = [];
         $title = '';
-        $description = 'Finding reliable ';
-        $description2 = 'At '.$siteName.', we are continuously expanding our ';
-        $description3 = 'Many users also search for ';
-        $countryName = config('country.name_in_en');
+        $description = 'Explore verified ';
+        $description2 = 'At '.$siteName.', genuine ';
+        $description3 = 'Thousands of buyers are also browsing ';
+        $countryName = config('country.name_in_en', '');
         if (!empty($data['cat'])){
-            $title .=$data['cat']['name'];
+            $title .= 'Find the Best '.$data['cat']['name'].' for Sale';
             $description .= $data['cat']['name'];
             $description2 .= $data['cat']['name'];
             $description3 .= $data['cat']['name'].' in ';
@@ -223,9 +223,9 @@
                 $randomCities = $citiesCollection->shuffle()->take(5);
             }
         }
-        $description .=' options';
-        $description2 .=' listings';
-        $description3 .='nearby locations to find better deals, faster availability, or more options. As our platform grows';
+        $description .=' listings';
+        $description2 .=' ads are published every day';
+        $description3 .='neighboring regions — uncovering better prices, faster choices, and wider variety. As our platform continues to grow';
         if (!empty($data['city'])){
             $title .=' in '.$data['city']['name'];
             $description .=' in '.$data['city']['name'];
@@ -233,29 +233,28 @@
             $description3 .=', '.$data['city']['name'];
             $cityName = $data['city']['name'];
         }
-        $description .= ' can be challenging, especially when availability changes frequently. Whether you’re searching for affordable services, trusted professionals, or the latest listings, having access to a growing local marketplace makes the process much easier.';
-        $description2 .='with new ads being added regularly by local users and businesses. While availability may vary at times, you can still explore nearby areas, compare options, and discover opportunities across the wider ';
-        $description3 .=' is becoming an important part of our expanding local classifieds network.';
+        $description .= ' — connect with trusted local sellers, compare the best available deals, and find exactly what you need. Your next great opportunity is closer than you think.';
+        $description2 .='by real local sellers and service providers. While availability naturally shifts over time, you can still browse surrounding areas, compare your options, and uncover fresh opportunities across the ';
+        $description3 .=' is emerging as a key part of our thriving local classifieds community.';
         if (isset($countryName)){
             $title .= ', '.$countryName;
-            $description2 .=$countryName;
         }
-        $description2 .=' region.';
+        $description2 .=' marketplace.';
 	@endphp
-	<div class="w-100 mt-3" style="font-family: Arial, sans-serif; " >
+	<div class="w-100 pt-5" style="font-family: Arial, sans-serif; " >
 		<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
 			<div class="card-body">
 				<h2 style="font-size: 22px; margin-bottom: 12px;font-weight: bold">{{$title}}</h2>
 				<p>{{$description}}</p>
 				<p>{{$description2}}</p>
 				<p>{{$description3}}</p>
-				<p>Here’s what you can do:</p>
+				<p>Here are a few smart next steps:</p>
 				<ul style="list-style-type: disc; padding-left: 20px;margin-bottom: 20px">
-					<li>Try searching in nearby cities or broader locations</li>
-					<li>Refine your search with different keywords or filters</li>
-					<li><a class="text-primary text-decoration-none" href="{{urlGen()->addPost()}}" style="text-decoration: underline;">Post your own free {{$categoryName}} listing now</a></li>
+					<li>Expand your search to nearby cities or surrounding areas</li>
+					<li>Try different keywords or adjust your filters for sharper results</li>
+					<li><a class="text-primary text-decoration-none" href="{{urlGen()->addPost()}}" style="text-decoration: underline;">Be the first to list &mdash; post your free {{$categoryName}} ad today</a></li>
 				</ul>
-				<p><em>{{$siteName}} is growing fast in {{$countryName}}. Check back soon for the latest {{$categoryName}} opportunities near you.</em></p>
+				<p><em>{{$siteName}} is rapidly growing across {{$countryName}}. New {{$categoryName}} listings are added every day &mdash; check back soon for the latest deals near you.</em></p>
 			</div>
 		</div>
 	</div>
@@ -263,7 +262,7 @@
 		<div class="w-100 mt-3 mb-5" style="font-family: Arial, sans-serif;">
 			<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
 				<div class="card-body">
-					<h3 style="font-size: 20px; margin-bottom: 16px;">You can also explore listings in nearby areas:</h3>
+					<h3 style="font-size: 20px; margin-bottom: 16px;">Find {{$categoryName}} listings in other cities near you:</h3>
 					<ul class="list-group list-group-flush">
 						@foreach($randomCities as $city)
 							@php

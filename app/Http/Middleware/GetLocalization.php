@@ -98,7 +98,8 @@ class GetLocalization
 					config()->set('country.lang', $countryLang->toArray());
 				}
 			}
-			
+
+            config()->set('country.name_in_en',$country->get('name'));
 			config()->set('country.code', $country->get('code'));
 			config()->set('country.icode', $country->get('icode'));
 			config()->set('country.iso3', $country->get('iso3'));

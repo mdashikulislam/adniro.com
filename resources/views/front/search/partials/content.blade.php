@@ -6,37 +6,31 @@
     $cityName    = data_get($city, 'name', '');
     $cityIn      = $cityName ? 'in ' . $cityName : '';
     $countryName = config('country.name', '');
-
+    $siteName = config('settings.app.name');
     $mapsEmbedApiKey = config('services.google_maps_platform.maps_embed_api_key');
 @endphp
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
-
-            {{-- ── HERO BANNER ── --}}
             <div class="seo-hero">
-                <h1>Discover {{ $catPlural }} {{ $cityIn }}</h1>
+                <h1>Discover {{ $catPlural }} {{ $cityIn }}{{$countryName ? ', '.$countryName:''}}</h1>
                 <p>
                     Looking for trusted {{ $catPlural }} {{ $cityIn }}{{ $cityName ? ', ' : '' }}{{ $countryName }}?
-                    Adniro connects you with real listings, verified sellers, and the best deals — all in one place.
+                    {{$siteName}} connects you with real listings, verified sellers, and the best deals — all in one place.
                 </p>
             </div>
-
-            {{-- ── INTRO ── --}}
             <div class="mb-4">
                 <h2 class="h4 fw-bold mb-2" style="color:#111827;">
                     Explore the Best {{ $catPlural }} Marketplace
                 </h2>
                 <p class="text-muted" style="max-width:760px; line-height:1.75;">
-                    Adniro is designed to help users easily find, compare, and connect for {{ $catPlural }} {{ $cityIn }}.
+                    {{$siteName}} is designed to help users easily find, compare, and connect for {{ $catPlural }} {{ $cityIn }}.
                     Whether you are searching for the latest listings or planning to post your own, our platform provides a seamless experience.
                 </p>
                 <p class="text-muted" style="max-width:760px; line-height:1.75;">
                     With growing demand in {{ $countryName }}, more people are turning to online platforms to explore opportunities in {{ $catPlural }}.
                 </p>
             </div>
-
-            {{-- ── FEATURE CARDS ── --}}
             <div class="row g-3 mb-5">
 
                 <div class="col-md-6 col-lg-3">
@@ -72,12 +66,10 @@
                 </div>
 
             </div>
-
-            {{-- ── WHY ADNIRO ── --}}
             <div class="why-section">
-                <h2 class="h5 fw-bold mb-3" style="color:#111827;">Why Choose Adniro?</h2>
+                <h2 class="h5 fw-bold mb-3" style="color:#111827;">Why Choose {{$siteName}}?</h2>
                 <p class="text-muted mb-3" style="max-width:680px; line-height:1.75;">
-                    Adniro focuses on simplicity, speed, and trust — making it easier to browse listings and connect with real users.
+                    {{$siteName}} focuses on simplicity, speed, and trust — making it easier to browse listings and connect with real users.
                 </p>
                 <ul class="why-check-list">
                     <li>
@@ -98,33 +90,26 @@
                     </li>
                 </ul>
             </div>
-
-            {{-- ── DEMAND BLOCK ── --}}
             <div class="demand-block">
                 <h2 class="h5 fw-bold mb-2" style="color:#111827;">
                     Demand for {{ $catPlural }} {{ $cityIn }}
                 </h2>
                 <p class="text-muted mb-0" style="line-height:1.75;">
                     The demand for {{ $catPlural }} {{ $cityIn }} is growing as more users prefer online marketplaces.
-                    Adniro helps buyers find better deals while giving sellers faster exposure.
+                    {{$siteName}} helps buyers find better deals while giving sellers faster exposure.
                 </p>
             </div>
-
-            {{-- ── MAP ── --}}
             <div class="map-wrapper mb-5">
                 <iframe
                     src="https://www.google.com/maps/embed/v1/place?q={{ urlencode($cityName) }},{{ urlencode($countryName) }}&key={{$mapsEmbedApiKey}}"
                     width="100%" height="340" style="border:0;" loading="lazy" allowfullscreen>
                 </iframe>
             </div>
-
-            {{-- ── FAQ ── --}}
             <div class="mb-5">
                 <h2 class="h5 fw-bold mb-3" style="color:#111827;">Frequently Asked Questions</h2>
 
                 <div class="accordion faq-modern" id="faqAccordion">
 
-                    {{-- 1 --}}
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button" type="button"
@@ -134,7 +119,7 @@
                         </h2>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Yes, Adniro allows users to post {{ $catName }} listings for free. Premium options are available to boost visibility.
+                                Yes, {{$siteName}} allows users to post {{ $catName }} listings for free. Premium options are available to boost visibility.
                             </div>
                         </div>
                     </div>
@@ -234,7 +219,7 @@
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button"
                                 data-bs-toggle="collapse" data-bs-target="#faq8" aria-expanded="false">
-                                Can businesses post listings on Adniro?
+                                Can businesses post listings on {{$siteName}}?
                             </button>
                         </h2>
                         <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
@@ -264,12 +249,12 @@
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button"
                                 data-bs-toggle="collapse" data-bs-target="#faq10" aria-expanded="false">
-                                Is Adniro available in {{ $countryName }}?
+                                Is {{$siteName}} available in {{ $countryName }}?
                             </button>
                         </h2>
                         <div id="faq10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Yes, Adniro supports listings across multiple regions including {{ $countryName }}.
+                                Yes, {{$siteName}} supports listings across multiple regions including {{ $countryName }}.
                             </div>
                         </div>
                     </div>
@@ -339,12 +324,12 @@
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button"
                                 data-bs-toggle="collapse" data-bs-target="#faq15" aria-expanded="false">
-                                Why choose Adniro over other platforms?
+                                Why choose {{$siteName}} over other platforms?
                             </button>
                         </h2>
                         <div id="faq15" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Adniro offers a modern interface, better search tools, and a growing marketplace for faster and easier transactions.
+                                {{$siteName}} offers a modern interface, better search tools, and a growing marketplace for faster and easier transactions.
                             </div>
                         </div>
                     </div>
@@ -355,9 +340,11 @@
         </div>
     </div>
 </div>
-@push('after_helpers_styles_stack')
-    @parent
+@push('after_styles_stack')
     <style>
+        header .navbar{
+            display: none;
+        }
         .seo-hero {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0d9488 100%);
             border-radius: 1.25rem;
