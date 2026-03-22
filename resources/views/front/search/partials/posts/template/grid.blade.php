@@ -242,8 +242,8 @@
         $description2 .=' marketplace.';
 	@endphp
 	{{-- No Results: Main Info Card --}}
-	<div class="w-100">
-		<div class="card border-0 rounded-3 overflow-hidden" >
+	<div class="w-100 pt-4 mb-4">
+		<div class="card border-0 rounded-3" style="box-shadow: 0 4px 24px 0 rgba(99,102,241,.10);">
 			{{-- Header Banner --}}
 			<div class="px-4 pt-4 pb-3" style="border-bottom: 2px solid #e9ecef;">
 				<div class="d-flex align-items-center gap-3">
@@ -300,7 +300,7 @@
 
 	{{-- Nearby Cities Card --}}
 	@if(!empty($randomCities))
-		<div class="w-100 mt-3 mb-5">
+		<div class="w-100 mb-4">
 			<div class="card border-0 rounded-3" style="box-shadow: 0 4px 24px 0 rgba(99,102,241,.10);">
 				<div class="card-body px-4 py-4">
 					<div class="d-flex align-items-center gap-2 mb-3">
