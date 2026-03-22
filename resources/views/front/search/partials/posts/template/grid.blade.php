@@ -199,6 +199,47 @@
 	<div class="py-5 text-center w-100">
 		{{ t('no_result_refine_your_search') }}
 	</div>
+	@php
+		$data = $apiExtra['preSearch'] ?? [];
+		$randomCities = [];
+		if (!empty($data['cat'])){
+			$title .=$data['cat']['name'];
+			$description .= $data['cat']['name'];
+			$description2 .= $data['cat']['name'];
+			$description3 .= $data['cat']['name'].' in ';
+			$categoryName = $data['cat']['name'];
+			$citiesCollection = collect($apiExtra['sidebar']['cities'] ?? []);
+			if (!empty($data['city']['slug'])) {
+				$randomCities = $citiesCollection
+					->where('slug', '!=', $data['city']['slug'])
+					->shuffle()
+					->take(5);
+			} else {
+				$randomCities = $citiesCollection->shuffle()->take(5);
+			}
+		}
+	@endphp
+	@if(!empty($randomCities))
+		<div class="w-100 mt-3" style="font-family: Arial, sans-serif;">
+			<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
+				<div class="card-body">
+					<h3 style="font-size: 20px; margin-bottom: 16px;">You can also explore listings in nearby areas:</h3>
+					<ul class="list-group list-group-flush">
+						@foreach($randomCities as $city)
+							@php
+								$cityUrl = urlGen()->city($city, null, $data['cat'] ?? null);
+							@endphp
+							<li class="list-group-item">
+								<a class="text-primary" href="{{ $cityUrl }}" class="text-decoration-none">
+									{{ $categoryName }} in {{ $city['name'] }}
+								</a>
+							</li>
+						@endforeach
+					</ul>
+				</div>
+			</div>
+		</div>
+	@endif
 @endif
 
 @section('after_scripts')
