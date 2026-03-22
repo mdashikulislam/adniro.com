@@ -18,8 +18,6 @@
 	$selectedDisplayMode = config('settings.listings_list.display_mode', 'grid-view');
 	$hideOnXsOrLower = 'd-none d-sm-block';
 	$hideInlineOnMdOrLower = 'd-none d-lg-inline-block';
-    $category = @$apiExtra['preSearch']['cat'] ?? null;
-    $city = @$apiExtra['preSearch']['city'] ?? null;
 @endphp
 @section('search')
 	@parent
@@ -333,7 +331,11 @@
 		
 		{{-- Category Description --}}
 		@include('front.search.partials.category-description')
-		@include('front.search.partials.content',['category'=> $category, 'city' => $city])
+		@if(!request()->is('*/search'))
+			@include('front.search.partials.content',['category'=> $cat, 'city' => $city])
+		@else
+
+		@endif
 		{{-- Show Posts Tags --}}
 		@include('front.search.partials.tags')
 		
