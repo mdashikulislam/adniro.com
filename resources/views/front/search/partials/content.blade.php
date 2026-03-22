@@ -8,8 +8,6 @@
     $countryName = config('country.name', '');
 
     $mapsEmbedApiKey = config('services.google_maps_platform.maps_embed_api_key');
-    $geoMapAddress = getItemAddressForMap($city);
-    $mapsEmbedApiUrl = getGoogleMapsEmbedApiUrl($mapsEmbedApiKey, $geoMapAddress);
 @endphp
 <div class="container">
     <div class="row">
@@ -115,7 +113,7 @@
             {{-- ── MAP ── --}}
             <div class="map-wrapper mb-5">
                 <iframe
-                    src="https://www.google.com/maps/embed/v1/place?q={{ urlencode($cityName) }},{{ urlencode($countryName) }}&key={{$mapsEmbedApiUrl}}"
+                    src="https://www.google.com/maps/embed/v1/place?q={{ urlencode($cityName) }},{{ urlencode($countryName) }}&key={{$mapsEmbedApiKey}}"
                     width="100%" height="340" style="border:0;" loading="lazy" allowfullscreen>
                 </iframe>
             </div>
