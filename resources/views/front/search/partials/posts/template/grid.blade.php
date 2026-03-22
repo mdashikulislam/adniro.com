@@ -241,40 +241,85 @@
         }
         $description2 .=' marketplace.';
 	@endphp
-	<div class="w-100 pt-5" style="font-family: Arial, sans-serif; " >
-		<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
-			<div class="card-body">
-				<h2 style="font-size: 22px; margin-bottom: 12px;font-weight: bold">{{$title}}</h2>
-				<p>{{$description}}</p>
-				<p>{{$description2}}</p>
-				<p>{{$description3}}</p>
-				<p>Here are a few smart next steps:</p>
-				<ul style="list-style-type: disc; padding-left: 20px;margin-bottom: 20px">
-					<li>Expand your search to nearby cities or surrounding areas</li>
-					<li>Try different keywords or adjust your filters for sharper results</li>
-					<li><a class="text-primary text-decoration-none" href="{{urlGen()->addPost()}}" style="text-decoration: underline;">Be the first to list &mdash; post your free {{$categoryName}} ad today</a></li>
-				</ul>
-				<p><em>{{$siteName}} is rapidly growing across {{$countryName}}. New {{$categoryName}} listings are added every day &mdash; check back soon for the latest deals near you.</em></p>
+	{{-- No Results: Main Info Card --}}
+	<div class="w-100">
+		<div class="card border-0 rounded-3 overflow-hidden" >
+			{{-- Header Banner --}}
+			<div class="px-4 pt-4 pb-3" style="border-bottom: 2px solid #e9ecef;">
+				<div class="d-flex align-items-center gap-3">
+					<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:52px;height:52px;background:linear-gradient(135deg,#6366f1,#0d9488);">
+						<i class="bi bi-search text-white" style="font-size:1.4rem;"></i>
+					</div>
+					<div>
+						<h2 class="mb-0 fw-bold" style="font-size:1.25rem;color:#1e1b4b;">{{$title}}</h2>
+						<span class="badge rounded-pill mt-1" style="background:#ede9fe;color:#0d9488;font-size:.75rem;font-weight:500;">0 listings found</span>
+					</div>
+				</div>
+			</div>
+			{{-- Body --}}
+			<div class="card-body px-4 py-4">
+				<p class="text-secondary mb-3" style="font-size:.95rem;line-height:1.7;">{{$description}}</p>
+				<p class="text-secondary mb-3" style="font-size:.95rem;line-height:1.7;">{{$description2}}</p>
+				<p class="text-secondary mb-4" style="font-size:.95rem;line-height:1.7;">{{$description3}}</p>
+
+				{{-- Next Steps --}}
+				<div class="rounded-3 p-3 mb-4" style="background:#f0f4ff;border:1px solid #dde3ff;">
+					<p class="fw-semibold mb-3" style="color:#0d9488;font-size:.9rem;"><i class="bi bi-lightbulb me-2"></i>Here are a few smart next steps:</p>
+					<div class="d-flex flex-column gap-2">
+						<div class="d-flex align-items-start gap-2">
+							<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:20px;height:20px;background:#0d9488;">
+								<i class="bi bi-geo-alt-fill text-white" style="font-size:.55rem;"></i>
+							</span>
+							<span style="font-size:.9rem;color:#374151;">Expand your search to nearby cities or surrounding areas</span>
+						</div>
+						<div class="d-flex align-items-start gap-2">
+							<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:20px;height:20px;background:#0d9488;">
+								<i class="bi bi-sliders text-white" style="font-size:.55rem;"></i>
+							</span>
+							<span style="font-size:.9rem;color:#374151;">Try different keywords or adjust your filters for sharper results</span>
+						</div>
+						<div class="d-flex align-items-start gap-2">
+							<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:20px;height:20px;background:#0d9488;">
+								<i class="bi bi-pencil-fill text-white" style="font-size:.55rem;"></i>
+							</span>
+							<span style="font-size:.9rem;color:#374151;">
+								<a href="{{urlGen()->addPost()}}" class="fw-semibold text-decoration-none" style="color:#0d9488;">Be the first to list &mdash; post your free {{$categoryName}} ad today</a>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				{{-- Footer Note --}}
+				<div class="d-flex align-items-center gap-2 pt-2" style="border-top:1px solid #e9ecef;">
+					<i class="bi bi-stars" style="color:#f59e0b;font-size:1rem;"></i>
+					<p class="mb-0 fst-italic text-secondary" style="font-size:.85rem;">{{$siteName}} is rapidly growing across {{$countryName}}. New {{$categoryName}} listings are added every day &mdash; check back soon for the latest deals near you.</p>
+				</div>
 			</div>
 		</div>
 	</div>
+
+	{{-- Nearby Cities Card --}}
 	@if(!empty($randomCities))
-		<div class="w-100 mt-3 mb-5" style="font-family: Arial, sans-serif;">
-			<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
-				<div class="card-body">
-					<h3 style="font-size: 20px; margin-bottom: 16px;">Find {{$categoryName}} listings in other cities near you:</h3>
-					<ul class="list-group list-group-flush">
+		<div class="w-100 mt-3 mb-5">
+			<div class="card border-0 rounded-3" style="box-shadow: 0 4px 24px 0 rgba(99,102,241,.10);">
+				<div class="card-body px-4 py-4">
+					<div class="d-flex align-items-center gap-2 mb-3">
+						<i class="bi bi-pin-map-fill" style="color:#0d9488;font-size:1.1rem;"></i>
+						<h3 class="mb-0 fw-semibold" style="font-size:1rem;color:#1e1b4b;">Find {{$categoryName}} listings in other cities near you:</h3>
+					</div>
+					<div class="row g-2">
 						@foreach($randomCities as $city)
 							@php
 								$cityUrl = urlGen()->city($city, null, $data['cat'] ?? null);
 							@endphp
-							<li class="list-group-item">
-								<a class="text-primary" href="{{ $cityUrl }}" class="text-decoration-none">
-									{{ $categoryName }} in {{ $city['name'] }}
+							<div class="col-12 col-sm-6">
+								<a href="{{ $cityUrl }}" class="d-flex align-items-center gap-2 text-decoration-none rounded-2 px-3 py-2 hover-bg-tertiary" style="border:1px solid #e5e7eb;transition:all .2s;">
+									<i class="bi bi-geo-alt" style="color:#0d9488;"></i>
+									<span style="font-size:.9rem;color:#374151;">{{ $categoryName }} in {{ $city['name'] }}</span>
 								</a>
-							</li>
+							</div>
 						@endforeach
-					</ul>
+					</div>
 				</div>
 			</div>
 		</div>
