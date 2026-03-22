@@ -196,31 +196,71 @@
 		@endforeach
 	</div>
 @else
-	<div class="py-5 text-center w-100">
-		{{ t('no_result_refine_your_search') }}
-	</div>
 	@php
 		$data = $apiExtra['preSearch'] ?? [];
-		$randomCities = [];
-		if (!empty($data['cat'])){
-			$title .=$data['cat']['name'];
-			$description .= $data['cat']['name'];
-			$description2 .= $data['cat']['name'];
-			$description3 .= $data['cat']['name'].' in ';
-			$categoryName = $data['cat']['name'];
-			$citiesCollection = collect($apiExtra['sidebar']['cities'] ?? []);
-			if (!empty($data['city']['slug'])) {
-				$randomCities = $citiesCollection
-					->where('slug', '!=', $data['city']['slug'])
-					->shuffle()
-					->take(5);
-			} else {
-				$randomCities = $citiesCollection->shuffle()->take(5);
-			}
-		}
+        $siteName = config('settings.app.name');
+        $categoryName = '';
+        $cityName = '';
+        $randomCities = [];
+        $title = '';
+        $description = 'Finding reliable ';
+        $description2 = 'At '.$siteName.', we are continuously expanding our ';
+        $description3 = 'Many users also search for ';
+        $countryName = config('country.name_in_en');
+        if (!empty($data['cat'])){
+            $title .=$data['cat']['name'];
+            $description .= $data['cat']['name'];
+            $description2 .= $data['cat']['name'];
+            $description3 .= $data['cat']['name'].' in ';
+            $categoryName = $data['cat']['name'];
+            $citiesCollection = collect($apiExtra['sidebar']['cities'] ?? []);
+            if (!empty($data['city']['slug'])) {
+                $randomCities = $citiesCollection
+                    ->where('slug', '!=', $data['city']['slug'])
+                    ->shuffle()
+                    ->take(5);
+            } else {
+                $randomCities = $citiesCollection->shuffle()->take(5);
+            }
+        }
+        $description .=' options';
+        $description2 .=' listings';
+        $description3 .='nearby locations to find better deals, faster availability, or more options. As our platform grows';
+        if (!empty($data['city'])){
+            $title .=' in '.$data['city']['name'];
+            $description .=' in '.$data['city']['name'];
+            $description2 .=' in '.$data['city']['name'].', ';
+            $description3 .=', '.$data['city']['name'];
+            $cityName = $data['city']['name'];
+        }
+        $description .= ' can be challenging, especially when availability changes frequently. Whether you’re searching for affordable services, trusted professionals, or the latest listings, having access to a growing local marketplace makes the process much easier.';
+        $description2 .='with new ads being added regularly by local users and businesses. While availability may vary at times, you can still explore nearby areas, compare options, and discover opportunities across the wider ';
+        $description3 .=' is becoming an important part of our expanding local classifieds network.';
+        if (isset($countryName)){
+            $title .= ', '.$countryName;
+            $description2 .=$countryName;
+        }
+        $description2 .=' region.';
 	@endphp
+	<div class="w-100 mt-3" style="font-family: Arial, sans-serif; " >
+		<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
+			<div class="card-body">
+				<h2 style="font-size: 22px; margin-bottom: 12px;font-weight: bold">{{$title}}</h2>
+				<p>{{$description}}</p>
+				<p>{{$description2}}</p>
+				<p>{{$description3}}</p>
+				<p>Here’s what you can do:</p>
+				<ul style="list-style-type: disc; padding-left: 20px;margin-bottom: 20px">
+					<li>Try searching in nearby cities or broader locations</li>
+					<li>Refine your search with different keywords or filters</li>
+					<li><a class="text-primary text-decoration-none" href="{{urlGen()->addPost()}}" style="text-decoration: underline;">Post your own free {{$categoryName}} listing now</a></li>
+				</ul>
+				<p><em>{{$siteName}} is growing fast in {{$countryName}}. Check back soon for the latest {{$categoryName}} opportunities near you.</em></p>
+			</div>
+		</div>
+	</div>
 	@if(!empty($randomCities))
-		<div class="w-100 mt-3" style="font-family: Arial, sans-serif;">
+		<div class="w-100 mt-3 mb-5" style="font-family: Arial, sans-serif;">
 			<div class="card" style="box-shadow: 0 3px 5px 0 rgba(140, 152, 164, .2)">
 				<div class="card-body">
 					<h3 style="font-size: 20px; margin-bottom: 16px;">You can also explore listings in nearby areas:</h3>
