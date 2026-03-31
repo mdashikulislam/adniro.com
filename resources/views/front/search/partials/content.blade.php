@@ -342,9 +342,6 @@
 </div>
 @push('after_styles_stack')
     <style>
-        header .navbar{
-            display: none;
-        }
         .seo-hero {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0d9488 100%);
             border-radius: 1.25rem;

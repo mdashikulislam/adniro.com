@@ -6,15 +6,15 @@
 	$posts = (array)data_get($apiResult, 'data');
 	$totalPosts = (int)data_get($apiResult, 'meta.total', 0);
 	$tags = (array)data_get($apiExtra, 'tags');
-	
+
 	$postTypes ??= [];
 	$orderByOptions ??= [];
 	$displayModes ??= [];
-	
+
 	$isLeftSidebarEnabled = (config('settings.listings_list.show_left_sidebar') == '1');
 	$breakpointKey = config('settings.listings_list.left_sidebar_offcanvas', 'sm');
 	$pageBreakpoint = getSerpOffcanvasBreakpoint($breakpointKey, $isLeftSidebarEnabled);
-	
+
 	$selectedDisplayMode = config('settings.listings_list.display_mode', 'grid-view');
 	$hideOnXsOrLower = 'd-none d-sm-block';
 	$hideInlineOnMdOrLower = 'd-none d-lg-inline-block';
@@ -26,14 +26,14 @@
 @section('content')
 	<div class="main-container">
 		@include('front.search.partials.breadcrumbs')
-		
+
 		{{-- SEO H1 Title --}}
 		@php
 			$cat ??= null;
 			$city ??= null;
 			$admin ??= null;
 			$h1Title = '';
-			
+
 			// Build unique H1 title based on page type
 			if (!empty($city)) {
 				// City page
@@ -86,7 +86,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		@if (config('settings.listings_list.show_cats_in_top'))
 			@if (!empty($cats))
 				<div class="container mb-2 {{ $hideOnXsOrLower }}">
@@ -97,7 +97,7 @@
 			@endif
 			@include('front.search.partials.categories')
 		@endif
-		
+
 		@if (!empty($topAdvertising))
 			@include('front.layouts.partials.advertising.top', ['paddingTopExists' => true])
 			@php
@@ -110,14 +110,14 @@
 				}
 			@endphp
 		@endif
-		
+
 		<div class="container">
 			<div class="row">
 				{{-- Sidebar --}}
                 @if ($isLeftSidebarEnabled)
                     @include('front.search.partials.sidebar', ['pageBreakpoint' => $pageBreakpoint])
                 @endif
-				
+
 				{{-- Content --}}
 				@php
 					$rightColSize = data_get($pageBreakpoint, 'rightColSize') ?? ($isLeftSidebarEnabled ? 'col-md-9' : 'col-md-12');
@@ -182,7 +182,7 @@
 								@endif
 							@endif
 						</ul>
-						
+
 						{{-- Breadcrumb --}}
 						<div class="container bg-body py-3 border border-top-0">
 							<div class="row">
@@ -201,7 +201,7 @@
 								</div>
 							</div>
 						</div>
-						
+
 						{{-- Filters, OrderBy & Display Mode --}}
 						<div class="container px-1 py-2 bg-body-tertiary border border-top-0">
 							<ul class="list-inline m-0 p-0 text-end">
@@ -219,7 +219,7 @@
 										</a>
 									</li>
 								@endif
-								
+
 								{{-- OrderBy --}}
 								<li class="list-inline-item px-2">
 									<div class="dropdown">
@@ -233,15 +233,15 @@
 														@php
 															$currentUrl = request()->fullUrl();
 															$currentUrlWithoutOrderBy = urlBuilder($currentUrl)->removeParameter('orderBy')->toString();
-															
+
 															$optionQuery = (array)data_get($option, 'query');
 															$optionUrl = urlBuilder($currentUrl)->setParameters($optionQuery)->toString();
-															
+
 															$optionParams = urlBuilder($optionUrl)->getAllParameters();
 															$optionParams = collect($optionParams)->sortKeys()->toArray();
 															$currentParams = urlBuilder(request()->fullUrl())->getAllParameters();
 															$currentParams = collect($currentParams)->sortKeys()->toArray();
-															
+
 															$optionUrl = ($optionUrl == $currentUrlWithoutOrderBy) ? '#' : $optionUrl;
 															$activeClass = ($optionParams == $currentParams) ? ' active' : '';
 														@endphp
@@ -256,7 +256,7 @@
 										</ul>
 									</div>
 								</li>
-								
+
 								{{-- Display Modes --}}
 								@if (!empty($posts) && $totalPosts > 0)
 									<li class="list-inline-item px-2">
@@ -281,7 +281,7 @@
 								@endif
 							</ul>
 						</div>
-						
+
 						{{-- Listing List --}}
 						<div class="tab-content bg-body" id="myTabContent">
 							<div class="tab-pane fade show active" id="contentAll" role="tabpanel" aria-labelledby="tabAll">
@@ -296,7 +296,7 @@
 								</div>
 							</div>
 						</div>
-						
+
 						{{-- Save Search Link --}}
 						@php
 							$keyword = request()->query('q');
@@ -315,20 +315,20 @@
 							</div>
 						@endif
 					</div>
-					
+
 					{{-- Pagination --}}
 					@include('vendor.pagination.api.bootstrap-5')
-					
+
 				</div>
 			</div>
 		</div>
-		
+
 		{{-- Advertising --}}
 		@include('front.layouts.partials.advertising.bottom')
-		
+
 		{{-- Promo Listing Button --}}
 		@include('front.search.partials.call-to-action')
-		
+
 		{{-- Category Description --}}
 		@include('front.search.partials.category-description')
 		@if(!request()->is('*/search'))
@@ -338,9 +338,8 @@
 		@endif
 		{{-- Show Posts Tags --}}
 		@include('front.search.partials.tags')
-		
+
 	</div>
-	
 	@includeWhen(!auth()->check(), 'auth.login.partials.modal')
 @endsection
 
@@ -357,7 +356,7 @@
 				postTypeEl.forEach((element) => {
 					element.addEventListener('click', (event) => {
 						event.preventDefault();
-						
+
 						let goToUrl = event.target.getAttribute('href');
 						redirect(goToUrl);
 					});
