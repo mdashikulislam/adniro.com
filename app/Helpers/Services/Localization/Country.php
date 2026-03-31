@@ -86,10 +86,15 @@ class Country
 	 */
 	public function find(): Collection
 	{
-		// Get the user's country by its IP address
-		$this->ipCountry = $this->getCountryFromIP();
-		$this->country = collect();
-		
+
+        $this->country = collect();
+        $this->ipCountry = collect();
+
+        $geoipActivation = config('settings.localization.geoip_activation');
+        $defaultCountryCode = config('settings.localization.default_country_code');
+        if ($geoipActivation) {
+            $this->ipCountry = $this->getCountryFromIP();
+        }
 		// Get the country
 		if (isFromApi()) {
 			// API call
