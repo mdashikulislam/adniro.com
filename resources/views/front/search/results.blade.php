@@ -331,11 +331,11 @@
 
 		{{-- Category Description --}}
 		@include('front.search.partials.category-description')
-		@if(!request()->is('*/search'))
-			@include('front.search.partials.content',['category'=> $cat, 'city' => $city])
-		@else
+{{--		@if(!request()->is('*/search'))--}}
+{{--			@include('front.search.partials.content',['category'=> $cat, 'city' => $city])--}}
+{{--		@else--}}
 
-		@endif
+{{--		@endif--}}
 		{{-- Show Posts Tags --}}
 		@include('front.search.partials.tags')
 

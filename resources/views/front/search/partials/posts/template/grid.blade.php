@@ -1,20 +1,15 @@
 @php
 	use App\Enums\BootstrapColor;
 	use Illuminate\Support\Number;
-	
+
 	$posts ??= [];
 	$totalPosts ??= 0;
-	
+
 	$city ??= null;
 	$cat ??= null;
-	
+
 	$defaultCols = 4;
-    $customCols ??=0;
-    if ($customCols > 0) {
-		$lgCols = $customCols;
-	}else{
-        $lgCols = (int)config('settings.listings_list.grid_view_cols', $defaultCols);
-	}
+	$lgCols = (int)config('settings.listings_list.grid_view_cols', $defaultCols);
 	$lgCols = Number::clamp($lgCols, min: 2, max: 4);
 	$mdCols = ($lgCols >= 3) ? 3 : $lgCols;
 	$smCols = ($lgCols >= 2) ? 2 : $lgCols;
@@ -30,7 +25,7 @@
 							'class' => 'lazyload img-fluid w-100 h-auto rounded',
 							//'style' => 'max-width: 300px; max-height: 200px; width: auto; height: 200px;',
 						];
-						
+
 						$postUrl = urlGen()->post($post);
 						$parentCatUrl = null;
 						if (!empty(data_get($post, 'category.parent'))) {
@@ -39,7 +34,7 @@
 						$catUrl = urlGen()->category(data_get($post, 'category'), null, $city);
 						$locationUrl = urlGen()->city(data_get($post, 'city'), null, $cat);
 					@endphp
-					
+
 					<div class="row h-100 d-flex flex-column justify-content-between">
 						<div class="col-12 p-0 mx-0">
 							<div class="row">
@@ -60,11 +55,11 @@
 												@endif
 											@endif
 										@endif
-										
+
 										<div class="position-absolute top-0 end-0 mt-2 me-3 bg-body-secondary opacity-75 rounded px-1">
 											<i class="fa-solid fa-camera"></i> {{ data_get($post, 'count_pictures') }}
 										</div>
-										
+
 										<a href="{{ $postUrl }}">
 											@php
 												$src = data_get($post, 'picture.url.medium');
@@ -75,7 +70,7 @@
 										</a>
 									</div>
 								</div>
-								
+
 								{{-- Details --}}
 								<div class="col-12 mt-3">
 									<div class="px-3">
@@ -85,7 +80,7 @@
 												{{ str(data_get($post, 'title'))->limit(70) }}
 											</a>
 										</h5>
-										
+
 										{{-- Infos --}}
 										@php
 											$showPostInfo = (
@@ -105,9 +100,9 @@
 														@if (!empty(data_get($post, 'postType')))
 															<div class="list-inline-item">
 																<span class="badge rounded-pill text-bg-secondary fw-normal"
-																      data-bs-toggle="tooltip"
-																      data-bs-placement="bottom"
-																      title="{{ data_get($post, 'postType.label') }}"
+																	  data-bs-toggle="tooltip"
+																	  data-bs-placement="bottom"
+																	  title="{{ data_get($post, 'postType.label') }}"
 																>
 																	{{ strtoupper(mb_substr(data_get($post, 'postType.label'), 0, 1)) }}
 																</span>
@@ -147,7 +142,7 @@
 								</div>
 							</div>
 						</div>
-						
+
 						{{-- Price & Favourite Button --}}
 						<div class="col-12">
 							<div class="row">
@@ -159,13 +154,13 @@
 										</div>
 									@endif
 								@endif
-								
+
 								<div class="col-12 text-end">
 									<h5 class="fs-4 fw-bold">
 										{!! data_get($post, 'price_formatted') !!}
 									</h5>
 								</div>
-								
+
 								<div class="col-12 text-end">
 									@if (!empty(data_get($post, 'payment.package')))
 										@if (data_get($post, 'payment.package.has_badge') == 1)
@@ -196,134 +191,9 @@
 		@endforeach
 	</div>
 @else
-	@php
-		$data = $apiExtra['preSearch'] ?? [];
-        $siteName = config('settings.app.name');
-        $categoryName = '';
-        $cityName = '';
-        $randomCities = [];
-        $title = '';
-        $description = 'Explore verified ';
-        $description2 = 'At '.$siteName.', genuine ';
-        $description3 = 'Thousands of buyers are also browsing ';
-        $countryName = config('country.name_in_en', '');
-        if (!empty($data['cat'])){
-            $title .= 'Find the Best '.$data['cat']['name'].' for Sale';
-            $description .= $data['cat']['name'];
-            $description2 .= $data['cat']['name'];
-            $description3 .= $data['cat']['name'].' in ';
-            $categoryName = $data['cat']['name'];
-            $citiesCollection = collect($apiExtra['sidebar']['cities'] ?? []);
-            if (!empty($data['city']['slug'])) {
-                $randomCities = $citiesCollection
-                    ->where('slug', '!=', $data['city']['slug'])
-                    ->shuffle()
-                    ->take(5);
-            } else {
-                $randomCities = $citiesCollection->shuffle()->take(5);
-            }
-        }
-        $description .=' listings';
-        $description2 .=' ads are published every day';
-        $description3 .='neighboring regions — uncovering better prices, faster choices, and wider variety. As our platform continues to grow';
-        if (!empty($data['city'])){
-            $title .=' in '.$data['city']['name'];
-            $description .=' in '.$data['city']['name'];
-            $description2 .=' in '.$data['city']['name'].', ';
-            $description3 .=', '.$data['city']['name'];
-            $cityName = $data['city']['name'];
-        }
-        $description .= ' — connect with trusted local sellers, compare the best available deals, and find exactly what you need. Your next great opportunity is closer than you think.';
-        $description2 .='by real local sellers and service providers. While availability naturally shifts over time, you can still browse surrounding areas, compare your options, and uncover fresh opportunities across the ';
-        $description3 .=' is emerging as a key part of our thriving local classifieds community.';
-        if (isset($countryName)){
-            $title .= ', '.$countryName;
-        }
-        $description2 .=' marketplace.';
-	@endphp
-	{{-- No Results: Main Info Card --}}
-	<div class="w-100 pt-4 mb-4">
-		<div class="card border-0 rounded-3" style="box-shadow: 0 4px 24px 0 rgba(99,102,241,.10);">
-			{{-- Header Banner --}}
-			<div class="px-4 pt-4 pb-3" style="border-bottom: 2px solid #e9ecef;">
-				<div class="d-flex align-items-center gap-3">
-					<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:52px;height:52px;background:linear-gradient(135deg,#6366f1,#0d9488);">
-						<i class="bi bi-search text-white" style="font-size:1.4rem;"></i>
-					</div>
-					<div>
-						<h2 class="mb-0 fw-bold" style="font-size:1.25rem;color:#1e1b4b;">{{$title}}</h2>
-						<span class="badge rounded-pill mt-1" style="background:#ede9fe;color:#0d9488;font-size:.75rem;font-weight:500;">0 listings found</span>
-					</div>
-				</div>
-			</div>
-			{{-- Body --}}
-			<div class="card-body px-4 py-4">
-				<p class="text-secondary mb-3" style="font-size:.95rem;line-height:1.7;">{{$description}}</p>
-				<p class="text-secondary mb-3" style="font-size:.95rem;line-height:1.7;">{{$description2}}</p>
-				<p class="text-secondary mb-4" style="font-size:.95rem;line-height:1.7;">{{$description3}}</p>
-
-				{{-- Next Steps --}}
-				<div class="rounded-3 p-3 mb-4" style="background:#f0f4ff;border:1px solid #dde3ff;">
-					<p class="fw-semibold mb-3" style="color:#0d9488;font-size:.9rem;"><i class="bi bi-lightbulb me-2"></i>Here are a few smart next steps:</p>
-					<div class="d-flex flex-column gap-2">
-						<div class="d-flex align-items-start gap-2">
-							<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:20px;height:20px;background:#0d9488;">
-								<i class="bi bi-geo-alt-fill text-white" style="font-size:.55rem;"></i>
-							</span>
-							<span style="font-size:.9rem;color:#374151;">Expand your search to nearby cities or surrounding areas</span>
-						</div>
-						<div class="d-flex align-items-start gap-2">
-							<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:20px;height:20px;background:#0d9488;">
-								<i class="bi bi-sliders text-white" style="font-size:.55rem;"></i>
-							</span>
-							<span style="font-size:.9rem;color:#374151;">Try different keywords or adjust your filters for sharper results</span>
-						</div>
-						<div class="d-flex align-items-start gap-2">
-							<span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:20px;height:20px;background:#0d9488;">
-								<i class="bi bi-pencil-fill text-white" style="font-size:.55rem;"></i>
-							</span>
-							<span style="font-size:.9rem;color:#374151;">
-								<a href="{{urlGen()->addPost()}}" class="fw-semibold text-decoration-none" style="color:#0d9488;">Be the first to list &mdash; post your free {{$categoryName}} ad today</a>
-							</span>
-						</div>
-					</div>
-				</div>
-
-				{{-- Footer Note --}}
-				<div class="d-flex align-items-center gap-2 pt-2" style="border-top:1px solid #e9ecef;">
-					<i class="bi bi-stars" style="color:#f59e0b;font-size:1rem;"></i>
-					<p class="mb-0 fst-italic text-secondary" style="font-size:.85rem;">{{$siteName}} is rapidly growing across {{$countryName}}. New {{$categoryName}} listings are added every day &mdash; check back soon for the latest deals near you.</p>
-				</div>
-			</div>
-		</div>
+	<div class="py-5 text-center w-100">
+		{{ t('no_result_refine_your_search') }}
 	</div>
-
-	{{-- Nearby Cities Card --}}
-	@if(!empty($randomCities))
-		<div class="w-100 mb-4">
-			<div class="card border-0 rounded-3" style="box-shadow: 0 4px 24px 0 rgba(99,102,241,.10);">
-				<div class="card-body px-4 py-4">
-					<div class="d-flex align-items-center gap-2 mb-3">
-						<i class="bi bi-pin-map-fill" style="color:#0d9488;font-size:1.1rem;"></i>
-						<h3 class="mb-0 fw-semibold" style="font-size:1rem;color:#1e1b4b;">Find {{$categoryName}} listings in other cities near you:</h3>
-					</div>
-					<div class="row g-2">
-						@foreach($randomCities as $city)
-							@php
-								$cityUrl = urlGen()->city($city, null, $data['cat'] ?? null);
-							@endphp
-							<div class="col-12 col-sm-6">
-								<a href="{{ $cityUrl }}" class="d-flex align-items-center gap-2 text-decoration-none rounded-2 px-3 py-2 hover-bg-tertiary" style="border:1px solid #e5e7eb;transition:all .2s;">
-									<i class="bi bi-geo-alt" style="color:#0d9488;"></i>
-									<span style="font-size:.9rem;color:#374151;">{{ $categoryName }} in {{ $city['name'] }}</span>
-								</a>
-							</div>
-						@endforeach
-					</div>
-				</div>
-			</div>
-		</div>
-	@endif
 @endif
 
 @section('after_scripts')
