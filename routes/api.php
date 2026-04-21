@@ -45,6 +45,7 @@ use App\Http\Controllers\Api\ThreadMessageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserTypeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -457,6 +458,10 @@ Route::prefix('captcha')
 	->group(function ($router) {
 		Route::get('/', 'getCaptcha')->name('api.captcha.getCaptcha');
 	});
+
+
+Route::post('/webhooks/aws-ses', [WebhookController::class, 'awsSes']);
+
 
 // fallback
 // catch all routes where the path does not start with 'plugins'
