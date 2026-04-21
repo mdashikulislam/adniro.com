@@ -460,7 +460,7 @@ Route::prefix('captcha')
 	});
 
 
-Route::post('/webhooks/aws-ses', [WebhookController::class, 'awsSes']);
+Route::any('/webhooks/aws-ses', [WebhookController::class, 'awsSes']);
 
 
 // fallback
