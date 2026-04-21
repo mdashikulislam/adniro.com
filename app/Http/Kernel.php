@@ -22,6 +22,9 @@ class Kernel
 {
 	public function __invoke(Middleware $middleware): void
 	{
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/aws-ses',
+        ]);
 		/*
 		 * The application's global HTTP middleware stack
 		 */
