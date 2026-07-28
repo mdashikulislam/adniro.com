@@ -54,7 +54,7 @@ Route::controller(FileController::class)
 
 if (!$isDomainmappingAvailable) {
 	// SITEMAPS (XML)
-	Route::get('sitemaps.xml', [SitemapsController::class, 'getAllCountriesSitemapIndex']);
+	Route::middleware('custom.cache.header')->get('sitemaps.xml', [SitemapsController::class, 'getAllCountriesSitemapIndex']);
 }
 
 // Impersonate (As admin user, login as another user)
@@ -251,6 +251,7 @@ Route::feeds();
 if (!$isDomainmappingAvailable) {
 	// SITEMAPS (XML)
 	Route::controller(SitemapsController::class)
+		->middleware('custom.cache.header')
 		->group(function ($router) {
 			$router->pattern('countryCode', getCountryCodeRoutePattern());
 			Route::get('{countryCode}/sitemaps.xml', 'getSitemapIndexByCountry')->name('xml.sitemaps.all');

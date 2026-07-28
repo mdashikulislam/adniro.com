@@ -38,6 +38,11 @@ class SitemapsController extends FrontController
 {
 	protected Carbon|string $defaultDate = '2015-10-30T20:10:00+02:00';
 	protected bool $isDomainmappingAvailable = false;
+
+	// Cap on cities listed per category sitemap (biggest cities first).
+	// Without a cap, categories × cities creates a crawl space of hundreds of
+	// thousands of uncached search URLs that bots hammer around the clock.
+	protected int $maxCitiesPerCategorySitemap = 200;
 	
 	public function __construct()
 	{
@@ -406,13 +411,15 @@ class SitemapsController extends FrontController
         if (empty($country)) {
             return Sitemap::render();
         }
-        $cacheId = 'cities.' . $country['icode'] . '.all';
+        $cacheId = 'cities.' . $country['icode'] . '.top.' . $this->maxCitiesPerCategorySitemap;
         $cacheExpiration = $this->cacheExpiration ?? 3600;
         $cities = Cache::remember($cacheId, $cacheExpiration, function () use ($country) {
             return City::query()
+                ->select(['id', 'name'])
                 ->inCountry($country['icode'])
                 ->orderByDesc('population')
                 ->orderBy('name')
+                ->take($this->maxCitiesPerCategorySitemap)
                 ->get();
         });
 
@@ -424,7 +431,7 @@ class SitemapsController extends FrontController
         foreach ($cities as $city) {
             $citySlug = slugify($city->name);
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
-            Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+            Sitemap::addTag($url, $this->defaultDate, 'weekly', '0.7');
         }
         return Sitemap::render();
     }
