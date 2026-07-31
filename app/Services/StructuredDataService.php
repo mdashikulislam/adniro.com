@@ -71,33 +71,51 @@ class StructuredDataService
 	/**
 	 * BreadcrumbList from a list of ['name' => ..., 'url' => ...(optional)] items
 	 *
+	 * Rules (Google breadcrumb guidance):
+	 * - The last ListItem (current page) gets "name" only, never "item".
+	 * - "item" URLs are absolute and canonical (query strings stripped).
+	 * - Crumbs pointing to search URLs (noindexed, robots-blocked) are dropped.
+	 *
 	 * @param array $items
 	 * @return array|null
 	 */
 	public function breadcrumbs(array $items): ?array
 	{
-		$listItems = [];
-		$position = 1;
-		foreach ($items as $item) {
+		$cleanItems = [];
+		$lastIndex = count($items) - 1;
+		foreach (array_values($items) as $index => $item) {
 			$name = html_entity_decode(strip_tags((string)data_get($item, 'name')));
 			$name = normalizeWhitespace($name);
 			if (trim($name) === '') {
 				continue;
 			}
-			$listItem = [
-				'@type'    => 'ListItem',
-				'position' => $position++,
-				'name'     => $name,
-			];
-			$url = data_get($item, 'url');
-			if (!empty($url)) {
-				$listItem['item'] = $url;
+
+			$url = $this->canonicalUrl(data_get($item, 'url'));
+			$isCurrentPage = ($index >= $lastIndex);
+
+			// Intermediate crumbs must link an indexable page; search URLs never are
+			if (!$isCurrentPage && (empty($url) || $this->isSearchUrl($url))) {
+				continue;
 			}
-			$listItems[] = $listItem;
+
+			$cleanItems[] = ['name' => $name, 'url' => $isCurrentPage ? null : $url];
 		}
 
-		if (count($listItems) < 2) {
+		if (count($cleanItems) < 2) {
 			return null;
+		}
+
+		$listItems = [];
+		foreach (array_values($cleanItems) as $index => $item) {
+			$listItem = [
+				'@type'    => 'ListItem',
+				'position' => $index + 1,
+				'name'     => $item['name'],
+			];
+			if (!empty($item['url'])) {
+				$listItem['item'] = $item['url'];
+			}
+			$listItems[] = $listItem;
 		}
 
 		return [
@@ -105,6 +123,47 @@ class StructuredDataService
 			'@type'           => 'BreadcrumbList',
 			'itemListElement' => $listItems,
 		];
+	}
+
+	/**
+	 * The country's canonical crawlable homepage URL
+	 * (e.g. https://www.adniro.com/in), the site root otherwise.
+	 *
+	 * @return string
+	 */
+	public function countryHomeUrl(): string
+	{
+		$countryCode = strtolower((string)config('country.icode'));
+		if (isMultiCountriesUrlsEnabled() && !empty($countryCode)) {
+			return url('/' . $countryCode);
+		}
+
+		return url('/');
+	}
+
+	protected function canonicalUrl($url): ?string
+	{
+		if (empty($url) || !is_string($url)) {
+			return null;
+		}
+
+		// Absolute URL without query string or fragment
+		$url = strtok($url, '?');
+		$url = strtok($url, '#');
+
+		return str_starts_with($url, 'http') ? rtrim($url, '/') : null;
+	}
+
+	protected function isSearchUrl(string $url): bool
+	{
+		try {
+			$searchPath = parse_url(urlGen()->searchWithoutQuery(), PHP_URL_PATH);
+			$urlPath = parse_url($url, PHP_URL_PATH);
+
+			return !empty($searchPath) && !empty($urlPath) && str_starts_with($urlPath, rtrim($searchPath, '/'));
+		} catch (Throwable $e) {
+			return false;
+		}
 	}
 
 	/**

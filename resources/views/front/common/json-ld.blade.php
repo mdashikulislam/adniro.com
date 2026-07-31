@@ -10,7 +10,8 @@
 	if ($isListingDetailsPage) {
 		$jsonLdSchemas[] = $sdService->forListing((array)$post, (array)($pictures ?? []), (array)($customFields ?? []));
 
-		$bcItems = [['name' => config('country.name'), 'url' => url('/')]];
+		// Country > Category > Subcategory > {listing title}
+		$bcItems = [['name' => config('country.name'), 'url' => $sdService->countryHomeUrl()]];
 		foreach ((array)($catBreadcrumb ?? []) as $bcItem) {
 			$bcItems[] = ['name' => data_get($bcItem, 'name'), 'url' => data_get($bcItem, 'url')];
 		}
@@ -19,7 +20,8 @@
 	}
 
 	if ($isSearchResultsPage) {
-		$bcItems = [['name' => config('country.name'), 'url' => urlGen()->searchWithoutQuery()]];
+		// Country > Category (> Subcategory) (> City) — mirrors the visible trail
+		$bcItems = [['name' => config('country.name'), 'url' => $sdService->countryHomeUrl()]];
 		foreach ((array)$bcTab as $bcItem) {
 			$bcItems[] = ['name' => data_get($bcItem, 'name'), 'url' => data_get($bcItem, 'url')];
 		}
