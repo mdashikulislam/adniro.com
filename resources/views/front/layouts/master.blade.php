@@ -16,6 +16,7 @@
 	<meta charset="{{ config('larapen.core.charset', 'utf-8') }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	@include('front.common.meta-robots')
+	@include('front.common.json-ld')
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href="{{ config('settings.app.favicon_url') }}">
 	<title>{!! MetaTag::get('title') !!}</title>
