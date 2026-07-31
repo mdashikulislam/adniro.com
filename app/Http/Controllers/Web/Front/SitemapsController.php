@@ -38,6 +38,7 @@ class SitemapsController extends FrontController
 {
 	protected Carbon|string $defaultDate = '2015-10-30T20:10:00+02:00';
 	protected bool $isDomainmappingAvailable = false;
+	protected int $minListingsToIndex = 3;
 	
 	public function __construct()
 	{
@@ -49,6 +50,55 @@ class SitemapsController extends FrontController
 			plugin_exists('domainmapping')
 			&& plugin_installed_file_exists('domainmapping')
 		);
+
+		$this->minListingsToIndex = (int)config('seo.min_listings_to_index', 3);
+	}
+
+	/**
+	 * Live listings counts for a country, aggregated per category (including
+	 * ancestor categories), per city and per category×city combination.
+	 * Built from a single grouped query and cached; used to keep pages below
+	 * the indexing threshold out of the XML sitemaps.
+	 *
+	 * @param string $countryCode
+	 * @return array{cat: array<int, int>, city: array<int, int>, catCity: array<string, int>}
+	 */
+	protected function getListingCounts(string $countryCode): array
+	{
+		$cacheId = 'sitemaps.listingCounts.' . strtolower($countryCode);
+
+		return Cache::remember($cacheId, $this->cacheExpiration, function () use ($countryCode) {
+			$rows = Post::query()
+				->verified()
+				->unarchived()
+				->inCountry($countryCode)
+				->whereNotNull('category_id')
+				->groupBy('category_id', 'city_id')
+				->selectRaw('category_id, city_id, COUNT(*) as total')
+				->get();
+
+			$parentByCat = Category::query()->pluck('parent_id', 'id');
+
+			$counts = ['cat' => [], 'city' => [], 'catCity' => []];
+			foreach ($rows as $row) {
+				$cityId = (int)$row->city_id;
+				$total = (int)$row->total;
+
+				$counts['city'][$cityId] = ($counts['city'][$cityId] ?? 0) + $total;
+
+				// Roll the count up through the category's ancestors
+				$catId = (int)$row->category_id;
+				$depthGuard = 0;
+				while (!empty($catId) && $depthGuard++ < 10) {
+					$counts['cat'][$catId] = ($counts['cat'][$catId] ?? 0) + $total;
+					$key = $catId . '-' . $cityId;
+					$counts['catCity'][$key] = ($counts['catCity'][$key] ?? 0) + $total;
+					$catId = (int)($parentByCat[$catId] ?? 0);
+				}
+			}
+
+			return $counts;
+		});
 	}
 	
 	/**
@@ -210,14 +260,19 @@ class SitemapsController extends FrontController
 		});
 		
 		if ($cats->count() > 0) {
+			$counts = $this->getListingCounts($country['code']);
 			$cats = collect($cats)->keyBy('id');
-			
+
 			foreach ($cats as $cat) {
+				// Only indexable pages (enough live listings) belong in the sitemap
+				if (($counts['cat'][$cat->id] ?? 0) < $this->minListingsToIndex) {
+					continue;
+				}
 				$url = urlGen()->category($cat, $country['icode']);
 				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
 			}
 		}
-		
+
 		return Sitemap::render();
 	}
 	
@@ -259,13 +314,18 @@ class SitemapsController extends FrontController
 		});
 		
 		if ($cities->count() > 0) {
+			$counts = $this->getListingCounts($country['code']);
 			foreach ($cities as $city) {
+				// Only indexable pages (enough live listings) belong in the sitemap
+				if (($counts['city'][$city->id] ?? 0) < $this->minListingsToIndex) {
+					continue;
+				}
 				$city->name = trim(head(explode('/', $city->name)));
 				$url = urlGen()->city($city, $country['icode']);
 				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
 			}
 		}
-		
+
 		return Sitemap::render();
 	}
 	
@@ -406,6 +466,12 @@ class SitemapsController extends FrontController
         if (empty($country)) {
             return Sitemap::render();
         }
+
+        $cat = $this->findCategoryBySlugs($country, $catSlug, $subCatSlug);
+        if (empty($cat)) {
+            return Sitemap::render();
+        }
+
         $cacheId = 'cities.' . $country['icode'] . '.all';
         $cacheExpiration = $this->cacheExpiration ?? 3600;
         $cities = Cache::remember($cacheId, $cacheExpiration, function () use ($country) {
@@ -416,17 +482,57 @@ class SitemapsController extends FrontController
                 ->get();
         });
 
+        $counts = $this->getListingCounts($country['code']);
+
         $basePath = $this->isDomainmappingAvailable ? '' : $country['icode'] . '/';
         $basePath .= 'category/' . $catSlug;
         if (!empty($subCatSlug)) {
             $basePath .= '/' . $subCatSlug;
         }
         foreach ($cities as $city) {
+            // Only indexable pages (enough live listings) belong in the sitemap
+            if (($counts['catCity'][$cat->id . '-' . $city->id] ?? 0) < $this->minListingsToIndex) {
+                continue;
+            }
             $citySlug = slugify($city->name);
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
             Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
         }
         return Sitemap::render();
+    }
+
+    /**
+     * Resolve a category from its URL slugs (parent slug + optional child slug)
+     *
+     * @param array $country
+     * @param string|null $catSlug
+     * @param string|null $subCatSlug
+     * @return \App\Models\Category|null
+     */
+    protected function findCategoryBySlugs(array $country, ?string $catSlug, ?string $subCatSlug = null): ?Category
+    {
+        $cacheId = 'categories.' . $country['icode'] . '.all';
+        $cacheExpiration = $this->cacheExpiration ?? 3600;
+        $cats = Cache::remember($cacheId, $cacheExpiration, function () {
+            return Category::query()->orderBy('lft')->get();
+        });
+
+        $catSlug = trim(strtolower((string)$catSlug));
+        $subCatSlug = trim(strtolower((string)$subCatSlug));
+
+        $catsById = $cats->keyBy('id');
+
+        return $cats->first(function ($cat) use ($catSlug, $subCatSlug, $catsById) {
+            $slug = trim(strtolower((string)$cat->slug));
+            if (!empty($subCatSlug)) {
+                $parent = !empty($cat->parent_id) ? $catsById->get($cat->parent_id) : null;
+                $parentSlug = !empty($parent) ? trim(strtolower((string)$parent->slug)) : '';
+
+                return ($slug === $subCatSlug && $parentSlug === $catSlug);
+            }
+
+            return (empty($cat->parent_id) && $slug === $catSlug);
+        });
     }
     public function getSitemapCategoryLocationByCountry(string $countryCode = null)
     {
@@ -446,10 +552,26 @@ class SitemapsController extends FrontController
             $basePath = '';
         }
         if ($cats->count() > 0) {
+            // Categories having at least one city above the indexing threshold
+            $counts = $this->getListingCounts($country['code']);
+            $catsWithIndexableCity = [];
+            foreach ($counts['catCity'] as $key => $total) {
+                if ($total >= $this->minListingsToIndex) {
+                    $catId = (int)strtok($key, '-');
+                    $catsWithIndexableCity[$catId] = true;
+                }
+            }
+
+            $catsById = $cats->keyBy('id');
             foreach ($cats as $cat) {
+                // Skip category sitemaps that would contain no indexable page
+                if (empty($catsWithIndexableCity[$cat->id])) {
+                    continue;
+                }
+                $parent = !empty($cat->parent_id) ? $catsById->get($cat->parent_id) : null;
                 $url = '';
-                if (!empty($cat->parent)) {
-                    $catUrl = trim(strtolower((string)$cat->parent->slug)) . '/' . trim(strtolower((string)$cat->slug));
+                if (!empty($parent)) {
+                    $catUrl = trim(strtolower((string)$parent->slug)) . '/' . trim(strtolower((string)$cat->slug));
                 } else {
                     $catUrl = trim(strtolower((string)$cat->slug));
                 }

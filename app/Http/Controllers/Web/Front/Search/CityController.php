@@ -87,7 +87,11 @@ class CityController extends BaseController
 			&& routeActionHas('Search\\')
 			&& empty(data_get($apiResult, 'data'))
 		);
-		
+		// Thin Pages (Fewer live listings than the indexing threshold)
+		$noIndexLowContentPages = (
+			(int)data_get($apiResult, 'meta.total', 0) < (int)config('seo.min_listings_to_index', 3)
+		);
+
 		return view(
 			'front.search.results',
 			compact(
@@ -96,7 +100,8 @@ class CityController extends BaseController
 				'apiExtra',
 				'noIndexCitiesPermalinkPages',
 				'noIndexFiltersOnEntriesPages',
-				'noIndexNoResultPages'
+				'noIndexNoResultPages',
+				'noIndexLowContentPages'
 			)
 		);
 	}

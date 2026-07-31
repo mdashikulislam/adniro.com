@@ -251,6 +251,7 @@ Route::feeds();
 if (!$isDomainmappingAvailable) {
 	// SITEMAPS (XML)
 	Route::controller(SitemapsController::class)
+		->middleware('custom.cache.header')
 		->group(function ($router) {
 			$router->pattern('countryCode', getCountryCodeRoutePattern());
 			Route::get('{countryCode}/sitemaps.xml', 'getSitemapIndexByCountry')->name('xml.sitemaps.all');

@@ -19,10 +19,13 @@
 	
 	// "No result" Pages (Empty Searches Results Pages)
 	$noIndexNoResultPages ??= false;
-	
+
+	// Thin Pages (Fewer live listings than the indexing threshold)
+	$noIndexLowContentPages ??= false;
+
 	// Listings Report Pages
 	$noIndexListingsReportPages ??= false;
-	
+
 	// All Website Pages
 	$noIndexAllPages = (config('settings.seo.no_index_all'));
 @endphp
@@ -36,9 +39,12 @@
 		|| $noIndexUsersByUsernamePages
 		|| $noIndexTagsPages
 		|| $noIndexFiltersOnEntriesPages
-		|| $noIndexNoResultPages
 		|| $noIndexListingsReportPages
 	)
 	<meta name="robots" content="noindex,nofollow">
+	<meta name="googlebot" content="noindex">
+@elseif ($noIndexLowContentPages || $noIndexNoResultPages)
+	{{-- Thin/empty results pages: keep them crawlable but out of the index --}}
+	<meta name="robots" content="noindex,follow">
 	<meta name="googlebot" content="noindex">
 @endif
