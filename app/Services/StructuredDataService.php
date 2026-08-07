@@ -228,6 +228,97 @@ class StructuredDataService
 		return $schema;
 	}
 
+	/**
+	 * BlogPosting schema for a blog post details page
+	 *
+	 * @param \App\Models\BlogPost|null $post
+	 * @return array|null
+	 */
+	public function forBlogPost($post): ?array
+	{
+		$title = data_get($post, 'title');
+		if (empty($title)) {
+			return null;
+		}
+
+		$authorName = data_get($post, 'author.name');
+		$publisherName = config('settings.app.name') ?: config('app.name');
+
+		$schema = [
+			'@context'         => 'https://schema.org',
+			'@type'            => 'BlogPosting',
+			'headline'         => str($title)->limit(110)->toString(),
+			'description'      => $this->plainText(data_get($post, 'excerpt')),
+			'articleBody'      => $this->plainText(data_get($post, 'content')),
+			'url'              => $this->canonicalUrl(data_get($post, 'url')),
+			'mainEntityOfPage' => $this->canonicalUrl(data_get($post, 'url')),
+			'image'            => data_get($post, 'image_url'),
+			'datePublished'    => $this->isoDate(data_get($post, 'published_at')),
+			'dateModified'     => $this->isoDate(data_get($post, 'updated_at') ?: data_get($post, 'published_at')),
+			'articleSection'   => data_get($post, 'category.name'),
+			'inLanguage'       => config('app.locale'),
+		];
+
+		if (!empty($authorName)) {
+			$schema['author'] = [
+				'@type' => 'Person',
+				'name'  => $authorName,
+			];
+		}
+
+		if (!empty($publisherName)) {
+			$schema['publisher'] = $this->filter([
+				'@type' => 'Organization',
+				'name'  => $publisherName,
+				'logo'  => config('settings.app.logo_url'),
+			]);
+		}
+
+		return $this->filter($schema);
+	}
+
+	/**
+	 * Blog schema (blog homepage & category archives)
+	 *
+	 * @param iterable $posts
+	 * @param string|null $name
+	 * @param string|null $description
+	 * @param string|null $url
+	 * @return array|null
+	 */
+	public function forBlogList(iterable $posts, ?string $name = null, ?string $description = null, ?string $url = null): ?array
+	{
+		$blogPosts = [];
+		foreach ($posts as $post) {
+			$postUrl = $this->canonicalUrl(data_get($post, 'url'));
+			if (empty($postUrl)) {
+				continue;
+			}
+
+			$blogPosts[] = $this->filter([
+				'@type'         => 'BlogPosting',
+				'headline'      => str((string)data_get($post, 'title'))->limit(110)->toString(),
+				'url'           => $postUrl,
+				'image'         => data_get($post, 'image_url'),
+				'datePublished' => $this->isoDate(data_get($post, 'published_at')),
+			]);
+		}
+
+		if (empty($blogPosts)) {
+			return null;
+		}
+
+		return $this->filter([
+			'@context'    => 'https://schema.org',
+			'@type'       => 'Blog',
+			'name'        => $name,
+			'description' => $description,
+			'url'         => $this->canonicalUrl($url) ?? urlGen()->blog(),
+			'inLanguage'  => config('app.locale'),
+			'blogPost'    => $blogPosts,
+		]);
+	}
+
 	// Listing schema builders
 
 	protected function product(array $post, array $pictures, array $customFields): array

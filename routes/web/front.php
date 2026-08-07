@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\Front\Blog\BlogController;
 use App\Http\Controllers\Web\Front\Browsing\Category\CategoryController as BrowsingCategoryController;
 use App\Http\Controllers\Web\Front\Browsing\Location\AutoCompleteController;
 use App\Http\Controllers\Web\Front\Browsing\Location\ModalController;
@@ -71,6 +72,20 @@ if (!doesCountriesPageCanBeHomepage()) {
 } else {
 	Route::get('/', CountriesController::class)->name('country.list.as.homepage');
 }
+
+
+// BLOG
+// Note: Registered before the listings routes to keep the '/blog*' URIs' precedence
+Route::namespace('Blog')
+	->middleware('custom.cache.header')
+	->controller(BlogController::class)
+	->group(function ($router) {
+		Route::get(dynamicRoute('routes.blog'), 'index')->name('blog.index');
+		Route::get(dynamicRoute('routes.blogCategoryBySlug'), 'category')->name('blog.category')
+			->where('slug', '[^/]+');
+		Route::get(dynamicRoute('routes.blogPostBySlug'), 'show')->name('blog.show')
+			->where('slug', '[^/]+');
+	});
 
 
 // POSTS
@@ -259,6 +274,7 @@ if (!$isDomainmappingAvailable) {
 			Route::get('{countryCode}/sitemaps/categories.xml', 'getCategoriesSitemapByCountry')->name('xml.sitemaps.categories');
 			Route::get('{countryCode}/sitemaps/cities.xml', 'getCitiesSitemapByCountry')->name('xml.sitemaps.cities');
 			Route::get('{countryCode}/sitemaps/posts.xml', 'getListingsSitemapByCountry')->name('xml.sitemaps.listings');
+			Route::get('{countryCode}/sitemaps/blog.xml', 'getBlogSitemapByCountry')->name('xml.sitemaps.blog');
             Route::get('{countryCode}/sitemaps/category/location.xml', 'getSitemapCategoryLocationByCountry');
             Route::get('{countryCode}/sitemaps/category/{catSlug}.xml', 'getCategoriesSitemapLocationByCountry');
             Route::get('{countryCode}/sitemaps/category/{catSlug}/{subCatSlug}.xml', 'getCategoriesSitemapLocationByCountry');

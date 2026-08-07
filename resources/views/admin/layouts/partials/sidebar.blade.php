@@ -183,6 +183,40 @@
 							</a>
 						</li>
 					@endif
+					@if (
+						doesUserHavePermission($authUser, 'admin.blog-post.view')
+						|| doesUserHavePermission($authUser, 'admin.blog-category.view')
+						|| userHasSuperAdminPermissions()
+					)
+						<li class="sidebar-item">
+							<a href="#collapseBlog"
+							   class="sidebar-link has-arrow waves-effect waves-dark"
+							   data-bs-toggle="collapse"
+							   aria-expanded="false"
+							   aria-controls="collapseBlog"
+							>
+								<i data-feather="edit-3" class="feather-icon"></i> <span class="hide-menu">{{ trans('admin.blog') }}</span>
+							</a>
+							<ul class="collapse first-level" id="collapseBlog">
+								@if (doesUserHavePermission($authUser, 'admin.blog-post.view') || userHasSuperAdminPermissions())
+									<li class="sidebar-item">
+										<a href="{{ urlGen()->adminUrl('blog/posts') }}" class="sidebar-link">
+											<i class="mdi mdi-adjust"></i>
+											<span class="hide-menu">{{ trans('admin.blog_posts') }}</span>
+										</a>
+									</li>
+								@endif
+								@if (doesUserHavePermission($authUser, 'admin.blog-category.view') || userHasSuperAdminPermissions())
+									<li class="sidebar-item">
+										<a href="{{ urlGen()->adminUrl('blog/categories') }}" class="sidebar-link">
+											<i class="mdi mdi-adjust"></i>
+											<span class="hide-menu">{{ trans('admin.blog_categories') }}</span>
+										</a>
+									</li>
+								@endif
+							</ul>
+						</li>
+					@endif
 					{!! $pluginsMenu !!}
 					
 					{{-- ======================================= --}}

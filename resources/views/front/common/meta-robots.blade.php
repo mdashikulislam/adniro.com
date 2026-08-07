@@ -26,6 +26,9 @@
 	// Listings Report Pages
 	$noIndexListingsReportPages ??= false;
 
+	// Blog Search Results Pages
+	$noIndexBlogSearchPages ??= false;
+
 	// All Website Pages
 	$noIndexAllPages = (config('settings.seo.no_index_all'));
 @endphp
@@ -43,7 +46,7 @@
 	)
 	<meta name="robots" content="noindex,nofollow">
 	<meta name="googlebot" content="noindex">
-@elseif ($noIndexLowContentPages || $noIndexNoResultPages)
+@elseif ($noIndexLowContentPages || $noIndexNoResultPages || $noIndexBlogSearchPages)
 	{{-- Thin/empty results pages: keep them crawlable but out of the index --}}
 	<meta name="robots" content="noindex,follow">
 	<meta name="googlebot" content="noindex">

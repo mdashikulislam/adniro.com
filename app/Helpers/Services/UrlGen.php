@@ -365,6 +365,56 @@ class UrlGen
 	}
 	
 	/**
+	 * Blog homepage URL
+	 *
+	 * @return string
+	 */
+	public function blog(): string
+	{
+		return urlBuilder(url(config('routes.blog')))->toString();
+	}
+
+	/**
+	 * Blog category URL
+	 *
+	 * @param $entry
+	 * @return string
+	 */
+	public function blogCategory($entry): string
+	{
+		$entry = is_array($entry) ? Arr::toObject($entry) : $entry;
+
+		$slug = $entry->slug ?? null;
+		if (empty($slug)) {
+			return $this->blog();
+		}
+
+		$path = str_replace(['{slug}'], [$slug], config('routes.blogCategoryBySlug'));
+
+		return urlBuilder(url($path))->toString();
+	}
+
+	/**
+	 * Blog post URL
+	 *
+	 * @param $entry
+	 * @return string
+	 */
+	public function blogPost($entry): string
+	{
+		$entry = is_array($entry) ? Arr::toObject($entry) : $entry;
+
+		$slug = $entry->slug ?? null;
+		if (empty($slug)) {
+			return $this->blog();
+		}
+
+		$path = str_replace(['{slug}'], [$slug], config('routes.blogPostBySlug'));
+
+		return urlBuilder(url($path))->toString();
+	}
+
+	/**
 	 * @param string|null $countryCode
 	 * @return string
 	 */

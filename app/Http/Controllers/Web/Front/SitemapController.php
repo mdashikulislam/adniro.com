@@ -16,6 +16,8 @@
 
 namespace App\Http\Controllers\Web\Front;
 
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\City;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -79,7 +81,27 @@ class SitemapController extends FrontController
 				->get();
 		});
 		$data['cities'] = $cities;
-		
+
+		// Get the Blog categories & the latest blog posts
+		$blogCacheParams = [
+			'action'  => 'get.blog.sitemap',
+			'country' => config('country.code'),
+			'locale'  => $locale,
+		];
+		$blogData = caching()->remember(BlogPost::class, $blogCacheParams, function () {
+			return [
+				'blogCategories' => BlogCategory::query()->orderBy('lft')->orderBy('name')->get(),
+				'blogPosts'      => BlogPost::query()
+					->published()
+					->availableInCountry()
+					->orderByDesc('published_at')
+					->take(50)
+					->get(),
+			];
+		});
+		$data['blogCategories'] = data_get($blogData, 'blogCategories');
+		$data['blogPosts'] = data_get($blogData, 'blogPosts');
+
 		// Meta Tags
 		[$title, $description, $keywords] = getMetaTag('sitemap');
 		MetaTag::set('title', $title);

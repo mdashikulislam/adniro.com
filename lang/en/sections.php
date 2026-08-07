@@ -12,5 +12,7 @@ return [
 	'top_ad' => 'Advertising #1',
 	'bottom_ad' => 'Advertising #2',
 	'companies' => 'Companies',
+	'blog' => 'Blog',
+	'description_blog' => 'Latest Blog Posts Section',
 ];
 

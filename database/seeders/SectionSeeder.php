@@ -47,6 +47,11 @@ class SectionSeeder extends Seeder
 				'description' => 'Mini Stats Section',
 			],
 			[
+				'name'        => 'blog',
+				'label'       => 'Blog',
+				'description' => 'Latest Blog Posts Section',
+			],
+			[
 				'name'        => 'text_area',
 				'label'       => 'Text Area',
 				'description' => 'Text Area Section',

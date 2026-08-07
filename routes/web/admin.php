@@ -18,6 +18,8 @@ use App\Http\Controllers\Web\Admin\ActionController;
 use App\Http\Controllers\Web\Admin\AdvertisingController;
 use App\Http\Controllers\Web\Admin\BackupController;
 use App\Http\Controllers\Web\Admin\BlacklistController;
+use App\Http\Controllers\Web\Admin\BlogCategoryController;
+use App\Http\Controllers\Web\Admin\BlogPostController;
 use App\Http\Controllers\Web\Admin\CategoryController;
 use App\Http\Controllers\Web\Admin\CategoryFieldController;
 use App\Http\Controllers\Web\Admin\CityController;
@@ -130,6 +132,10 @@ Route::middleware(['admin', 'clearance', 'banned.user', 'no.http.cache'])
 		PanelRoutes::resource('admins2/{admin2Code}/cities', CityController::class);                      // Rewrite to valid route
 		PanelRoutes::resource('cities', CityController::class);                                           // Redirect to /countries
 		
+		// blog
+		PanelRoutes::resource('blog/categories', BlogCategoryController::class);
+		PanelRoutes::resource('blog/posts', BlogPostController::class);
+
 		PanelRoutes::resource('advertisings', AdvertisingController::class);
 		PanelRoutes::resource('blacklists', BlacklistController::class);
 		PanelRoutes::resource('currencies', CurrencyController::class);

@@ -24,6 +24,8 @@ if (file_exists($iniConfigFile)) {
 
 use App\Helpers\Common\Date\TimeZoneManager;
 use App\Helpers\Services\Localization\Country as CountryLocalization;
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Page;
@@ -102,6 +104,43 @@ class SitemapsController extends FrontController
 	}
 	
 	/**
+	 * Check if the given country is the app's default country
+	 *
+	 * @param string|null $countryCode
+	 * @return bool
+	 */
+	protected function isDefaultCountry(?string $countryCode): bool
+	{
+		$defaultCountryCode = config('settings.localization.default_country_code');
+
+		if (empty($defaultCountryCode) || empty($countryCode)) {
+			return true;
+		}
+
+		return strtolower($defaultCountryCode) === strtolower($countryCode);
+	}
+
+	/**
+	 * Count the published blog posts available in the given country
+	 * (i.e. the global posts & the posts targeting that country)
+	 *
+	 * @param string|null $countryCode
+	 * @return int
+	 */
+	protected function countBlogPosts(?string $countryCode = null): int
+	{
+		$countryCode = !empty($countryCode) ? $countryCode : config('country.code');
+
+		$cacheParams = ['action' => 'count.blog.posts', 'country' => $countryCode];
+
+		$count = caching()->remember(BlogPost::class, $cacheParams, function () use ($countryCode) {
+			return BlogPost::query()->published()->availableInCountry($countryCode)->count();
+		});
+
+		return (int)$count;
+	}
+
+	/**
 	 * Common Queries
 	 */
 	public function commonQueries(): void
@@ -165,6 +204,12 @@ class SitemapsController extends FrontController
 		if ($countPosts > 0) {
 			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/posts.xml'));
 		}
+
+		// The blog is not country specific: only referenced in the default country's sitemap index
+		if ($this->isDefaultCountry($country['code']) && $this->countBlogPosts($country['code']) > 0) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/blog.xml'));
+		}
+
 		return Sitemap::index();
 	}
 	
@@ -229,6 +274,64 @@ class SitemapsController extends FrontController
 		return Sitemap::render();
 	}
 	
+	/**
+	 * Blog sitemap (blog homepage, categories & posts)
+	 *
+	 * Note: The blog is not country specific, so its URLs don't have any country prefix.
+	 *
+	 * @param string|null $countryCode
+	 * @return \Illuminate\Http\Response
+	 */
+	public function getBlogSitemapByCountry(string $countryCode = null): Response
+	{
+		if (empty($countryCode)) {
+			$countryCode = config('country.code');
+		}
+
+		// Get Country Settings
+		$country = $this->getCountrySettings($countryCode);
+		if (empty($country)) {
+			return Sitemap::render();
+		}
+
+		// Blog homepage
+		Sitemap::addTag(urlGen()->blog(), $this->defaultDate, 'daily', '0.8');
+
+		// Blog categories
+		$categories = caching()->remember(BlogCategory::class, ['action' => 'get.blog.categories', 'format' => 'xml'], function () {
+			return BlogCategory::query()->orderBy('lft')->orderBy('name')->get();
+		});
+
+		foreach ($categories as $category) {
+			$url = urlGen()->blogCategory($category);
+			Sitemap::addTag($url, $this->defaultDate, 'weekly', '0.6');
+		}
+
+		// Blog posts (the global ones & the ones targeting this country)
+		$limit = (int)env('XML_SITEMAP_LIMIT', 1000);
+		$postsCacheParams = [
+			'action'  => 'get.blog.posts',
+			'country' => $country['code'],
+			'limit'   => $limit,
+			'format'  => 'xml',
+		];
+		$posts = caching()->remember(BlogPost::class, $postsCacheParams, function () use ($country, $limit) {
+			return BlogPost::query()
+				->published()
+				->availableInCountry($country['code'])
+				->orderByDesc('published_at')
+				->take($limit)
+				->get();
+		});
+
+		foreach ($posts as $post) {
+			$lastModified = $post->updated_at ?? $post->published_at ?? $this->defaultDate;
+			Sitemap::addTag($post->url, $lastModified, 'weekly', '0.7');
+		}
+
+		return Sitemap::render();
+	}
+
 	/**
 	 * @param string|null $countryCode
 	 * @return \Illuminate\Http\Response

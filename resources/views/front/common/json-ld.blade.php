@@ -28,6 +28,26 @@
 		$jsonLdSchemas[] = $sdService->breadcrumbs($bcItems);
 	}
 
+	$isBlogPostPage = (routeActionHas('Blog\BlogController@show') && !empty($post) && $post instanceof \App\Models\BlogPost);
+	$isBlogListPage = (routeActionHas('Blog\BlogController@index') || routeActionHas('Blog\BlogController@category'));
+
+	if ($isBlogPostPage) {
+		$jsonLdSchemas[] = $sdService->forBlogPost($post);
+	}
+
+	if ($isBlogListPage && !empty($posts)) {
+		$jsonLdSchemas[] = $sdService->forBlogList($posts, $title ?? null, $subTitle ?? null, url()->current());
+	}
+
+	if ($isBlogPostPage || $isBlogListPage) {
+		// Home > Blog (> Category) (> {post title})
+		$bcItems = [['name' => t('home'), 'url' => url('/')]];
+		foreach ((array)($breadcrumbs ?? []) as $bcItem) {
+			$bcItems[] = ['name' => data_get($bcItem, 'name'), 'url' => data_get($bcItem, 'url')];
+		}
+		$jsonLdSchemas[] = $sdService->breadcrumbs($bcItems);
+	}
+
 	if ($isHomepage) {
 		$jsonLdSchemas[] = $sdService->organization();
 		$jsonLdSchemas[] = $sdService->website();

@@ -129,8 +129,47 @@
 					</div>
 				@endif
 
+				@if (!empty($blogPosts) && $blogPosts->count() > 0)
+					@include('front.common.spacer')
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h3 class="mb-0 fs-5 fw-bold">
+									<i class="bi bi-journal-text"></i> {{ t('blog') }}
+								</h3>
+							</div>
+
+							<div class="card-body">
+								<div class="container">
+									@if (!empty($blogCategories) && $blogCategories->count() > 0)
+										<div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mb-3">
+											@foreach ($blogCategories as $blogCategory)
+												<div class="col px-4 py-1">
+													<a href="{{ $blogCategory->url }}" class="{{ linkClass('body-emphasis') }}">
+														<i class="bi bi-folder"></i> {{ $blogCategory->name }}
+													</a>
+												</div>
+											@endforeach
+										</div>
+									@endif
+
+									<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-1">
+										@foreach ($blogPosts as $blogPost)
+											<div class="col px-4 py-1">
+												<a href="{{ $blogPost->url }}" class="{{ linkClass('body-emphasis') }}">
+													{{ str($blogPost->title)->limit(60) }}
+												</a>
+											</div>
+										@endforeach
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				@endif
+
 			</div>
-			
+
 			@include('front.layouts.partials.social.horizontal')
 		</div>
 	</div>

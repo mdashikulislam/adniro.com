@@ -18,6 +18,7 @@ namespace App\Services\Section;
 
 use App\Helpers\Services\Search\PostQueries;
 use App\Models\Advertising;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Post;
@@ -376,6 +377,45 @@ trait SectionDataTrait
 		return [];
 	}
 	
+	/**
+	 * Get the latest blog posts
+	 *
+	 * @param array|null $values
+	 * @return array
+	 */
+	protected function blog(?array $values = []): array
+	{
+		$cacheExpiration = (int)($values['cache_expiration'] ?? 0);
+		$maxItems = (int)($values['max_items'] ?? 3);
+		$maxItems = ($maxItems > 0) ? $maxItems : 3;
+		$isFeaturedFirstEnabled = (($values['featured_first'] ?? '0') == '1');
+
+		// Cache Parameters
+		$cacheParams = [
+			'action'        => 'get.blog.posts',
+			'country'       => config('country.code'),
+			'limit'         => $maxItems,
+			'featuredFirst' => $isFeaturedFirstEnabled,
+			'locale'        => config('app.locale'),
+		];
+
+		$posts = caching()->remember(BlogPost::class, $cacheParams, function () use ($maxItems, $isFeaturedFirstEnabled) {
+			return BlogPost::query()
+				->published()
+				->availableInCountry()
+				->with(['category'])
+				->when($isFeaturedFirstEnabled, fn ($query) => $query->orderByDesc('featured'))
+				->orderByDesc('published_at')
+				->orderByDesc('id')
+				->take($maxItems)
+				->get();
+		}, $cacheExpiration);
+
+		return [
+			'posts' => $posts,
+		];
+	}
+
 	/**
 	 * @param array|null $values
 	 * @return array
