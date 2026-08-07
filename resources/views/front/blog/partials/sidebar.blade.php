@@ -65,9 +65,9 @@
 				@foreach($sidebarPosts as $sidebarPost)
 					<li class="list-group-item">
 						<div class="d-flex gap-2">
-							@if (!empty($sidebarPost->thumbnail_url))
+							@if (!empty($sidebarPost->cover_thumbnail_url))
 								<a href="{{ $sidebarPost->url }}" class="flex-shrink-0">
-									<img src="{{ $sidebarPost->thumbnail_url }}"
+									<img src="{{ $sidebarPost->cover_thumbnail_url }}"
 									     alt="{{ str($sidebarPost->title)->slug() }}"
 									     loading="lazy"
 									     style="width: 70px; height: 55px; object-fit: cover; border-radius: 4px;"

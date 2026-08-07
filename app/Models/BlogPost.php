@@ -41,7 +41,7 @@ class BlogPost extends BaseModel
 	/**
 	 * @var array<int, string>
 	 */
-	protected $appends = ['image_url', 'thumbnail_url', 'url'];
+	protected $appends = ['image_url', 'thumbnail_url', 'cover_url', 'cover_thumbnail_url', 'url'];
 
 	/**
 	 * The attributes that aren't mass assignable.
@@ -208,6 +208,10 @@ class BlogPost extends BaseModel
 		);
 	}
 
+	/**
+	 * The post's cover image URL (null when the post hasn't any picture).
+	 * Used for the SEO tags (Open Graph & JSON-LD), that must not get a placeholder.
+	 */
 	protected function imageUrl(): Attribute
 	{
 		return Attribute::make(
@@ -219,6 +223,24 @@ class BlogPost extends BaseModel
 	{
 		return Attribute::make(
 			get: fn () => $this->getImageUrl('picture-md'),
+		);
+	}
+
+	/**
+	 * The post's cover image URL for display,
+	 * with the app's default picture ("no image" placeholder) as fallback
+	 */
+	protected function coverUrl(): Attribute
+	{
+		return Attribute::make(
+			get: fn () => $this->getImageUrl('picture-lg', withDefault: true),
+		);
+	}
+
+	protected function coverThumbnailUrl(): Attribute
+	{
+		return Attribute::make(
+			get: fn () => $this->getImageUrl('picture-md', withDefault: true),
 		);
 	}
 
@@ -272,16 +294,24 @@ class BlogPost extends BaseModel
 	| OTHER PRIVATE METHODS
 	|--------------------------------------------------------------------------
 	*/
-	private function getImageUrl(string $resizeOptionsName): ?string
+	/**
+	 * @param string $resizeOptionsName
+	 * @param bool $withDefault Get the app's default picture when the post hasn't any picture
+	 * @return string|null
+	 */
+	private function getImageUrl(string $resizeOptionsName, bool $withDefault = false): ?string
 	{
 		$filePath = $this->image_path ?? null;
+
 		if (empty($filePath)) {
-			return null;
+			return $withDefault
+				? thumbParam(null, true)->setOption($resizeOptionsName)->url()
+				: null;
 		}
 
 		// Add the post's image thumbnails generation in queue
 		GenerateThumbnail::dispatch($filePath, false, $resizeOptionsName);
 
-		return thumbParam($filePath, false)->setOption($resizeOptionsName)->url();
+		return thumbParam($filePath, $withDefault)->setOption($resizeOptionsName)->url();
 	}
 }

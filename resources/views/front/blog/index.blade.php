@@ -68,9 +68,9 @@
 				<div class="col-12 col-lg-8">
 					@if (!empty($posts) && $posts->total() > 0)
 						<div class="row">
-							@foreach($posts as $post)
+							@foreach($posts as $blogPostItem)
 								@include('front.blog.partials.card', [
-									'post'     => $post,
+									'post'     => $blogPostItem,
 									'colClass' => 'col-md-6',
 								])
 							@endforeach

@@ -18,7 +18,8 @@ trait BlogPostTrait
 
 	public function crudImageColumn(?Panel $xPanel = null, array $column = []): string
 	{
-		$imageUrl = $this->image_url ?? null;
+		// Fallbacks to the app's default picture ("no image" placeholder)
+		$imageUrl = $this->cover_thumbnail_url ?? null;
 		if (empty($imageUrl)) {
 			return '';
 		}

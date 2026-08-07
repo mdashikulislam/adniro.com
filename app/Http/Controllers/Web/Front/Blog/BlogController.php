@@ -160,11 +160,19 @@ class BlogController extends FrontController
 			title: $post->seo_title,
 			description: $post->seo_description,
 			keywords: $post->seo_keywords,
-			imageUrl: $post->image_url
+			imageUrl: $post->image_url,
+			ogType: 'article'
 		);
 
+		/*
+		 * Note: The entry is shared as 'blogPost' (and not as 'post'),
+		 * since the front master layout applies listings specific logic
+		 * (e.g. Open Graph tags rendering) when a 'post' variable is available.
+		 */
+		$blogPost = $post;
+
 		return view('front.blog.show', array_merge(
-			compact('post', 'relatedPosts', 'breadcrumbs'),
+			compact('blogPost', 'relatedPosts', 'breadcrumbs'),
 			$this->getSidebarData()
 		));
 	}
@@ -224,15 +232,14 @@ class BlogController extends FrontController
 		];
 
 		$data = caching()->remember(BlogPost::class, $cacheParams, function () {
+			// All the activated categories are listed (including the ones without any post)
 			$categories = BlogCategory::query()
 				->withCount([
 					'posts' => fn ($query) => $query->published()->availableInCountry(),
 				])
 				->orderBy('lft')
 				->orderBy('name')
-				->get()
-				->filter(fn ($category) => (int)$category->posts_count > 0)
-				->values();
+				->get();
 
 			$recentPosts = BlogPost::query()
 				->published()
@@ -263,7 +270,8 @@ class BlogController extends FrontController
 		?string $title = null,
 		?string $description = null,
 		?string $keywords = null,
-		?string $imageUrl = null
+		?string $imageUrl = null,
+		?string $ogType = null
 	): void {
 		$title = !empty($title) ? $title . ' - ' . config('app.name') : config('app.name');
 		$description = !empty($description) ? strip_tags($description) : null;
@@ -275,6 +283,12 @@ class BlogController extends FrontController
 		// Open Graph
 		try {
 			$this->og->title($title)->description($description);
+			if (!empty($ogType)) {
+				if ($this->og->has('type')) {
+					$this->og->forget('type');
+				}
+				$this->og->type($ogType);
+			}
 			if (!empty($imageUrl)) {
 				if ($this->og->has('image')) {
 					$this->og->forget('image')->forget('image:width')->forget('image:height');

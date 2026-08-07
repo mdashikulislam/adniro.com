@@ -1,14 +1,19 @@
 @extends('front.layouts.master')
 
 @php
-	/** @var \App\Models\BlogPost $post */
-	$post ??= null;
+	/**
+	 * @var \App\Models\BlogPost $entry
+	 * Note: The entry is NOT named '$post', since the variables defined in this view are shared
+	 * with the master layout, that applies listings specific logic when a '$post' variable exists.
+	 */
+	$entry = $blogPost ?? null;
 	$relatedPosts ??= collect();
 	$breadcrumbs ??= [];
 
-	$category = data_get($post, 'category');
-	$author = data_get($post, 'author');
-	$imageUrl = data_get($post, 'image_url');
+	$category = data_get($entry, 'category');
+	$author = data_get($entry, 'author');
+	// Fallbacks to the app's default picture ("no image" placeholder) when the post hasn't any picture
+	$imageUrl = data_get($entry, 'cover_url') ?? data_get($entry, 'image_url');
 @endphp
 
 @section('content')
@@ -22,7 +27,7 @@
 					<article class="card border shadow-sm">
 						@if (!empty($imageUrl))
 							@php
-								echo generateImageHtml($imageUrl, str(data_get($post, 'title'))->slug()->toString(), null, [
+								echo generateImageHtml($imageUrl, str(data_get($entry, 'title'))->slug()->toString(), null, [
 									'class' => 'card-img-top w-100',
 									'style' => 'max-height: 460px; object-fit: cover;',
 								]);
@@ -36,12 +41,12 @@
 								</a>
 							@endif
 
-							<h1 class="fs-2 fw-bold mb-3">{{ data_get($post, 'title') }}</h1>
+							<h1 class="fs-2 fw-bold mb-3">{{ data_get($entry, 'title') }}</h1>
 
 							<div class="d-flex flex-wrap gap-3 text-body-secondary small border-bottom pb-3 mb-4">
 								<span>
 									<i class="fa-regular fa-calendar"></i>
-									{{ t('blog_published_on', ['date' => data_get($post, 'published_at')?->translatedFormat('F d, Y')]) }}
+									{{ t('blog_published_on', ['date' => data_get($entry, 'published_at')?->translatedFormat('F d, Y')]) }}
 								</span>
 								@if (!empty($author) && !empty($author->name))
 									<span>
@@ -51,16 +56,16 @@
 								@endif
 								<span>
 									<i class="fa-regular fa-clock"></i>
-									{{ t('blog_min_read', ['count' => $post->readingTime()]) }}
+									{{ t('blog_min_read', ['count' => $entry->readingTime()]) }}
 								</span>
 								<span>
 									<i class="fa-regular fa-eye"></i>
-									{{ t('blog_views', ['count' => (int)data_get($post, 'views')]) }}
+									{{ t('blog_views', ['count' => (int)data_get($entry, 'views')]) }}
 								</span>
 							</div>
 
 							<div class="text-start from-wysiwyg blog-content">
-								{!! data_get($post, 'content') !!}
+								{!! data_get($entry, 'content') !!}
 							</div>
 						</div>
 					</article>

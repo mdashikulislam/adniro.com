@@ -28,11 +28,11 @@
 		$jsonLdSchemas[] = $sdService->breadcrumbs($bcItems);
 	}
 
-	$isBlogPostPage = (routeActionHas('Blog\BlogController@show') && !empty($post) && $post instanceof \App\Models\BlogPost);
+	$isBlogPostPage = (routeActionHas('Blog\BlogController@show') && !empty($blogPost));
 	$isBlogListPage = (routeActionHas('Blog\BlogController@index') || routeActionHas('Blog\BlogController@category'));
 
 	if ($isBlogPostPage) {
-		$jsonLdSchemas[] = $sdService->forBlogPost($post);
+		$jsonLdSchemas[] = $sdService->forBlogPost($blogPost);
 	}
 
 	if ($isBlogListPage && !empty($posts)) {

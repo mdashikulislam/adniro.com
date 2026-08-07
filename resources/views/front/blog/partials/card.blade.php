@@ -9,7 +9,10 @@
 
 	$postTitle = (string)data_get($post, 'title');
 	$postUrl = data_get($post, 'url');
-	$imageUrl = data_get($post, 'thumbnail_url') ?? data_get($post, 'image_url');
+	// Fallbacks to the app's default picture ("no image" placeholder) when the post hasn't any picture
+	$imageUrl = data_get($post, 'cover_thumbnail_url')
+		?? data_get($post, 'thumbnail_url')
+		?? data_get($post, 'image_url');
 	$categoryName = data_get($post, 'category.name');
 	$categoryUrl = data_get($post, 'category.url');
 	$excerpt = strip_tags((string)data_get($post, 'excerpt'));
