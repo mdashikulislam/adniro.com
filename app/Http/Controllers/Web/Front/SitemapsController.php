@@ -73,6 +73,7 @@ class SitemapsController extends FrontController
 			$rows = Post::query()
 				->verified()
 				->unarchived()
+				->whereNull('deleted_at')
 				->inCountry($countryCode)
 				->whereNotNull('category_id')
 				->groupBy('category_id', 'city_id')
@@ -367,8 +368,8 @@ class SitemapsController extends FrontController
 			$cats = collect($cats)->keyBy('id');
 
 			foreach ($cats as $cat) {
-				// Only indexable pages (enough live listings) belong in the sitemap
-				if (($counts['cat'][$cat->id] ?? 0) < $this->minListingsToIndex) {
+				// Only categories with at least one active listing belong in the sitemap
+				if (($counts['cat'][$cat->id] ?? 0) < 1) {
 					continue;
 				}
 				$url = urlGen()->category($cat, $country['icode']);
@@ -397,38 +398,32 @@ class SitemapsController extends FrontController
 		
 		$limit = (int)env('XML_SITEMAP_LIMIT', 1000);
 		
-		// Cache Parameters
-		$cacheParams = [
-			'action'      => 'get.cities',
-			'country'     => $country['code'],
-			'orderByDesc' => 'population',
-			'orderBy'     => 'name',
-			'limit'       => $limit,
-			'format'      => 'xml',
-		];
+		// Only cities with at least one active listing belong in the sitemap.
+		// The (cached) listing counts give us that set of city IDs up front, so we
+		// query just those cities instead of scanning the whole country's city table.
+		$counts = $this->getListingCounts($country['code']);
+		$cityIds = array_keys(array_filter($counts['city'] ?? [], fn ($total) => $total >= 1));
+		if (empty($cityIds)) {
+			return Sitemap::render();
+		}
 		
-		$cities = caching()->remember(City::class, $cacheParams, function () use ($country, $limit) {
+		$cacheId = 'sitemaps.cities.' . strtolower($country['code']) . '.' . md5(implode(',', $cityIds));
+		$cities = Cache::remember($cacheId, $this->cacheExpiration, function () use ($country, $cityIds, $limit) {
 			return City::query()
 				->inCountry($country['code'])
-				->take($limit)
+				->whereIn('id', $cityIds)
 				->orderByDesc('population')
 				->orderBy('name')
+				->take($limit)
 				->get();
 		});
 		
-		if ($cities->count() > 0) {
-			$counts = $this->getListingCounts($country['code']);
-			foreach ($cities as $city) {
-				// Only indexable pages (enough live listings) belong in the sitemap
-				if (($counts['city'][$city->id] ?? 0) < $this->minListingsToIndex) {
-					continue;
-				}
-				$city->name = trim(head(explode('/', $city->name)));
-				$url = urlGen()->city($city, $country['icode']);
-				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
-			}
+		foreach ($cities as $city) {
+			$city->name = trim(head(explode('/', $city->name)));
+			$url = urlGen()->city($city, $country['icode']);
+			Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
 		}
-
+		
 		return Sitemap::render();
 	}
 	
@@ -455,14 +450,19 @@ class SitemapsController extends FrontController
 			'action'      => 'get.listings',
 			'country'     => $country['code'],
 			'verified'    => true,
+			'unarchived'  => true,
+			'notTrashed'  => true,
 			'orderByDesc' => 'created_at',
 			'limit'       => $limit,
 			'format'      => 'xml',
 		];
 		
+		// Only active listings: verified (& reviewed), not archived, not soft-deleted
 		$posts = caching()->remember(Post::class, $cacheParams, function () use ($country, $limit) {
 			return Post::query()
 				->verified()
+				->unarchived()
+				->whereNull('deleted_at')
 				->inCountry($country['code'])
 				->take($limit)
 				->orderByDesc('created_at')
@@ -470,8 +470,14 @@ class SitemapsController extends FrontController
 		});
 		
 		if ($posts->count() > 0) {
+			$isDomainMapped = (bool)config('plugins.domainmapping.installed');
 			foreach ($posts as $post) {
-				$url = urlGen()->post($post);
+				// Every listing here is already active, so skip urlGen()->post():
+				// its isVerifiedPost() re-check serializes the whole model (with all
+				// appended accessors) per listing and dominates the sitemap's load time.
+				$path = urlGen()->postPathBasic(hashId($post->id), $post->slug);
+				$url = $isDomainMapped ? dmUrl($post->country_code, $path) : url($path);
+				$url = urlBuilder($url)->toString();
 				Sitemap::addTag($url, $post->created_at, 'daily', '0.6');
 			}
 		}
@@ -575,17 +581,30 @@ class SitemapsController extends FrontController
             return Sitemap::render();
         }
 
-        $cacheId = 'cities.' . $country['icode'] . '.all';
-        $cacheExpiration = $this->cacheExpiration ?? 3600;
-        $cities = Cache::remember($cacheId, $cacheExpiration, function () use ($country) {
+        // Only cities with at least one active listing in this category belong in the sitemap.
+        // The (cached) listing counts give us that set of city IDs up front, so we
+        // query just those cities instead of scanning the whole country's city table.
+        $counts = $this->getListingCounts($country['code']);
+        $prefix = $cat->id . '-';
+        $cityIds = [];
+        foreach ($counts['catCity'] ?? [] as $key => $total) {
+            if ($total >= 1 && str_starts_with($key, $prefix)) {
+                $cityIds[] = (int)substr($key, strlen($prefix));
+            }
+        }
+        if (empty($cityIds)) {
+            return Sitemap::render();
+        }
+
+        $cacheId = 'sitemaps.catCities.' . strtolower($country['code']) . '.' . $cat->id . '.' . md5(implode(',', $cityIds));
+        $cities = Cache::remember($cacheId, $this->cacheExpiration, function () use ($country, $cityIds) {
             return City::query()
                 ->inCountry($country['icode'])
+                ->whereIn('id', $cityIds)
                 ->orderByDesc('population')
                 ->orderBy('name')
                 ->get();
         });
-
-        $counts = $this->getListingCounts($country['code']);
 
         $basePath = $this->isDomainmappingAvailable ? '' : $country['icode'] . '/';
         $basePath .= 'category/' . $catSlug;
@@ -593,10 +612,6 @@ class SitemapsController extends FrontController
             $basePath .= '/' . $subCatSlug;
         }
         foreach ($cities as $city) {
-            // Only indexable pages (enough live listings) belong in the sitemap
-            if (($counts['catCity'][$cat->id . '-' . $city->id] ?? 0) < $this->minListingsToIndex) {
-                continue;
-            }
             $citySlug = slugify($city->name);
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
             Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
@@ -655,11 +670,11 @@ class SitemapsController extends FrontController
             $basePath = '';
         }
         if ($cats->count() > 0) {
-            // Categories having at least one city above the indexing threshold
+            // Categories having at least one city with an active listing
             $counts = $this->getListingCounts($country['code']);
             $catsWithIndexableCity = [];
             foreach ($counts['catCity'] as $key => $total) {
-                if ($total >= $this->minListingsToIndex) {
+                if ($total >= 1) {
                     $catId = (int)strtok($key, '-');
                     $catsWithIndexableCity[$catId] = true;
                 }
