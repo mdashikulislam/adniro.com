@@ -116,7 +116,7 @@ trait DetailedTrait
 		
 		// Listing isn't found
 		if (empty($post) || empty($post->category) || empty($post->city)) {
-			abort(404, t('post_not_found'));
+			abort(410, t('post_not_found'));
 		}
 		
 		// Increment the listing's visit counter

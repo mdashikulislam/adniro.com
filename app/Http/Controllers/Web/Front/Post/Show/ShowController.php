@@ -130,7 +130,7 @@ class ShowController extends FrontController
 		$customFields = data_get($data, 'extra.fieldsValues');
 		
 		// Listing isn't found
-		abort_if(empty($post), 404, $message ?? t('post_not_found'));
+		abort_if(empty($post), 410, $message ?? t('post_not_found'));
 		
 		session()->put('isPostVisited', $postId);
 		

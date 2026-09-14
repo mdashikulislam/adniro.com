@@ -465,6 +465,8 @@ return [
     'session_expired_reload_needed' => 'The session expired, please reload the page and try again.',
     'error_http_404_title' => 'Page not found',
 	'error_http_404_message' => 'The page you are looking for does not exist or has been moved. <a href=":url">Return to Home</a>',
+    'error_http_410_title' => 'Listing no longer available',
+	'error_http_410_message' => 'The listing you are looking for has been removed or is no longer available. <a href=":url">Return to Home</a>',
 	'Forbidden' => 'Forbidden',
 	'Unauthorized action' => 'Unauthorized action',
 	'Bad request' => 'Bad request',
