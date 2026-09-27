@@ -20,15 +20,13 @@
 @if ($totalPosts > 0)
 	<div class="container{{ $cssClasses }}" style="{!! $style !!}">
 		<div class="card"{!! $htmlAttr !!}>
-			<div class="card-header border-bottom-0">
-				<h4 class="mb-0 float-start fw-lighter">
+			<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+				<h4 class="mb-0 fw-lighter section-title">
 					{!! data_get($widget, 'title') !!}
 				</h4>
-				<h5 class="mb-0 float-end mt-1 fs-6 fw-lighter text-uppercase">
-					<a href="{{ data_get($widget, 'link') }}" class="{{ linkClass() }}">
-						{{ t('View more') }} <i class="fa-solid fa-bars"></i>
-					</a>
-				</h5>
+				<a href="{{ data_get($widget, 'link') }}" class="{{ linkClass() }} section-more-link">
+					{{ t('View more') }} <i class="fa-solid fa-arrow-right"></i>
+				</a>
 			</div>
 			
 			<div class="card-body rounded py-0">
@@ -42,7 +40,7 @@
 				@if (data_get($sectionOptions, 'show_view_more_btn') == '1')
 					<div class="row border-top pt-3 mt-0 mb-3">
 						<div class="col-12 text-center">
-							<a href="{{ urlGen()->searchWithoutQuery() }}" class="btn btn-primary">
+							<a href="{{ urlGen()->searchWithoutQuery() }}" class="btn btn-primary section-cta-btn">
 								<i class="bi bi-box-arrow-in-right"></i> {{ t('View more') }}
 							</a>
 						</div>
