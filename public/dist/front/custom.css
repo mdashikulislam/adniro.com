@@ -2586,3 +2586,257 @@ li.is-open > .filter-sublist {
 .sidebar-card .filter-list a.filter-item:hover .filter-item-count {
 	color: var(--bs-secondary-color);
 }
+
+/* =======================================================
+ * Sidebar tree: reference design (hairline rows, tree connectors)
+ * ======================================================= */
+.sidebar-card .sidebar-section {
+	padding: 1rem 1rem 1rem !important;
+}
+
+.sidebar-card .sidebar-section > h5 {
+	margin-bottom: .25rem !important;
+	padding-bottom: .6rem !important;
+	border-bottom: 0 !important;
+	font-size: 1rem !important;
+}
+
+/* Top-level rows */
+.filter-list > li {
+	margin: 0;
+	border-bottom: 1px solid var(--bs-border-color) !important;
+	border-radius: 0;
+}
+
+.filter-list > li:last-child {
+	border-bottom: 0 !important;
+}
+
+.filter-row {
+	gap: 0;
+}
+
+.filter-item {
+	gap: .8rem;
+	padding: .75rem .5rem;
+	margin: 0;
+	border-radius: 0;
+	font-size: .95rem;
+	font-weight: 400;
+	color: var(--bs-body-color) !important;
+	background: transparent !important;
+}
+
+a.filter-item:hover {
+	color: var(--bs-primary) !important;
+	background: transparent !important;
+}
+
+.filter-item-icon {
+	width: 22px;
+	height: 22px;
+	font-size: 1.05rem;
+	color: var(--bs-primary);
+	opacity: 1;
+	background: transparent !important;
+}
+
+.filter-item-count {
+	font-size: .8rem;
+	color: var(--bs-secondary-color);
+}
+
+/* Chevrons back: right for links, down for the toggle */
+.filter-item-arrow {
+	display: inline-block !important;
+	font-size: .8rem;
+	color: #b5bcc6;
+	transition: color .15s ease;
+}
+
+a.filter-item:hover .filter-item-arrow {
+	color: var(--bs-primary);
+	transform: none;
+}
+
+.filter-toggle {
+	width: 34px;
+	height: 34px;
+	border-radius: 8px;
+	background: transparent !important;
+	color: #b5bcc6;
+	font-size: .8rem;
+}
+
+.filter-toggle i {
+	display: inline-block;
+	transform: rotate(-90deg);
+	transition: transform .2s ease;
+}
+
+.filter-toggle:hover {
+	color: var(--bs-primary);
+}
+
+li.is-open > .filter-row .filter-toggle i {
+	transform: rotate(0deg);
+}
+
+li.is-open > .filter-row .filter-toggle {
+	color: var(--bs-primary);
+}
+
+/* Open group: tinted block containing parent + children */
+.filter-list > li.is-open {
+	background-color: rgba(var(--bs-primary-rgb), .05);
+	border-radius: 12px;
+	border-bottom: 0 !important;
+	padding-bottom: .25rem;
+	margin: 2px 0;
+}
+
+.filter-list > li.is-open > .filter-row > .filter-item {
+	font-weight: 600;
+	color: var(--bs-primary) !important;
+}
+
+.filter-list > li.active > .filter-row > .filter-item,
+.filter-list > li.active > .filter-item {
+	font-weight: 600;
+	color: var(--bs-primary) !important;
+}
+
+.filter-list > li.active > .filter-row > .filter-item::before,
+.filter-list > li.active > .filter-item::before,
+.filter-sublist > li.active > .filter-item::before {
+	display: none;
+}
+
+/* Sub-list with tree connectors */
+.filter-sublist {
+	position: relative;
+	display: none;
+	margin: 0 0 .35rem 1.55rem !important;
+	padding: 0 .35rem 0 0;
+	border: 0;
+	background: transparent;
+}
+
+.filter-sublist::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 1.25rem;
+	border-left: 1px solid #cfd5dc;
+}
+
+li.is-open > .filter-sublist {
+	display: block;
+}
+
+.filter-sublist > li {
+	position: relative;
+	margin: 0;
+	padding-left: 1.1rem;
+	border: 0 !important;
+}
+
+.filter-sublist > li::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: .85rem;
+	border-top: 1px solid #cfd5dc;
+}
+
+.filter-sublist .filter-item {
+	gap: .75rem;
+	padding: .62rem .35rem;
+	font-size: .92rem;
+	font-weight: 400;
+	color: var(--bs-body-color) !important;
+}
+
+.filter-sublist .filter-item-icon {
+	width: 20px;
+	height: 20px;
+	font-size: .95rem;
+	color: var(--bs-secondary-color);
+}
+
+.filter-sublist a.filter-item:hover,
+.sidebar-card .filter-list li .filter-sublist > li > a.filter-item:hover {
+	color: var(--bs-primary) !important;
+	background: transparent !important;
+}
+
+.filter-sublist a.filter-item:hover .filter-item-icon,
+.sidebar-card .filter-list li .filter-sublist > li > a.filter-item:hover .filter-item-icon {
+	color: var(--bs-primary);
+}
+
+.sidebar-card .filter-list li .filter-sublist > li.active > .filter-item {
+	color: var(--bs-primary) !important;
+	font-weight: 600;
+}
+
+.sidebar-card .filter-list li .filter-sublist > li.active > .filter-item .filter-item-icon {
+	color: var(--bs-primary);
+}
+
+/* Third level: continue the connector */
+.filter-sublist .filter-sublist {
+	margin-left: 1.3rem !important;
+}
+
+/* Locations & other simple lists share the row style */
+.sidebar-section-cities .filter-item-icon {
+	color: var(--bs-primary);
+}
+
+/* View more: quiet link, right under the list */
+.sidebar-card .maxlist-more {
+	margin: .35rem 0 0 !important;
+}
+
+.sidebar-card .maxlist-more a {
+	padding: .3rem .5rem;
+}
+
+[data-bs-theme="dark"] .filter-sublist::before,
+[data-bs-theme="dark"] .filter-sublist > li::before {
+	border-color: rgba(255, 255, 255, .15);
+}
+
+[data-bs-theme="dark"] .filter-item-arrow,
+[data-bs-theme="dark"] .filter-toggle {
+	color: rgba(255, 255, 255, .35);
+}
+
+/* Tighter sub-list indent; wrap at spaces only */
+.filter-sublist {
+	margin-left: 1.15rem !important;
+	padding-right: .15rem;
+}
+
+.filter-sublist > li {
+	padding-left: .85rem;
+}
+
+.filter-sublist > li::before {
+	width: .65rem;
+}
+
+.filter-sublist .filter-item {
+	gap: .6rem;
+	padding-left: .25rem;
+	padding-right: .25rem;
+}
+
+.filter-item-name {
+	overflow-wrap: normal;
+	word-break: normal;
+	hyphens: none;
+}
