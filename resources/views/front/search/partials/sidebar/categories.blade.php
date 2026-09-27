@@ -6,7 +6,12 @@
 	
 	$showCatCount = (bool)config('settings.listings_list.count_categories_listings');
 @endphp
-@if (!empty($cat))
+@php
+	// Use the expandable tree (root list) for root and second-level categories;
+	// deeper levels keep the sibling list with a back link.
+	$useCategoryTree = empty($cat) || empty(data_get($cat, 'parent.parent'));
+@endphp
+@if (!empty($cat) && !$useCategoryTree)
 	@php
 		$categoryParent = data_get($cat, 'parent') ?? null;
 		$categoryChildren = data_get($cat, 'children') ?? [];

@@ -53,7 +53,11 @@
 										$iSubCatIcon = data_get($iSubCat, 'icon_class') ?: 'bi bi-folder';
 										$iSubCatCount = $countPostsPerCat[$iSubCatId]['total'] ?? 0;
 									@endphp
-									<li class="{{ $currentCatId == $iSubCatId ? 'active' : '' }}">
+									@php
+										$isActiveSub = ($currentCatId == $iSubCatId);
+										$subChildren = ($isActiveSub && isset($cat)) ? collect(data_get($cat, 'children') ?? []) : collect();
+									@endphp
+									<li class="{{ $isActiveSub ? 'active' : '' }}{{ $subChildren->isNotEmpty() ? ' has-children is-open' : '' }}">
 										<a href="{{ urlGen()->category($iSubCat, null, $city ?? null) }}" class="filter-item" title="{{ data_get($iSubCat, 'name') }}">
 											<span class="filter-item-icon"><i class="{{ $iSubCatIcon }}"></i></span>
 											<span class="filter-item-name">{{ data_get($iSubCat, 'name') }}</span>
@@ -62,6 +66,22 @@
 											@endif
 											<i class="bi bi-chevron-right filter-item-arrow"></i>
 										</a>
+										@if ($subChildren->isNotEmpty())
+											<ul class="list-unstyled filter-sublist">
+												@foreach ($subChildren as $iSubSubCat)
+													<li>
+														<a href="{{ urlGen()->category($iSubSubCat, null, $city ?? null) }}" class="filter-item" title="{{ data_get($iSubSubCat, 'name') }}">
+															<span class="filter-item-icon"><i class="{{ data_get($iSubSubCat, 'icon_class') ?: 'bi bi-folder' }}"></i></span>
+															<span class="filter-item-name">{{ data_get($iSubSubCat, 'name') }}</span>
+															@if ($showCatCount)
+																<span class="filter-item-count">{{ $countPostsPerCat[data_get($iSubSubCat, 'id')]['total'] ?? 0 }}</span>
+															@endif
+															<i class="bi bi-chevron-right filter-item-arrow"></i>
+														</a>
+													</li>
+												@endforeach
+											</ul>
+										@endif
 									</li>
 								@endforeach
 							</ul>

@@ -2319,3 +2319,30 @@ li.is-open > .filter-sublist {
 .filter-sublist .filter-item-name {
 	font-size: .86rem;
 }
+
+/* Active item inside an expanded sub-list */
+.filter-sublist > li.active .filter-item {
+	background-color: rgba(var(--bs-primary-rgb), .08);
+	color: var(--bs-primary) !important;
+	font-weight: 600;
+}
+
+.filter-sublist > li.active .filter-item-icon {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+.filter-sublist > li.active .filter-item-count {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+.filter-sublist > li.active .filter-item-arrow {
+	color: var(--bs-primary);
+}
+
+/* The open parent reads as the current branch */
+.filter-list > li.is-open > .filter-row .filter-item {
+	font-weight: 600;
+	color: var(--bs-emphasis-color) !important;
+}
