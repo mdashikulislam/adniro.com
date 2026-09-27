@@ -76,6 +76,34 @@ function ajaxResponse(): Ajax
  * @param string|bool|null $filePathFallback
  * @return \App\Helpers\Services\ThumbnailParams
  */
+/**
+ * Disk existence check with a per-request memo (thumbnail URLs are resolved many times per page)
+ *
+ * @param \Illuminate\Contracts\Filesystem\Filesystem $disk
+ * @param string|null $path
+ * @return bool
+ */
+function thumbDiskExists($disk, ?string $path): bool
+{
+	static $memo = [];
+	
+	if (empty($path)) {
+		return false;
+	}
+	// Only positive results are memoized: a file can be created later in the same request
+	// (e.g. a thumbnail generated on the fly) and must then be seen.
+	$key = spl_object_id($disk) . '|' . $path;
+	if (!empty($memo[$key])) {
+		return true;
+	}
+	$exists = (bool)$disk->exists($path);
+	if ($exists) {
+		$memo[$key] = true;
+	}
+	
+	return $exists;
+}
+
 function thumbParam(?string $filePath, string|null|bool $filePathFallback = null): ThumbnailParams
 {
 	return new ThumbnailParams($filePath, $filePathFallback);

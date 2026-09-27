@@ -64,7 +64,7 @@ class Thumbnail
 		}
 		
 		// Check if the original file exists (i.e. file before resize)
-		if (!$this->disk->exists($filePath)) {
+		if (!thumbDiskExists($this->disk, $filePath)) {
 			$this->filePath = $this->filePathFallback;
 			
 			return;
@@ -122,12 +122,12 @@ class Thumbnail
 		$thumbFilename = $thumbFilenamePrefix . '-' . $filename;
 		$thumbFilePath = $thumbFileDir . $thumbFilename;
 		
-		if (!$this->disk->exists($thumbFileDir)) {
+		if (!thumbDiskExists($this->disk, $thumbFileDir)) {
 			$this->disk->makeDirectory($thumbFileDir);
 		}
 		
 		// 4. Does the thumb file exist?
-		if ($this->disk->exists($thumbFilePath)) {
+		if (thumbDiskExists($this->disk, $thumbFilePath)) {
 			// Save the thumbnail file path
 			$this->filePath = $thumbFilePath;
 			

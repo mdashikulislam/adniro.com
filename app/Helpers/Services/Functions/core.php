@@ -218,6 +218,22 @@ function getCountries(bool $includeNonActive = false): array
  */
 function getCountriesCodes(): array
 {
+	// The list only changes when country SQL files are added: memoize per request and cache for a day
+	static $memo = null;
+	if (is_array($memo)) {
+		return $memo;
+	}
+	try {
+		$memo = cache()->remember('system.countries_codes', 86400, fn () => getCountriesCodesUncached());
+	} catch (Throwable $e) {
+		$memo = getCountriesCodesUncached();
+	}
+	
+	return is_array($memo) ? $memo : [];
+}
+
+function getCountriesCodesUncached(): array
+{
 	// Get the countries from the umpirsky database
 	$countries = getCountriesFromArray(raw: true);
 	$umpirskyCodes = collect($countries)->keyBy('value')->keys();
@@ -247,6 +263,11 @@ function getCountriesCodes(): array
  */
 function getCountryCodeRoutePattern(): string
 {
+	static $memo = null;
+	if (is_string($memo)) {
+		return $memo;
+	}
+	
 	// Country Code Pattern
 	$countriesCodes = collect(getCountriesCodes())->map(fn ($item) => strtolower($item));
 	$countryCodePattern = $countriesCodes->isNotEmpty() ? $countriesCodes->join('|') : null;
@@ -257,7 +278,7 @@ function getCountryCodeRoutePattern(): string
 	 * '(?i:foo)' : Make 'foo' case-insensitive
 	 */
 	
-	return '(?i:' . $countryCodePattern . ')';
+	return $memo = '(?i:' . $countryCodePattern . ')';
 }
 
 /**

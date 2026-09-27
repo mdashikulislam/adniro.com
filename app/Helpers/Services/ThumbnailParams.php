@@ -59,7 +59,7 @@ class ThumbnailParams
 		$params = $this->resizeParameters($resizeOptionsName);
 		
 		$filePath = $params['thumbFilePath'] ?? $params['filePath'] ?? $this->filePathFallback;
-		if (empty($filePath) || !$this->disk->exists($filePath)) return null;
+		if (empty($filePath) || !thumbDiskExists($this->disk, $filePath)) return null;
 		
 		try {
 			$url = $this->disk->url($filePath) . getPictureVersion();
@@ -110,7 +110,7 @@ class ThumbnailParams
 		}
 		
 		// Check if the original file exists (i.e. file before resize)
-		if (!$this->disk->exists($filePath)) {
+		if (!thumbDiskExists($this->disk, $filePath)) {
 			$this->params['filePath'] = $this->filePathFallback;
 			
 			return $this;
