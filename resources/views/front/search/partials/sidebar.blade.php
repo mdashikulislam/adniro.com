@@ -14,16 +14,6 @@
 			{{-- The #movableSidebarContent element will be moved here based on the client window size --}}
 			<div class="card sidebar-card" id="movableSidebarContent">
 				<div class="card-body vstack gap-4 text-wrap">
-					<div class="sidebar-head d-flex align-items-center justify-content-between">
-						<h4 class="sidebar-head-title mb-0">
-							<i class="bi bi-sliders2"></i> {{ t('Filters') }}
-						</h4>
-						@if (!empty(request()->except(['page'])))
-							<a href="{{ urlGen()->searchWithoutQuery() }}" class="sidebar-head-reset" rel="nofollow">
-								{{ t('Clear all') }}
-							</a>
-						@endif
-					</div>
 					@include('front.search.partials.sidebar.fields')
 					@include('front.search.partials.sidebar.categories')
 					@include('front.search.partials.sidebar.cities')
