@@ -14,12 +14,19 @@
 	var sessionCookie = (scriptEl && scriptEl.getAttribute('data-session-cookie')) || 'laravel_session';
 	var tokenUrl = (scriptEl && scriptEl.getAttribute('data-token-url')) || '/common/csrf-token';
 	
-	var ready = hasSessionCookie();
 	var pending = null;
 	
+	/*
+	 * The session cookie is HttpOnly (invisible to JS), so rely on:
+	 *  - the server flag: pages rendered for a visitor with a session say data-has-session="1"
+	 *    (cached guest pages are only ever rendered for cookie-less requests, so they say "0"),
+	 *  - the XSRF-TOKEN cookie, which Laravel sets readable and which only exists with a session.
+	 */
 	function hasSessionCookie() {
-		return document.cookie.indexOf(sessionCookie + '=') !== -1;
+		return document.cookie.indexOf(sessionCookie + '=') !== -1
+			|| document.cookie.indexOf('XSRF-TOKEN=') !== -1;
 	}
+	var ready = (scriptEl && scriptEl.getAttribute('data-has-session') === '1') || hasSessionCookie();
 	
 	function applyToken(token) {
 		if (!token) return;

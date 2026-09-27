@@ -208,9 +208,10 @@
 
 {{-- App JS files (Handled by Mix) --}}
 <script src="{{ url(mix('dist/front/scripts.js')) }}"></script>
-<script src="{{ url('assets/js/app/guest-cache.js') . getPictureVersion() }}"
+<script src="{{ url('assets/js/app/guest-cache.js') }}?v={{ @filemtime(public_path('assets/js/app/guest-cache.js')) ?: 1 }}"
         data-session-cookie="{{ config('session.cookie') }}"
         data-token-url="{{ url('common/csrf-token') }}"
+        data-has-session="{{ request()->attributes->get(\App\Http\Middleware\GuestPageCache::ATTRIBUTE) === true ? '0' : '1' }}"
 ></script>
 
 {{-- Lazy Loading JS --}}
