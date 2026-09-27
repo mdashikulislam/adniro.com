@@ -1508,8 +1508,13 @@
 .results-title {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: .9rem;
 	padding: .35rem 0 .9rem;
+}
+
+.results-title-tabs .results-tabs.nav-tabs {
+	margin-bottom: 0;
 }
 
 .results-title-icon {

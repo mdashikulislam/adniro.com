@@ -77,11 +77,64 @@
 				<div class="col-12">
 					<div class="page-title-wrapper results-title">
 						<span class="results-title-icon"><i class="bi bi-search"></i></span>
-						<div>
-							<h1 class="results-title-text m-0 p-0">{{ $h1Title }}</h1>
-							@if (isset($count) && data_get($count, '0') !== null)
-								<div class="results-title-sub">{{ number_format((int)data_get($count, '0')) }} {{ trans_choice('global.count_listings', (int)data_get($count, '0')) }}</div>
+						<h1 class="results-title-text m-0 p-0">{{ $h1Title }}</h1>
+						<div class="results-title-tabs ms-md-auto">
+						<ul class="nav nav-tabs results-tabs" id="postType">
+				@php
+					$linkActiveClass = '';
+					$linkActiveAttr = '';
+					$badgeClass = 'text-bg-secondary';
+					if (config('settings.listing_form.show_listing_type')) {
+						if (!request()->filled('type') || request()->query('type') == '') {
+							$linkActiveClass = ' active fw-bold';
+							$linkActiveAttr = ' aria-current="page"';
+							$badgeClass = 'text-bg-danger';
+						}
+					} else {
+						$linkActiveClass = ' active fw-bold';
+						$linkActiveAttr = ' aria-current="page"';
+						$badgeClass = 'text-bg-danger';
+					}
+				@endphp
+				<li class="nav-item">
+					<a href="{!! request()->fullUrlWithoutQuery(['page', 'type']) !!}"
+					   class="nav-link fs-6{{ $linkActiveClass }}"{!! $linkActiveAttr !!}
+					>
+						{{ t('all_listings') }} <span class="badge {{ $badgeClass }}">{{ data_get($count, '0') }}</span>
+					</a>
+				</li>
+				@if (config('settings.listing_form.show_listing_type'))
+					@if (!empty($postTypes))
+						@foreach ($postTypes as $postType)
+							@php
+								$postTypeId = data_get($postType, 'id');
+								$postTypeUrl = request()->fullUrlWithQuery(['type' => $postTypeId, 'page' => null]);
+								$postTypeCount = data_get($count, $postTypeId) ?? 0;
+								$isSelectedPostType = (request()->filled('type') && request()->query('type') == $postTypeId);
+							@endphp
+							@if ($isSelectedPostType)
+								<li class="nav-item">
+									<a href="{!! $postTypeUrl !!}" class="nav-link fs-6 active fw-bold">
+										{{ data_get($postType, 'label') }}
+										<span class="badge text-bg-danger {{ $hideInlineOnMdOrLower }}">
+											{{ $postTypeCount }}
+										</span>
+									</a>
+								</li>
+							@else
+								<li class="nav-item">
+									<a href="{!! $postTypeUrl !!}" class="nav-link fs-6">
+										{{ data_get($postType, 'label') }}
+										<span class="badge text-bg-secondary {{ $hideInlineOnMdOrLower }}">
+											{{ $postTypeCount }}
+										</span>
+									</a>
+								</li>
 							@endif
+						@endforeach
+					@endif
+				@endif
+			</ul>
 						</div>
 					</div>
 				</div>
@@ -126,63 +179,6 @@
 				@endphp
 				<div class="{{ $rightColSize }} mb-4">
 					<div class="{{ $selectedDisplayMode }}{{ str_ends_with($rightColSize, '-12') ? ' noSideBar' : '' }}">
-						{{-- Nav tabs --}}
-						<ul class="nav nav-tabs results-tabs" id="postType">
-							@php
-								$linkActiveClass = '';
-								$linkActiveAttr = '';
-								$badgeClass = 'text-bg-secondary';
-								if (config('settings.listing_form.show_listing_type')) {
-									if (!request()->filled('type') || request()->query('type') == '') {
-										$linkActiveClass = ' active fw-bold';
-										$linkActiveAttr = ' aria-current="page"';
-										$badgeClass = 'text-bg-danger';
-									}
-								} else {
-									$linkActiveClass = ' active fw-bold';
-									$linkActiveAttr = ' aria-current="page"';
-									$badgeClass = 'text-bg-danger';
-								}
-							@endphp
-							<li class="nav-item">
-								<a href="{!! request()->fullUrlWithoutQuery(['page', 'type']) !!}"
-								   class="nav-link fs-6{{ $linkActiveClass }}"{!! $linkActiveAttr !!}
-								>
-									{{ t('all_listings') }} <span class="badge {{ $badgeClass }}">{{ data_get($count, '0') }}</span>
-								</a>
-							</li>
-							@if (config('settings.listing_form.show_listing_type'))
-								@if (!empty($postTypes))
-									@foreach ($postTypes as $postType)
-										@php
-											$postTypeId = data_get($postType, 'id');
-											$postTypeUrl = request()->fullUrlWithQuery(['type' => $postTypeId, 'page' => null]);
-											$postTypeCount = data_get($count, $postTypeId) ?? 0;
-											$isSelectedPostType = (request()->filled('type') && request()->query('type') == $postTypeId);
-										@endphp
-										@if ($isSelectedPostType)
-											<li class="nav-item">
-												<a href="{!! $postTypeUrl !!}" class="nav-link fs-6 active fw-bold">
-													{{ data_get($postType, 'label') }}
-													<span class="badge text-bg-danger {{ $hideInlineOnMdOrLower }}">
-														{{ $postTypeCount }}
-													</span>
-												</a>
-											</li>
-										@else
-											<li class="nav-item">
-												<a href="{!! $postTypeUrl !!}" class="nav-link fs-6">
-													{{ data_get($postType, 'label') }}
-													<span class="badge text-bg-secondary {{ $hideInlineOnMdOrLower }}">
-														{{ $postTypeCount }}
-													</span>
-												</a>
-											</li>
-										@endif
-									@endforeach
-								@endif
-							@endif
-						</ul>
 
 						{{-- Breadcrumb --}}
 						<div class="container results-toolbar-top">
