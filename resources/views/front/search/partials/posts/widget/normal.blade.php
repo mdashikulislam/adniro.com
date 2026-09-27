@@ -19,7 +19,7 @@
 @endphp
 @if ($totalPosts > 0)
 	<div class="container{{ $cssClasses }}" style="{!! $style !!}">
-		<div class="card"{!! $htmlAttr !!}>
+		<div class="card listing-section"{!! $htmlAttr !!}>
 			<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
 				<h4 class="mb-0 fw-lighter section-title">
 					{!! data_get($widget, 'title') !!}
@@ -38,7 +38,7 @@
 					@include('front.search.partials.posts.template.grid')
 				@endif
 				@if (data_get($sectionOptions, 'show_view_more_btn') == '1')
-					<div class="row border-top pt-3 mt-0 mb-3">
+					<div class="row pt-2 mt-0 mb-3 listing-section-more">
 						<div class="col-12 text-center">
 							<a href="{{ urlGen()->searchWithoutQuery() }}" class="btn btn-primary section-cta-btn">
 								<i class="bi bi-box-arrow-in-right"></i> {{ t('View more') }}

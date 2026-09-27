@@ -27,7 +27,7 @@
 @endphp
 @if ($locCanBeShown || $mapCanBeShown)
 	<div class="container{{ $cssClasses }} location-card" style="{!! $style !!}">
-		<div class="card bg-body-tertiary"{!! $htmlAttr !!}>
+		<div class="card bg-body-tertiary section-unboxed"{!! $htmlAttr !!}>
 			<div class="card-body rounded p-4 p-lg-3 pb-lg-4 p-md-2">
 				
 				<div class="row">

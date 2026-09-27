@@ -76,6 +76,22 @@
 							</span>
 						@endif
 						
+						@if ($savedByLoggedUser)
+							<a class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
+								<i class="bi bi-heart-fill small"></i> <span>{{ t('Saved') }}</span>
+							</a>
+						@else
+							<a class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
+								<i class="bi bi-heart small"></i> <span>{{ t('Save') }}</span>
+							</a>
+						@endif
+						
+						@if ($showPostInfo && !config('settings.listings_list.hide_location') && !empty(data_get($post, 'city.name')))
+							<a href="{!! $locationUrl !!}" class="listing-card-location">
+								<i class="bi bi-geo-alt-fill"></i> {{ data_get($post, 'city.name') }}
+							</a>
+						@endif
+						
 						@if ($countPictures > 0)
 							<span class="listing-card-count">
 								<i class="fa-solid fa-camera"></i> {{ $countPictures }}
@@ -85,13 +101,31 @@
 					
 					{{-- Body --}}
 					<div class="listing-card-body">
-						@if ($showPostInfo && !config('settings.listings_list.hide_category'))
-							<div class="listing-card-cat">
-								@if (!empty(data_get($post, 'category.parent')))
-									<a href="{!! $parentCatUrl !!}" class="{{ linkClass() }}">{{ data_get($post, 'category.parent.name') }}</a>
-									<i class="bi bi-chevron-right"></i>
+						@if ($showPostInfo)
+							<div class="listing-card-topline">
+								@if (!config('settings.listings_list.hide_category') && !empty(data_get($post, 'category.name')))
+									@php
+										$catPath = !empty(data_get($post, 'category.parent'))
+											? data_get($post, 'category.parent.name') . ' » ' . data_get($post, 'category.name')
+											: data_get($post, 'category.name');
+									@endphp
+									<a href="{!! $catUrl !!}" class="listing-card-cat" title="{{ $catPath }}">
+										{{ data_get($post, 'category.name') }}
+									</a>
 								@endif
-								<a href="{!! $catUrl !!}" class="{{ linkClass() }}">{{ data_get($post, 'category.name') }}</a>
+								@if (
+									!config('settings.listings_list.hide_post_type')
+									&& config('settings.listing_form.show_listing_type')
+									&& !empty(data_get($post, 'postType'))
+								)
+									<span class="listing-card-type"
+									      data-bs-toggle="tooltip"
+									      data-bs-placement="bottom"
+									      title="{{ data_get($post, 'postType.label') }}"
+									>
+										{{ strtoupper(mb_substr(data_get($post, 'postType.label'), 0, 1)) }}
+									</span>
+								@endif
 							</div>
 						@endif
 						
@@ -101,68 +135,30 @@
 							</a>
 						</h5>
 						
-						@if ($showPostInfo)
-							<ul class="listing-card-meta list-unstyled mb-0">
-								@if (
-									!config('settings.listings_list.hide_post_type')
-									&& config('settings.listing_form.show_listing_type')
-									&& !empty(data_get($post, 'postType'))
-								)
-									<li>
-										<span class="badge rounded-pill text-bg-secondary fw-normal"
-										      data-bs-toggle="tooltip"
-										      data-bs-placement="bottom"
-										      title="{{ data_get($post, 'postType.label') }}"
-										>
-											{{ strtoupper(mb_substr(data_get($post, 'postType.label'), 0, 1)) }}
-										</span>
-									</li>
-								@endif
-								@if (!config('settings.listings_list.hide_location') && !empty(data_get($post, 'city.name')))
-									<li>
-										<i class="bi bi-geo-alt"></i>
-										<a href="{!! $locationUrl !!}" class="{{ linkClass('secondary') }}">{{ data_get($post, 'city.name') }}</a>
-										{{ data_get($post, 'distance_info') }}
-									</li>
-								@endif
-								@if (!config('settings.listings_list.hide_date'))
-									<li>
-										<i class="fa-regular fa-clock"></i> {!! data_get($post, 'created_at_formatted') !!}
-									</li>
-								@endif
-							</ul>
-						@endif
-					</div>
-					
-					{{-- Footer: Reviews, Price & Favourite Button --}}
-					<div class="listing-card-footer">
 						@if (config('plugins.reviews.installed'))
 							@if (view()->exists('reviews::ratings-list'))
-								<div class="listing-card-reviews w-100 mb-2">
+								<div class="listing-card-reviews">
 									@include('reviews::ratings-list')
 								</div>
 							@endif
 						@endif
 						
-						<div class="listing-card-price{{ $isTextPrice ? ' listing-card-price-text' : '' }}">
-							{!! $priceFormatted !!}
-						</div>
-						
-						<div class="listing-card-actions">
-							@if ($hasPackageBadge)
-								<span class="listing-card-package">
-									<i class="fa-solid fa-certificate"></i> {{ $packageShortName }}
-								</span>
-							@endif
-							@if ($savedByLoggedUser)
-								<a class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
-									<i class="bi bi-heart-fill small"></i> <span>{{ t('Saved') }}</span>
-								</a>
-							@else
-								<a class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
-									<i class="bi bi-heart small"></i> <span>{{ t('Save') }}</span>
-								</a>
-							@endif
+						<div class="listing-card-footer">
+							<div class="listing-card-price{{ $isTextPrice ? ' listing-card-price-text' : '' }}">
+								{!! $priceFormatted !!}
+							</div>
+							<div class="listing-card-footer-right">
+								@if ($hasPackageBadge)
+									<span class="listing-card-package">
+										<i class="fa-solid fa-certificate"></i> {{ $packageShortName }}
+									</span>
+								@endif
+								@if ($showPostInfo && !config('settings.listings_list.hide_date'))
+									<span class="listing-card-date">
+										<i class="fa-regular fa-clock"></i> {!! data_get($post, 'created_at_formatted') !!}
+									</span>
+								@endif
+							</div>
 						</div>
 					</div>
 					
