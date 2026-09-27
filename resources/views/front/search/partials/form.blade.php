@@ -60,14 +60,15 @@
 	      name="search"
 	      action="{{ urlGen()->searchWithoutQuery() }}"
 	      method="GET"
+	      class="results-search-form"
 	      data-csrf-token="{{ csrf_token() }}"
 	>
 		@if (!empty($qFilterBy))
 			<input type="hidden" name="filterBy" value="{{ $qFilterBy }}">
 		@endif
 		<div class="row m-0">
-			<div class="col-12 px-1 py-1 bg-primary rounded">
-				<div class="row gx-1 gy-1">
+			<div class="col-12 results-search-bar">
+				<div class="row gx-2 gy-2 align-items-center">
 					
 					{{-- c --}}
 					@php
@@ -133,7 +134,7 @@
 					
 					{{-- button --}}
 					<div class="col-xl-2 col-md-2 col-sm-12 col-12 d-grid">
-						<button type="submit" class="btn btn-primary">
+						<button type="submit" class="btn btn-primary results-search-btn">
 							<i class="fa-solid fa-magnifying-glass"></i> <span
 									class="fw-bold d-sm-inline-block d-md-none d-lg-none d-xl-inline-block"
 							>{{ t('find') }}</span>

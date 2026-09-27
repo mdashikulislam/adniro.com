@@ -12,7 +12,7 @@
 		<aside>
 			
 			{{-- The #movableSidebarContent element will be moved here based on the client window size --}}
-			<div class="card" id="movableSidebarContent">
+			<div class="card sidebar-card" id="movableSidebarContent">
 				<div class="card-body vstack gap-4 text-wrap">
 					@include('front.search.partials.sidebar.fields')
 					@include('front.search.partials.sidebar.categories')

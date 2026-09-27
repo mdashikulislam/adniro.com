@@ -24,7 +24,7 @@
 	@include('front.search.partials.form')
 @endsection
 @section('content')
-	<div class="main-container">
+	<div class="main-container search-results-page">
 		@include('front.search.partials.breadcrumbs')
 
 		{{-- SEO H1 Title --}}
@@ -75,12 +75,13 @@
 		<div class="container mb-3">
 			<div class="row">
 				<div class="col-12">
-					<div class="page-title-wrapper py-3 px-4 bg-white border rounded shadow-sm text-center">
-						<div class="d-flex justify-content-center align-items-center">
-							<i style="font-size: 22px" class="bi  bi-search me-2 text-primary"></i>
-							<h1 class="h4  fw-bold m-0 p-0 text-dark">
-								{{ $h1Title }}
-							</h1>
+					<div class="page-title-wrapper results-title">
+						<span class="results-title-icon"><i class="bi bi-search"></i></span>
+						<div>
+							<h1 class="results-title-text m-0 p-0">{{ $h1Title }}</h1>
+							@if (isset($count) && data_get($count, '0') !== null)
+								<div class="results-title-sub">{{ number_format((int)data_get($count, '0')) }} {{ trans_choice('global.count_listings', (int)data_get($count, '0')) }}</div>
+							@endif
 						</div>
 					</div>
 				</div>
@@ -126,7 +127,7 @@
 				<div class="{{ $rightColSize }} mb-4">
 					<div class="{{ $selectedDisplayMode }}{{ str_ends_with($rightColSize, '-12') ? ' noSideBar' : '' }}">
 						{{-- Nav tabs --}}
-						<ul class="nav nav-tabs" id="postType">
+						<ul class="nav nav-tabs results-tabs" id="postType">
 							@php
 								$linkActiveClass = '';
 								$linkActiveAttr = '';
@@ -184,9 +185,9 @@
 						</ul>
 
 						{{-- Breadcrumb --}}
-						<div class="container bg-body py-3 border border-top-0">
+						<div class="container results-toolbar-top">
 							<div class="row">
-								<div class="col-12 d-flex align-items-center justify-content-between">
+								<div class="col-12 d-flex align-items-center justify-content-between gap-2 flex-wrap">
 									<h4 class="mb-0 fs-6 breadcrumb-list clearfix">
 										{!! (isset($htmlTitle)) ? $htmlTitle : '' !!}
 									</h4>
@@ -203,13 +204,13 @@
 						</div>
 
 						{{-- Filters, OrderBy & Display Mode --}}
-						<div class="container px-1 py-2 bg-body-tertiary border border-top-0">
-							<ul class="list-inline m-0 p-0 text-end">
+						<div class="container results-toolbar">
+							<ul class="list-inline m-0 p-0 text-end d-flex align-items-center justify-content-end gap-2">
 								{{-- Filter (Show/Hide Sidebar) | d-inline-block d-sm-inline-block d-md-none --}}
 								@if ($isLeftSidebarEnabled)
 									<li class="list-inline-item px-2{{ $showInlineOnSmallScreen }}">
 										<a href="#"
-										   class="text-uppercase {{ linkClass() }} navbar-toggler"
+										   class="text-uppercase {{ linkClass() }} navbar-toggler results-filter-btn"
 										   data-bs-toggle="offcanvas"
 										   data-bs-target="#smallScreenSidebar"
 										   aria-controls="smallScreenSidebar"
@@ -223,8 +224,8 @@
 								{{-- OrderBy --}}
 								<li class="list-inline-item px-2">
 									<div class="dropdown">
-										<a href="#" class="dropdown-toggle text-uppercase {{ linkClass() }}" data-bs-toggle="dropdown" aria-expanded="false">
-											{{ t('Sort by') }}
+										<a href="#" class="dropdown-toggle text-uppercase {{ linkClass() }} results-sort-btn" data-bs-toggle="dropdown" aria-expanded="false">
+											<i class="bi bi-arrow-down-up"></i> {{ t('Sort by') }}
 										</a>
 										<ul class="dropdown-menu">
 											@if (!empty($orderByOptions))
@@ -261,7 +262,7 @@
 								@if (!empty($posts) && $totalPosts > 0)
 									<li class="list-inline-item px-2">
 										@if (!empty($displayModes))
-											<div class="btn-group">
+											<div class="btn-group results-view-switch">
 												@foreach($displayModes as $displayMode => $value)
 													@php
 														$displayModeUrl = request()->fullUrlWithQuery((array)data_get($value, 'query'));
@@ -285,7 +286,7 @@
 						{{-- Listing List --}}
 						<div class="tab-content bg-body" id="myTabContent">
 							<div class="tab-pane fade show active" id="contentAll" role="tabpanel" aria-labelledby="tabAll">
-								<div class="container border border-top-0 rounded-bottom px-3">
+								<div class="container results-list px-0">
 									@if ($selectedDisplayMode == 'list-view')
 										@include('front.search.partials.posts.template.list')
 									@elseif ($selectedDisplayMode == 'compact-view')
@@ -303,7 +304,7 @@
 							$searchCanBeSaved = (!empty($keyword) && data_get($count, '0') > 0);
 						@endphp
 						@if ($searchCanBeSaved)
-							<div class="container border-bottom py-2 mt-3 border rounded fs-5 fw-bold text-center">
+							<div class="container py-2 mt-3 results-save-search text-center">
 								<a id="saveSearch"
 								   href=""
 								   data-search-url="{!! request()->fullUrlWithoutQuery(['_token', 'location']) !!}"
