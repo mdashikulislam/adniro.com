@@ -84,7 +84,11 @@
 	{!! $homeStyle !!}
 	
 	{{-- Custom CSS --}}
-	<link href="{{ url()->asset('dist/front/custom.css') . getPictureVersion() }}" rel="stylesheet">
+	@php
+		$customCssPath = public_path('dist/front/custom.css');
+		$customCssVersion = file_exists($customCssPath) ? '?v=' . filemtime($customCssPath) : getPictureVersion();
+	@endphp
+	<link href="{{ url()->asset('dist/front/custom.css') . $customCssVersion }}" rel="stylesheet">
 	
     @yield('after_styles')
 	@stack('after_styles_stack')
