@@ -12,9 +12,9 @@
 	@endphp
 	@continue(!$canBeDisplayed)
 	@if (!empty($children))
-		<div class="col">
+		<div class="col footer-col">
 			{!! $labelHtml !!}
-			<ul class="mb-0 list-unstyled">
+			<ul class="mb-0 list-unstyled footer-links">
 				@foreach($children as $subMenu)
 					@php
 						$subLabelHtml = data_get($subMenu, 'label_html');
@@ -30,7 +30,7 @@
 			</ul>
 		</div>
 	@else
-		<div class="col">
+		<div class="col footer-col footer-col-single">
 			{!! $labelHtml !!}
 		</div>
 	@endif
