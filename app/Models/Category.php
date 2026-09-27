@@ -308,7 +308,26 @@ class Category extends BaseModel
 	{
 		return Attribute::make(
 			get: function () {
-				return thumbService($this->image_path ?? null)->resize('cat')->url();
+				// Resolving a thumbnail URL checks the disk several times; the result only
+				// changes when the image or the skin changes, so keep it in the cache.
+				static $memo = [];
+				
+				$path = $this->image_path ?? null;
+				$skin = getFrontSkin(request()->input('skin'));
+				$key = 'category.image_url.' . md5(($path ?? '') . '|' . $skin);
+				
+				if (array_key_exists($key, $memo)) {
+					return $memo[$key];
+				}
+				
+				$resolver = fn () => thumbService($path)->resize('cat')->url();
+				try {
+					$url = cache()->remember($key, 86400, $resolver);
+				} catch (\Throwable $e) {
+					$url = $resolver();
+				}
+				
+				return $memo[$key] = $url;
 			},
 		);
 	}
@@ -328,6 +347,21 @@ class Category extends BaseModel
 	|--------------------------------------------------------------------------
 	*/
 	private function getImage($value, $attributes)
+	{
+		// The resolution below hits the disk up to four times; memoize it per request
+		// (same raw value + skin => same result).
+		static $memo = [];
+		
+		$skinForKey = getFrontSkin(request()->input('skin'));
+		$memoKey = md5(serialize([$value, $attributes['image_path'] ?? null, $skinForKey]));
+		if (array_key_exists($memoKey, $memo)) {
+			return $memo[$memoKey];
+		}
+		
+		return $memo[$memoKey] = $this->resolveImage($value, $attributes);
+	}
+	
+	private function resolveImage($value, $attributes)
 	{
 		// OLD PATH
 		$oldValue = $this->getImageFromOriginPath($value);

@@ -78,7 +78,7 @@ trait CategoryTrait
 		
 		// Cache Parameters
 		$cacheParams = [
-			'action'  => 'get.root.categories.with.children',
+			'action'  => 'get.root.categories.with.children.v2',
 			'locale'  => $locale,
 			'orderBy' => 'lft',
 			'limit'   => $limit,
@@ -86,7 +86,7 @@ trait CategoryTrait
 		
 		// Children are loaded (one level) so the sidebar can expand them inline
 		$cats = caching()->remember(Category::class, $cacheParams, function () use ($limit) {
-			return Category::roots()->with('childrenClosure')->orderBy('lft')->take($limit)->get();
+			return Category::roots()->with('childrenClosure.parent')->orderBy('lft')->take($limit)->get();
 		});
 		
 		if ($cats->count() > 0) {
