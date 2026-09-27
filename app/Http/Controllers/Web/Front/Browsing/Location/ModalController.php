@@ -37,7 +37,7 @@ class ModalController extends FrontController
 	{
 		$languageCode = request()->input('languageCode', config('app.locale'));
 		$countryChanged = request()->input('countryChanged', 0);
-		$currSearch = unserialize(base64_decode(request()->input('currSearch')));
+		$currSearch = $this->decodeCurrSearch(request()->input('currSearch'));
 		$page = request()->integer('page', 1);
 		$_token = request()->input('_token');
 		$query = request()->input('query');
@@ -125,7 +125,7 @@ class ModalController extends FrontController
 	{
 		$languageCode = request()->input('languageCode', config('app.locale'));
 		$countryChanged = request()->input('countryChanged', 0);
-		$currSearch = unserialize(base64_decode(request()->input('currSearch')));
+		$currSearch = $this->decodeCurrSearch(request()->input('currSearch'));
 		$perPage = getNumberOfItemsPerPage('cities');
 		$page = request()->integer('page', 1);
 		$_token = request()->input('_token');
@@ -276,5 +276,30 @@ class ModalController extends FrontController
 		}
 		
 		return is_array($country) ? $country : [];
+	}
+
+	/**
+	 * Safely decode the "currSearch" request parameter.
+	 *
+	 * The value is a base64-encoded serialized array produced by the location modal view.
+	 * Object instantiation is forbidden here to prevent PHP object injection (RCE).
+	 *
+	 * @param mixed $value
+	 * @return array
+	 */
+	private function decodeCurrSearch(mixed $value): array
+	{
+		if (!is_string($value) || $value === '') {
+			return [];
+		}
+		
+		$decoded = base64_decode($value, true);
+		if ($decoded === false) {
+			return [];
+		}
+		
+		$data = @unserialize($decoded, ['allowed_classes' => false]);
+		
+		return is_array($data) ? $data : [];
 	}
 }
