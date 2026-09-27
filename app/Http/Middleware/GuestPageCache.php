@@ -45,6 +45,13 @@ class GuestPageCache
 	
 	public function handle(Request $request, Closure $next): Response
 	{
+		// Kill switch: the CDN must bypass its cache for visitors carrying a session cookie
+		// before this is enabled (GUEST_PAGE_CACHE=true in .env), otherwise logged-in users
+		// could be served a cached guest page.
+		if (!filter_var(env('GUEST_PAGE_CACHE', false), FILTER_VALIDATE_BOOLEAN)) {
+			return $next($request);
+		}
+		
 		$isCacheable = $this->isCacheableGuestRequest($request);
 		
 		if ($isCacheable) {
