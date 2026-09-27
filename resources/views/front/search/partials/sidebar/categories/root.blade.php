@@ -11,7 +11,7 @@
 			<h5 class="border-bottom pb-2 d-flex justify-content-between">
 				<span class="fw-bold">{{ t('all_categories') }}</span> {!! $clearFilterBtn ?? '' !!}
 			</h5>
-			<ul class="mb-0 list-unstyled filter-list long-list">
+			<ul class="mb-0 list-unstyled filter-list{{ empty($currentCatId) ? ' long-list' : '' }}">
 				@foreach ($cats as $iCat)
 					@php
 						$iCatId = data_get($iCat, 'id');
