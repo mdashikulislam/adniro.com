@@ -66,7 +66,7 @@
 				}
 			} elseif (request()->filled('q')) {
 				// Search query page
-				$h1Title = t('Search Results for') . ': "' . request()->query('q') . '"';
+				$h1Title = t('blog_search_results_for', ['keyword' => request()->query('q')]);
 			} else {
 				// Default general search page
 				$h1Title = t('all_listings') . ' ' . t('in') . ' ' . config('country.name');
@@ -183,6 +183,7 @@
 				<div class="{{ $rightColSize }} mb-4">
 					<div class="{{ $selectedDisplayMode }}{{ str_ends_with($rightColSize, '-12') ? ' noSideBar' : '' }}">
 
+						@if (!empty($posts) && $totalPosts > 0)
 						{{-- Filters, OrderBy & Display Mode --}}
 						<div class="container results-toolbar">
 							<ul class="list-inline m-0 p-0 text-end d-flex align-items-center justify-content-end gap-2">
@@ -268,6 +269,7 @@
 								@endif
 							</ul>
 						</div>
+						@endif
 
 						{{-- Listing List --}}
 						<div class="tab-content bg-body" id="myTabContent">

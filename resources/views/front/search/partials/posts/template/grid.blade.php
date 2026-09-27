@@ -167,9 +167,7 @@
 		@endforeach
 	</div>
 @else
-	<div class="py-5 text-center w-100">
-		{{ t('no_result_refine_your_search') }}
-	</div>
+	@include('front.search.partials.posts.empty')
 @endif
 
 @section('after_scripts')

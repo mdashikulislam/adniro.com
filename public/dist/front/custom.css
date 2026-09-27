@@ -3111,3 +3111,113 @@ li.is-open > .filter-sublist {
 	background-color: rgba(255, 255, 255, .18);
 	border-color: transparent;
 }
+
+/* =======================================================
+ * Search: empty state
+ * ======================================================= */
+.search-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: 3.5rem 1.5rem 3rem;
+	margin: .5rem 0 1rem;
+	border: 1px dashed rgba(var(--bs-primary-rgb), .35);
+	border-radius: 20px;
+	background:
+		radial-gradient(60% 60% at 50% 0%, rgba(var(--bs-primary-rgb), .07) 0%, rgba(var(--bs-primary-rgb), 0) 100%),
+		var(--bs-body-bg);
+}
+
+.search-empty-art {
+	position: relative;
+	width: 96px;
+	height: 96px;
+	margin-bottom: 1.25rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background-color: rgba(var(--bs-primary-rgb), .1);
+	color: var(--bs-primary);
+	font-size: 2.4rem;
+}
+
+.search-empty-ring {
+	position: absolute;
+	inset: -10px;
+	border-radius: 50%;
+	border: 2px dashed rgba(var(--bs-primary-rgb), .3);
+	animation: search-empty-spin 24s linear infinite;
+}
+
+@keyframes search-empty-spin {
+	to { transform: rotate(360deg); }
+}
+
+.search-empty-badge {
+	position: absolute;
+	right: -2px;
+	bottom: 2px;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: .8rem;
+	color: #fff;
+	background-color: #e0245e;
+	border: 3px solid var(--bs-body-bg);
+	box-shadow: 0 6px 14px -6px rgba(224, 36, 94, .6);
+}
+
+.search-empty-title {
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+	margin: 0 0 .4rem;
+	max-width: 32ch;
+	overflow-wrap: anywhere;
+}
+
+.search-empty-text {
+	font-size: .95rem;
+	color: var(--bs-secondary-color);
+	max-width: 44ch;
+	margin: 0 0 1.5rem;
+}
+
+.search-empty-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: .6rem;
+}
+
+.search-empty-btn.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .45rem;
+	border-radius: 999px;
+	padding: .6rem 1.35rem;
+	font-weight: 600;
+}
+
+.search-empty-btn.btn-outline-primary {
+	border-color: rgba(var(--bs-primary-rgb), .4);
+}
+
+.search-empty-btn.btn-outline-primary:hover {
+	background-color: var(--bs-primary);
+	border-color: var(--bs-primary);
+	color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.search-empty-ring { animation: none; }
+}
+
+[data-bs-theme="dark"] .search-empty {
+	background-color: var(--bs-tertiary-bg);
+}
