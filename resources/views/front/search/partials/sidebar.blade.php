@@ -12,27 +12,8 @@
 		<aside>
 			
 			{{-- The #movableSidebarContent element will be moved here based on the client window size --}}
-			@php
-				$activeFilters = collect(request()->except(['page', 'orderBy', '_token', 'location', 'distance', 'display']))
-					->filter(fn ($v) => is_array($v) ? count(array_filter($v, fn ($x) => $x !== null && $x !== '')) > 0 : ($v !== null && $v !== ''))
-					->count();
-			@endphp
 			<div class="card sidebar-card" id="movableSidebarContent">
 				<div class="card-body vstack gap-4 text-wrap">
-					<div class="sidebar-head">
-						<div class="sidebar-head-title">
-							<i class="bi bi-sliders2"></i>
-							<span>{{ t('Filters') }}</span>
-							@if ($activeFilters > 0)
-								<span class="sidebar-head-count">{{ $activeFilters }}</span>
-							@endif
-						</div>
-						@if ($activeFilters > 0)
-							<a href="{{ urlGen()->searchWithoutQuery() }}" class="sidebar-head-reset" rel="nofollow">
-								<i class="bi bi-arrow-counterclockwise"></i> {{ t('Clear all') }}
-							</a>
-						@endif
-					</div>
 					@include('front.search.partials.sidebar.fields')
 					@include('front.search.partials.sidebar.categories')
 					@include('front.search.partials.sidebar.cities')
