@@ -87,6 +87,16 @@
                 icon.innerHTML = '<i class="bi ' + icons[kind] + '"></i>';
                 h5.prepend(icon);
             });
+            
+            /* Expand / collapse sub-categories inline */
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.filter-toggle');
+                if (!btn) return;
+                e.preventDefault();
+                const li = btn.closest('li');
+                const open = li.classList.toggle('is-open');
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
         });
         
         onDocumentReady((event) => {
