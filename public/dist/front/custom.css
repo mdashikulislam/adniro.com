@@ -2573,3 +2573,16 @@ li.is-open > .filter-sublist {
 	background-color: var(--bs-tertiary-bg);
 	border-color: rgba(255, 255, 255, .08);
 }
+
+/* Hover: icons stay teal (no white-on-tile leftovers) */
+.sidebar-card .filter-list a.filter-item:hover .filter-item-icon,
+.sidebar-card .filter-list a.filter-item:hover .filter-item-count,
+.sidebar-card .filter-list li.active > .filter-row > a.filter-item:hover .filter-item-icon {
+	color: var(--bs-primary);
+	background: transparent !important;
+	opacity: 1;
+}
+
+.sidebar-card .filter-list a.filter-item:hover .filter-item-count {
+	color: var(--bs-secondary-color);
+}
