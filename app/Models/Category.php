@@ -304,20 +304,22 @@ class Category extends BaseModel
 		);
 	}
 	
+	/** Per-process memo of resolved category image URLs (key => url) */
+	protected static array $imageUrlMemo = [];
+	
 	protected function imageUrl(): Attribute
 	{
 		return Attribute::make(
 			get: function () {
 				// Resolving a thumbnail URL checks the disk several times; the result only
-				// changes when the image or the skin changes, so keep it in the cache.
-				static $memo = [];
-				
+				// changes when the image or the skin changes, so keep it in the cache and in a
+				// process-wide memo (shared by all Category instances of the request).
 				$path = $this->image_path ?? null;
 				$skin = getFrontSkin(request()->input('skin'));
 				$key = 'category.image_url.' . md5(($path ?? '') . '|' . $skin);
 				
-				if (array_key_exists($key, $memo)) {
-					return $memo[$key];
+				if (array_key_exists($key, static::$imageUrlMemo)) {
+					return static::$imageUrlMemo[$key];
 				}
 				
 				$resolver = fn () => thumbService($path)->resize('cat')->url();
@@ -327,7 +329,7 @@ class Category extends BaseModel
 					$url = $resolver();
 				}
 				
-				return $memo[$key] = $url;
+				return static::$imageUrlMemo[$key] = $url;
 			},
 		);
 	}
