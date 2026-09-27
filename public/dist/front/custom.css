@@ -2346,3 +2346,164 @@ li.is-open > .filter-sublist {
 	font-weight: 600;
 	color: var(--bs-emphasis-color) !important;
 }
+
+/* =======================================================
+ * Sidebar tree, refined: tinted parent row + nested panel
+ * ======================================================= */
+.sidebar-card .sidebar-section {
+	padding: .9rem .9rem 1rem !important;
+}
+
+.sidebar-card .sidebar-section > h5 {
+	margin-bottom: .6rem !important;
+	padding-bottom: .65rem !important;
+}
+
+/* Rows */
+.filter-list > li {
+	border-bottom: 0 !important;
+	margin-bottom: 2px;
+}
+
+.filter-row {
+	gap: .3rem;
+}
+
+.filter-item {
+	gap: .6rem;
+	padding: .45rem .5rem;
+	border-radius: 12px;
+}
+
+.filter-item-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	font-size: .9rem;
+}
+
+/* Names wrap instead of truncating (max two lines) */
+.filter-item-name {
+	white-space: normal;
+	overflow: hidden;
+	text-overflow: clip;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	line-height: 1.25;
+	font-size: .9rem;
+}
+
+/* No chevrons: the tiles and the nested panel carry the structure */
+.filter-item-arrow {
+	display: none !important;
+}
+
+/* Toggle */
+.filter-toggle {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background-color: var(--bs-tertiary-bg);
+	color: var(--bs-secondary-color);
+	font-size: .7rem;
+}
+
+.filter-toggle:hover {
+	background-color: rgba(var(--bs-primary-rgb), .15);
+	color: var(--bs-primary);
+}
+
+/* Open parent */
+.filter-list > li.is-open > .filter-row .filter-item {
+	background-color: rgba(var(--bs-primary-rgb), .08);
+	color: var(--bs-primary) !important;
+	font-weight: 600;
+}
+
+.filter-list > li.is-open > .filter-row .filter-item-icon {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+.filter-list > li.is-open > .filter-row .filter-toggle {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+/* Nested panel */
+.filter-sublist {
+	margin: .3rem 0 .55rem !important;
+	padding: .3rem;
+	border-left: 0;
+	border-radius: 14px;
+	background-color: var(--bs-tertiary-bg);
+}
+
+.filter-sublist > li {
+	margin-bottom: 1px;
+}
+
+.filter-sublist .filter-item {
+	gap: .55rem;
+	padding: .4rem .5rem;
+	border-radius: 10px;
+}
+
+.filter-sublist .filter-item-icon {
+	width: 27px;
+	height: 27px;
+	border-radius: 8px;
+	background-color: var(--bs-body-bg);
+	color: var(--bs-primary);
+	font-size: .78rem;
+}
+
+.filter-sublist .filter-item-name {
+	font-size: .85rem;
+}
+
+.filter-sublist a.filter-item:hover {
+	background-color: rgba(255, 255, 255, .75);
+	color: var(--bs-primary) !important;
+}
+
+.filter-sublist a.filter-item:hover .filter-item-icon {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+.filter-sublist > li.active .filter-item {
+	background-color: var(--bs-body-bg);
+	color: var(--bs-primary) !important;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 6px 14px -8px rgba(0, 0, 0, .18);
+}
+
+.filter-sublist > li.active .filter-item-icon {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+/* Third level inside the panel: a hairline indent, not another panel */
+.filter-sublist .filter-sublist {
+	margin: .15rem 0 .25rem .9rem !important;
+	padding: 0 0 0 .6rem;
+	border-radius: 0;
+	background: transparent;
+	border-left: 2px solid rgba(var(--bs-primary-rgb), .2);
+}
+
+/* Dark mode */
+[data-bs-theme="dark"] .filter-sublist {
+	background-color: rgba(255, 255, 255, .05);
+}
+
+[data-bs-theme="dark"] .filter-sublist .filter-item-icon,
+[data-bs-theme="dark"] .filter-sublist > li.active .filter-item {
+	background-color: rgba(255, 255, 255, .08);
+}
+
+[data-bs-theme="dark"] .filter-sublist a.filter-item:hover {
+	background-color: rgba(255, 255, 255, .08);
+}
