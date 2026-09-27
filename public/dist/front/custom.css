@@ -247,6 +247,12 @@
 	display: flex;
 	align-items: center;
 	gap: .6rem;
+	padding-left: 0;
+}
+
+/* The icon tile is the accent here; hide the bar */
+.location-title::before {
+	display: none;
 }
 
 .location-title-icon {
@@ -554,5 +560,163 @@
 	
 	.stats-item:hover .stats-icon {
 		transform: none;
+	}
+}
+
+/* =======================================================
+ * Home: Hero & Search Bar
+ * ======================================================= */
+.hero-section {
+	position: relative;
+	overflow: hidden;
+	background-position: center;
+	background-size: cover;
+}
+
+/* Readability overlay + primary glow (sits under the content) */
+.hero-section .hero-overlay {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(60% 70% at 50% 40%, rgba(var(--bs-primary-rgb), .22) 0%, rgba(var(--bs-primary-rgb), 0) 100%),
+		linear-gradient(180deg, rgba(0, 0, 0, .15) 0%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, .35) 100%);
+}
+
+.hero-section .hero-content {
+	position: relative;
+	z-index: 1;
+}
+
+.hero-title {
+	font-size: clamp(1.9rem, 4vw, 3rem);
+	letter-spacing: .02em;
+	line-height: 1.15;
+	margin-bottom: .5rem;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+}
+
+.hero-subtitle {
+	font-size: clamp(1rem, 1.6vw, 1.25rem) !important;
+	font-weight: 300;
+	opacity: .92;
+	margin-bottom: 1.75rem !important;
+	text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
+}
+
+/* Search bar container */
+#homepage .search-bar {
+	border-radius: 999px;
+	background-color: var(--bs-body-bg);
+	margin-left: 0;
+	margin-right: 0;
+	padding: 6px;
+	box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .25);
+	transition: box-shadow .25s ease, transform .25s ease;
+}
+
+#homepage .search-bar:focus-within {
+	box-shadow: 0 22px 44px -14px rgba(0, 0, 0, .55), 0 0 0 3px rgba(var(--bs-primary-rgb), .35);
+}
+
+/* Fields: remove the heavy colored borders, keep a soft inner divider */
+#homepage .search-row .search-col > div.search-field {
+	border-width: 0 !important;
+	border-color: transparent !important;
+	background-color: transparent;
+	padding-top: .35rem;
+	padding-bottom: .35rem;
+	min-height: 52px;
+}
+
+#homepage .search-row .search-col > div.search-field-location {
+	position: relative;
+}
+
+@media (min-width: 768px) {
+	#homepage .search-row .search-col > div.search-field-location::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 22%;
+		bottom: 22%;
+		width: 1px;
+		background-color: var(--bs-border-color);
+	}
+}
+
+.search-field-icon {
+	color: var(--bs-primary);
+	opacity: .85;
+	flex-shrink: 0;
+	margin-right: .35rem;
+}
+
+#homepage .search-row .search-col .form-control {
+	background-color: transparent;
+	font-size: 1rem;
+	color: var(--bs-body-color);
+}
+
+#homepage .search-row .search-col .form-control::placeholder {
+	color: var(--bs-secondary-color);
+}
+
+/* Button */
+#homepage .search-row .search-col button.search-btn {
+	border-width: 0 !important;
+	border-radius: 999px !important;
+	min-height: 52px;
+	padding-left: 1.5rem;
+	padding-right: 1.5rem;
+	font-size: 1rem;
+	background-image: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), .85) 100%);
+	box-shadow: 0 8px 18px -8px rgba(var(--bs-primary-rgb), .8);
+	transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+#homepage .search-row .search-col button.search-btn:hover,
+#homepage .search-row .search-col button.search-btn:focus-visible {
+	filter: brightness(1.06);
+	box-shadow: 0 12px 22px -8px rgba(var(--bs-primary-rgb), .9);
+}
+
+#homepage .search-row .search-col button.search-btn:active {
+	transform: scale(.98);
+}
+
+/* Stacked layout on phones: each field is its own pill */
+@media (max-width: 767.98px) {
+	#homepage .search-bar {
+		border-radius: 22px;
+		padding: 8px;
+	}
+	
+	#homepage .search-row .search-col > div.search-field {
+		background-color: var(--bs-tertiary-bg) !important;
+		border-radius: 999px !important;
+		min-height: 48px;
+	}
+	
+	#homepage .search-row .search-col button.search-btn {
+		min-height: 48px;
+		margin-top: .25rem;
+	}
+	
+	.hero-subtitle {
+		margin-bottom: 1.25rem !important;
+	}
+}
+
+/* Dark mode */
+[data-bs-theme="dark"] #homepage .search-bar {
+	background-color: var(--bs-tertiary-bg);
+	box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .8), 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#homepage .search-bar,
+	#homepage .search-row .search-col button.search-btn {
+		transition: none;
 	}
 }

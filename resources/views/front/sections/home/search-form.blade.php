@@ -42,23 +42,24 @@
 	@php
 		$parallaxClass = ($parallax == '1') ? ' parallax' : '';
 	@endphp
-	<div class="hero-wrap bg-secondary d-flex align-items-center{{ $cssClasses . $parallaxClass }}" style="{!! $style !!}">
-		<div class="container text-center">
+	<div class="hero-wrap hero-section bg-secondary d-flex align-items-center{{ $cssClasses . $parallaxClass }}" style="{!! $style !!}">
+		<div class="hero-overlay" aria-hidden="true"></div>
+		<div class="container text-center hero-content">
 			
 			@if ($hideTitle != '1')
-				<h1 class="text-uppercase fw-bold text-white text-shadow"{!! $titleHtmlAttr !!}>
+				<h1 class="text-uppercase fw-bold text-white text-shadow hero-title"{!! $titleHtmlAttr !!}>
 					{{ $headerTitle }}
 				</h1>
 			@endif
 			@if ($hideSubTitle != '1')
-				<h5 class="fs-4 lead text-white text-shadow mb-3"{!! $subtitleHtmlAttr !!}>
+				<h5 class="fs-4 lead text-white text-shadow mb-3 hero-subtitle"{!! $subtitleHtmlAttr !!}>
 					{!! $headerSubTitle !!}
 				</h5>
 			@endif
 			
 			@if ($hideSearchBar != '1')
 				<div class="row d-flex justify-content-center"{!! $searchBarHtmlAttr !!}>
-					<div class="col-9">
+					<div class="col-xl-8 col-lg-9 col-md-11 col-12">
 						<form id="searchForm"
 						      name="search"
 						      action="{{ urlGen()->searchWithoutQuery() }}"
