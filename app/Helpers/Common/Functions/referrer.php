@@ -103,11 +103,9 @@ function getLocales(?string $from = null, bool $includeNonLocales = false): arra
 	$locales = [];
 	
 	// Get available|installed locales from the server
+	// (the shell call is cached: the installed system locales rarely change)
 	if ($isFromInstalled || $isFromMerged) {
-		try {
-			exec('locale -a', $locales);
-		} catch (Throwable $e) {
-		}
+		$locales = getInstalledSystemLocales();
 	}
 	
 	// Get locales from config (referrer)
@@ -126,6 +124,30 @@ function getLocales(?string $from = null, bool $includeNonLocales = false): arra
 	return collect($locales)
 		->reject(fn ($code) => !$includeNonLocales && in_array(strtolower($code), $nonLocales))
 		->toArray();
+}
+
+/**
+ * Get the locales installed on the server (output of "locale -a"), cached for one day
+ *
+ * @return array
+ */
+function getInstalledSystemLocales(): array
+{
+	$resolver = function () {
+		$locales = [];
+		try {
+			exec('locale -a', $locales);
+		} catch (Throwable $e) {
+		}
+		
+		return is_array($locales) ? $locales : [];
+	};
+	
+	try {
+		return cache()->remember('system.installed_locales', 86400, $resolver);
+	} catch (Throwable $e) {
+		return $resolver();
+	}
 }
 
 /**
