@@ -6,7 +6,7 @@
 		$linkClass = linkClass('body-emphasis');
 	@endphp
 	<div id="catsList">
-		<div class="container p-0 vstack gap-2">
+		<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-categories">
 			<h5 class="border-bottom pb-2 d-flex justify-content-between">
 				<span class="fw-bold">{{ t('all_categories') }}</span> {!! $clearFilterBtn ?? '' !!}
 			</h5>

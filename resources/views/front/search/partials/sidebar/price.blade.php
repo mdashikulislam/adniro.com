@@ -6,7 +6,7 @@
 @endphp
 @if ($isPriceFilterCanBeDisplayed)
 	{{-- Price --}}
-	<div class="container p-0 vstack gap-2">
+	<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-price">
 		<h5 class="border-bottom pb-2 d-flex justify-content-between">
 			<span class="fw-bold">
 				{{ (!in_array(data_get($cat, 'type'), ['job-offer', 'job-search'])) ? t('price_range') : t('salary_range') }}

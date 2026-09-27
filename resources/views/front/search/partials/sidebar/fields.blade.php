@@ -40,7 +40,7 @@
 				@if (in_array(data_get($field, 'type'), ['text', 'textarea', 'url', 'number']))
 					
 					{{-- text --}}
-					<div class="container p-0 vstack gap-2">
+					<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-field">
 						<h5 class="border-bottom pb-2 d-flex justify-content-between">
 							<span class="fw-bold">{{ data_get($field, 'name') }}</span> {!! $clearFilterBtn !!}
 						</h5>
@@ -76,7 +76,7 @@
 				@if (data_get($field, 'type') == 'checkbox')
 					
 					{{-- checkbox --}}
-					<div class="container p-0 vstack gap-2">
+					<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-field">
 						<h5 class="border-bottom pb-2 d-flex justify-content-between">
 							<span class="fw-bold">{{ data_get($field, 'name') }}</span> {!! $clearFilterBtn !!}
 						</h5>
@@ -100,7 +100,7 @@
 					@endphp
 					@if (!empty($checklistOptions) && is_array($checklistOptions))
 						{{-- checkbox_multiple --}}
-						<div class="container p-0 vstack gap-2">
+						<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-field">
 							<h5 class="border-bottom pb-2 d-flex justify-content-between">
 								<span class="fw-bold">{{ data_get($field, 'name') }}</span> {!! $clearFilterBtn !!}
 							</h5>
@@ -173,7 +173,7 @@
 					
 					@if (!empty(data_get($field, 'options')))
 						{{-- radio --}}
-						<div class="container p-0 vstack gap-2">
+						<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-field">
 							<h5 class="border-bottom pb-2 d-flex justify-content-between">
 								<span class="fw-bold">{{ data_get($field, 'name') }}</span> {!! $clearFilterBtn !!}
 							</h5>
@@ -203,7 +203,7 @@
 				@if (data_get($field, 'type') == 'select')
 				
 					{{-- select --}}
-					<div class="container p-0 vstack gap-2">
+					<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-field">
 						<h5 class="border-bottom pb-2 d-flex justify-content-between">
 							<span class="fw-bold">{{ data_get($field, 'name') }}</span> {!! $clearFilterBtn !!}
 						</h5>
@@ -234,7 +234,7 @@
 					@endphp
 					@if (view()->exists("helpers.forms.fields.{$dateFieldComponent}"))
 						{{-- date --}}
-						<div class="container p-0 vstack gap-2">
+						<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-field">
 							<h5 class="border-bottom pb-2 d-flex justify-content-between">
 								<span class="fw-bold">{{ data_get($field, 'name') }}</span> {!! $clearFilterBtn !!}
 							</h5>

@@ -28,7 +28,7 @@
 	<div id="subCatsList">
 		@if (!empty($categoryChildren))
 			
-			<div class="container p-0 vstack gap-2">
+			<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-categories">
 				<h5 class="border-bottom pb-2 d-flex justify-content-between mb-0">
 					<span class="fw-bold">
 						@if (!empty($categoryParent))
@@ -82,7 +82,7 @@
 		@else
 			
 			@if (!empty($categoryParentChildren))
-				<div class="container p-0 vstack gap-2">
+				<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-categories">
 					<h5 class="border-bottom pb-2 d-flex justify-content-between">
 						<span class="fw-bold">
 							@if (!empty($categoryParentOfParent))

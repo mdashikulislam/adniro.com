@@ -3,7 +3,7 @@
 	$clearFilterBtn = urlGen()->getDateFilterClearLink($cat ?? null, $city ?? null);
 @endphp
 {{-- Date --}}
-<div class="container p-0 vstack gap-2">
+<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-date">
 	<h5 class="border-bottom pb-2 d-flex justify-content-between">
 		<span class="fw-bold">{{ t('Date Posted') }}</span> {!! $clearFilterBtn !!}
 	</h5>

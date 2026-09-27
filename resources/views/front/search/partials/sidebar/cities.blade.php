@@ -15,7 +15,7 @@
 	$linkClass = linkClass('body-emphasis');
 @endphp
 {{-- City --}}
-<div class="container p-0 vstack gap-2">
+<div class="container p-0 vstack gap-2 sidebar-section sidebar-section-cities">
 	<h5 class="border-bottom pb-2 d-flex justify-content-between">
 		<span class="fw-bold">{{ t('locations') }}</span> {!! $clearFilterBtn !!}
 	</h5>

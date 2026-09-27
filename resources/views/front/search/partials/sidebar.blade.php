@@ -12,8 +12,27 @@
 		<aside>
 			
 			{{-- The #movableSidebarContent element will be moved here based on the client window size --}}
+			@php
+				$activeFilters = collect(request()->except(['page', 'orderBy', '_token', 'location', 'distance', 'display']))
+					->filter(fn ($v) => is_array($v) ? count(array_filter($v, fn ($x) => $x !== null && $x !== '')) > 0 : ($v !== null && $v !== ''))
+					->count();
+			@endphp
 			<div class="card sidebar-card" id="movableSidebarContent">
 				<div class="card-body vstack gap-4 text-wrap">
+					<div class="sidebar-head">
+						<div class="sidebar-head-title">
+							<span class="sidebar-head-icon"><i class="bi bi-sliders2"></i></span>
+							<span>{{ t('Filters') }}</span>
+							@if ($activeFilters > 0)
+								<span class="sidebar-head-count">{{ $activeFilters }}</span>
+							@endif
+						</div>
+						@if ($activeFilters > 0)
+							<a href="{{ urlGen()->searchWithoutQuery() }}" class="sidebar-head-reset" rel="nofollow">
+								<i class="bi bi-arrow-counterclockwise"></i> {{ t('Clear all') }}
+							</a>
+						@endif
+					</div>
 					@include('front.search.partials.sidebar.fields')
 					@include('front.search.partials.sidebar.categories')
 					@include('front.search.partials.sidebar.cities')
@@ -47,6 +66,45 @@
     @parent
     <script>
         var baseUrl = '{{ request()->url() }}';
+        
+        /* Sidebar sections: icon, chevron & collapse */
+        onDocumentReady((event) => {
+            const icons = {
+                categories: 'bi-grid-fill',
+                cities: 'bi-geo-alt-fill',
+                date: 'bi-calendar3',
+                price: 'bi-cash-coin',
+                field: 'bi-funnel-fill',
+            };
+            document.querySelectorAll('#movableSidebarContent .sidebar-section').forEach((sec) => {
+                const h5 = sec.querySelector(':scope > h5');
+                if (!h5 || sec.dataset.enhanced) return;
+                sec.dataset.enhanced = '1';
+                
+                const body = document.createElement('div');
+                body.className = 'sidebar-section-body';
+                let node = h5.nextSibling;
+                while (node) { const next = node.nextSibling; body.appendChild(node); node = next; }
+                sec.appendChild(body);
+                
+                let kind = 'field';
+                Object.keys(icons).forEach((k) => { if (sec.classList.contains('sidebar-section-' + k)) kind = k; });
+                const icon = document.createElement('span');
+                icon.className = 'sidebar-section-icon';
+                icon.innerHTML = '<i class="bi ' + icons[kind] + '"></i>';
+                h5.prepend(icon);
+                
+                const chevron = document.createElement('span');
+                chevron.className = 'sidebar-section-chevron';
+                chevron.innerHTML = '<i class="bi bi-chevron-down"></i>';
+                h5.appendChild(chevron);
+                
+                h5.addEventListener('click', (e) => {
+                    if (e.target.closest('a')) return;
+                    sec.classList.toggle('is-collapsed');
+                });
+            });
+        });
         
         onDocumentReady((event) => {
 			const breakpointSize = {{ $breakpointSize }};
