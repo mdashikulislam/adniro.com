@@ -180,25 +180,6 @@
 				<div class="{{ $rightColSize }} mb-4">
 					<div class="{{ $selectedDisplayMode }}{{ str_ends_with($rightColSize, '-12') ? ' noSideBar' : '' }}">
 
-						{{-- Breadcrumb --}}
-						<div class="container results-toolbar-top">
-							<div class="row">
-								<div class="col-12 d-flex align-items-center justify-content-between gap-2 flex-wrap">
-									<h4 class="mb-0 fs-6 breadcrumb-list clearfix">
-										{!! (isset($htmlTitle)) ? $htmlTitle : '' !!}
-									</h4>
-
-									@if (!empty(request()->all()))
-										<div>
-											<a class="{{ linkClass() }}" href="{!! urlGen()->searchWithoutQuery() !!}">
-												<i class="bi bi-x-lg"></i> {{ t('Clear all') }}
-											</a>
-										</div>
-									@endif
-								</div>
-							</div>
-						</div>
-
 						{{-- Filters, OrderBy & Display Mode --}}
 						<div class="container results-toolbar">
 							<ul class="list-inline m-0 p-0 text-end d-flex align-items-center justify-content-end gap-2">
