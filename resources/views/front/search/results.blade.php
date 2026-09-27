@@ -183,6 +183,12 @@
 						{{-- Filters, OrderBy & Display Mode --}}
 						<div class="container results-toolbar">
 							<ul class="list-inline m-0 p-0 text-end d-flex align-items-center justify-content-end gap-2">
+								{{-- Results count --}}
+								@if (isset($count) && data_get($count, '0') !== null)
+									<li class="list-inline-item me-auto results-count">
+										<strong>{{ number_format((int)data_get($count, '0')) }}</strong> {{ trans_choice('global.count_listings', (int)data_get($count, '0')) }}
+									</li>
+								@endif
 								{{-- Filter (Show/Hide Sidebar) | d-inline-block d-sm-inline-block d-md-none --}}
 								@if ($isLeftSidebarEnabled)
 									<li class="list-inline-item px-2{{ $showInlineOnSmallScreen }}">
