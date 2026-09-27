@@ -4,8 +4,7 @@
 	// Clear Filter Button
 	$clearFilterBtn = urlGen()->getCategoryFilterClearLink($cat ?? null, $city ?? null);
 	
-	// Links CSS Class
-	$linkClass = linkClass('body-emphasis');
+	$showCatCount = (bool)config('settings.listings_list.count_categories_listings');
 @endphp
 @if (!empty($cat))
 	@php
@@ -14,14 +13,9 @@
 		$categoryParentOfParent = data_get($cat, 'parent.parent') ?? null;
 		$categoryParentChildren = data_get($cat, 'parent.children') ?? [];
 		
-		/*dump($cat);
-		dump($categoryParent);
-		dump($categoryChildren);
-		dump($categoryParentOfParent);
-		dump($categoryParentChildren);
-		dd('STOP');*/
-		
 		$catParentUrl = urlGen()->parentCategory($categoryParent ?? null, $city ?? null);
+		$catIcon = data_get($cat, 'icon_class') ?: 'bi bi-folder-fill';
+		$catCount = $countPostsPerCat[data_get($cat, 'id')]['total'] ?? 0;
 	@endphp
 	
 	{{-- SubCategory --}}
@@ -32,50 +26,45 @@
 				<h5 class="border-bottom pb-2 d-flex justify-content-between mb-0">
 					<span class="fw-bold">
 						@if (!empty($categoryParent))
-							<a href="{{ urlGen()->category($categoryParent, null, $city ?? null) }}"
-							   class="{{ $linkClass }}"
-							>
-								<i class="fa-solid fa-reply"></i> {{ data_get($cat, 'parent.name') }}
+							<a href="{{ urlGen()->category($categoryParent, null, $city ?? null) }}" class="filter-back-link">
+								<i class="bi bi-arrow-left"></i> {{ data_get($cat, 'parent.name') }}
 							</a>
 						@else
-							<a href="{{ $catParentUrl }}" class="{{ $linkClass }}">
-								<i class="fa-solid fa-reply"></i> {{ t('all_categories') }}
+							<a href="{{ $catParentUrl }}" class="filter-back-link">
+								<i class="bi bi-arrow-left"></i> {{ t('all_categories') }}
 							</a>
 						@endif
 					</span> {!! $clearFilterBtn !!}
 				</h5>
-				<ul class="mb-0 list-unstyled">
-					<li class="py-1">
-						<div class="border-bottom pb-2 mb-3">
-							<span class="fs-5">
-								@if (in_array(config('settings.listings_list.show_category_icon'), [4, 5, 6, 8]))
-									<i class="{{ data_get($cat, 'icon_class') ?? 'bi bi-folder-fill' }}"></i>
-								@endif
-								{{ data_get($cat, 'name') }}
-							</span>
-							@if (config('settings.listings_list.count_categories_listings'))
-								&nbsp;<span class="fw-normal">({{ $countPostsPerCat[data_get($cat, 'id')]['total'] ?? 0 }})</span>
+				<ul class="mb-0 list-unstyled filter-list">
+					{{-- Current category --}}
+					<li class="active">
+						<span class="filter-item">
+							<span class="filter-item-icon"><i class="{{ $catIcon }}"></i></span>
+							<span class="filter-item-name">{{ data_get($cat, 'name') }}</span>
+							@if ($showCatCount)
+								<span class="filter-item-count">{{ $catCount }}</span>
 							@endif
-						</div>
-						<ul class="mb-0 ps-2 list-unstyled long-list">
-							@foreach ($categoryChildren as $iSubCat)
-								<li class="py-1">
-									<a href="{{ urlGen()->category($iSubCat, null, $city ?? null) }}"
-									   class="{{ $linkClass }}"
-									   title="{{ data_get($iSubCat, 'name') }}"
-									>
-										@if (in_array(config('settings.listings_list.show_category_icon'), [4, 5, 6, 8]))
-											<i class="{{ data_get($iSubCat, 'icon_class') ?? 'bi bi-folder-fill' }}"></i>
-										@endif
-										{{ str(data_get($iSubCat, 'name'))->limit(100) }}
-										@if (config('settings.listings_list.count_categories_listings'))
-											&nbsp;<span class="fw-normal">({{ $countPostsPerCat[data_get($iSubCat, 'id')]['total'] ?? 0 }})</span>
-										@endif
-									</a>
-								</li>
-							@endforeach
-						</ul>
+						</span>
 					</li>
+				</ul>
+				<ul class="mb-0 list-unstyled filter-list filter-list-children long-list">
+					@foreach ($categoryChildren as $iSubCat)
+						@php
+							$iSubCatIcon = data_get($iSubCat, 'icon_class') ?: 'bi bi-folder';
+							$iSubCatCount = $countPostsPerCat[data_get($iSubCat, 'id')]['total'] ?? 0;
+						@endphp
+						<li>
+							<a href="{{ urlGen()->category($iSubCat, null, $city ?? null) }}" class="filter-item" title="{{ data_get($iSubCat, 'name') }}">
+								<span class="filter-item-icon"><i class="{{ $iSubCatIcon }}"></i></span>
+								<span class="filter-item-name">{{ str(data_get($iSubCat, 'name'))->limit(100) }}</span>
+								@if ($showCatCount)
+									<span class="filter-item-count">{{ $iSubCatCount }}</span>
+								@endif
+								<i class="bi bi-chevron-right filter-item-arrow"></i>
+							</a>
+						</li>
+					@endforeach
 				</ul>
 			</div>
 			
@@ -86,49 +75,44 @@
 					<h5 class="border-bottom pb-2 d-flex justify-content-between">
 						<span class="fw-bold">
 							@if (!empty($categoryParentOfParent))
-								<a href="{{ urlGen()->category($categoryParentOfParent, null, $city ?? null) }}"
-								   class="{{ $linkClass }}"
-								>
-									<i class="fa-solid fa-reply"></i> {{ data_get($cat, 'parent.parent.name') }}
+								<a href="{{ urlGen()->category($categoryParentOfParent, null, $city ?? null) }}" class="filter-back-link">
+									<i class="bi bi-arrow-left"></i> {{ data_get($cat, 'parent.parent.name') }}
 								</a>
 							@elseif (!empty($categoryParent))
-								<a href="{{ urlGen()->category($categoryParent, null, $city ?? null) }}"
-								   class="{{ $linkClass }}"
-								>
-									<i class="fa-solid fa-reply"></i> {{ data_get($cat, 'name') }}
+								<a href="{{ urlGen()->category($categoryParent, null, $city ?? null) }}" class="filter-back-link">
+									<i class="bi bi-arrow-left"></i> {{ data_get($cat, 'parent.name') }}
 								</a>
 							@else
-								<a href="{{ $catParentUrl }}" class="{{ $linkClass }}">
-									<i class="fa-solid fa-reply"></i> {{ t('all_categories') }}
+								<a href="{{ $catParentUrl }}" class="filter-back-link">
+									<i class="bi bi-arrow-left"></i> {{ t('all_categories') }}
 								</a>
 							@endif
 						</span> {!! $clearFilterBtn !!}
 					</h5>
-					<ul class="mb-0 list-unstyled">
+					<ul class="mb-0 list-unstyled filter-list long-list">
 						@foreach ($categoryParentChildren as $iSubCat)
-							<li class="py-1">
-								@if (data_get($iSubCat, 'id') == data_get($cat, 'id'))
-									<span class="fw-bold">
-										@if (in_array(config('settings.listings_list.show_category_icon'), [4, 5, 6, 8]))
-											<i class="{{ data_get($iSubCat, 'icon_class') ?? 'bi bi-folder-fill' }}"></i>
-										@endif
-										{{ str(data_get($iSubCat, 'name'))->limit(100) }}
-										@if (config('settings.listings_list.count_categories_listings'))
-											&nbsp;<span class="fw-normal">({{ $countPostsPerCat[data_get($iSubCat, 'id')]['total'] ?? 0 }})</span>
+							@php
+								$isActiveSub = (data_get($iSubCat, 'id') == data_get($cat, 'id'));
+								$iSubCatIcon = data_get($iSubCat, 'icon_class') ?: 'bi bi-folder';
+								$iSubCatCount = $countPostsPerCat[data_get($iSubCat, 'id')]['total'] ?? 0;
+							@endphp
+							<li class="{{ $isActiveSub ? 'active' : '' }}">
+								@if ($isActiveSub)
+									<span class="filter-item">
+										<span class="filter-item-icon"><i class="{{ $iSubCatIcon }}"></i></span>
+										<span class="filter-item-name">{{ str(data_get($iSubCat, 'name'))->limit(100) }}</span>
+										@if ($showCatCount)
+											<span class="filter-item-count">{{ $iSubCatCount }}</span>
 										@endif
 									</span>
 								@else
-									<a href="{{ urlGen()->category($iSubCat, null, $city ?? null) }}"
-									   class="{{ $linkClass }}"
-									   title="{{ data_get($iSubCat, 'name') }}"
-									>
-										@if (in_array(config('settings.listings_list.show_category_icon'), [4, 5, 6, 8]))
-											<i class="{{ data_get($iSubCat, 'icon_class') ?? 'bi bi-folder-fill' }}"></i>
+									<a href="{{ urlGen()->category($iSubCat, null, $city ?? null) }}" class="filter-item" title="{{ data_get($iSubCat, 'name') }}">
+										<span class="filter-item-icon"><i class="{{ $iSubCatIcon }}"></i></span>
+										<span class="filter-item-name">{{ str(data_get($iSubCat, 'name'))->limit(100) }}</span>
+										@if ($showCatCount)
+											<span class="filter-item-count">{{ $iSubCatCount }}</span>
 										@endif
-										{{ str(data_get($iSubCat, 'name'))->limit(100) }}
-										@if (config('settings.listings_list.count_categories_listings'))
-											&nbsp;<span class="fw-normal">({{ $countPostsPerCat[data_get($iSubCat, 'id')]['total'] ?? 0 }})</span>
-										@endif
+										<i class="bi bi-chevron-right filter-item-arrow"></i>
 									</a>
 								@endif
 							</li>

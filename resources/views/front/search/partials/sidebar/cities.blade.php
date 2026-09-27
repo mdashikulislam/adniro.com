@@ -11,8 +11,7 @@
 		collect($cities)->push($city)->toArray();
 	}
 	
-	// Links CSS Class
-	$linkClass = linkClass('body-emphasis');
+	$showCityCount = (bool)config('settings.listings_list.count_cities_listings');
 @endphp
 {{-- City --}}
 <div class="container p-0 vstack gap-2 sidebar-section sidebar-section-cities">
@@ -20,34 +19,25 @@
 		<span class="fw-bold">{{ t('locations') }}</span> {!! $clearFilterBtn !!}
 	</h5>
 	<div>
-		<ul class="mb-0 list-unstyled long-list">
+		<ul class="mb-0 list-unstyled filter-list long-list">
 			@if (!empty($cities))
 				@foreach ($cities as $iCity)
-					<li class="py-1">
-						@if (
-							(
-								isset($city)
-								&& data_get($city, 'id') == data_get($iCity, 'id')
-							)
+					@php
+						$isActiveCity = (
+							(isset($city) && data_get($city, 'id') == data_get($iCity, 'id'))
 							|| request()->input('l') == data_get($iCity, 'id')
-							)
-							<span class="fw-bold">
-								{{ data_get($iCity, 'name') }}
-								@if (config('settings.listings_list.count_cities_listings'))
-									&nbsp;<span class="fw-normal">({{ data_get($iCity, 'posts_count') ?? 0 }})</span>
-								@endif
-							</span>
-						@else
-							<a href="{!! urlGen()->city($iCity, null, $cat ?? null) !!}"
-							   class="{{ $linkClass }}"
-							   title="{{ data_get($iCity, 'name') }}"
-							>
-								{{ data_get($iCity, 'name') }}
-								@if (config('settings.listings_list.count_cities_listings'))
-									&nbsp;<span class="fw-normal">({{ data_get($iCity, 'posts_count') ?? 0 }})</span>
-								@endif
-							</a>
-						@endif
+						);
+						$iCityCount = data_get($iCity, 'posts_count') ?? 0;
+					@endphp
+					<li class="{{ $isActiveCity ? 'active' : '' }}">
+						<a href="{!! urlGen()->city($iCity, null, $cat ?? null) !!}" class="filter-item" title="{{ data_get($iCity, 'name') }}">
+							<span class="filter-item-icon"><i class="bi bi-geo-alt{{ $isActiveCity ? '-fill' : '' }}"></i></span>
+							<span class="filter-item-name">{{ data_get($iCity, 'name') }}</span>
+							@if ($showCityCount)
+								<span class="filter-item-count">{{ $iCityCount }}</span>
+							@endif
+							<i class="bi bi-chevron-right filter-item-arrow"></i>
+						</a>
 					</li>
 				@endforeach
 			@endif
