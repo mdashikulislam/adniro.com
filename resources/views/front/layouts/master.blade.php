@@ -208,6 +208,10 @@
 
 {{-- App JS files (Handled by Mix) --}}
 <script src="{{ url(mix('dist/front/scripts.js')) }}"></script>
+<script src="{{ url('assets/js/app/guest-cache.js') . getPictureVersion() }}"
+        data-session-cookie="{{ config('session.cookie') }}"
+        data-token-url="{{ url('common/csrf-token') }}"
+></script>
 
 {{-- Lazy Loading JS --}}
 @if (config('settings.optimization.lazy_loading_activation') == 1)

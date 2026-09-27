@@ -37,6 +37,7 @@ class Kernel
 			\App\Http\Middleware\TrimStrings::class,
 			\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
 			\Larapen\Honeypot\app\Http\Middleware\ProtectAgainstSpam::class,
+			\App\Http\Middleware\GuestPageCache::class,
 		]);
 		
 		/*

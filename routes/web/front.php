@@ -51,6 +51,7 @@ Route::controller(FileController::class)
 		Route::get('file', 'watchMediaContent');
 		Route::get('js/fileinput/locales/{code}.js', 'bootstrapFileinputLocales');
 		Route::get('css/style.css', 'cssStyle');
+		Route::get('csrf-token', 'csrfToken');
 	});
 
 if (!$isDomainmappingAvailable) {

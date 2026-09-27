@@ -191,4 +191,15 @@ class FileController extends Controller
 			->header('Content-Type', 'text/css')
 			->header('Cache-Control', $canUseCache ? 'public, max-age=' . $cacheTtl : 'no-cache, private');
 	}
+
+	/**
+	 * Fresh CSRF token for pages served from the CDN cache (see GuestPageCache).
+	 * Starting a session here also sets the session cookie for the visitor.
+	 */
+	public function csrfToken()
+	{
+		return response()
+			->json(['token' => csrf_token()])
+			->header('Cache-Control', 'no-store, no-cache, private, max-age=0');
+	}
 }
