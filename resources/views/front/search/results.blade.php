@@ -23,6 +23,7 @@
 	@parent
 	@include('front.search.partials.form')
 @endsection
+@section('body_class', 'page-results')
 @section('content')
 	<div class="main-container search-results-page">
 		@include('front.search.partials.breadcrumbs')
@@ -78,6 +79,7 @@
 					<div class="page-title-wrapper results-title">
 						<span class="results-title-icon"><i class="bi bi-search"></i></span>
 						<h1 class="results-title-text m-0 p-0">{{ $h1Title }}</h1>
+						@if (config('settings.listing_form.show_listing_type') && !empty($postTypes))
 						<div class="results-title-tabs ms-md-auto">
 						<ul class="nav nav-tabs results-tabs" id="postType">
 				@php
@@ -136,6 +138,7 @@
 				@endif
 			</ul>
 						</div>
+						@endif
 					</div>
 				</div>
 			</div>

@@ -133,7 +133,7 @@
 		@endforeach
 	@endif
 </head>
-<body class="bg-body text-body-emphasis skin">
+<body class="bg-body text-body-emphasis skin @yield('body_class')">
 @section('header')
 	@include('front.layouts.partials.header')
 @show

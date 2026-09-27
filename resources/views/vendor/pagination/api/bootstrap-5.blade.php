@@ -66,12 +66,7 @@
         
         <div class="d-none d-md-flex justify-content-md-center">
             <div class="row">
-                <div class="col-12 mb-3">
-                    <p class="text-muted mb-0 text-center">
-                        {!! t('pagination_meta', ['from' => $fromFormatted, 'to' => $toFormatted, 'total' => $totalFormatted]) !!}
-                    </p>
-                </div>
-                
+
                 <div class="col-12 d-flex justify-content-center">
                     <ul class="pagination">
                         {{-- Previous Page Link --}}
@@ -127,10 +122,4 @@
             </div>
         </div>
     </nav>
-@else
-    @if ($total > 0)
-        <div class="text-secondary text-center mt-3">
-            {!! t('pagination_meta', ['from' => $fromFormatted, 'to' => $toFormatted, 'total' => $totalFormatted]) !!}
-        </div>
-    @endif
 @endif
