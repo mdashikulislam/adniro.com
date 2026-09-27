@@ -189,42 +189,70 @@ class Category extends BaseModel
                     return $defaultIconClass;
                 }
 
-                $defaultFontIconSet = config('larapen.core.defaultFontIconSet', 'bootstrap');
+                $iClassesArray = static::getFontIconSetClasses();
 
-                // Load icon file
-                $filePath = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.path');
-
-                if (!is_file($filePath)) {
-                    return $defaultIconClass;
-                }
-
-                $buffer = file_get_contents($filePath);
-
-                $ifVersion = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.version');
-                $versionQuoted = preg_quote($ifVersion, '#');
-
-                $matches = [];
-
-                if (
-                    preg_match(
-                        '#version:\s*' . $versionQuoted . '\s*,[^i]{0,1000}icons:\s*\[([^\]]+)\]#',
-                        $buffer,
-                        $matches
-                    )
-                ) {
-                    $raw = str_replace(["'", "\n", "\t"], '', $matches[1]);
-                    $iClassesArray = preg_split('/\s*,\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
-                } else {
-                    $iClassesArray = [];
-                }
-
-                if (!empty($iClassesArray) && !in_array($value, $iClassesArray, true)) {
+                if (!empty($iClassesArray) && !isset($iClassesArray[$value])) {
                     return $defaultIconClass;
                 }
 
                 return $value;
             }
         );
+    }
+
+    /**
+     * Get the icon classes of the default font icon set (keyed by class name).
+     *
+     * The icon set file (~117KB of JS) used to be read and parsed on every access of every
+     * category's "icon_class" (dozens of times per request). It is now parsed once per
+     * process and kept in the cache, keyed by the file's modification time.
+     *
+     * @return array
+     */
+    public static function getFontIconSetClasses(): array
+    {
+        static $memo = null;
+        if (is_array($memo)) {
+            return $memo;
+        }
+
+        $defaultFontIconSet = config('larapen.core.defaultFontIconSet', 'bootstrap');
+        $filePath = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.path');
+        $ifVersion = config('larapen.core.fontIconSet.' . $defaultFontIconSet . '.version');
+
+        if (empty($filePath) || !is_file($filePath)) {
+            return $memo = [];
+        }
+
+        $resolver = function () use ($filePath, $ifVersion) {
+            $buffer = file_get_contents($filePath);
+            $versionQuoted = preg_quote((string)$ifVersion, '#');
+            $matches = [];
+
+            if (
+                preg_match(
+                    '#version:\s*' . $versionQuoted . '\s*,[^i]{0,1000}icons:\s*\[([^\]]+)\]#',
+                    $buffer,
+                    $matches
+                )
+            ) {
+                $raw = str_replace(["'", "\n", "\t"], '', $matches[1]);
+                $list = preg_split('/\s*,\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
+
+                return array_fill_keys($list, true);
+            }
+
+            return [];
+        };
+
+        try {
+            $cacheKey = 'font_icon_set_classes.' . $defaultFontIconSet . '.' . filemtime($filePath);
+            $memo = cache()->remember($cacheKey, 86400, $resolver);
+        } catch (\Throwable $e) {
+            $memo = $resolver();
+        }
+
+        return is_array($memo) ? $memo : [];
     }
 
 

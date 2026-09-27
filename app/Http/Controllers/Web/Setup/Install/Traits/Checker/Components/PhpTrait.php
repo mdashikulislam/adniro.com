@@ -56,6 +56,40 @@ trait PhpTrait
 	 */
 	public function getPhpBinaryPath(): ?string
 	{
+		// Resolving the PHP binary spawns "whereis php" (a PATH-wide scan): memoize it per process
+		// and keep it in the cache for a day instead of running it on every web request.
+		static $memoPath = false;
+		if ($memoPath !== false) {
+			return $memoPath;
+		}
+		
+		try {
+			$cached = cache()->get('system.php_binary_path');
+			if (is_string($cached) && $cached !== '') {
+				return $memoPath = $cached;
+			}
+		} catch (Throwable $e) {
+		}
+		
+		$path = $this->resolvePhpBinaryPath();
+		
+		if (!empty($path)) {
+			try {
+				cache()->put('system.php_binary_path', $path, 86400);
+			} catch (Throwable $e) {
+			}
+		}
+		
+		return $memoPath = $path;
+	}
+	
+	/**
+	 * Resolve the PHP binary path on the server (uncached)
+	 *
+	 * @return string|null
+	 */
+	private function resolvePhpBinaryPath(): ?string
+	{
 		$path = null;
 		
 		if (defined(PHP_BINARY)) {
@@ -103,6 +137,20 @@ trait PhpTrait
 	 */
 	public function getPhpBinaryVersion(): ?string
 	{
+		// "php --version" boots a full PHP CLI process: memoize per process and cache for a day.
+		static $memoVersion = false;
+		if ($memoVersion !== false) {
+			return $memoVersion;
+		}
+		
+		try {
+			$cached = cache()->get('system.php_binary_version');
+			if (is_string($cached) && $cached !== '') {
+				return $memoVersion = $cached;
+			}
+		} catch (Throwable $e) {
+		}
+		
 		$version = null;
 		
 		$phpBinaryPath = $this->getPhpBinaryPath();
@@ -121,7 +169,14 @@ trait PhpTrait
 			$version = $this->parsePhpVersion($version);
 		}
 		
-		return $version;
+		if (!empty($version) && is_string($version)) {
+			try {
+				cache()->put('system.php_binary_version', $version, 86400);
+			} catch (Throwable $e) {
+			}
+		}
+		
+		return $memoVersion = $version;
 	}
 	
 	/**

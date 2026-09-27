@@ -136,31 +136,59 @@ class FileController extends Controller
 	 */
 	public function cssStyle()
 	{
-		$out = '';
-		
-		$hOut = '/* === CSS Version === */' . "\n";
-		$hOut .= '/* === v' . config('version.app') . ' === */' . "\n";
-		
-		try {
-			$out .= view('front.common.css.style', ['disk' => $this->disk])->render();
-			$out = preg_replace('|</?style[^>]*>|i', '', $out);
-		} catch (Throwable $e) {
-			$out .= '/* === CSS Error Found === */' . "\n";
-		}
-		
 		$isMinifyDisabled = request()->filled('minifyDisabled');
 		$isDebugEnabled = request()->filled('debug');
 		
-		if (!$isMinifyDisabled) {
-			$out = cssMinify($out);
-		}
+		// The generated CSS only depends on the skin/display settings & the query string,
+		// so render it once and keep it in the cache instead of on every page view.
+		$cacheTtl = 3600; // 1 hour
+		$cacheKey = 'front.css.style.' . md5(implode('|', [
+				config('version.app'),
+				config('settings.style.skin'),
+				config('settings.style.custom_css'),
+				config('app.locale'),
+				request()->getQueryString(),
+			]));
+		$canUseCache = (!$isMinifyDisabled && !$isDebugEnabled);
 		
-		$out = $hOut . $out;
+		$render = function () use ($isMinifyDisabled) {
+			$out = '';
+			
+			$hOut = '/* === CSS Version === */' . "\n";
+			$hOut .= '/* === v' . config('version.app') . ' === */' . "\n";
+			
+			try {
+				$out .= view('front.common.css.style', ['disk' => $this->disk])->render();
+				$out = preg_replace('|</?style[^>]*>|i', '', $out);
+			} catch (Throwable $e) {
+				$out .= '/* === CSS Error Found === */' . "\n";
+			}
+			
+			if (!$isMinifyDisabled) {
+				$out = cssMinify($out);
+			}
+			
+			return $hOut . $out;
+		};
+		
+		$out = null;
+		if ($canUseCache) {
+			try {
+				$out = cache()->remember($cacheKey, $cacheTtl, $render);
+			} catch (Throwable $e) {
+				$out = null;
+			}
+		}
+		if (!is_string($out)) {
+			$out = $render();
+		}
 		
 		if ($isDebugEnabled) {
 			dd($out);
 		}
 		
-		return response($out, 200)->header('Content-Type', 'text/css');
+		return response($out, 200)
+			->header('Content-Type', 'text/css')
+			->header('Cache-Control', $canUseCache ? 'public, max-age=' . $cacheTtl : 'no-cache, private');
 	}
 }
