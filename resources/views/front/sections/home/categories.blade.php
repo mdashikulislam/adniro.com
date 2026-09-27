@@ -24,15 +24,13 @@
 <div class="container{{ $cssClasses }} d-flex align-items-center" style="{!! $style !!}">
 	<div class="card"{!! $htmlAttr !!}>
 		
-		<div class="card-header border-bottom-0">
-			<h4 class="mb-0 float-start fw-lighter">
+		<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+			<h4 class="mb-0 fw-lighter section-title">
 				{{ t('Browse by') }} <span class="fw-bold">{{ t('category') }}</span>
 			</h4>
-			<h5 class="mb-0 float-end mt-1 fs-6 fw-lighter text-uppercase">
-				<a href="{{ urlGen()->sitemap() }}" class="{{ linkClass() }}">
-					{{ t('View more') }} <i class="fa-solid fa-bars"></i>
-				</a>
-			</h5>
+			<a href="{{ urlGen()->sitemap() }}" class="{{ linkClass() }} section-more-link">
+				{{ t('View more') }} <i class="fa-solid fa-arrow-right"></i>
+			</a>
 		</div>
 		<div class="card-body rounded py-0">
 			@if ($catDisplayType == 'c_picture_list')

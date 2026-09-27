@@ -34,8 +34,9 @@
 					@if (!$mapCanBeShown)
 						<div class="row">
 							<div class="col-xl-12 col-sm-12">
-								<h4 class="pb-3 px-0 fw-bold text-nowrap">
-									<i class="bi bi-geo-alt"></i>&nbsp;{{ t('Choose a city') }}
+								<h4 class="mb-0 pb-3 px-0 fw-lighter section-title location-title">
+									<span class="location-title-icon"><i class="bi bi-geo-alt-fill"></i></span>
+									<span class="fw-bold">{{ t('Choose a city') }}</span>
 								</h4>
 							</div>
 						</div>
@@ -44,13 +45,13 @@
 					@php
 						$leftClassCol = '';
 						$rightClassCol = '';
-						$rowCol = 'row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1'; // Cities Columns
+						$rowCol = 'row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2'; // Cities Columns
 						
 						if ($locCanBeShown && $mapCanBeShown) {
 							// Display the Cities & the Map
 							$leftClassCol = 'col-lg-8 col-md-12';
 							$rightClassCol = 'col-lg-3 col-md-12 mt-3 mt-xl-0 mt-lg-0';
-							$rowCol = 'row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-1';
+							$rowCol = 'row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-2';
 							
 							if ($locColumns == 2) {
 								$leftClassCol = 'col-md-6 col-sm-12';
@@ -77,31 +78,35 @@
 						<div class="{{ $leftClassCol }} m-0 p-0">
 							@if (!empty($cities))
 								@if ($mapCanBeShown)
-									<h4 class="pt-1 pb-3 px-3 fw-bold text-nowrap">
-										<i class="bi bi-geo-alt"></i>&nbsp;{{ t('Choose a city or region') }}
+									<h4 class="mb-0 pt-1 pb-3 px-3 fw-lighter section-title location-title">
+										<span class="location-title-icon"><i class="bi bi-geo-alt-fill"></i></span>
+										<span class="fw-bold">{{ t('Choose a city or region') }}</span>
 									</h4>
 								@endif
 								<div class="row px-4">
 									<div class="col-xl-12">
-										<div id="cityList" class="row {{ $rowCol }}">
+										<div id="cityList" class="row {{ $rowCol }} g-2 city-list">
 											@foreach ($cities as $key => $city)
-												<div class="col mb-2">
+												<div class="col">
 													@if (data_get($city, 'id') == 0)
 														<a href="#browseLocations"
-														   class="{{ linkClass('body-emphasis') }}"
+														   class="{{ linkClass('body-emphasis') }} city-chip city-chip-more"
 														   data-bs-toggle="modal"
 														   data-admin-code="0"
 														   data-city-id="0"
 														>
-															{!! data_get($city, 'name') !!}
+															<span class="city-chip-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+															<span class="city-chip-name">{!! preg_replace('/\s*(&raquo;|»)\s*$/u', '', data_get($city, 'name')) !!}</span>
+															<i class="bi bi-arrow-right city-chip-arrow"></i>
 														</a>
 													@else
-														<a href="{{ urlGen()->city($city) }}" class="{{ linkClass('body-emphasis') }}">
-															{{ data_get($city, 'name') }}
+														<a href="{{ urlGen()->city($city) }}" class="{{ linkClass('body-emphasis') }} city-chip">
+															<span class="city-chip-icon"><i class="bi bi-geo-alt"></i></span>
+															<span class="city-chip-name">{{ data_get($city, 'name') }}</span>
+															@if ($locCountListingsPerCity)
+																<span class="city-chip-count">{{ data_get($city, 'posts_count') ?? 0 }}</span>
+															@endif
 														</a>
-														@if ($locCountListingsPerCity)
-															&nbsp;({{ data_get($city, 'posts_count') ?? 0 }})
-														@endif
 													@endif
 												</div>
 											@endforeach
@@ -112,8 +117,8 @@
 										@php
 											[$createListingLinkUrl, $createListingLinkAttr] = getCreateListingLinkInfo();
 										@endphp
-										<div class="col-xl-12 text-center pt-5">
-											<a class="btn btn-outline-primary px-3"
+										<div class="col-xl-12 text-center pt-4 pt-lg-5">
+											<a class="btn btn-primary section-cta-btn"
 											   href="{{ $createListingLinkUrl }}"{!! $createListingLinkAttr !!}
 											>
 												<i class="fa-regular fa-pen-to-square"></i> {{ t('create_listing') }}

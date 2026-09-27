@@ -53,10 +53,10 @@
 @endphp
 
 <div class="container{{ $cssClasses }}" style="{!! $style !!}">
-	<div class="card border-0 bg-body-tertiary"{!! $htmlAttr !!}>
+	<div class="card border-0 bg-body-tertiary stats-card"{!! $htmlAttr !!}>
 		<div class="card-body text-secondary">
 			
-			<div class="row">
+			<div class="row g-3 stats-list">
 				@foreach($statItems as $key => $item)
 					@php
 						$icon = $item['icon'];
@@ -66,17 +66,17 @@
 						$label = $item['label'];
 					@endphp
 					<div class="col-sm-4 col-12">
-						<div class="d-flex align-items-center justify-content-md-center justify-content-sm-start">
-							<div class="text-end">
-								<i class="{{ $icon }} fs-1"></i>
+						<div class="stats-item d-flex align-items-center justify-content-md-center justify-content-sm-start">
+							<div class="stats-icon">
+								<i class="{{ $icon }}"></i>
 							</div>
 							<div class="ms-3 text-start">
-								<h5 class="fs-1 fw-bold m-0">
+								<h5 class="stats-value fw-bold m-0">
 									@if (!empty($prefix))<span>{{ $prefix }}</span>@endif
 									<span class="counter">{{ $count }}</span>
 									@if (!empty($suffix))<span>{{ $suffix }}</span>@endif
 								</h5>
-								<div class="fs-5">{{ $label }}</div>
+								<div class="stats-label">{{ $label }}</div>
 							</div>
 						</div>
 					</div>
@@ -93,13 +93,13 @@
 		<script>
 			onDocumentReady((event) => {
 				const counterUp = window.counterUp.default;
-				const counterEl = document.querySelector('.counter');
-				if (counterEl) {
+				const counterEls = document.querySelectorAll('.counter');
+				counterEls.forEach((counterEl) => {
 					counterUp(counterEl, {
 						duration: {{ $counterUpTime }},
 						delay: {{ $counterUpDelay }}
 					});
-				}
+				});
 			});
 		</script>
 	@endif
