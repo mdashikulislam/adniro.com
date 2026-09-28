@@ -5863,7 +5863,7 @@ body.page-cms main {
 
 .cms-hero {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	gap: 1rem;
 	padding: 1.5rem 1.6rem;
 	margin-bottom: 1.5rem;
@@ -5906,6 +5906,13 @@ body.page-cms main {
 	position: relative;
 	z-index: 1;
 	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.cms-hero-body > :last-child {
+	margin-bottom: 0;
 }
 
 .cms-hero-title {
