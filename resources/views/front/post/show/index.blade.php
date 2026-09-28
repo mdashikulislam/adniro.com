@@ -152,31 +152,41 @@
 								</a>
 							</h1>
 							
-							<ul class="listing-meta list-unstyled">
-								<li>
-									<i class="bi bi-geo-alt-fill"></i>
-									<a href="{!! urlGen()->city(data_get($post, 'city')) !!}">{{ data_get($post, 'city.name') }}</a>
-								</li>
-								@if (!config('settings.listing_page.hide_date'))
-									<li><i class="bi bi-clock"></i> {!! data_get($post, 'created_at_formatted') !!}</li>
-								@endif
-								@if (!empty($parentCatName) && $parentCatName != $catName)
-									<li><i class="bi bi-folder2-open"></i> {{ $parentCatName }}</li>
-								@endif
-								<li><i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') }}</li>
-							</ul>
-							
-							@if (!empty(data_get($post, 'price_formatted')))
-								<div class="listing-price-row">
-									<div class="listing-price">
-										<span class="listing-price-label">{{ data_get($post, 'price_label') }}</span>
-										<span class="listing-price-value">{!! data_get($post, 'price_formatted') !!}</span>
-										@if (data_get($post, 'negotiable') == 1)
-											<span class="listing-price-negotiable">{{ t('negotiable') }}</span>
-										@endif
+							<div class="listing-header-bottom">
+								<ul class="listing-meta list-unstyled">
+									<li class="listing-meta-city">
+										<i class="bi bi-geo-alt-fill"></i>
+										<a href="{!! urlGen()->city(data_get($post, 'city')) !!}">{{ data_get($post, 'city.name') }}</a>
+									</li>
+									@if (!config('settings.listing_page.hide_date'))
+										<li><i class="bi bi-clock"></i> {!! data_get($post, 'created_at_formatted') !!}</li>
+									@endif
+									@if (!empty($parentCatName) && $parentCatName != $catName)
+										<li><i class="bi bi-folder2-open"></i> {{ $parentCatName }}</li>
+									@endif
+									<li><i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') }}</li>
+								</ul>
+								
+								@if (!empty(data_get($post, 'price_formatted')))
+									@php
+										$isTextPrice = !preg_match('/\d/', strip_tags((string)data_get($post, 'price_formatted')));
+									@endphp
+									<div class="listing-price-card{{ $isTextPrice ? ' listing-price-card-text' : '' }}">
+										<span class="listing-price-icon">
+											<i class="bi {{ $isTextPrice ? 'bi-chat-left-dots-fill' : 'bi-tag-fill' }}"></i>
+										</span>
+										<span class="listing-price-body">
+											<span class="listing-price-label">{{ data_get($post, 'price_label') }}</span>
+											<span class="listing-price-value">
+												{!! data_get($post, 'price_formatted') !!}
+												@if (data_get($post, 'negotiable') == 1)
+													<span class="listing-price-negotiable">{{ t('negotiable') }}</span>
+												@endif
+											</span>
+										</span>
 									</div>
-								</div>
-							@endif
+								@endif
+							</div>
 						</header>
 						
 						{{-- Pictures --}}
