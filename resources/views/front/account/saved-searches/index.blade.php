@@ -38,7 +38,7 @@
 						<div class="row">
 							<div class="col-md-12">
 								@if (!empty($savedSearches) && $totalSavedSearches > 0)
-									<div class="row row-cols-lg-2 row-cols-1 g-1 g-lg-1 mb-3">
+									<div class="saved-search-grid mb-3">
 										@foreach ($savedSearches as $search)
 											@php
 												$isSelected = (request()->query('q') == data_get($search, 'keyword'));
@@ -48,34 +48,28 @@
 												$detailUrl = url(urlGen()->getAccountBasePath() . '/saved-searches/' . $searchId);
 												$deleteUrl = url(urlGen()->getAccountBasePath() . '/saved-searches/' . $searchId . '/delete');
 											@endphp
-											<div class="col p-1">
-												<div class="w-100 border border rounded bg-body p-2 clearfix{{ $activeClass }}">
-													<div class="float-start d-flex align-items-center h-100 px-1 fs-6">
-														<a href="{{ $detailUrl }}" class="{{ linkClass() }}">
-															<span>
-																{{ str(data_get($search, 'keyword'))->headline()->limit(20) }}
-															</span>
-															<span class="badge rounded-pill text-bg-warning" id="{{ $searchId }}">
-																{{ data_get($search, 'count') }}~
-															</span>
-														</a>
-													</div>
-													<div class="float-end">
-														<a href="{{ $deleteUrl }}"
-														   class="confirm-simple-action {{ linkClass() }}"
-														   data-bs-toggle="tooltip"
-														   title="{{ t('Delete') }}"
-														>
-															<i class="bi bi-trash text-danger"></i>
-														</a>
-													</div>
-												</div>
+											<div class="saved-search-card{{ $activeClass }}">
+												<a href="{{ $detailUrl }}" class="saved-search-main">
+													<span class="saved-search-icon"><i class="bi bi-bell-fill"></i></span>
+													<span class="saved-search-body">
+														<span class="saved-search-keyword">{{ str(data_get($search, 'keyword'))->headline()->limit(30) }}</span>
+														<span class="saved-search-count" id="{{ $searchId }}">{{ data_get($search, 'count') }}~ {{ t('listings') }}</span>
+													</span>
+												</a>
+												<a href="{{ $deleteUrl }}"
+												   class="saved-search-delete confirm-simple-action"
+												   data-bs-toggle="tooltip"
+												   title="{{ t('Delete') }}"
+												>
+													<i class="bi bi-trash3"></i>
+												</a>
 											</div>
 										@endforeach
 									</div>
 								@else
-									<div class="text-center mt-3 mb-5">
-										{{ $apiMessage ?? t('You have no saved search') }}
+									<div class="account-empty">
+										<i class="bi bi-bell-slash"></i>
+										<span>{{ $apiMessage ?? t('You have no saved search') }}</span>
 									</div>
 								@endif
 								

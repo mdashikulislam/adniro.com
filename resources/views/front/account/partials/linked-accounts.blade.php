@@ -3,18 +3,17 @@
 	$providers ??= [];
 @endphp
 <div class="col-12">
-	<div class="card">
-		<div class="card-header">
-			<h5 class="card-title mb-0">
-				{{ trans('auth.connected_accounts') }}
-			</h5>
+	<div class="card account-card">
+		<div class="card-header account-card-head">
+			<span class="account-card-icon"><i class="bi bi-link-45deg"></i></span>
+			<h5 class="card-title mb-0">{{ trans('auth.connected_accounts') }}</h5>
 		</div>
 		<div class="card-body">
 			@if (!empty($providers))
 				<form action="{{ urlGen()->accountLinkedAccounts() }}" method="POST">
 					{!! csrf_field() !!}
 					<input name="_method" type="hidden" value="DELETE">
-					<table class="table">
+					<table class="table account-simple-table">
 						<thead>
 						<tr>
 							<th scope="col" style="width: 10%">#</th>
@@ -48,7 +47,7 @@
 								<td>{!! $connectedAt !!}</td>
 								<td>
 									<a href="{{ urlGen()->accountDisconnectLinkedAccount($provider) }}"
-									   class="btn btn-sm btn-secondary{{ $disableClass }}"
+									   class="btn btn-sm account-action-btn{{ $disableClass }}"
 									>
 										{{ $actionBtnLabel }}
 									</a>
@@ -59,11 +58,10 @@
 					</table>
 				</form>
 			@else
-				<idv class="row m-5">
-					<div class="col-12 text-muted fs-6 d-flex justify-content-center">
-						{{ trans('auth.no_connected_accounts') }}
-					</div>
-				</idv>
+				<div class="account-empty">
+					<i class="bi bi-link-45deg"></i>
+					<span>{{ trans('auth.no_connected_accounts') }}</span>
+				</div>
 			@endif
 		</div>
 	</div>

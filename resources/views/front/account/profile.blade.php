@@ -49,9 +49,11 @@
 						'headerTitle' => '<i class="bi bi-person-circle"></i> ' . trans('auth.profile')
 					])
 					
-					<div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2">
-						<div class="row gy-3">
+					<div class="row g-4 account-profile-layout">
+						<div class="col-lg-4">
 							@include('front.account.partials.profile-photo')
+						</div>
+						<div class="col-lg-8">
 							@include('front.account.partials.profile-details')
 						</div>
 					</div>

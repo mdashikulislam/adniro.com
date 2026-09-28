@@ -1,4 +1,4 @@
-<div class="col-12">
+<div class="account-avatar-card">
 	<div class="row">
 		{{-- photo_path --}}
 		@php
@@ -13,7 +13,7 @@
 		@include('helpers.forms.fields.fileinput-ajax-avatar', [
 			'name'       => 'photo_path',
 			'label'      => t('Photo or Avatar'),
-			'labelClass' => 'fw-bold',
+			'labelClass' => 'visually-hidden',
 			'value'      => $savedAvatar,
 			'pluginOptions' => [
 				'uploadUrl'       => $uploadUrl,

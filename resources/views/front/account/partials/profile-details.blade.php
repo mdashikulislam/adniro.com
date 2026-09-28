@@ -1,13 +1,12 @@
 <div class="col-12">
-	<div class="card">
-		<div class="card-header">
-			<h5 class="card-title mb-0">
-				{{ t('Account Details') }}
-			</h5>
+	<div class="card account-card">
+		<div class="card-header account-card-head">
+			<span class="account-card-icon"><i class="bi bi-person-vcard-fill"></i></span>
+			<h5 class="card-title mb-0">{{ t('Account Details') }}</h5>
 		</div>
 		<div class="card-body">
-			<div class="row d-flex justify-content-center">
-				<div class="col-xl-7 col-lg-8 col-md-10 col-sm-12">
+			<div class="row">
+				<div class="col-12">
 					<form name="details" action="{{ urlGen()->accountProfile() }}" method="POST" role="form">
 						@csrf
 						@method('PUT')
@@ -24,6 +23,7 @@
 								'optionValueName' => 'id',
 								'optionTextName'  => 'title',
 								'value'           => $authUser->gender_id ?? null,
+								'baseClass'       => ['wrapper' => 'mb-3 col-md-6'],
 							])
 							
 							{{-- name --}}
@@ -33,6 +33,7 @@
 								'placeholder' => t('enter_your_name'),
 								'required'    => true,
 								'value'       => $authUser->name ?? null,
+								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
 							])
 							
 							{{-- username --}}
@@ -43,6 +44,7 @@
 								'required'    => true,
 								'value'       => $authUser->username ?? null,
 								'prefix'      => '<i class="fa-regular fa-user"></i>',
+								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
 							])
 							
 							{{-- auth_field (as notification channel) --}}
@@ -87,6 +89,7 @@
 								'prefix'      => '<i class="fa-regular fa-envelope"></i>',
 								'suffix'      => null,
 								'wrapper'     => ['class' => "auth-field-item{$forceToDisplay}"],
+								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
 							])
 							
 							{{-- phone --}}
@@ -111,18 +114,17 @@
 								'countryCode' => $phoneCountryValue,
 								'suffix'      => $suffix,
 								'wrapper'     => ['class' => "auth-field-item{$forceToDisplay}"],
+								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
 							])
 							
 							{{-- country_code --}}
 							<input type="hidden" name="country_code" value="{{ $authUser->country_code ?? null }}">
 							
 							{{-- button --}}
-							<div class="col-12 mb-3 mt-3">
-								<div class="row">
-									<div class="col-md-12">
-										<button type="submit" class="btn btn-primary">{{ t('Update') }}</button>
-									</div>
-								</div>
+							<div class="col-12 mt-2 account-form-actions">
+								<button type="submit" class="btn btn-primary account-submit-btn">
+									<i class="bi bi-check2-circle"></i> {{ t('Update') }}
+								</button>
 							</div>
 						</div>
 					</form>

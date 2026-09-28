@@ -39,9 +39,13 @@
 								{{ t('Admin users can not be deleted by this way') }}
 							</div>
 						@else
-							<p>
-								{{ t('are_you_sure_to_close_account') }}
-							</p>
+							<div class="account-danger-box">
+								<span class="account-danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+								<div>
+									<p class="account-danger-title">{{ t('are_you_sure_to_close_account') }}</p>
+									<p class="account-danger-text">{{ t('your_data_will_permanently_deleted') }} {{ t('action_warning') }}</p>
+								</div>
+							</div>
 							
 							<form action="{{ urlGen()->accountClosing() }}" method="POST" role="form">
 								@csrf
@@ -60,14 +64,13 @@
 									'required' => true,
 									'options'  => $closingOptions,
 									'value'    => '0',
-									'hint'     => t('your_data_will_permanently_deleted') . ' ' . t('action_warning')
 								])
 								
 								{{-- button --}}
-								<div class="row mb-3 mt-4">
-									<div class="col-md-12">
-										<button type="submit" class="btn btn-danger">{{ t('submit') }}</button>
-									</div>
+								<div class="account-form-actions mt-2">
+									<button type="submit" class="btn btn-danger account-submit-btn">
+										<i class="bi bi-person-x"></i> {{ t('submit') }}
+									</button>
 								</div>
 							</form>
 						@endif

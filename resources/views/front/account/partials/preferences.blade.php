@@ -4,15 +4,14 @@
 	$authUserIsAdmin ??= false;
 @endphp
 <div class="col-12">
-	<div class="card">
-		<div class="card-header">
-			<h5 class="card-title mb-0">
-				{{ t('Settings') }}
-			</h5>
+	<div class="card account-card">
+		<div class="card-header account-card-head">
+			<span class="account-card-icon"><i class="bi bi-sliders2"></i></span>
+			<h5 class="card-title mb-0">{{ t('Settings') }}</h5>
 		</div>
 		<div class="card-body">
-			<div class="row d-flex justify-content-center">
-				<div class="col-xl-7 col-lg-8 col-md-10 col-sm-12">
+			<div class="row">
+				<div class="col-12">
 					<form name="settings"
 					      action="{{ urlGen()->accountPreferences() }}"
 					      method="POST"
@@ -88,12 +87,10 @@
 							])
 							
 							{{-- button --}}
-							<div class="col-12 mb-3 mt-3">
-								<div class="row">
-									<div class="col-md-12">
-										<button type="submit" class="btn btn-primary">{{ t('Update') }}</button>
-									</div>
-								</div>
+							<div class="col-12 mt-2 account-form-actions">
+								<button type="submit" class="btn btn-primary account-submit-btn">
+									<i class="bi bi-check2-circle"></i> {{ t('Update') }}
+								</button>
 							</div>
 						</div>
 					</form>
