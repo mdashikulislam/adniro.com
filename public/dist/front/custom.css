@@ -8943,3 +8943,179 @@ body.page-listing-form form#payableForm > .row > .col-md-8 {
 	padding-right: 2.6rem !important;
 	border-radius: 999px !important;
 }
+
+/* Stepper v2: equal columns, circle above label, progress lines */
+.listing-wizard {
+	padding: .9rem 1rem .75rem;
+	border-radius: 20px;
+	gap: 0;
+	align-items: stretch;
+}
+
+.listing-wizard .nav-item {
+	position: relative;
+	flex: 1 1 0;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	min-width: 0;
+}
+
+.listing-wizard .nav-item + .nav-item::before {
+	content: none;
+}
+
+.listing-wizard .nav-item::before,
+.listing-wizard .nav-item::after {
+	content: "";
+	position: absolute;
+	top: 22px;
+	height: 3px;
+	border-radius: 3px;
+	background-color: var(--bs-border-color);
+	z-index: 0;
+}
+
+.listing-wizard .nav-item::before {
+	left: 0;
+	right: 50%;
+	margin-right: 24px;
+}
+
+.listing-wizard .nav-item::after {
+	left: 50%;
+	right: 0;
+	margin-left: 24px;
+}
+
+.listing-wizard .nav-item:first-child::before,
+.listing-wizard .nav-item:last-child::after {
+	content: none;
+}
+
+/* completed step: both lines teal; active step: incoming line teal */
+.listing-wizard .nav-item:has(.nav-link:not(.disabled):not(.active))::before,
+.listing-wizard .nav-item:has(.nav-link:not(.disabled):not(.active))::after,
+.listing-wizard .nav-item:has(.nav-link.active)::before {
+	background: linear-gradient(90deg, var(--bs-primary), rgba(var(--bs-primary-rgb), .6));
+}
+
+.listing-wizard .nav-link {
+	position: relative;
+	z-index: 1;
+	flex-direction: column;
+	gap: .5rem;
+	padding: .15rem .5rem;
+	background: transparent !important;
+	white-space: normal;
+	text-align: center;
+}
+
+.listing-wizard .nav-link.active {
+	color: var(--bs-primary);
+}
+
+.listing-wizard-num {
+	width: 38px;
+	height: 38px;
+	font-size: .9rem;
+	box-shadow: 0 0 0 4px var(--bs-body-bg);
+}
+
+.listing-wizard .nav-link.active .listing-wizard-num {
+	box-shadow: 0 0 0 4px var(--bs-body-bg), 0 0 0 7px rgba(var(--bs-primary-rgb), .18), 0 10px 20px -10px rgba(var(--bs-primary-rgb), .9);
+}
+
+.listing-wizard .nav-link:not(.disabled):not(.active) .listing-wizard-num {
+	color: #fff;
+	border-color: var(--bs-primary);
+	background-color: var(--bs-primary);
+}
+
+.listing-wizard-label {
+	font-size: .82rem;
+	font-weight: 600;
+	letter-spacing: .01em;
+}
+
+.listing-wizard .nav-link.disabled .listing-wizard-label {
+	color: var(--bs-secondary-color);
+}
+
+@media (max-width: 767.98px) {
+	.listing-wizard {
+		padding: .7rem .5rem .55rem;
+		border-radius: 16px;
+	}
+	
+	.listing-wizard .nav-item::before,
+	.listing-wizard .nav-item::after {
+		top: 18px;
+	}
+	
+	.listing-wizard .nav-item::before {
+		margin-right: 20px;
+	}
+	
+	.listing-wizard .nav-item::after {
+		margin-left: 20px;
+	}
+	
+	.listing-wizard-num {
+		width: 32px;
+		height: 32px;
+		font-size: .8rem;
+	}
+	
+	.listing-wizard .nav-link .listing-wizard-label {
+		display: block;
+		font-size: .7rem;
+	}
+}
+
+/* Step buttons on the edit photos / packages pages (outline variants) */
+body.page-listing-form #nextStepAction,
+body.page-listing-form .btn-lg.btn-outline-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .5rem;
+	padding: .75rem 1.5rem;
+	border-radius: 999px;
+	font-size: 1rem;
+	font-weight: 700;
+	color: #fff;
+	border: 0;
+	background: linear-gradient(120deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), .82) 100%);
+	box-shadow: 0 12px 24px -12px rgba(var(--bs-primary-rgb), .9);
+	transition: transform .15s ease, box-shadow .15s ease;
+}
+
+body.page-listing-form #nextStepAction:hover,
+body.page-listing-form .btn-lg.btn-outline-primary:hover {
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 16px 28px -12px rgba(var(--bs-primary-rgb), 1);
+}
+
+body.page-listing-form #skipBtn,
+body.page-listing-form .btn-lg.btn-outline-secondary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .5rem;
+	padding: .75rem 1.5rem;
+	border-radius: 999px;
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--bs-emphasis-color);
+	background-color: var(--bs-tertiary-bg);
+	border: 1px solid var(--bs-border-color);
+}
+
+body.page-listing-form #skipBtn:hover,
+body.page-listing-form .btn-lg.btn-outline-secondary:hover {
+	color: var(--bs-emphasis-color);
+	background-color: var(--bs-secondary-bg);
+	border-color: var(--bs-border-color);
+}
