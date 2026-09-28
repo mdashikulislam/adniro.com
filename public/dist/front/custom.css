@@ -7391,7 +7391,7 @@ body.page-account .account-card .text-muted {
 	object-fit: contain;
 	background-color: #fff;
 	padding: 6px;
-	border-radius: 50% !important;
+	border-radius: 22px !important;
 	border: 4px solid var(--bs-body-bg) !important;
 	box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), .35), 0 16px 30px -18px rgba(0, 0, 0, .4);
 }
