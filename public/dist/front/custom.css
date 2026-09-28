@@ -3769,45 +3769,52 @@ body.page-listing main {
 	margin-bottom: 0;
 }
 
-/* Specs grid */
+/* Specs grid: two per row, label left / value right */
 .listing-specs {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-	gap: .7rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: .6rem .8rem;
 }
 
 .listing-spec {
 	display: flex;
-	flex-direction: column;
-	gap: .25rem;
-	padding: .8rem .95rem;
-	border-radius: 14px;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+	padding: .7rem .95rem;
+	border-radius: 12px;
 	background-color: var(--bs-tertiary-bg);
 	border: 1px solid transparent;
-	transition: border-color .15s ease, background-color .15s ease;
+	border-left: 3px solid rgba(var(--bs-primary-rgb), .45);
+	transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
 }
 
 .listing-spec:hover {
 	border-color: rgba(var(--bs-primary-rgb), .3);
+	border-left-color: var(--bs-primary);
 	background-color: rgba(var(--bs-primary-rgb), .05);
+	transform: translateX(2px);
 }
 
 .listing-spec-wide {
 	grid-column: 1 / -1;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: .35rem;
 }
 
 .listing-spec-label {
-	font-size: .74rem;
+	font-size: .78rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: .05em;
 	color: var(--bs-secondary-color);
+	white-space: nowrap;
 }
 
 .listing-spec-value {
-	font-size: .98rem;
+	font-size: .95rem;
 	font-weight: 700;
-	color: var(--bs-emphasis-color);
+	color: var(--bs-primary);
+	text-align: right;
 	word-break: break-word;
 }
 
@@ -3815,7 +3822,8 @@ body.page-listing main {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 	gap: .35rem .75rem;
-	margin: .2rem 0 0;
+	margin: 0;
+	width: 100%;
 	font-size: .9rem;
 	font-weight: 500;
 	color: var(--bs-emphasis-color);
@@ -3839,6 +3847,7 @@ body.page-listing main {
 
 .listing-spec-video {
 	margin-top: .35rem;
+	width: 100%;
 	border-radius: 10px;
 	overflow: hidden;
 }
@@ -4238,7 +4247,7 @@ a.seller-fact-value:hover {
 	}
 	
 	.listing-specs {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: 1fr;
 	}
 	
 	.listing-back-link {
@@ -4398,10 +4407,6 @@ a.seller-fact-value:hover {
 
 .listing-section-icon {
 	box-shadow: inset 0 0 0 1px rgba(var(--bs-primary-rgb), .18);
-}
-
-.listing-spec-value {
-	color: var(--bs-primary);
 }
 
 /* Listing header: meta chips + price card */
