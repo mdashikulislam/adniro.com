@@ -4541,3 +4541,200 @@ a.seller-fact-value:hover {
 		justify-content: flex-start;
 	}
 }
+
+/* =======================================================
+ * Phone number modal (security tips)
+ * ======================================================= */
+.phone-modal .modal-content {
+	border: 0;
+	border-radius: 22px;
+	overflow: hidden;
+	box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .35);
+}
+
+.phone-modal-header {
+	padding: 1.1rem 1.5rem;
+	border-bottom: 1px solid var(--bs-border-color);
+	background: linear-gradient(90deg, rgba(var(--bs-primary-rgb), .08) 0%, rgba(var(--bs-primary-rgb), 0) 100%);
+}
+
+.phone-modal-title {
+	display: flex;
+	align-items: center;
+	gap: .65rem;
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+}
+
+.phone-modal-title-icon,
+.phone-modal-tips-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 10px;
+	background-color: rgba(var(--bs-primary-rgb), .12);
+	color: var(--bs-primary);
+	font-size: .95rem;
+}
+
+.phone-modal-body {
+	padding: 1.5rem;
+}
+
+.phone-modal-number-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 1.5rem 1.25rem;
+	border-radius: 18px;
+	background: linear-gradient(120deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), .82) 100%);
+	color: #fff;
+	box-shadow: 0 18px 36px -18px rgba(var(--bs-primary-rgb), .7);
+	position: relative;
+	overflow: hidden;
+}
+
+.phone-modal-number-wrap::after {
+	content: "";
+	position: absolute;
+	width: 220px;
+	height: 220px;
+	right: -80px;
+	top: -120px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .12);
+	pointer-events: none;
+}
+
+.phone-modal-number-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 54px;
+	height: 54px;
+	border-radius: 16px;
+	background: rgba(255, 255, 255, .18);
+	border: 1px solid rgba(255, 255, 255, .3);
+	font-size: 1.5rem;
+	position: relative;
+	z-index: 1;
+}
+
+.phone-modal-number {
+	font-size: clamp(1.5rem, 4vw, 2.2rem);
+	font-weight: 800;
+	letter-spacing: .02em;
+	line-height: 1.1;
+	color: #fff;
+	position: relative;
+	z-index: 1;
+	word-break: break-all;
+}
+
+.phone-modal-number img {
+	max-width: 100%;
+	height: auto;
+	filter: brightness(0) invert(1);
+}
+
+.phone-modal-tips {
+	margin-top: 1.25rem;
+	padding: 1.1rem 1.25rem;
+	border-radius: 16px;
+	background-color: rgba(245, 158, 11, .08);
+	border: 1px solid rgba(245, 158, 11, .25);
+}
+
+.phone-modal-tips-title {
+	display: flex;
+	align-items: center;
+	gap: .65rem;
+	margin: 0 0 .65rem;
+	font-size: 1rem;
+	font-weight: 700;
+	color: #92400e;
+}
+
+.phone-modal-tips-title .phone-modal-tips-icon {
+	background-color: rgba(245, 158, 11, .18);
+	color: #b45309;
+}
+
+.phone-modal-tips-text {
+	font-size: .9rem;
+	line-height: 1.6;
+	color: var(--bs-body-color);
+}
+
+.phone-modal-tips-text ul {
+	margin: 0;
+	padding-left: 1.2rem;
+}
+
+.phone-modal-tips-text li + li {
+	margin-top: .35rem;
+}
+
+.phone-modal-tips-text p:last-child {
+	margin-bottom: 0;
+}
+
+.phone-modal-footer {
+	padding: 1rem 1.5rem;
+	border-top: 1px solid var(--bs-border-color);
+	gap: .5rem;
+}
+
+.phone-modal-footer .btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .45rem;
+	padding: .6rem 1.25rem;
+	border-radius: 999px;
+	font-weight: 600;
+	margin: 0;
+}
+
+.phone-modal-close.btn {
+	background-color: var(--bs-tertiary-bg);
+	border-color: transparent;
+	color: var(--bs-secondary-color);
+}
+
+.phone-modal-close.btn:hover {
+	background-color: var(--bs-secondary-bg);
+	color: var(--bs-emphasis-color);
+}
+
+.phone-modal-call.btn {
+	box-shadow: 0 10px 20px -10px rgba(var(--bs-primary-rgb), .8);
+}
+
+.phone-modal-call.btn:hover {
+	transform: translateY(-1px);
+}
+
+[data-bs-theme="dark"] .phone-modal-tips {
+	background-color: rgba(245, 158, 11, .12);
+}
+
+[data-bs-theme="dark"] .phone-modal-tips-title {
+	color: #fbbf24;
+}
+
+@media (max-width: 575.98px) {
+	.phone-modal-body {
+		padding: 1.1rem;
+	}
+
+	.phone-modal-number-wrap {
+		flex-direction: column;
+		text-align: center;
+		gap: .6rem;
+	}
+}
