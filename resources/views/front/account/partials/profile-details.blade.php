@@ -114,7 +114,7 @@
 								'countryCode' => $phoneCountryValue,
 								'suffix'      => $suffix,
 								'wrapper'     => ['class' => "auth-field-item{$forceToDisplay}"],
-								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
+								'baseClass'   => ['wrapper' => 'mb-3 col-md-12'],
 							])
 							
 							{{-- country_code --}}
