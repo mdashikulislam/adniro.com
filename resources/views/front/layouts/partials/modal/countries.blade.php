@@ -36,18 +36,6 @@
 			</div>
 
 			<div class="modal-body country-modal-body">
-				@if ($countries->count() > 8)
-					<div class="country-modal-search">
-						<i class="bi bi-search"></i>
-						<input type="text"
-						       id="countryModalFilter"
-						       class="form-control"
-						       placeholder="{{ t('search') }}"
-						       autocomplete="off"
-						>
-					</div>
-				@endif
-
 				<div id="modalCountryList" class="country-grid">
 					@if ($countries->isNotEmpty())
 						@foreach ($countries as $code => $country)
@@ -83,9 +71,6 @@
 						@endforeach
 					@endif
 				</div>
-				<div class="country-grid-empty d-none">
-					<i class="bi bi-search"></i> {{ t('no_results') }}
-				</div>
 			</div>
 
 			@if ($showCountryFlagNextLang && $multiCountryIsEnabled)
@@ -100,36 +85,3 @@
 	</div>
 </div>
 
-@section('after_scripts')
-	@parent
-	<script>
-		onDocumentReady((event) => {
-			const filterEl = document.getElementById('countryModalFilter');
-			const listEl = document.getElementById('modalCountryList');
-			if (!filterEl || !listEl) return;
-
-			const emptyEl = listEl.parentElement.querySelector('.country-grid-empty');
-			const tiles = listEl.querySelectorAll('.country-tile');
-
-			filterEl.addEventListener('input', () => {
-				const q = filterEl.value.trim().toLowerCase();
-				let visible = 0;
-				tiles.forEach((tile) => {
-					const match = (q === '') || (tile.dataset.name || '').includes(q);
-					tile.classList.toggle('d-none', !match);
-					if (match) visible++;
-				});
-				if (emptyEl) emptyEl.classList.toggle('d-none', visible > 0);
-			});
-
-			const modalEl = document.getElementById('selectCountry');
-			if (modalEl) {
-				modalEl.addEventListener('shown.bs.modal', () => filterEl.focus());
-				modalEl.addEventListener('hidden.bs.modal', () => {
-					filterEl.value = '';
-					filterEl.dispatchEvent(new Event('input'));
-				});
-			}
-		});
-	</script>
-@endsection
