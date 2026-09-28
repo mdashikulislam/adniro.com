@@ -125,7 +125,7 @@ class CategoryIconsSeeder extends Seeder
 		'household-services-housekeeping'      => 'fa-solid fa-broom',
 		'tourism-hotels-restaurants-leisure'   => 'fa-solid fa-utensils',
 		'transportation-logistics'             => 'fa-solid fa-truck-fast',
-		'others-jobs-offer'                    => 'fa-solid fa-ellipsis',
+		'others-jobs-offer'                    => 'fa-solid fa-user-tie',
 		
 		// Services
 		'casting-model-photographer'           => 'fa-solid fa-clapperboard',
@@ -143,7 +143,7 @@ class CategoryIconsSeeder extends Seeder
 		'tourism-and-travel-services'          => 'fa-solid fa-plane',
 		'translation-writing'                  => 'fa-solid fa-language',
 		'construction-renovation-carpentry'    => 'fa-solid fa-helmet-safety',
-		'other-services'                       => 'fa-solid fa-ellipsis',
+		'other-services'                       => 'fa-solid fa-concierge-bell',
 		
 		// Learning
 		'language-classes'                     => 'fa-solid fa-language',
