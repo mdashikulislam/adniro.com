@@ -1601,7 +1601,6 @@
 .results-toolbar {
 	padding: .25rem 0 .85rem !important;
 	border: 0 !important;
-	border-bottom: 1px solid var(--bs-border-color) !important;
 	border-radius: 0;
 	background-color: transparent !important;
 	margin-bottom: 1.1rem;
@@ -1781,11 +1780,15 @@ body.page-results .listing-card:hover {
 }
 
 body.page-results .results-toolbar {
-	padding: .55rem .9rem !important;
-	border: 1px solid var(--bs-border-color) !important;
-	border-radius: 14px;
-	background-color: var(--bs-body-bg) !important;
+	padding: 0 0 .25rem !important;
+	border: 0 !important;
+	border-radius: 0;
+	background-color: transparent !important;
 	box-shadow: none;
+}
+
+.results-toolbar .list-inline-item.results-view-item {
+	margin-right: auto !important;
 }
 
 body.page-results .results-filter-btn,

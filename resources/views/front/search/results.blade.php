@@ -193,7 +193,29 @@
 						@if (!empty($posts) && $totalPosts > 0)
 						{{-- Filters, OrderBy & Display Mode --}}
 						<div class="container results-toolbar">
-							<ul class="list-inline m-0 p-0 text-end d-flex align-items-center justify-content-end gap-2">
+							<ul class="list-inline m-0 p-0 d-flex align-items-center gap-2">
+								{{-- Display Modes --}}
+								@if (!empty($posts) && $totalPosts > 0)
+									<li class="list-inline-item px-2 me-auto results-view-item">
+										@if (!empty($displayModes))
+											<div class="btn-group results-view-switch">
+												@foreach($displayModes as $displayMode => $value)
+													@php
+														$displayModeUrl = request()->fullUrlWithQuery((array)data_get($value, 'query'));
+														$activeClass = ($selectedDisplayMode == $displayMode) ? ' active' : '';
+														$activeAttr = ($selectedDisplayMode == $displayMode) ? ' aria-current="page"' : '';
+													@endphp
+													<a href="{!! $displayModeUrl !!}"
+													   class="btn btn-outline-primary btn-sm{{ $activeClass }}"
+													   rel="nofollow"{!! $activeAttr !!}
+													>
+														<i class="{{ data_get($value, 'icon') }}"></i>
+													</a>
+												@endforeach
+											</div>
+										@endif
+									</li>
+								@endif
 								{{-- Filter (Show/Hide Sidebar) | d-inline-block d-sm-inline-block d-md-none --}}
 								@if ($isLeftSidebarEnabled)
 									<li class="list-inline-item px-2{{ $showInlineOnSmallScreen }}">
@@ -246,28 +268,6 @@
 									</div>
 								</li>
 
-								{{-- Display Modes --}}
-								@if (!empty($posts) && $totalPosts > 0)
-									<li class="list-inline-item px-2">
-										@if (!empty($displayModes))
-											<div class="btn-group results-view-switch">
-												@foreach($displayModes as $displayMode => $value)
-													@php
-														$displayModeUrl = request()->fullUrlWithQuery((array)data_get($value, 'query'));
-														$activeClass = ($selectedDisplayMode == $displayMode) ? ' active' : '';
-														$activeAttr = ($selectedDisplayMode == $displayMode) ? ' aria-current="page"' : '';
-													@endphp
-													<a href="{!! $displayModeUrl !!}"
-													   class="btn btn-outline-primary btn-sm{{ $activeClass }}"
-													   rel="nofollow"{!! $activeAttr !!}
-													>
-														<i class="{{ data_get($value, 'icon') }}"></i>
-													</a>
-												@endforeach
-											</div>
-										@endif
-									</li>
-								@endif
 							</ul>
 						</div>
 						@endif
