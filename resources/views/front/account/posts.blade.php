@@ -71,38 +71,27 @@
 							<form name="listForm" action="{{ url($basePath . '/delete') }}" method="POST">
 								@csrf
 								
-								<div class="d-flex justify-content-between bg-body rounded p-3 mb-3 table-action">
-									<div class="text-nowrap d-flex align-items-center">
-										<div class="btn-group" role="group">
-											<button type="button" class="btn btn-sm btn btn-outline-primary pb-0">
-												<input type="checkbox" id="checkAll" class="from-check-all">
-											</button>
-											<button type="button" class="btn btn-sm btn btn-primary from-check-all">
-												{{ t('Select') }}: {{ t('All') }}
-											</button>
-										</div>
-										
-										<button type="submit" class="btn btn-sm btn btn-danger ms-1 confirm-simple-action">
-											<i class="fa-regular fa-trash-can"></i> {{ t('Delete') }}
+								<div class="account-toolbar table-action">
+									<div class="account-toolbar-left">
+										<label class="account-check-all" for="checkAll">
+											<input type="checkbox" id="checkAll" class="form-check-input from-check-all">
+											<span>{{ t('Select') }}: {{ t('All') }}</span>
+										</label>
+
+										<button type="submit" class="btn account-delete-btn confirm-simple-action">
+											<i class="bi bi-trash3"></i> {{ t('Delete') }}
 										</button>
 									</div>
-									
-									<div class="w-100 table-search">
-										<div class="row">
-											<label class="col-5 my-0 form-label text-end">{{ t('search') }} <br>
-												<a title="clear filter" class="clear-filter {{ linkClass() }}" href="#clear">
-													[{{ t('clear') }}]
-												</a>
-											</label>
-											<div class="col-7 my-0">
-												<input type="text" class="form-control" id="filter">
-											</div>
-										</div>
+
+									<div class="account-search table-search">
+										<i class="bi bi-search"></i>
+										<input type="text" class="form-control" id="filter" placeholder="{{ t('search') }}">
+										<a title="{{ t('clear') }}" class="clear-filter" href="#clear"><i class="bi bi-x-lg"></i></a>
 									</div>
 								</div>
-								
+
 								<table id="addManageTable"
-									   class="table mb-0 table-striped"
+									   class="table mb-0 account-table"
 									   data-filter="#filter"
 									   data-filter-text-only="true"
 								>
@@ -162,18 +151,16 @@
 											@endphp
 											<tr>
 												<td style="width:2%" class="add-img-selector">
-													<div class="checkbox">
-														<label><input type="checkbox" name="entries[]" value="{{ data_get($post, 'id') }}"></label>
-													</div>
+													<input type="checkbox" class="form-check-input" name="entries[]" value="{{ data_get($post, 'id') }}" aria-label="{{ t('Select') }}">
 												</td>
-												<td style="width:20%" class="add-img-td">
-													<a href="{{ $postUrl }}">
-														<img class="img-thumbnail img-fluid" src="{{ data_get($post, 'picture.url.medium') }}" alt="img">
+												<td style="width:18%" class="add-img-td">
+													<a href="{{ $postUrl }}" class="account-row-photo">
+														<img src="{{ data_get($post, 'picture.url.medium') }}" alt="{{ str(data_get($post, 'title'))->limit(40) }}">
 													</a>
 												</td>
-												<td style="width:52%" class="items-details-td">
+												<td style="width:54%" class="items-details-td">
 													<div>
-														<p>
+														<div class="account-row-title">
 															<a href="{{ $postUrl }}"
 															   class="{{ linkClass() }} fw-bold"
 															   title="{{ data_get($post, 'title') }}"
@@ -204,55 +191,44 @@
 																	</span>
 																@endif
 															@endif
-														</p>
+														</div>
 														@php
 															$listingDates = getListingDates($post, $pagePath);
+															$priceFormatted = data_get($post, 'price_formatted');
+															$isTextPrice = !preg_match('/\d/', strip_tags((string)$priceFormatted));
 														@endphp
-														@if (!empty($listingDates))
-															@foreach($listingDates as $label => $labeledDate)
-																<p class="mb-1">
-																	<i class="fa-regular fa-clock"
-																	   data-bs-toggle="tooltip"
-																	   data-bs-placement="bottom"
-																	   title="{{ $label }}"
-																	></i>&nbsp;{!! $labeledDate !!}
-																</p>
-															@endforeach
-														@endif
-														<p class="mb-1">
-															<i class="fa-regular fa-eye"
-															   data-bs-toggle="tooltip"
-															   data-bs-placement="bottom"
-															   title="{{ t('Visitors') }}"
-															></i> {{ data_get($post, 'visits_formatted') ?? 0 }}
-															
-															<i class="bi bi-geo-alt"
-															   data-bs-toggle="tooltip"
-															   data-bs-placement="bottom"
-															   title="{{ t('Located In') }}"
-															></i> {{ data_get($post, 'city.name') ?? '-' }}
-															
-															<img src="{{ data_get($post, 'country_flag_url') }}" alt=""
-															     data-bs-toggle="tooltip"
-															     title="{{ data_get($post, 'country.name') }}"
-															>
-														</p>
+														<ul class="account-row-meta list-unstyled">
+															@if (!empty($listingDates))
+																@foreach($listingDates as $label => $labeledDate)
+																	<li data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ $label }}">
+																		<i class="bi bi-clock"></i> {!! $labeledDate !!}
+																	</li>
+																@endforeach
+															@endif
+															<li data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ t('Visitors') }}">
+																<i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') ?? 0 }}
+															</li>
+															<li data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ t('Located In') }}">
+																<i class="bi bi-geo-alt-fill"></i> {{ data_get($post, 'city.name') ?? '-' }}
+																<img src="{{ data_get($post, 'country_flag_url') }}" alt="{{ data_get($post, 'country.name') }}">
+															</li>
+														</ul>
 													</div>
 												</td>
 												<td style="width:16%" class="price-td d-md-table-cell d-sm-none d-none">
-													<div class="fw-bold">
-														{!! data_get($post, 'price_formatted') !!}
+													<div class="account-row-price{{ $isTextPrice ? ' is-text' : '' }}">
+														{!! $priceFormatted !!}
 													</div>
 												</td>
 												<td style="width:10%" class="action-td">
 													<div>
 														<div class="btn-group">
 															<button type="button"
-															        class="btn btn btn-outline-primary dropdown-toggle"
+															        class="btn account-action-btn dropdown-toggle"
 															        data-bs-toggle="dropdown"
 															        aria-expanded="false"
 															>
-																{{ t('action') }}
+																<i class="bi bi-three-dots"></i> {{ t('action') }}
 															</button>
 															<ul class="dropdown-menu">
 																@if ($isEditingAllowed)
@@ -294,7 +270,7 @@
 																	<a class="dropdown-item confirm-simple-action text-danger"
 																	   href="{{ $deletingUrl }}"
 																	>
-																		<i class="fa-regular fa-trash-can"></i> {{ t('Delete') }}
+																		<i class="bi bi-trash3"></i> {{ t('Delete') }}
 																	</a>
 																</li>
 															</ul>
@@ -306,8 +282,9 @@
 									@else
 										<tr>
 											<td colspan="5">
-												<div class="text-center my-5">
-													{{ $apiMessage ?? t('no_posts_found') }}
+												<div class="account-empty">
+													<i class="bi bi-inbox"></i>
+													<span>{{ $apiMessage ?? t('no_posts_found') }}</span>
 												</div>
 											</td>
 										</tr>

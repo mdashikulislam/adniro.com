@@ -44,14 +44,12 @@
 					])
 					
 					<div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2">
-						<div class="row mb-3">
-							<div class="col-12">
-								<h4 class="p-0">
-									{{ t('Hello') }} {{ $authUser->name }}!
-								</h4>
+						<div class="account-welcome">
+							<div>
+								<h4>{{ t('Hello') }} {{ $authUser->name }}! 👋</h4>
 								<span class="small text-secondary">
-	                                {{ t('You last logged in at') }}: {!! $authUser->last_login_at_formatted !!}
-	                            </span>
+									<i class="bi bi-clock-history"></i> {{ t('You last logged in at') }}: {!! $authUser->last_login_at_formatted !!}
+								</span>
 							</div>
 						</div>
 						
