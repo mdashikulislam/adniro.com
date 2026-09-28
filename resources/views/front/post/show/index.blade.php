@@ -22,6 +22,7 @@
 	$bottomAdvertising ??= [];
 @endphp
 
+@section('body_class', 'page-listing')
 @section('content')
 	@include('front.common.spacer')
 	@php
@@ -61,7 +62,7 @@
 		</div>
 	@endif
 	
-	<div class="main-container">
+	<div class="main-container listing-page">
 		
 		@if (!empty($topAdvertising))
 			@include('front.layouts.partials.advertising.top', ['paddingTopExists' => $paddingTopExists ?? false])
@@ -70,15 +71,15 @@
 			@endphp
 		@endif
 		
+		{{-- Breadcrumb + back link --}}
 		<div class="container {{ !empty($topAdvertising) ? 'mt-3' : 'mt-2' }}">
 			<div class="row">
-				<div class="col-md-12">
-					
-					<nav aria-label="breadcrumb" role="navigation" class="float-start">
-						<ol class="breadcrumb">
+				<div class="col-12 listing-topbar">
+					<nav aria-label="breadcrumb" role="navigation" class="listing-breadcrumb">
+						<ol class="breadcrumb mb-0">
 							<li class="breadcrumb-item">
 								<a href="{{ url('/') }}" class="{{ linkClass() }}">
-									<i class="fa-solid fa-house"></i>
+									<i class="bi bi-house-door-fill"></i>
 								</a>
 							</li>
 							<li class="breadcrumb-item">
@@ -100,82 +101,88 @@
 							</li>
 						</ol>
 					</nav>
-					
-					<div class="float-end">
-						<a href="{{ rawurldecode(url()->previous()) }}" class="{{ linkClass() }}">
-							<i class="fa-solid fa-angles-left"></i> {{ t('back_to_results') }}
-						</a>
-					</div>
-				
+					<a href="{{ rawurldecode(url()->previous()) }}" class="listing-back-link">
+						<i class="bi bi-arrow-left"></i> {{ t('back_to_results') }}
+					</a>
 				</div>
 			</div>
 		</div>
 		
 		<div class="container">
-			<div class="row">
+			<div class="row g-4">
 				{{-- Content --}}
-				<div class="col-lg-9">
+				<div class="col-lg-8">
 					@php
 						$overflowStyle = (!auth()->check() && plugin_exists('reviews')) ? 'overflow: visible;' : '';
+						$catName = data_get($post, 'category.name');
+						$parentCatName = data_get($post, 'category.parent.name');
+						$catUrl = !empty(data_get($post, 'category')) ? urlGen()->category(data_get($post, 'category')) : null;
 					@endphp
-					<div class="container border rounded bg-body-tertiary px-3 pt-2 pb-3 mb-md-0 mb-3 items-details-wrapper" style="{{ $overflowStyle }}">
-						{{-- Title --}}
-						<div class="clearfix">
-							<h1 class="fs-3 fw-bold text-wrap float-start">
-								<a href="{{ urlGen()->post($post) }}"
-								   class="{{ linkClass() }}"
-								   title="{{ data_get($post, 'title') }}"
-								>
+					<div class="listing-main items-details-wrapper" style="{{ $overflowStyle }}">
+						
+						{{-- Header: category, title, meta, price --}}
+						<header class="listing-header">
+							<div class="listing-header-top">
+								<div class="listing-chips">
+									@if (!empty($catName))
+										<a href="{{ $catUrl }}" class="listing-chip listing-chip-cat">
+											<i class="{{ data_get($post, 'category.icon_class') ?: 'bi bi-folder-fill' }}"></i>
+											{{ $catName }}
+										</a>
+									@endif
+									@if (config('settings.listing_form.show_listing_type') && !empty(data_get($post, 'postType')))
+										<span class="listing-chip listing-chip-type">{{ data_get($post, 'postType.label') }}</span>
+									@endif
+									@if (data_get($post, 'featured') == 1 && !empty(data_get($post, 'payment.package')))
+										<span class="listing-chip listing-chip-featured"
+										      data-bs-placement="bottom"
+										      data-bs-toggle="tooltip"
+										      title="{{ data_get($post, 'payment.package.short_name') }}"
+										>
+											<i class="bi bi-patch-check-fill"></i> {{ t('Featured') }}
+										</span>
+									@endif
+								</div>
+								<div class="listing-ref">{{ t('reference') }}: <span>{{ data_get($post, 'reference') }}</span></div>
+							</div>
+							
+							<h1 class="listing-title">
+								<a href="{{ urlGen()->post($post) }}" title="{{ data_get($post, 'title') }}">
 									{{ data_get($post, 'title') }}
 								</a>
-								
-								@if (data_get($post, 'featured') == 1 && !empty(data_get($post, 'payment.package')))
-									@php
-										$ribbonColor = data_get($post, 'payment.package.ribbon');
-										$ribbonColorClass = BootstrapColor::Text->getColorClass($ribbonColor);
-										$packageShortName = data_get($post, 'payment.package.short_name');
-									@endphp
-									<i class="fa-solid fa-check-circle {{ $ribbonColorClass }}"
-									   data-bs-placement="bottom"
-									   data-bs-toggle="tooltip"
-									   title="{{ $packageShortName }}"
-									></i>
-								@endif
 							</h1>
-							@if (config('settings.listing_form.show_listing_type'))
-								@if (!empty(data_get($post, 'postType')))
-									<span class="badge rounded-pill text-bg-dark float-end mt-2">
-										{{ data_get($post, 'postType.label') }}
-									</span>
-								@endif
-							@endif
-						</div>
-						
-						{{-- Infos --}}
-						<div class="border-top py-2 mt-0 text-secondary d-flex justify-content-between">
-							<ul class="list-inline mb-0">
+							
+							<ul class="listing-meta list-unstyled">
+								<li>
+									<i class="bi bi-geo-alt-fill"></i>
+									<a href="{!! urlGen()->city(data_get($post, 'city')) !!}">{{ data_get($post, 'city.name') }}</a>
+								</li>
 								@if (!config('settings.listing_page.hide_date'))
-									<li class="list-inline-item"{!! (config('lang.direction')=='rtl') ? ' dir="rtl"' : '' !!}>
-										<i class="fa-regular fa-clock"></i> {!! data_get($post, 'created_at_formatted') !!}
-									</li>
+									<li><i class="bi bi-clock"></i> {!! data_get($post, 'created_at_formatted') !!}</li>
 								@endif
-								<li class="list-inline-item"{!! (config('lang.direction')=='rtl') ? ' dir="rtl"' : '' !!}>
-									<i class="bi bi-folder"></i> {{ data_get($post, 'category.parent.name', data_get($post, 'category.name')) }}
-								</li>
-								<li class="list-inline-item"{!! (config('lang.direction')=='rtl') ? ' dir="rtl"' : '' !!}>
-									<i class="bi bi-geo-alt"></i> {{ data_get($post, 'city.name') }}
-								</li>
-								<li class="list-inline-item"{!! (config('lang.direction')=='rtl') ? ' dir="rtl"' : '' !!}>
-									<i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') }}
-								</li>
+								@if (!empty($parentCatName) && $parentCatName != $catName)
+									<li><i class="bi bi-folder2-open"></i> {{ $parentCatName }}</li>
+								@endif
+								<li><i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') }}</li>
 							</ul>
-							<div class="text-nowrap"{!! (config('lang.direction')=='rtl') ? ' dir="rtl"' : '' !!}>
-								{{ t('reference') }}: {{ data_get($post, 'reference') }}
-							</div>
-						</div>
+							
+							@if (!empty(data_get($post, 'price_formatted')))
+								<div class="listing-price-row">
+									<div class="listing-price">
+										<span class="listing-price-label">{{ data_get($post, 'price_label') }}</span>
+										<span class="listing-price-value">{!! data_get($post, 'price_formatted') !!}</span>
+										@if (data_get($post, 'negotiable') == 1)
+											<span class="listing-price-negotiable">{{ t('negotiable') }}</span>
+										@endif
+									</div>
+								</div>
+							@endif
+						</header>
 						
 						{{-- Pictures --}}
-						@include('front.post.show.partials.pictures-slider')
+						<div class="listing-gallery">
+							@include('front.post.show.partials.pictures-slider')
+						</div>
 						
 						{{-- Reviews Stars --}}
 						@if (config('plugins.reviews.installed'))
@@ -190,7 +197,7 @@
 				</div>
 				
 				{{-- Sidebar --}}
-				<div class="col-lg-3">
+				<div class="col-lg-4">
 					@include('front.post.show.partials.sidebar')
 				</div>
 			</div>

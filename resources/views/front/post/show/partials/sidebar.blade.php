@@ -30,79 +30,59 @@
 	
 	$linkClass = linkClass();
 @endphp
-<aside class="vstack gap-md-4 gap-3">
-	<div class="card">
-		@if ($isPostOwner)
-			<div class="card-header fw-bold">
-				{{ t('Manage Listing') }}
-			</div>
-		@endif
+<aside class="listing-sidebar vstack gap-3">
+	{{-- Seller / Manage card --}}
+	<div class="card seller-card">
 		<div class="card-body">
-			{{-- Author Info (for Guests & Non-Owner Users) --}}
-			@if (!$isPostOwner)
-				<div class="container p-0 border-bottom pb-3 mb-3">
-					<div class="row">
-						<div class="col-md-4">
-							<img src="{{ data_get($post, 'user_photo_url') }}" class="img-fluid rounded" alt="{{ data_get($post, 'contact_name') }}">
-						</div>
-						<div class="col-md-8 vstack gap-1">
-							<small class="text-secondary">{{ t('Posted by') }}</small>
-							<span class="fs-6 fw-bold">
+			@if ($isPostOwner)
+				<div class="seller-card-head">
+					<span class="seller-card-head-icon"><i class="bi bi-gear-fill"></i></span>
+					<span>{{ t('Manage Listing') }}</span>
+				</div>
+			@else
+				{{-- Author Info (for Guests & Non-Owner Users) --}}
+				<div class="seller-profile">
+					<div class="seller-avatar">
+						<img src="{{ data_get($post, 'user_photo_url') }}" alt="{{ data_get($post, 'contact_name') }}">
+					</div>
+					<div class="seller-info">
+						<span class="seller-label">{{ t('Posted by') }}</span>
+						<span class="seller-name">
 							@if (!empty($user))
-								<a href="{{ urlGen()->user($user) }}" class="{{ $linkClass }}">
-									{{ data_get($post, 'contact_name') }}
-								</a>
-								@else
-									{{ data_get($post, 'contact_name') }}
-								@endif
-							</span>
-							
-							@if (config('plugins.reviews.installed'))
-								@if (view()->exists('reviews::ratings-user'))
-									@include('reviews::ratings-user')
-								@endif
+								<a href="{{ urlGen()->user($user) }}">{{ data_get($post, 'contact_name') }}</a>
+							@else
+								{{ data_get($post, 'contact_name') }}
 							@endif
-						</div>
+						</span>
+						@if (config('plugins.reviews.installed'))
+							@if (view()->exists('reviews::ratings-user'))
+								@include('reviews::ratings-user')
+							@endif
+						@endif
 					</div>
 				</div>
-			@endif
-			
-			{{-- Author Additional Info (for Guests & Non-Owner Users) --}}
-			@php
-				$evActionClass = 'border-top-0';
-			@endphp
-			@if (!$isPostOwner)
-				<div class="container p-0 mb-3 text-secondary small">
-					<div class="row my-2">
-						<div class="col-6 text-start">
-							<i class="bi bi-geo-alt"></i> {{ t('location') }}
-						</div>
-						<div class="col-6 text-end">
-							<a href="{!! urlGen()->city(data_get($post, 'city')) !!}" class="{{ $linkClass }}">
-								{{ data_get($post, 'city.name') }}
-							</a>
-						</div>
-					</div>
+				
+				{{-- Author Additional Info --}}
+				<ul class="seller-facts list-unstyled">
+					<li>
+						<span class="seller-fact-label"><i class="bi bi-geo-alt"></i> {{ t('location') }}</span>
+						<a href="{!! urlGen()->city(data_get($post, 'city')) !!}" class="seller-fact-value">
+							{{ data_get($post, 'city.name') }}
+						</a>
+					</li>
 					@if (!config('settings.listing_page.hide_date'))
 						@if (!empty($user) && !empty(data_get($user, 'created_at_formatted')))
-							<div class="row my-2">
-								<div class="col-6 text-start">
-									<i class="bi bi-person-check"></i> {{ t('Joined') }}
-								</div>
-								<div class="col-6 text-end">
-									<span>{!! data_get($user, 'created_at_formatted') !!}</span>
-								</div>
-							</div>
+							<li>
+								<span class="seller-fact-label"><i class="bi bi-person-check"></i> {{ t('Joined') }}</span>
+								<span class="seller-fact-value">{!! data_get($user, 'created_at_formatted') !!}</span>
+							</li>
 						@endif
 					@endif
-				</div>
-				@php
-					$evActionClass = 'border-top pt-3';
-				@endphp
+				</ul>
 			@endif
 			
 			{{-- Actions Buttons --}}
-			<div class="container p-0 {{ $evActionClass }} d-grid gap-2">
+			<div class="seller-actions d-grid gap-2">
 				{{-- Actions Buttons (for Logged-in Users) --}}
 				@if (!empty($authUser))
 					@if ($isPostOwner)
@@ -188,8 +168,9 @@
 	
 	{{-- Google Maps --}}
 	@if ($isMapEnabled)
-		<div class="card">
-			<div class="card-header fw-bold">
+		<div class="card sidebar-panel">
+			<div class="card-header sidebar-panel-head">
+				<span class="sidebar-panel-icon"><i class="bi bi-map-fill"></i></span>
 				{{ t('location_map') }}
 			</div>
 			<div class="card-body text-start p-0">
@@ -212,8 +193,16 @@
 	@endif
 	
 	{{-- Social Media Sharing --}}
-	@if (isVerifiedPost($post))
-		@include('front.layouts.partials.social.horizontal')
+	@if (isVerifiedPost($post) && isSocialSharesEnabled())
+		<div class="card sidebar-panel share-panel">
+			<div class="card-header sidebar-panel-head">
+				<span class="sidebar-panel-icon"><i class="bi bi-share-fill"></i></span>
+				{{ t('share_on_social_media') }}
+			</div>
+			<div class="card-body">
+				@include('front.layouts.partials.social.horizontal')
+			</div>
+		</div>
 	@endif
 	
 	{{-- Safety Tips --}}
@@ -224,25 +213,24 @@
 			t('Pay only after collecting the item'),
 		];
 	@endphp
-	<div class="card">
-		<div class="card-header fw-bold">
+	<div class="card sidebar-panel tips-panel">
+		<div class="card-header sidebar-panel-head">
+			<span class="sidebar-panel-icon"><i class="bi bi-shield-check"></i></span>
 			{{ t('Safety Tips for Buyers') }}
 		</div>
 		<div class="card-body text-start">
-			<ul class="list-unstyled">
+			<ul class="list-unstyled tips-list">
 				@foreach($tips as $tip)
-					<li><i class="bi bi-check-lg"></i> {{ $tip }}</li>
+					<li><i class="bi bi-check-circle-fill"></i> <span>{{ $tip }}</span></li>
 				@endforeach
 			</ul>
 			@php
 				$tipsLinkAttributes = getUrlPageByType('tips');
 			@endphp
 			@if (!str_contains($tipsLinkAttributes, 'href="#"') && !str_contains($tipsLinkAttributes, 'href=""'))
-				<p>
-					<a class="float-end {{ $linkClass }}" {!! $tipsLinkAttributes !!}>
-						{{ t('Know more') }} <i class="fa-solid fa-angles-right"></i>
-					</a>
-				</p>
+				<a class="tips-more" {!! $tipsLinkAttributes !!}>
+					{{ t('Know more') }} <i class="bi bi-arrow-right"></i>
+				</a>
 			@endif
 		</div>
 	</div>
