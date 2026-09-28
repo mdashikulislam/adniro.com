@@ -68,12 +68,12 @@
 			$_id = data_get($category, 'id');
 			$_name = data_get($category, 'name');
 		@endphp
-		<p>
-			<a href="{!! $_url !!}" class="btn btn-primary btn-sm modal-cat-link" data-ignore-guard="true">
-				<i class="fa-solid fa-reply"></i> {{ t('go_to_parent_categories') }}
-			</a>&nbsp;
-			<strong>{{ $_name }}</strong>
-		</p>
+		<div class="category-modal-nav">
+			<a href="{!! $_url !!}" class="btn category-modal-back modal-cat-link" data-ignore-guard="true">
+				<i class="bi bi-arrow-left"></i> {{ t('go_to_parent_categories') }}
+			</a>
+			<span class="category-modal-current">{{ $_name }}</span>
+		</div>
 	@endif
 	
 	@if (!empty($categories))
@@ -117,7 +117,7 @@
 			
 			@elseif ($catDisplayType == 'c_bigIcon_list')
 			
-				<div id="modalCategoryList" class="row row-cols-lg-6 row-cols-md-4 row-cols-sm-3 row-cols-2 py-0 px-0">
+				<div id="modalCategoryList" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 g-2 py-0 px-0 category-modal-grid">
 					@foreach($categories as $key => $cat)
 						@php
 							$_id = data_get($cat, 'id');
@@ -129,8 +129,8 @@
 							$_name = data_get($cat, 'name');
 							$_url = urlBuilder($selectionUrl)->setParameters(['parentId' => $_id])->toString();
 						@endphp
-						<div class="col px-0 d-flex justify-content-center align-content-stretch">
-							<div class="text-center justify-content-center w-100 border rounded px-3 py-2 m-1">
+						<div class="col d-flex justify-content-center align-content-stretch">
+							<div class="category-tile w-100{{ !$_hasLink ? ' is-current' : '' }}">
 								@if ($_hasLink)
 									<a href="{!! $_url !!}"
 									   class="modal-cat-link {{ $linkClass }}"
@@ -140,12 +140,13 @@
 									   data-type="{{ $_type }}"
 									>
 								@endif
-									@if (in_array(config('settings.listings_list.show_category_icon'), [2, 6, 7, 8]))
-										<i class="{{ $_iconClass ?? 'bi bi-folder-fill' }}" style="font-size: 3rem;"></i>
+									<span class="category-tile-icon"><i class="{{ $_iconClass ?? 'bi bi-folder-fill' }}"></i></span>
+									<h6 class="category-tile-name">{{ $_name }}</h6>
+									@if ($_hasChildren)
+										<i class="bi bi-chevron-right category-tile-arrow"></i>
+									@elseif (!$_hasLink)
+										<i class="bi bi-check-lg category-tile-check"></i>
 									@endif
-									<h6 class="mt-2 fw-bold{{ !$_hasLink ? ' text-secondary' : '' }}">
-										{{ $_name }}
-									</h6>
 								@if ($_hasLink)
 									</a>
 								@endif
@@ -163,7 +164,7 @@
 					$borderBottom = $listTypes[$catDisplayType] ?? '';
 					$borderBottom = !empty($borderBottom) ? ' ' . $borderBottom : '';
 				@endphp
-				<ul id="modalCategoryList" class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-1 mt-4 list-unstyled">
+				<ul id="modalCategoryList" class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-1 g-2 mt-1 list-unstyled category-modal-list">
 					@foreach ($categories as $key => $cat)
 						@php
 							$_catId = data_get($cat, 'id', 0);
@@ -179,8 +180,8 @@
 							
 							$_url = urlBuilder($selectionUrl)->setParameters(['parentId' => $_catId])->toString();
 						@endphp
-						<li class="col{{ $_hasLinkClass }} my-2 px-2 d-flex justify-content-center align-content-stretch">
-							<div class="w-100{{ $borderBottom }}">
+						<li class="col{{ $_hasLinkClass }} d-flex justify-content-center align-content-stretch">
+							<div class="category-row w-100{{ !$_hasLink ? ' is-current' : '' }}">
 								{!! $_catIcon !!}
 								@if ($_hasLink)
 									<a href="{!! $_url !!}"

@@ -29,18 +29,15 @@
 				<div class="col-xl-12">
 					
 					@if (session()->has('message'))
-						<div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3">
-							<div class="row">
-								<div class="col-12">
-									<div class="alert alert-success mb-0" role="alert">
-										<h2 class="p-0 mb-3">
-											<i class="fa-regular fa-circle-check"></i> {{ t('congratulations') }}
-										</h2>
-										<p class="mb-0">
-											{{ session('message') }} <a href="{{ url('/') }}">{{ t('Homepage') }}</a>
-										</p>
-									</div>
-								</div>
+						<div class="listing-finish">
+							<span class="listing-finish-icon"><i class="bi bi-check-lg"></i></span>
+							<h2 class="listing-finish-title">{{ t('congratulations') }}</h2>
+							<p class="listing-finish-text">{{ session('message') }}</p>
+							<div class="listing-finish-actions">
+								<a href="{{ url('/') }}" class="btn btn-primary listing-finish-btn"><i class="bi bi-house-door"></i> {{ t('Homepage') }}</a>
+								@if (auth()->check())
+									<a href="{{ url(urlGen()->getAccountBasePath() . '/posts/list') }}" class="btn btn-outline-primary listing-finish-btn"><i class="bi bi-collection"></i> {{ t('my_listings') }}</a>
+								@endif
 							</div>
 						</div>
 					@endif

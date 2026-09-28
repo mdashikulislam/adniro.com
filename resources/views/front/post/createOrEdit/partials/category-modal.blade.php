@@ -6,19 +6,20 @@
 	$adminCode = data_get($city, 'subadmin' . $adminType . '_code') ?? data_get($admin, 'code') ?? 0;
 @endphp
 {{-- Modal Select Category --}}
-<div class="modal fade" id="browseCategories" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal fade country-modal category-modal" id="browseCategories" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
 		<div class="modal-content">
 			
-			<div class="modal-header px-3">
-				<h4 class="modal-title fs-5 fw-bold" id="categoriesModalLabel">
-					<i class="bi bi-folder-check"></i> {{ t('select_a_category') }}
+			<div class="modal-header country-modal-header">
+				<h4 class="modal-title country-modal-title" id="categoriesModalLabel">
+					<span class="country-modal-title-icon"><i class="bi bi-grid-fill"></i></span>
+					<span>{{ t('select_a_category') }}</span>
 				</h4>
 				
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('Close') }}"></button>
 			</div>
 			
-			<div class="modal-body">
+			<div class="modal-body country-modal-body">
 				<div class="p-0 m-0" id="selectCats"></div>
 			</div>
 			

@@ -284,8 +284,9 @@
 										
 										
 										<div class="my-4 col-md-12">
-											<h5 class="w-100 mb-0 fw-bold fs-5 border rounded p-2">
-												<i class="bi bi-person-circle"></i> {{ t('seller_information') }}
+											<h5 class="listing-form-section">
+												<span class="listing-form-section-icon"><i class="bi bi-person-fill"></i></span>
+												<span>{{ t('seller_information') }}</span>
 											</h5>
 										</div>
 										
