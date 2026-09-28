@@ -101,8 +101,8 @@
 							</li>
 						</ol>
 					</nav>
-					<a href="{{ rawurldecode(url()->previous()) }}" class="listing-back-link">
-						<i class="bi bi-arrow-left"></i> {{ t('back_to_results') }}
+					<a href="{{ url('/') }}" class="listing-back-link">
+						<i class="bi bi-arrow-left"></i> {{ t('back_to_homepage') }}
 					</a>
 				</div>
 			</div>

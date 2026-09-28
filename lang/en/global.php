@@ -176,6 +176,7 @@ return [
     
     'footer_note' => '<strong>Sell</strong>, <strong>Offer</strong>, <strong>Rent</strong>, <strong>Bargain</strong>, <strong>Search</strong>, <strong>Buy</strong> products and services in <strong>:country</strong>. It\'s 100% free!',
     'home' => 'Home',
+    'back_to_homepage' => 'Back to Homepage',
     'about_us' => 'About us',
     'faq' => 'FAQ',
     'sitemap' => 'Sitemap',
