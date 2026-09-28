@@ -146,11 +146,7 @@
 								<div class="listing-ref">{{ t('reference') }}: <span>{{ data_get($post, 'reference') }}</span></div>
 							</div>
 							
-							<h1 class="listing-title">
-								<a href="{{ urlGen()->post($post) }}" title="{{ data_get($post, 'title') }}">
-									{{ data_get($post, 'title') }}
-								</a>
-							</h1>
+							<h1 class="listing-title">{{ data_get($post, 'title') }}</h1>
 							
 							<div class="listing-header-bottom">
 								<ul class="listing-meta list-unstyled">

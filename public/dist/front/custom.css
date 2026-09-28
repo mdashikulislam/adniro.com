@@ -3493,9 +3493,8 @@ body.page-listing main {
 	letter-spacing: -.01em;
 }
 
-.listing-title a {
-	color: var(--bs-emphasis-color) !important;
-	text-decoration: none !important;
+.listing-title {
+	color: var(--bs-emphasis-color);
 }
 
 .listing-meta {
