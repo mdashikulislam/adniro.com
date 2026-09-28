@@ -402,7 +402,7 @@
 		fiOptions.theme = '{{ $theme }}';
 		fiOptions.language = '{{ $language }}';
 		fiOptions.rtl = {{ $rtl }};
-		fiOptions.showClose = true;
+		fiOptions.showClose = false;
 		fiOptions.showUpload = false;
 		fiOptions.showRemove = false;
 		fiOptions.showCancel = false;
