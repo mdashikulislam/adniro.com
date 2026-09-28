@@ -7809,3 +7809,34 @@ body.page-account .input-group .input-group-text small {
 body.page-account .account-card .form-label .text-danger {
 	font-weight: 700;
 }
+
+/* Avatar uploader: let the preview grow so the buttons below it stay in flow */
+.account-avatar-card .file-preview,
+.account-avatar-card .file-preview-thumbnails,
+.account-avatar-card .krajee-default.file-preview-frame,
+.account-avatar-card .file-preview-frame,
+.account-avatar-card .kv-file-content,
+.account-avatar-card .file-drop-zone {
+	height: auto !important;
+	min-height: 0 !important;
+	max-height: none !important;
+	overflow: visible !important;
+	margin: 0 !important;
+}
+
+.account-avatar-card .file-thumbnail-footer {
+	position: static !important;
+	margin-top: .9rem !important;
+}
+
+.account-avatar-card .btn-file {
+	margin-top: 1.4rem !important;
+}
+
+.account-avatar-card .card-body {
+	padding-top: 52px;
+}
+
+.account-avatar-card .file-preview {
+	padding: 0 0 1.4rem !important;
+}
