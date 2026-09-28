@@ -5222,3 +5222,68 @@ a.seller-fact-value:hover {
 [data-bs-theme="dark"] .country-tile {
 	border-color: rgba(255, 255, 255, .1);
 }
+
+/* Language modal (shares the country modal design) */
+.lang-modal .modal-dialog {
+	max-width: 640px;
+}
+
+.lang-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lang-tile-name {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.2;
+	white-space: normal;
+}
+
+.lang-tile-native {
+	font-weight: 700;
+}
+
+.lang-tile-en {
+	font-size: .72rem;
+	font-weight: 500;
+	color: var(--bs-secondary-color);
+}
+
+.lang-tile.is-current .lang-tile-en {
+	color: rgba(var(--bs-primary-rgb), .8);
+}
+
+.lang-tile-code {
+	font-size: .72rem;
+	font-weight: 800;
+	letter-spacing: .04em;
+	color: var(--bs-primary);
+}
+
+.lang-modal-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: .6rem;
+}
+
+.lang-modal-surfing {
+	display: inline-flex;
+	align-items: center;
+	gap: .5rem;
+	font-size: .86rem;
+	color: var(--bs-secondary-color);
+}
+
+.lang-modal-surfing .flag-icon {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+}
+
+@media (max-width: 575.98px) {
+	.lang-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
