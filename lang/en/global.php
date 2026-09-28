@@ -573,6 +573,8 @@ return [
     'Contact' => 'Contact Us',
     'Contact us' => 'Contact us',
     'Contact Us' => 'Contact Us',
+    'Verified' => 'Verified',
+    'Public profile' => 'Public profile',
     'last_updated' => 'Last updated',
     'other_pages' => 'Other pages',
     'cms_page_intro' => 'Please read this page carefully. If you have any questions, feel free to contact us.',
