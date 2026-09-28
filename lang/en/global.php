@@ -182,6 +182,7 @@ return [
     'sitemap' => 'Sitemap',
     'i_am_abroad' => 'I am abroad',
     'countries' => 'Countries',
+    'countries_page_intro' => 'Choose a country to browse listings near you.',
     'terms' => 'Terms',
     'privacy' => 'Privacy',
     'all_rights_reserved' => 'All Rights Reserved',

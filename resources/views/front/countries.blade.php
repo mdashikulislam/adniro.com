@@ -26,69 +26,76 @@
 	@parent
 @endsection
 
+@section('body_class', 'page-countries')
 @section('content')
 	@include('front.common.spacer')
-	<div class="main-container pb-0">
+	@php
+		$currentCountryCode = strtolower((string)config('country.code'));
+	@endphp
+	<div class="main-container countries-page pb-0">
 		<div class="container">
-			@include('helpers.titles.title-2', ['title' => t('countries')])
 			
-			@php
-				$mb = !isSocialSharesEnabled() ? ' mb-4' : '';
-			@endphp
-			<div class="row{{ $mb }}">
-				<div class="col-md-12">
-					<div class="container bg-body-tertiary rounded py-3">
-						
-						<h3 class="fs-3 mb-4">
-							<i class="bi bi-geo-alt"></i> {{ t('select_a_country') }}
-						</h3>
-						
+			{{-- Page title --}}
+			<div class="countries-hero">
+				<span class="countries-hero-icon"><i class="bi bi-globe-americas"></i></span>
+				<div>
+					<h1 class="countries-hero-title">
+						{{ t('countries') }}
 						@if ($countries->isNotEmpty())
-							<div class="row row-cols-xl-4 row-cols-lg-3 row-cols-2 m-0" id="countryList">
-								@foreach ($countries as $code => $country)
-									@php
-										$countryUrl = dmUrl($country, '/', true, !config('plugins.domainmapping.installed'));
-										$countryName = $country->get('name');
-										$countryNameLimited = str($countryName)->limit(26)->toString();
-									@endphp
-									<div class="col mb-2">
-										@if ($countryFlagShape == 'rectangle')
-											<img src="{{ url('images/blank.gif') . getPictureVersion() }}"
-												 class="flag flag-{{ $country->get('icode') }}"
-												 style="margin-bottom: 4px; margin-right: 5px;"
-											     alt="{{ $countryNameLimited }}"
-											>
-										@else
-											<img src="{{ $country->get('flag16_url') }}"
-											     class=""
-											     style="margin-bottom: 4px; margin-right: 5px;"
-											     alt="{{ $countryNameLimited }}"
-											>
-										@endif
-										<a href="{{ $countryUrl }}"
-										   class="{{ linkClass('body-emphasis') }}"
-										   data-bs-toggle="tooltip"
-										   title="{!! $countryName !!}"
-										>
-											{{ $countryNameLimited }}
-										</a>
-									</div>
-								@endforeach
-							</div>
-						@else
-							<div class="row m-0">
-								<div class="col-12 text-center mb-3 text-danger fw-bold">
-									{{ t('countries_not_found') }}
-								</div>
-							</div>
+							<small class="country-modal-count">{{ $countries->count() }}</small>
 						@endif
-						
-					</div>
+					</h1>
+					<p class="countries-hero-text">{{ t('countries_page_intro') }}</p>
 				</div>
-				
 			</div>
 			
-			@include('front.layouts.partials.social.horizontal')
+			<div class="countries-card">
+				@if ($countries->isNotEmpty())
+					<div class="country-grid countries-grid" id="countryList">
+						@foreach ($countries as $code => $country)
+							@php
+								$countryUrl = dmUrl($country, '/', true, !config('plugins.domainmapping.installed'));
+								$countryName = $country->get('name');
+								$countryNameLimited = str($countryName)->limit(26)->toString();
+								$isCurrent = (strtolower((string)$code) == $currentCountryCode);
+								$flag32Url = $country->get('flag32_url') ?: $country->get('flag16_url');
+							@endphp
+							<a href="{{ $countryUrl }}"
+							   class="country-tile{{ $isCurrent ? ' is-current' : '' }}"
+							   title="{{ $countryName }}"
+							>
+								<span class="country-tile-flag">
+									@if ($countryFlagShape == 'rectangle')
+										<img src="{{ url('images/blank.gif') . getPictureVersion() }}"
+										     class="flag flag-{{ $country->get('icode') }}"
+										     alt="{{ $countryNameLimited }}"
+										>
+									@else
+										<img src="{{ $flag32Url }}" alt="{{ $countryNameLimited }}">
+									@endif
+								</span>
+								<span class="country-tile-name">{{ $countryNameLimited }}</span>
+								@if ($isCurrent)
+									<span class="country-tile-check"><i class="bi bi-check-lg"></i></span>
+								@else
+									<span class="country-tile-arrow"><i class="bi bi-arrow-right"></i></span>
+								@endif
+							</a>
+						@endforeach
+					</div>
+				@else
+					<div class="countries-empty">
+						<i class="bi bi-globe"></i>
+						<span>{{ t('countries_not_found') }}</span>
+					</div>
+				@endif
+			</div>
+			
+			@if (isSocialSharesEnabled())
+				<div class="countries-share">
+					@include('front.layouts.partials.social.horizontal')
+				</div>
+			@endif
 		</div>
 	</div>
 @endsection
