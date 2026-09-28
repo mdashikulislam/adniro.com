@@ -152,7 +152,7 @@
 										<i class="bi {{ $isTextPrice ? 'bi-chat-left-dots-fill' : 'bi-tag-fill' }}"></i>
 									</span>
 									<span class="listing-price-body">
-										<span class="listing-price-label">{{ data_get($post, 'price_label') }}</span>
+										<span class="visually-hidden">{{ data_get($post, 'price_label') }}</span>
 										<span class="listing-price-value">
 											{!! data_get($post, 'price_formatted') !!}
 											@if (data_get($post, 'negotiable') == 1)
