@@ -58,16 +58,14 @@
 @endphp
 @if ($totalPosts > 0)
 	<div class="container{{ $cssClasses }}" style="{!! $style !!}">
-		<div class="card"{!! $htmlAttr !!}>
-			<div class="card-header border-bottom-0">
-				<h4 class="mb-0 float-start fw-lighter">
+		<div class="card listing-section listing-carousel-section"{!! $htmlAttr !!}>
+			<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+				<h4 class="mb-0 fw-lighter section-title">
 					{!! data_get($widget, 'title') !!}
 				</h4>
-				<h5 class="mb-0 float-end mt-1 fs-6 fw-lighter text-uppercase">
-					<a href="{{ data_get($widget, 'link') }}" class="{{ linkClass() }}">
-						{{ t('View more') }} <i class="fa-solid fa-bars"></i>
-					</a>
-				</h5>
+				<a href="{{ data_get($widget, 'link') }}" class="{{ linkClass() }} section-more-link">
+					{{ t('View more') }} <i class="fa-solid fa-arrow-right"></i>
+				</a>
 			</div>
 			
 			@php
@@ -75,58 +73,85 @@
 				// Note: Remove when official RTL support is implemented.
 				$ltrAttr = $isRTLEnabled ? ' dir="ltr"' : '';
 			@endphp
-			<div class="card-body rounded p-3"{!! $ltrAttr !!}>
+			<div class="card-body rounded p-0"{!! $ltrAttr !!}>
 				@if ($carouselCtrl == 'true' && !str_starts_with($carouselCtrlPosition, 'bottom'))
 					@include('front.search.partials.posts.widget.carousel.controls')
 				@endif
-				<div class="m-0 featured-list-slider {{ $carouselSlug }} px-1">
+				<div class="m-0 featured-list-slider listing-carousel {{ $carouselSlug }}">
 					@foreach($posts as $key => $post)
 						@php
 							$postUrl = urlGen()->post($post);
+							$postId = data_get($post, 'id');
+							$countPictures = (int)data_get($post, 'count_pictures');
+							$priceFormatted = data_get($post, 'price_formatted');
+							$isTextPrice = !preg_match('/\d/', strip_tags((string)$priceFormatted));
+							$isFeatured = (data_get($post, 'featured') == 1);
+							$cityName = data_get($post, 'city.name');
+							$catName = data_get($post, 'category.name');
+							$catUrl = !empty(data_get($post, 'category')) ? urlGen()->category(data_get($post, 'category')) : null;
+							$cityUrl = !empty(data_get($post, 'city')) ? urlGen()->city(data_get($post, 'city')) : null;
+							$savedByLoggedUser = (bool)data_get($post, 'p_saved_by_logged_user');
 						@endphp
-						<div class="border-0">
-							<div class="item card p-0 d-flex justify-content-between flex-column hover-bg-tertiary"{!! $itemStyle !!}>
-								{{-- Main Picture --}}
-								<div class="w-100 m-0 position-relative item-carousel-thumb">
-									<div class="position-absolute top-0 end-0 mt-2 me-2 bg-body-secondary opacity-75 rounded p-1">
-										<i class="fa-solid fa-camera"></i> {{ data_get($post, 'count_pictures') }}
-									</div>
-									<a href="{{ $postUrl }}" class="{{ linkClass('body-emphasis') }}">
+						<div class="listing-carousel-slide">
+							<article class="listing-card{{ $isFeatured ? ' listing-card-featured' : '' }}">
+								{{-- Media --}}
+								<div class="listing-card-media">
+									<a href="{{ $postUrl }}" class="listing-card-img" aria-label="{{ data_get($post, 'title') }}">
 										@php
 											$src = data_get($post, 'picture.url.medium');
 											$webpSrc = data_get($post, 'picture.url.webp.medium');
 											$alt = str(data_get($post, 'title'))->slug();
-											$attr = ['class' => 'lazyload img-fluid rounded-top'];
+											$attr = ['class' => 'lazyload listing-card-picture'];
 											echo generateImageHtml($src, $alt, $webpSrc, $attr);
 										@endphp
 									</a>
+									@if ($savedByLoggedUser)
+										<a class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
+											<i class="bi bi-heart-fill small"></i> <span>{{ t('Saved') }}</span>
+										</a>
+									@else
+										<a class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
+											<i class="bi bi-heart small"></i> <span>{{ t('Save') }}</span>
+										</a>
+									@endif
+									@if (!empty($cityName) && !empty($cityUrl))
+										<a href="{!! $cityUrl !!}" class="listing-card-location">
+											<i class="bi bi-geo-alt-fill"></i> {{ $cityName }}
+										</a>
+									@endif
+									@if ($countPictures > 0)
+										<span class="listing-card-count">
+											<i class="fa-solid fa-camera"></i> {{ $countPictures }}
+										</span>
+									@endif
 								</div>
 								
-								<div class="card-body h-100 d-flex justify-content-between flex-column">
-									{{-- Title --}}
-									<h6 class="mb-0{{ $titleClass }} px-0 text-center text-break">
-										<a href="{{ $postUrl }}" class="{{ linkClass() }}">
-											{{ str(data_get($post, 'title'))->limit($titleLimit) }}
+								{{-- Body --}}
+								<div class="listing-card-body">
+									@if (!empty($catName))
+										<div class="listing-card-topline">
+											<a href="{!! $catUrl !!}" class="listing-card-cat" title="{{ $catName }}">{{ $catName }}</a>
+										</div>
+									@endif
+									<h5 class="listing-card-title">
+										<a href="{{ $postUrl }}" class="{{ linkClass('body-emphasis') }}">
+											{{ str(data_get($post, 'title'))->limit(60) }}
 										</a>
-									</h6>
-									
-									<div class="d-flex flex-column">
-										{{-- Reviews Stars --}}
-										@if ($isReviewsAddonInstalled)
-											<div class="text-center">
-												@if (view()->exists('reviews::ratings-list'))
-													@include('reviews::ratings-list')
-												@endif
+									</h5>
+									@if ($isReviewsAddonInstalled)
+										@if (view()->exists('reviews::ratings-list'))
+											<div class="listing-card-reviews">
+												@include('reviews::ratings-list')
 											</div>
 										@endif
-										
-										{{-- Price --}}
-										<h4 class="fs-4 fw-bold mt-3 text-center">
-											{!! data_get($post, 'price_formatted') !!}
-										</h4>
+									@endif
+									<div class="listing-card-footer">
+										<div class="listing-card-price{{ $isTextPrice ? ' listing-card-price-text' : '' }}">
+											{!! $priceFormatted !!}
+										</div>
 									</div>
 								</div>
-							</div>
+							</article>
 						</div>
 					@endforeach
 				</div>
@@ -324,7 +349,7 @@
 				
 				{{-- Items Title Animation --}}
 				{{-- https://animate.style --}}
-				const itemsTitles = document.querySelectorAll('.featured-list-slider .card-body > h6');
+				const itemsTitles = document.querySelectorAll('.featured-list-slider .listing-card-title');
 				if (itemsTitles.length) {
 					const animation = 'animate__pulse';
 					
