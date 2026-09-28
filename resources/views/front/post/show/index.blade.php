@@ -143,7 +143,24 @@
 										</span>
 									@endif
 								</div>
-								<div class="listing-ref">{{ t('reference') }}: <span>{{ data_get($post, 'reference') }}</span></div>
+							@if (!empty(data_get($post, 'price_formatted')))
+								@php
+									$isTextPrice = !preg_match('/\d/', strip_tags((string)data_get($post, 'price_formatted')));
+								@endphp
+								<div class="listing-price-card{{ $isTextPrice ? ' listing-price-card-text' : '' }}">
+									<span class="listing-price-icon">
+										<i class="bi {{ $isTextPrice ? 'bi-chat-left-dots-fill' : 'bi-tag-fill' }}"></i>
+									</span>
+									<span class="listing-price-body">
+										<span class="listing-price-label">{{ data_get($post, 'price_label') }}</span>
+										<span class="listing-price-value">
+											{!! data_get($post, 'price_formatted') !!}
+											@if (data_get($post, 'negotiable') == 1)
+												<span class="listing-price-negotiable">{{ t('negotiable') }}</span>
+											@endif
+										</span>
+									</span>
+	
 							</div>
 							
 							<h1 class="listing-title">{{ data_get($post, 'title') }}</h1>
@@ -162,25 +179,11 @@
 									@endif
 									<li><i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') }}</li>
 								</ul>
+								<div class="listing-ref">
+									<i class="bi bi-upc-scan"></i> {{ t('reference') }}: <span>{{ data_get($post, 'reference') }}</span>
+								</div>
 								
-								@if (!empty(data_get($post, 'price_formatted')))
-									@php
-										$isTextPrice = !preg_match('/\d/', strip_tags((string)data_get($post, 'price_formatted')));
-									@endphp
-									<div class="listing-price-card{{ $isTextPrice ? ' listing-price-card-text' : '' }}">
-										<span class="listing-price-icon">
-											<i class="bi {{ $isTextPrice ? 'bi-chat-left-dots-fill' : 'bi-tag-fill' }}"></i>
-										</span>
-										<span class="listing-price-body">
-											<span class="listing-price-label">{{ data_get($post, 'price_label') }}</span>
-											<span class="listing-price-value">
-												{!! data_get($post, 'price_formatted') !!}
-												@if (data_get($post, 'negotiable') == 1)
-													<span class="listing-price-negotiable">{{ t('negotiable') }}</span>
-												@endif
-											</span>
-										</span>
-									</div>
+							</div>
 								@endif
 							</div>
 						</header>

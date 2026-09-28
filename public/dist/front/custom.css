@@ -3429,7 +3429,7 @@ body.page-listing main {
 
 .listing-header-top {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: .5rem 1rem;
@@ -3476,12 +3476,25 @@ body.page-listing main {
 }
 
 .listing-ref {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	margin-left: auto;
+	padding: .38rem .8rem;
+	border-radius: 999px;
 	font-size: .78rem;
+	font-weight: 500;
 	color: var(--bs-secondary-color);
+	border: 1px dashed var(--bs-border-color);
+	background-color: var(--bs-body-bg);
+}
+
+.listing-ref i {
+	color: var(--bs-primary);
 }
 
 .listing-ref span {
-	font-weight: 600;
+	font-weight: 700;
 	color: var(--bs-emphasis-color);
 }
 
@@ -4412,7 +4425,7 @@ a.seller-fact-value:hover {
 /* Listing header: meta chips + price card */
 .listing-header-bottom {
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 1rem;
