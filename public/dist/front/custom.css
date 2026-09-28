@@ -4463,8 +4463,8 @@ a.seller-fact-value:hover {
 	display: inline-flex;
 	align-items: center;
 	margin-left: auto;
-	gap: .6rem;
-	padding: .35rem 1rem .35rem .45rem;
+	gap: .5rem;
+	padding: .28rem .8rem .28rem .35rem;
 	border-radius: 999px;
 	color: var(--bs-primary);
 	background: linear-gradient(90deg, rgba(var(--bs-primary-rgb), .12) 0%, rgba(var(--bs-primary-rgb), .05) 100%);
@@ -4478,12 +4478,12 @@ a.seller-fact-value:hover {
 	align-items: center;
 	justify-content: center;
 	flex: 0 0 auto;
-	width: 34px;
-	height: 34px;
+	width: 28px;
+	height: 28px;
 	border-radius: 50%;
 	background: var(--bs-primary);
 	color: #fff;
-	font-size: .95rem;
+	font-size: .8rem;
 	box-shadow: 0 6px 14px -6px rgba(var(--bs-primary-rgb), .8);
 }
 
@@ -4496,9 +4496,9 @@ a.seller-fact-value:hover {
 }
 
 .listing-price-card .listing-price-label {
-	font-size: .66rem;
+	font-size: .62rem;
 	font-weight: 700;
-	letter-spacing: .1em;
+	letter-spacing: .08em;
 	text-transform: uppercase;
 	color: var(--bs-secondary-color);
 }
@@ -4507,8 +4507,8 @@ a.seller-fact-value:hover {
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: .45rem;
-	font-size: 1.4rem;
+	gap: .4rem;
+	font-size: 1.15rem;
 	font-weight: 800;
 	letter-spacing: -.02em;
 	line-height: 1;
@@ -4516,15 +4516,15 @@ a.seller-fact-value:hover {
 }
 
 .listing-price-card-text .listing-price-value {
-	font-size: 1.05rem;
+	font-size: .95rem;
 	font-weight: 700;
 	letter-spacing: 0;
 }
 
 .listing-price-card .listing-price-negotiable {
-	padding: .22rem .6rem;
+	padding: .18rem .5rem;
 	border-radius: 999px;
-	font-size: .68rem;
+	font-size: .64rem;
 	font-weight: 700;
 	color: #fff;
 	background-color: var(--bs-primary);
