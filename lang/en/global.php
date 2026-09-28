@@ -151,6 +151,8 @@ return [
     'sell_buy_and_rent_products_and_services_on_app_in_minutes' => '<strong>Sell</strong>, <strong>Buy</strong> and <strong>Rent</strong> products and services on :appName in Minutes',
     'create_new_listing' => 'Create New Listing',
     'start_now' => 'Start Now!',
+    'Takes 2 minutes' => 'Takes 2 minutes',
+    'Reach local buyers' => 'Reach local buyers',
     'eg_smartphone' => 'e.g. Smartphone',
     'all_categories' => 'All Categories',
     'others_categories' => 'All Categories',
