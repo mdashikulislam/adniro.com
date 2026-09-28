@@ -35,5 +35,18 @@
 		{{-- Modal Default Admin. Code --}}
 		var defaultAdminType = '{{ $adminType }}';
 		var defaultAdminCode = '{{ $adminCode }}';
+		
+		{{-- Open the categories modal when clicking anywhere on the category box --}}
+		onDocumentReady((event) => {
+			document.addEventListener('click', (e) => {
+				const box = e.target.closest('#catsContainer');
+				if (!box || e.target.closest('a')) return;
+				const link = box.querySelector('a.modal-cat-link:last-of-type') || box.querySelector('a.modal-cat-link');
+				if (link) {
+					e.preventDefault();
+					link.click();
+				}
+			});
+		});
 	</script>
 @endsection
