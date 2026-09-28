@@ -5832,22 +5832,17 @@ body.page-countries main {
 /* =======================================================
  * Sticky footer: no empty space below the footer on short pages
  * ======================================================= */
+/* Block layout is kept on purpose: the navbar script sets a top margin on both
+   <main> and the homepage wrapper, and those must keep collapsing into one. */
 body.skin {
-	display: flex;
-	flex-direction: column;
+	display: flow-root;
 	min-height: 100vh;
 	min-height: 100dvh;
 }
 
-body.skin > main {
-	flex: 1 0 auto;
-	width: 100%;
-}
-
 body.skin > footer {
-	flex-shrink: 0;
-	margin-top: auto;
-	width: 100%;
+	position: sticky;
+	top: 100vh;
 }
 
 /* =======================================================
