@@ -23,7 +23,9 @@
 	<link rel="shortcut icon" href="{{ config('settings.app.favicon_url') }}">
 	<title>{!! MetaTag::get('title') !!}</title>
 	{!! MetaTag::tag('description') !!}{!! MetaTag::tag('keywords') !!}
-	<link rel="canonical" href="{{ url()->current() }}"/>
+	@if (empty($hideCanonical))
+		<link rel="canonical" href="{{ url()->current() }}"/>
+	@endif
 	{{-- Specify a default target for all hyperlinks and forms on the page --}}
 	<base target="_top"/>
 	@if (isset($post))
