@@ -79,8 +79,15 @@
 					<div class="page-title-wrapper results-title">
 						<span class="results-title-icon"><i class="bi bi-search"></i></span>
 						<h1 class="results-title-text m-0 p-0">{{ $h1Title }}</h1>
+						@if (!empty($posts) && $totalPosts > 0 && isset($count) && data_get($count, '0') !== null)
+							<span class="results-title-count ms-md-auto">
+								<i class="bi bi-grid-3x3-gap-fill"></i>
+								<strong>{{ number_format((int)data_get($count, '0')) }}</strong>
+								{{ trans_choice('global.count_listings', (int)data_get($count, '0')) }}
+							</span>
+						@endif
 						@if (config('settings.listing_form.show_listing_type') && !empty($postTypes))
-						<div class="results-title-tabs ms-md-auto">
+						<div class="results-title-tabs">
 						<ul class="nav nav-tabs results-tabs" id="postType">
 				@php
 					$linkActiveClass = '';
@@ -187,12 +194,6 @@
 						{{-- Filters, OrderBy & Display Mode --}}
 						<div class="container results-toolbar">
 							<ul class="list-inline m-0 p-0 text-end d-flex align-items-center justify-content-end gap-2">
-								{{-- Results count --}}
-								@if (isset($count) && data_get($count, '0') !== null)
-									<li class="list-inline-item me-auto results-count">
-										<strong>{{ number_format((int)data_get($count, '0')) }}</strong> {{ trans_choice('global.count_listings', (int)data_get($count, '0')) }}
-									</li>
-								@endif
 								{{-- Filter (Show/Hide Sidebar) | d-inline-block d-sm-inline-block d-md-none --}}
 								@if ($isLeftSidebarEnabled)
 									<li class="list-inline-item px-2{{ $showInlineOnSmallScreen }}">
