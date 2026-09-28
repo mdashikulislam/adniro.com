@@ -7840,3 +7840,61 @@ body.page-account .account-card .form-label .text-danger {
 .account-avatar-card .file-preview {
 	padding: 0 0 1.4rem !important;
 }
+
+/* Avatar uploader: tight, even spacing (avatar > actions > browse) */
+.account-avatar-card .file-drop-zone,
+.account-avatar-card .file-preview-thumbnails,
+.account-avatar-card .file-preview-frame,
+.account-avatar-card .kv-file-content {
+	padding: 0 !important;
+	line-height: 0;
+}
+
+.account-avatar-card .file-preview-frame {
+	display: block !important;
+	float: none !important;
+}
+
+.account-avatar-card .kv-file-content img {
+	display: block;
+	margin: 0 auto;
+}
+
+.account-avatar-card .file-thumbnail-footer {
+	margin: .75rem 0 0 !important;
+	line-height: 1;
+}
+
+.account-avatar-card .file-footer-buttons {
+	display: flex;
+	justify-content: center;
+	gap: .4rem;
+	margin: 0 !important;
+}
+
+.account-avatar-card .file-preview {
+	padding: 0 0 .85rem !important;
+}
+
+.account-avatar-card .btn-file {
+	margin-top: 0 !important;
+}
+
+.account-avatar-card .file-thumbnail-footer,
+.account-avatar-card .file-actions {
+	height: auto !important;
+	min-height: 0 !important;
+	padding: 0 !important;
+}
+
+.account-avatar-card .file-actions {
+	margin: 0 !important;
+}
+
+.account-avatar-card .file-thumbnail-footer {
+	margin: .6rem 0 0 !important;
+}
+
+.account-avatar-card .file-preview {
+	padding: 0 0 1rem !important;
+}
