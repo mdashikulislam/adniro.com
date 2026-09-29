@@ -368,8 +368,9 @@ class SitemapsController extends FrontController
 			$cats = collect($cats)->keyBy('id');
 
 			foreach ($cats as $cat) {
-				// Only categories with at least one active listing belong in the sitemap
-				if (($counts['cat'][$cat->id] ?? 0) < 1) {
+				// Only categories that reach the indexing threshold belong in the sitemap
+				// (pages below it are served with "noindex", see CategoryController)
+				if (($counts['cat'][$cat->id] ?? 0) < $this->minListingsToIndex) {
 					continue;
 				}
 				$url = urlGen()->category($cat, $country['icode']);
@@ -402,7 +403,8 @@ class SitemapsController extends FrontController
 		// The (cached) listing counts give us that set of city IDs up front, so we
 		// query just those cities instead of scanning the whole country's city table.
 		$counts = $this->getListingCounts($country['code']);
-		$cityIds = array_keys(array_filter($counts['city'] ?? [], fn ($total) => $total >= 1));
+		$minListings = $this->minListingsToIndex;
+		$cityIds = array_keys(array_filter($counts['city'] ?? [], fn ($total) => $total >= $minListings));
 		if (empty($cityIds)) {
 			return Sitemap::render();
 		}
@@ -588,7 +590,7 @@ class SitemapsController extends FrontController
         $prefix = $cat->id . '-';
         $cityIds = [];
         foreach ($counts['catCity'] ?? [] as $key => $total) {
-            if ($total >= 1 && str_starts_with($key, $prefix)) {
+            if ($total >= $this->minListingsToIndex && str_starts_with($key, $prefix)) {
                 $cityIds[] = (int)substr($key, strlen($prefix));
             }
         }
@@ -674,7 +676,7 @@ class SitemapsController extends FrontController
             $counts = $this->getListingCounts($country['code']);
             $catsWithIndexableCity = [];
             foreach ($counts['catCity'] as $key => $total) {
-                if ($total >= 1) {
+                if ($total >= $this->minListingsToIndex) {
                     $catId = (int)strtok($key, '-');
                     $catsWithIndexableCity[$catId] = true;
                 }
