@@ -50,6 +50,13 @@ class TagController extends BaseController
 		$apiExtra = data_get($data, 'extra');
 		$preSearch = data_get($apiExtra, 'preSearch');
 		
+		// Real URL (lowercase tag / the seller's username URL), out-of-range pages & canonical URL
+		// (see BaseController::applySeoUrlRules())
+		$seoRedirect = $this->applySeoUrlRules(urlGen()->tag(mb_strtolower($this->tag)), $apiResult);
+		if (!empty($seoRedirect)) {
+			return $seoRedirect;
+		}
+		
 		// Sidebar
 		$this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
 		
@@ -88,6 +95,11 @@ class TagController extends BaseController
 			&& empty(data_get($apiResult, 'data'))
 		);
 		
+		// Thin Pages (Fewer live listings than the indexing threshold), as on the category & city pages
+		$noIndexLowContentPages = (
+			(int)data_get($apiResult, 'meta.total', 0) < (int)config('seo.min_listings_to_index', 3)
+		);
+		
 		return view(
 			'front.search.results',
 			compact(
@@ -96,7 +108,8 @@ class TagController extends BaseController
 				'apiExtra',
 				'noIndexTagsPages',
 				'noIndexFiltersOnEntriesPages',
-				'noIndexNoResultPages'
+				'noIndexNoResultPages',
+				'noIndexLowContentPages'
 			)
 		);
 	}

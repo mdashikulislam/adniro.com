@@ -98,8 +98,11 @@ class BaseController extends FrontController
 			$expectedPath = trim(rawurldecode((string)parse_url($expectedUrl, PHP_URL_PATH)), '/');
 		}
 		
+		// The path compared decoded, but output percent-encoded (spaces in tags, non-ASCII slugs...)
+		$encodedPath = implode('/', array_map('rawurlencode', explode('/', $expectedPath)));
+		
 		if ($expectedPath !== $requestPath) {
-			$url = url($expectedPath);
+			$url = url($encodedPath);
 			$queryString = request()->getQueryString();
 			if (!empty($queryString)) {
 				$url .= '?' . $queryString;
@@ -117,7 +120,7 @@ class BaseController extends FrontController
 		$lastPage = max((int)data_get($apiResult, 'meta.last_page', 1), 1);
 		abort_if($currentPage > $lastPage, 404);
 		
-		$canonicalUrl = url($expectedPath);
+		$canonicalUrl = url($encodedPath);
 		if ($currentPage > 1) {
 			$canonicalUrl .= '?page=' . $currentPage;
 		}
