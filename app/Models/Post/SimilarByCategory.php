@@ -16,7 +16,6 @@
 
 namespace App\Models\Post;
 
-use App\Helpers\Common\PaginationHelper;
 use App\Jobs\GeneratePostCollectionThumbnails;
 use App\Models\Category;
 use App\Models\Post;
@@ -24,6 +23,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 trait SimilarByCategory
 {
+	use SimilarNeighbors;
+
 	/**
 	 * Get similar Posts (Posts in the same Category)
 	 *
@@ -93,17 +94,6 @@ trait SimilarByCategory
 			$posts->reviewed();
 		}
 		
-		// Get listings from same category
-		if (!empty($similarCatIds)) {
-			if (count($similarCatIds) == 1) {
-				if (isset($similarCatIds[0]) && !empty(isset($similarCatIds[0]))) {
-					$posts->where('category_id', (int)$similarCatIds[0]);
-				}
-			} else {
-				$posts->whereIn('category_id', $similarCatIds);
-			}
-		}
-		
 		// Relations
 		$posts->has('category');
 		if (!config('settings.listings_list.hide_category')) {
@@ -119,19 +109,24 @@ trait SimilarByCategory
 		$posts->with('payment', fn ($query) => $query->with('package'));
 		$posts->with('user');
 		$posts->with('user.permissions');
+		$basePosts = $posts;
 		
-		if (isset($this->id)) {
-			$posts->where($postsTable . '.id', '!=', $this->id);
+		// The listing's neighbors in its own category first (a single index range),
+		// then in the sibling categories when there aren't enough
+		$limit = (int)$limit;
+		$posts = $this->takeNeighbors((clone $basePosts)->where('category_id', (int)$this->category_id), $limit);
+		
+		$siblingCatIds = array_values(array_diff($similarCatIds, [(int)$this->category_id]));
+		if ($posts->count() < $limit && !empty($siblingCatIds)) {
+			$siblingPosts = $this->takeNeighbors(
+				(clone $basePosts)->whereIn('category_id', $siblingCatIds),
+				$limit - $posts->count()
+			);
+			$items = $posts->getCollection()->concat($siblingPosts->getCollection())->values();
+			$posts = new LengthAwarePaginator($items, $items->count(), $limit, 1, [
+				'path' => LengthAwarePaginator::resolveCurrentPath(),
+			]);
 		}
-		
-		// Set ORDER BY
-		// $posts->orderByDesc('created_at');
-		$seed = rand(1, 9999);
-		$posts->inRandomOrder($seed);
-		
-		// $posts = $posts->take((int)$limit)->get();
-		$posts = $posts->paginate((int)$limit);
-		$posts = PaginationHelper::adjustSides($posts);
 		
 		// Generate listings images thumbnails
 		GeneratePostCollectionThumbnails::dispatch($posts);
