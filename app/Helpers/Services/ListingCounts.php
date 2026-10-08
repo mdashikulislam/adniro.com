@@ -4,6 +4,8 @@ namespace App\Helpers\Services;
 
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Scopes\ReviewedScope;
+use App\Models\Scopes\VerifiedScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
@@ -80,11 +82,15 @@ class ListingCounts
 		$cacheId = 'sitemaps.listingLastMod.' . strtolower($countryCode);
 
 		return Cache::remember($cacheId, self::CACHE_TTL, function () use ($countryCode) {
+			// Without the verified/reviewed scopes: the query is then answered from the
+			// "idx_posts_lastmod_cat_city" index alone (a not yet verified listing's change
+			// only makes a "lastmod" slightly too recent, which is harmless)
 			$rows = Post::query()
+				->withoutGlobalScopes([VerifiedScope::class, ReviewedScope::class])
 				->inCountry($countryCode)
 				->whereNotNull('category_id')
 				->groupBy('category_id', 'city_id')
-				->selectRaw('category_id, city_id, MAX(COALESCE(updated_at, created_at)) as last_mod')
+				->selectRaw('category_id, city_id, MAX(updated_at) as updated, MAX(created_at) as created')
 				->get();
 
 			$parentByCat = Category::query()->pluck('parent_id', 'id');
@@ -92,10 +98,11 @@ class ListingCounts
 
 			$dates = ['country' => 0, 'cat' => [], 'city' => [], 'catCity' => []];
 			foreach ($rows as $row) {
-				if (empty($row->last_mod)) {
+				$lastMod = max((string)$row->updated, (string)$row->created);
+				if (empty($lastMod)) {
 					continue;
 				}
-				$time = Carbon::parse($row->last_mod, $timeZone)->getTimestamp();
+				$time = Carbon::parse($lastMod, $timeZone)->getTimestamp();
 				$cityId = (int)$row->city_id;
 
 				$dates['country'] = max($dates['country'], $time);
