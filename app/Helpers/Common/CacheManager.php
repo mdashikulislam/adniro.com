@@ -522,6 +522,17 @@ class CacheManager
 			return $this->supportsTags;
 		}
 		
+		// "versioning" strategy (default): invalidating a model's cache is a single version key
+		// increment (its old entries expire on their own), instead of a tag flush, which deletes
+		// every cached entry of the model one by one. For the listings (cached search results &
+		// details of every viewed listing, invalidated on every listing save), a tag flush grows
+		// with the number of listings and becomes very costly at scale.
+		if (config('cache-manager.invalidation_strategy', 'versioning') === 'versioning') {
+			$this->supportsTags = false;
+			
+			return $this->supportsTags;
+		}
+		
 		$storeName = config('cache.default');
 		$storeConfig = config("cache.stores.{$storeName}");
 		$driver = $storeConfig['driver'] ?? ''; // Always use inner driver, default empty (non-support)
