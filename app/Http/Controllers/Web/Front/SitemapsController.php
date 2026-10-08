@@ -71,6 +71,69 @@ class SitemapsController extends FrontController
 	}
 	
 	/**
+	 * Last time the listings of a country changed (see ListingCounts::lastModifiedForCountry())
+	 *
+	 * @param string $countryCode
+	 * @return array{country: int, cat: array<int, int>, city: array<int, int>, catCity: array<string, int>}
+	 */
+	protected function getListingLastMod(string $countryCode): array
+	{
+		return \App\Helpers\Services\ListingCounts::lastModifiedForCountry($countryCode);
+	}
+	
+	/**
+	 * The "lastmod" date of a sitemap entry: the real last change of its content.
+	 * Null (no "lastmod" tag) when that date is unknown, rather than a fake "now":
+	 * search engines stop trusting "lastmod" values that change on every fetch.
+	 *
+	 * @param \DateTimeInterface|int|string|null ...$dates
+	 * @return \Illuminate\Support\Carbon|null
+	 */
+	protected function lastMod(...$dates): ?Carbon
+	{
+		$latest = 0;
+		foreach ($dates as $date) {
+			if (empty($date)) {
+				continue;
+			}
+			$time = is_int($date) ? $date : Carbon::parse($date)->getTimestamp();
+			$latest = max($latest, $time);
+		}
+		
+		return ($latest > 0) ? Carbon::createFromTimestamp($latest, config('app.timezone', 'UTC')) : null;
+	}
+	
+	/**
+	 * Last change of the static pages (CMS pages)
+	 *
+	 * @return int
+	 */
+	protected function getPagesLastMod(): int
+	{
+		$date = caching()->remember(Page::class, ['action' => 'get.pages.lastmod'], function () {
+			return Page::query()->max('updated_at');
+		});
+		
+		return !empty($date) ? Carbon::parse($date)->getTimestamp() : 0;
+	}
+	
+	/**
+	 * Last change of the blog posts available in the given country
+	 *
+	 * @param string $countryCode
+	 * @return int
+	 */
+	protected function getBlogLastMod(string $countryCode): int
+	{
+		$cacheParams = ['action' => 'get.blog.lastmod', 'country' => $countryCode];
+		$date = caching()->remember(BlogPost::class, $cacheParams, function () use ($countryCode) {
+			return BlogPost::query()->published()->availableInCountry($countryCode)->max('updated_at');
+		});
+		
+		return !empty($date) ? Carbon::parse($date)->getTimestamp() : 0;
+	}
+	
+	/**
 	 * Check if the given country is the app's default country
 	 *
 	 * @param string|null $countryCode
@@ -135,7 +198,12 @@ class SitemapsController extends FrontController
 				$basePath = '';
 			}
 			
-			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps.xml'));
+			$lastMod = $this->getListingLastMod($country['code']);
+			$lastModDates = [$lastMod['country'], $this->getPagesLastMod()];
+			if ($this->isDefaultCountry($country['code'])) {
+				$lastModDates[] = $this->getBlogLastMod($country['code']);
+			}
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps.xml'), $this->lastMod(...$lastModDates));
 		}
 		
 		return Sitemap::index();
@@ -162,19 +230,24 @@ class SitemapsController extends FrontController
 			$basePath = '';
 		}
 		
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/pages.xml'));
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'));
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'));
-        Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'));
+		// Each child sitemap's "lastmod" is the last change of its content, so that
+		// search engines only re-fetch the sitemaps that actually changed
+		$listingsLastMod = $this->lastMod($this->getListingLastMod($country['code'])['country']);
+		$pagesLastMod = $this->lastMod($listingsLastMod, $this->getPagesLastMod());
+		
+		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/pages.xml'), $pagesLastMod);
+		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'), $listingsLastMod);
+		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'), $listingsLastMod);
+        Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'), $listingsLastMod);
 
         $countPosts = Post::verified()->inCountry($country['code'])->count();
 		if ($countPosts > 0) {
-			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/posts.xml'));
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/posts.xml'), $listingsLastMod);
 		}
 
 		// The blog is not country specific: only referenced in the default country's sitemap index
 		if ($this->isDefaultCountry($country['code']) && $this->countBlogPosts($country['code']) > 0) {
-			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/blog.xml'));
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/blog.xml'), $this->lastMod($this->getBlogLastMod($country['code'])));
 		}
 
 		return Sitemap::index();
@@ -203,17 +276,20 @@ class SitemapsController extends FrontController
 			$params['country'] = $country['code'];
 		}
 		
+		// The homepage, the HTML sitemap & the search page list the latest listings
+		$listingsLastMod = $this->lastMod($this->getListingLastMod($country['code'])['country']);
+		
 		$url = url('/');
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '1.0');
+		Sitemap::addTag($url, $listingsLastMod, 'daily', '1.0');
 		
 		$url = urlGen()->sitemap($country['icode']);
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.5');
+		Sitemap::addTag($url, $listingsLastMod, 'daily', '0.5');
 		
 		$url = urlGen()->search([], false, $country['icode']);
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.6');
+		Sitemap::addTag($url, $listingsLastMod, 'daily', '0.6');
 		
 		// Cache Parameters
 		$cacheParams = [
@@ -230,13 +306,14 @@ class SitemapsController extends FrontController
 		if ($pages->count() > 0) {
 			foreach ($pages as $page) {
 				$url = urlGen()->page($page);
-				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
+				Sitemap::addTag($url, $this->lastMod($page->updated_at ?? $page->created_at ?? null), 'monthly', '0.7');
 			}
 		}
 		
 		$url = urlGen()->contact();
 		$url = urlBuilder($url)->setParameters($params)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
+		// Static form: no known change date, so no "lastmod" at all
+		Sitemap::addTag($url, null, 'monthly', '0.7');
 		
 		return Sitemap::render();
 	}
@@ -261,19 +338,6 @@ class SitemapsController extends FrontController
 			return Sitemap::render();
 		}
 
-		// Blog homepage
-		Sitemap::addTag(urlGen()->blog(), $this->defaultDate, 'daily', '0.8');
-
-		// Blog categories
-		$categories = caching()->remember(BlogCategory::class, ['action' => 'get.blog.categories', 'format' => 'xml'], function () {
-			return BlogCategory::query()->orderBy('lft')->orderBy('name')->get();
-		});
-
-		foreach ($categories as $category) {
-			$url = urlGen()->blogCategory($category);
-			Sitemap::addTag($url, $this->defaultDate, 'weekly', '0.6');
-		}
-
 		// Blog posts (the global ones & the ones targeting this country)
 		$limit = (int)env('XML_SITEMAP_LIMIT', 1000);
 		$postsCacheParams = [
@@ -291,8 +355,24 @@ class SitemapsController extends FrontController
 				->get();
 		});
 
+		// Blog homepage & categories: last change of the posts they list
+		$blogLastMod = $this->lastMod($this->getBlogLastMod($country['code']));
+		Sitemap::addTag(urlGen()->blog(), $blogLastMod, 'daily', '0.8');
+
+		$categories = caching()->remember(BlogCategory::class, ['action' => 'get.blog.categories', 'format' => 'xml'], function () {
+			return BlogCategory::query()->orderBy('lft')->orderBy('name')->get();
+		});
+
+		$postsByCategory = $posts->groupBy('category_id');
+		foreach ($categories as $category) {
+			$categoryPosts = $postsByCategory->get($category->id, collect());
+			$dates = $categoryPosts->map(fn ($post) => $post->updated_at ?? $post->published_at)->all();
+			$url = urlGen()->blogCategory($category);
+			Sitemap::addTag($url, $this->lastMod(...$dates), 'weekly', '0.6');
+		}
+
 		foreach ($posts as $post) {
-			$lastModified = $post->updated_at ?? $post->published_at ?? $this->defaultDate;
+			$lastModified = $this->lastMod($post->updated_at ?? $post->published_at ?? null);
 			Sitemap::addTag($post->url, $lastModified, 'weekly', '0.7');
 		}
 
@@ -331,6 +411,7 @@ class SitemapsController extends FrontController
 		
 		if ($cats->count() > 0) {
 			$counts = $this->getListingCounts($country['code']);
+			$lastMods = $this->getListingLastMod($country['code']);
 			$cats = collect($cats)->keyBy('id');
 
 			foreach ($cats as $cat) {
@@ -340,7 +421,7 @@ class SitemapsController extends FrontController
 					continue;
 				}
 				$url = urlGen()->category($cat, $country['icode']);
-				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+				Sitemap::addTag($url, $this->lastMod($lastMods['cat'][$cat->id] ?? null), 'daily', '0.8');
 			}
 		}
 
@@ -386,10 +467,11 @@ class SitemapsController extends FrontController
 				->get();
 		});
 		
+		$lastMods = $this->getListingLastMod($country['code']);
 		foreach ($cities as $city) {
 			$city->name = trim(head(explode('/', $city->name)));
 			$url = urlGen()->city($city, $country['icode']);
-			Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
+			Sitemap::addTag($url, $this->lastMod($lastMods['city'][$city->id] ?? null), 'daily', '0.7');
 		}
 		
 		return Sitemap::render();
@@ -446,7 +528,8 @@ class SitemapsController extends FrontController
 				$path = urlGen()->postPathBasic(hashId($post->id), $post->slug);
 				$url = $isDomainMapped ? dmUrl($post->country_code, $path) : url($path);
 				$url = urlBuilder($url)->toString();
-				Sitemap::addTag($url, $post->created_at, 'daily', '0.6');
+				// "updated_at" is the last edit of the listing (visits don't touch it)
+				Sitemap::addTag($url, $this->lastMod($post->created_at, $post->updated_at), 'daily', '0.6');
 			}
 		}
 		
@@ -531,7 +614,7 @@ class SitemapsController extends FrontController
             foreach ($cats as $cat) {
                 $url = urlGen()->category($cat, $country['icode']);
                 $url = $url.'/'.$citySLug.'/'.$cityId;
-                Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+                Sitemap::addTag($url, $this->lastMod($this->getListingLastMod($country['code'])['catCity'][$cat->id . '-' . (int)$cityId] ?? null), 'daily', '0.8');
             }
         }
         return Sitemap::render();
@@ -579,10 +662,11 @@ class SitemapsController extends FrontController
         if (!empty($subCatSlug)) {
             $basePath .= '/' . $subCatSlug;
         }
+        $lastMods = $this->getListingLastMod($country['code']);
         foreach ($cities as $city) {
             $citySlug = slugify($city->name);
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
-            Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+            Sitemap::addTag($url, $this->lastMod($lastMods['catCity'][$cat->id . '-' . $city->id] ?? null), 'daily', '0.8');
         }
         return Sitemap::render();
     }
@@ -640,6 +724,7 @@ class SitemapsController extends FrontController
         if ($cats->count() > 0) {
             // Categories having at least one city with an active listing
             $counts = $this->getListingCounts($country['code']);
+            $lastMods = $this->getListingLastMod($country['code']);
             $catsWithIndexableCity = [];
             foreach ($counts['catCity'] as $key => $total) {
                 if ($total >= $this->minListingsToIndex) {
@@ -662,7 +747,7 @@ class SitemapsController extends FrontController
                     $catUrl = trim(strtolower((string)$cat->slug));
                 }
                 $url = $basePath.'sitemaps/category/'.$catUrl.'.xml';
-                Sitemap::addSitemap(dmUrl(collect($country), $url));
+                Sitemap::addSitemap(dmUrl(collect($country), $url), $this->lastMod($lastMods['cat'][$cat->id] ?? null));
             }
         }
         return Sitemap::index();

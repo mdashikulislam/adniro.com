@@ -83,8 +83,38 @@ class GuestPageCache
 		$response->headers->set('Cache-Control', 'public, max-age=0, s-maxage=' . self::EDGE_TTL . ', stale-while-revalidate=60');
 		$response->headers->set('Vary', 'Accept-Encoding');
 		$response->headers->set('X-Guest-Cache', 'cacheable');
-		
+
+		// Conditional requests: crawlers (Googlebot...) send back the ETag they got, and an
+		// unchanged page is answered with an empty "304 Not Modified" instead of the full HTML
+		$this->setEtag($response);
+		$response->isNotModified($request);
+
 		return $response;
+	}
+
+	/**
+	 * Weak ETag from the page's content. The per-visitor CSRF token is left out of the hash
+	 * (it's refreshed on the client by guest-cache.js), so the ETag only changes when the
+	 * page itself changes. Weak, because the CDN may re-compress the body.
+	 */
+	protected function setEtag(Response $response): void
+	{
+		$content = $response->getContent();
+		if (!is_string($content) || $content === '') {
+			return;
+		}
+
+		$content = preg_replace(
+			'#((?:name="csrf-token"\s+content|data-csrf-token|name="_token"\s+value)=")[^"]*(")#i',
+			'$1$2',
+			$content
+		);
+
+		// Parts that change on every view (visit counter, relative dates) are marked
+		// with "data-etag-skip" in the views and left out too
+		$content = preg_replace('#(<span data-etag-skip>).*?(</span>)#s', '$1$2', (string)$content);
+		
+		$response->setEtag(md5((string)$content), true);
 	}
 	
 	protected function isCacheableGuestRequest(Request $request): bool

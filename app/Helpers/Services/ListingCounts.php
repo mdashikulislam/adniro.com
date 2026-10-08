@@ -4,6 +4,7 @@ namespace App\Helpers\Services;
 
 use App\Models\Category;
 use App\Models\Post;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -58,6 +59,60 @@ class ListingCounts
 			}
 
 			return $counts;
+		});
+	}
+
+	/**
+	 * Last time the listings of a country changed (UNIX timestamps), aggregated
+	 * like forCountry(): per category (including ancestors), per city and per
+	 * category×city, plus the whole country.
+	 *
+	 * Archived & deleted listings are included on purpose: archiving or deleting
+	 * a listing bumps its "updated_at", and that removal changes the result pages
+	 * too. Used as the real "lastmod" of the XML sitemaps' URLs.
+	 *
+	 * @param string|null $countryCode
+	 * @return array{country: int, cat: array<int, int>, city: array<int, int>, catCity: array<string, int>}
+	 */
+	public static function lastModifiedForCountry(?string $countryCode = null): array
+	{
+		$countryCode = !empty($countryCode) ? $countryCode : (string)config('country.code');
+		$cacheId = 'sitemaps.listingLastMod.' . strtolower($countryCode);
+
+		return Cache::remember($cacheId, self::CACHE_TTL, function () use ($countryCode) {
+			$rows = Post::query()
+				->inCountry($countryCode)
+				->whereNotNull('category_id')
+				->groupBy('category_id', 'city_id')
+				->selectRaw('category_id, city_id, MAX(COALESCE(updated_at, created_at)) as last_mod')
+				->get();
+
+			$parentByCat = Category::query()->pluck('parent_id', 'id');
+			$timeZone = (string)config('app.timezone', 'UTC');
+
+			$dates = ['country' => 0, 'cat' => [], 'city' => [], 'catCity' => []];
+			foreach ($rows as $row) {
+				if (empty($row->last_mod)) {
+					continue;
+				}
+				$time = Carbon::parse($row->last_mod, $timeZone)->getTimestamp();
+				$cityId = (int)$row->city_id;
+
+				$dates['country'] = max($dates['country'], $time);
+				$dates['city'][$cityId] = max($dates['city'][$cityId] ?? 0, $time);
+
+				// Roll the date up through the category's ancestors
+				$catId = (int)$row->category_id;
+				$depthGuard = 0;
+				while (!empty($catId) && $depthGuard++ < 10) {
+					$dates['cat'][$catId] = max($dates['cat'][$catId] ?? 0, $time);
+					$key = $catId . '-' . $cityId;
+					$dates['catCity'][$key] = max($dates['catCity'][$key] ?? 0, $time);
+					$catId = (int)($parentByCat[$catId] ?? 0);
+				}
+			}
+
+			return $dates;
 		});
 	}
 

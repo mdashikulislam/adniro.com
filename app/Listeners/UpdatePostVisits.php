@@ -76,9 +76,13 @@ class UpdatePostVisits
 				$post->setRawAttributes($attributes, true);
 			}
 			
-			// Increment the listing's visit count
+			// Increment the listing's visit count, without touching "updated_at":
+			// it must only change when the listing's content changes (it's the
+			// "lastmod" of the XML sitemaps)
 			$post->visits = $post->visits + 1;
+			$post->timestamps = false;
 			$post->save();
+			$post->timestamps = true;
 		} catch (Throwable $e) {
 		}
 	}
