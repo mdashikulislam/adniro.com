@@ -154,10 +154,8 @@ class CategoryController extends BaseController
         }
         view()->share('og', $this->og);
         // SEO: noindex
-        $noIndexCitiesPermalinkPages = (
-            config('settings.seo.no_index_cities')
-            && routeActionHas('Search\CityController')
-        );
+        // (a category × city page is a city page too: the CityController check could never be true here)
+        $noIndexCitiesPermalinkPages = (bool)config('settings.seo.no_index_cities');
         // Filters (and Orders) on Listings Pages (Except Pagination)
         $noIndexFiltersOnEntriesPages = (
             config('settings.seo.no_index_filters_orders')
@@ -233,10 +231,8 @@ class CategoryController extends BaseController
         }
         view()->share('og', $this->og);
         // SEO: noindex
-        $noIndexCitiesPermalinkPages = (
-            config('settings.seo.no_index_cities')
-            && routeActionHas('Search\CityController')
-        );
+        // (a category × city page is a city page too: the CityController check could never be true here)
+        $noIndexCitiesPermalinkPages = (bool)config('settings.seo.no_index_cities');
         // Filters (and Orders) on Listings Pages (Except Pagination)
         $noIndexFiltersOnEntriesPages = (
             config('settings.seo.no_index_filters_orders')
