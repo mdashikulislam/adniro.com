@@ -469,7 +469,7 @@ class SitemapsController extends FrontController
 		
 		$lastMods = $this->getListingLastMod($country['code']);
 		foreach ($cities as $city) {
-			$city->name = trim(head(explode('/', $city->name)));
+			// Same URL as the internal links (the city pages redirect any other slug to it)
 			$url = urlGen()->city($city, $country['icode']);
 			Sitemap::addTag($url, $this->lastMod($lastMods['city'][$city->id] ?? null), 'daily', '0.7');
 		}
@@ -664,7 +664,7 @@ class SitemapsController extends FrontController
         }
         $lastMods = $this->getListingLastMod($country['code']);
         foreach ($cities as $city) {
-            $citySlug = slugify($city->name);
+            $citySlug = $city->slug;
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
             Sitemap::addTag($url, $this->lastMod($lastMods['catCity'][$cat->id . '-' . $city->id] ?? null), 'daily', '0.8');
         }

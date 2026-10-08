@@ -53,6 +53,12 @@ class CategoryController extends BaseController
 		$apiExtra = data_get($data, 'extra');
 		$preSearch = data_get($apiExtra, 'preSearch');
 		
+		// Real URL, out-of-range pages & canonical URL (see BaseController::applySeoUrlRules())
+		$seoRedirect = $this->applySeoUrlRules(urlGen()->category(data_get($preSearch, 'cat')), $apiResult);
+		if (!empty($seoRedirect)) {
+			return $seoRedirect;
+		}
+		
 		// Sidebar
 		$this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
 		
@@ -127,6 +133,12 @@ class CategoryController extends BaseController
         $apiResult = data_get($data, 'result');
         $apiExtra = data_get($data, 'extra');
         $preSearch = data_get($apiExtra, 'preSearch');
+        
+        // Real URL, out-of-range pages & canonical URL (see BaseController::applySeoUrlRules())
+        $seoRedirect = $this->applySeoUrlRules(urlGen()->city(data_get($preSearch, 'city'), null, data_get($preSearch, 'cat')), $apiResult);
+        if (!empty($seoRedirect)) {
+        	return $seoRedirect;
+        }
         $this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
         // Get Titles
         $this->getBreadcrumb($preSearch);
@@ -198,6 +210,12 @@ class CategoryController extends BaseController
         $apiResult = data_get($data, 'result');
         $apiExtra = data_get($data, 'extra');
         $preSearch = data_get($apiExtra, 'preSearch');
+        
+        // Real URL, out-of-range pages & canonical URL (see BaseController::applySeoUrlRules())
+        $seoRedirect = $this->applySeoUrlRules(urlGen()->city(data_get($preSearch, 'city'), null, data_get($preSearch, 'cat')), $apiResult);
+        if (!empty($seoRedirect)) {
+        	return $seoRedirect;
+        }
         $this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
         // Get Titles
         $this->getBreadcrumb($preSearch);

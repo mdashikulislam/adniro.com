@@ -165,6 +165,14 @@ trait MetaTagTrait
 		$metaTag['description'] = !empty($description) ? $description : ($fallbackDescription ?? $fallbackTitle);
 		$metaTag['keywords'] = $keywords;
 		
+		// Paginated pages: unique title & description per page
+		$page = (int)request()->query('page', 1);
+		if ($page > 1) {
+			$pageLabel = ' - Page ' . $page;
+			$metaTag['title'] .= $pageLabel;
+			$metaTag['description'] .= $pageLabel;
+		}
+		
 		return array_values($metaTag);
 	}
     private function applyCategoryLocationValue($cat,$location,&$fallbackTitle, &$fallbackDescription):array
