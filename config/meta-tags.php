@@ -20,7 +20,9 @@ return array(
      |
      */
     
-    'title_limit' => 70,
+    // 0: no limit. Search engines display a shortened title by themselves, but they use the
+    // whole title (keywords included) to rank the page: cutting it (with "...") only loses words.
+    'title_limit' => 0,
     
     /*
      |--------------------------------------------------------------------------

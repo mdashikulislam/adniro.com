@@ -335,6 +335,9 @@ class MetaTag
 		// Clean up the text (assuming this function exists in your codebase)
 		if (function_exists('singleLineStringCleanerStrict')) {
 			$text = singleLineStringCleanerStrict($text);
+			
+			// Meta values are single lines (the cleaner above keeps single line breaks)
+			$text = trim(preg_replace('/\s+/u', ' ', $text));
 		} else {
 			// Fallback cleanup
 			$text = strip_tags($text);
@@ -360,12 +363,17 @@ class MetaTag
 			return $text;
 		}
 		
-		// Use Laravel's Str helper if available, otherwise fallback
-		if (function_exists('str')) {
-			return str($text)->limit($limit)->toString();
+		if (mb_strlen($text) <= $limit) {
+			return $text;
 		}
 		
-		return mb_strlen($text) > $limit ? mb_substr($text, 0, $limit) . '...' : $text;
+		// Cut on a word boundary, without "..." (search engines shorten the snippets they
+		// display by themselves, a cut ending with "..." looks like a broken text)
+		$cut = mb_substr($text, 0, $limit + 1);
+		$lastSpace = mb_strrpos($cut, ' ');
+		$cut = ($lastSpace !== false && $lastSpace > $limit * 0.6) ? mb_substr($cut, 0, $lastSpace) : mb_substr($text, 0, $limit);
+		
+		return rtrim($cut, " \t\n\r\0\x0B,;:-–—|/(");
 	}
 	
 	/**

@@ -99,7 +99,14 @@ trait MetaTagTrait
 		}
 		if(!empty($category) && !empty($location)){
             [$title, $description, $keywords] = getMetaTag('searchCategoryLocation');
-            $this->applyCategoryLocationValue($category, $location, $fallbackTitle, $fallbackDescription);
+            // No template for these pages (getMetaTag() then returns the site's generic texts):
+            // the category's own SEO texts or default ones
+            $hasTemplate = caching()->remember(\App\Models\MetaTag::class, ['action' => 'exists', 'page' => 'searchCategoryLocation'], function () {
+                return \App\Models\MetaTag::query()->where('page', 'searchCategoryLocation')->exists();
+            });
+            if (!$hasTemplate || empty(trim((string)$title))) {
+                [$title, $description, $keywords] = $this->applyCategoryLocationValue($category, $location, $fallbackTitle, $fallbackDescription);
+            }
             if (!empty($category)) {
                 $this->applyCategoryValue($category, $title, $description, $keywords, $fallbackTitle, $fallbackDescription);
             }
@@ -182,9 +189,19 @@ trait MetaTagTrait
         }
         [$title, $description, $keywords] = [$fallbackTitle,$fallbackDescription,$fallbackTitle];
         if (!empty($cat)){
-            $title = str_replace('{category.name}', data_get($cat, 'name'), data_get($cat, 'seo_title'));
-            $description = str_replace('{category.name}', data_get($cat, 'name'), data_get($cat, 'seo_description'));
-            $keywords = str_replace('{category.name}', mb_strtolower(data_get($cat, 'name')), data_get($cat, 'seo_keywords'));
+            // The category's own SEO texts, or default ones (else the page would get an empty title)
+            $seoTitle = data_get($cat, 'seo_title');
+            $seoTitle = !empty($seoTitle) ? $seoTitle : '{category.name} {location.name.in} - {app.name}';
+            $seoDescription = data_get($cat, 'seo_description');
+            $seoDescription = !empty($seoDescription)
+                ? $seoDescription
+                : '{category.name} classified ads {location.name.in}, {country.name}. Browse the local listings or post a free ad on {app.name}.';
+            $seoKeywords = data_get($cat, 'seo_keywords');
+            $seoKeywords = !empty($seoKeywords) ? $seoKeywords : '{category.name} {location.name}, {location.name}, {category.name}';
+            
+            $title = str_replace('{category.name}', data_get($cat, 'name'), $seoTitle);
+            $description = str_replace('{category.name}', data_get($cat, 'name'), $seoDescription);
+            $keywords = str_replace('{category.name}', mb_strtolower(data_get($cat, 'name')), $seoKeywords);
         }
         if (!empty($location)) {
             $title = str_replace('{location.name}', data_get($location, 'name'), $title);
