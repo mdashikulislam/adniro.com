@@ -12,6 +12,12 @@
 	}
 	
 	$showCityCount = (bool)config('settings.listings_list.count_cities_listings');
+
+	// On a category page each city link opens a category×city page. Only the
+	// combinations with enough live listings deserve to be crawled; the others
+	// stay usable but are marked "nofollow" so crawlers don't waste budget on them.
+	$sidebarCatId = !empty($cat) ? (int)data_get($cat, 'id') : 0;
+	$minListingsToIndex = \App\Helpers\Services\ListingCounts::minListingsToIndex();
 @endphp
 {{-- City --}}
 <div class="container p-0 vstack gap-2 sidebar-section sidebar-section-cities">
@@ -28,9 +34,13 @@
 							|| request()->input('l') == data_get($iCity, 'id')
 						);
 						$iCityCount = data_get($iCity, 'posts_count') ?? 0;
+						$isThinCombo = (
+							!empty($sidebarCatId)
+							&& \App\Helpers\Services\ListingCounts::forCategoryCity($sidebarCatId, data_get($iCity, 'id')) < $minListingsToIndex
+						);
 					@endphp
 					<li class="{{ $isActiveCity ? 'active' : '' }}">
-						<a href="{!! urlGen()->city($iCity, null, $cat ?? null) !!}" class="filter-item" title="{{ data_get($iCity, 'name') }}">
+						<a href="{!! urlGen()->city($iCity, null, $cat ?? null) !!}" class="filter-item" title="{{ data_get($iCity, 'name') }}"{!! $isThinCombo ? ' rel="nofollow"' : '' !!}>
 							<span class="filter-item-icon"><i class="bi bi-geo-alt{{ $isActiveCity ? '-fill' : '' }}"></i></span>
 							<span class="filter-item-name">{{ data_get($iCity, 'name') }}</span>
 							@if ($showCityCount)

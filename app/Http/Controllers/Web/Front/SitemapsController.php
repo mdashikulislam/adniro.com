@@ -67,41 +67,7 @@ class SitemapsController extends FrontController
 	 */
 	protected function getListingCounts(string $countryCode): array
 	{
-		$cacheId = 'sitemaps.listingCounts.' . strtolower($countryCode);
-
-		return Cache::remember($cacheId, $this->cacheExpiration, function () use ($countryCode) {
-			$rows = Post::query()
-				->verified()
-				->unarchived()
-				->whereNull('deleted_at')
-				->inCountry($countryCode)
-				->whereNotNull('category_id')
-				->groupBy('category_id', 'city_id')
-				->selectRaw('category_id, city_id, COUNT(*) as total')
-				->get();
-
-			$parentByCat = Category::query()->pluck('parent_id', 'id');
-
-			$counts = ['cat' => [], 'city' => [], 'catCity' => []];
-			foreach ($rows as $row) {
-				$cityId = (int)$row->city_id;
-				$total = (int)$row->total;
-
-				$counts['city'][$cityId] = ($counts['city'][$cityId] ?? 0) + $total;
-
-				// Roll the count up through the category's ancestors
-				$catId = (int)$row->category_id;
-				$depthGuard = 0;
-				while (!empty($catId) && $depthGuard++ < 10) {
-					$counts['cat'][$catId] = ($counts['cat'][$catId] ?? 0) + $total;
-					$key = $catId . '-' . $cityId;
-					$counts['catCity'][$key] = ($counts['catCity'][$key] ?? 0) + $total;
-					$catId = (int)($parentByCat[$catId] ?? 0);
-				}
-			}
-
-			return $counts;
-		});
+		return \App\Helpers\Services\ListingCounts::forCountry($countryCode);
 	}
 	
 	/**
