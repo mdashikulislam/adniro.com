@@ -122,13 +122,14 @@
 						@foreach ($postTypes as $postType)
 							@php
 								$postTypeId = data_get($postType, 'id');
+								// Filter links ("?type=N", combined with any other filter): not worth crawling
 								$postTypeUrl = request()->fullUrlWithQuery(['type' => $postTypeId, 'page' => null]);
 								$postTypeCount = data_get($count, $postTypeId) ?? 0;
 								$isSelectedPostType = (request()->filled('type') && request()->query('type') == $postTypeId);
 							@endphp
 							@if ($isSelectedPostType)
 								<li class="nav-item">
-									<a href="{!! $postTypeUrl !!}" class="nav-link fs-6 active fw-bold">
+									<a href="{!! $postTypeUrl !!}" class="nav-link fs-6 active fw-bold" rel="nofollow">
 										{{ data_get($postType, 'label') }}
 										<span class="badge text-bg-danger {{ $hideInlineOnMdOrLower }}">
 											{{ $postTypeCount }}
@@ -137,7 +138,7 @@
 								</li>
 							@else
 								<li class="nav-item">
-									<a href="{!! $postTypeUrl !!}" class="nav-link fs-6">
+									<a href="{!! $postTypeUrl !!}" class="nav-link fs-6" rel="nofollow">
 										{{ data_get($postType, 'label') }}
 										<span class="badge text-bg-secondary {{ $hideInlineOnMdOrLower }}">
 											{{ $postTypeCount }}
