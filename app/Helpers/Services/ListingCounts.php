@@ -138,6 +138,52 @@ class ListingCounts
 	}
 
 	/**
+	 * Listing IDs range covered by each listings sitemap file: a file holds at most this
+	 * many URLs (Google's limit is 50,000) and a listing always stays in the same file
+	 */
+	public const LISTINGS_PER_SITEMAP = 25000;
+
+	/**
+	 * The listings sitemap files of a country: for each file number (listing ID / LISTINGS_PER_SITEMAP),
+	 * its number of live listings & its last change (UNIX timestamp).
+	 * Answered from the "idx_posts_live_cat_city" index alone.
+	 *
+	 * @param string|null $countryCode
+	 * @return array<int, array{total: int, lastmod: int}>
+	 */
+	public static function listingSitemapChunks(?string $countryCode = null): array
+	{
+		$countryCode = !empty($countryCode) ? $countryCode : (string)config('country.code');
+		$cacheId = 'seo.listingChunks.v2.' . strtolower($countryCode);
+
+		return self::remember($cacheId, function () use ($countryCode) {
+			$size = self::LISTINGS_PER_SITEMAP;
+			$rows = Post::query()
+				->verified()
+				->unarchived()
+				->whereNull('deleted_at')
+				->inCountry($countryCode)
+				->selectRaw('FLOOR(id / ?) as chunk, COUNT(*) as total, MAX(updated_at) as updated, MAX(created_at) as created', [$size])
+				->groupByRaw('FLOOR(id / ?)', [$size])
+				->toBase()
+				->get();
+
+			$timeZone = (string)config('app.timezone', 'UTC');
+			$chunks = [];
+			foreach ($rows as $row) {
+				$lastMod = max((string)$row->updated, (string)$row->created);
+				$chunks[(int)$row->chunk] = [
+					'total'   => (int)$row->total,
+					'lastmod' => !empty($lastMod) ? Carbon::parse($lastMod, $timeZone)->getTimestamp() : 0,
+				];
+			}
+			ksort($chunks);
+
+			return $chunks;
+		});
+	}
+
+	/**
 	 * Rebuild a country's cached data now (used by the scheduler)
 	 *
 	 * @param string $countryCode
@@ -146,13 +192,14 @@ class ListingCounts
 	public static function refresh(string $countryCode): void
 	{
 		$code = strtolower($countryCode);
-		foreach (['seo.listingCounts.v2.', 'seo.listingLastMod.v2.'] as $prefix) {
+		foreach (['seo.listingCounts.v2.', 'seo.listingLastMod.v2.', 'seo.listingChunks.v2.'] as $prefix) {
 			Cache::forget($prefix . $code . '.built');
 			unset(self::$memo[$prefix . $code]);
 		}
 
 		self::forCountry($countryCode);
 		self::lastModifiedForCountry($countryCode);
+		self::listingSitemapChunks($countryCode);
 	}
 
 	/**

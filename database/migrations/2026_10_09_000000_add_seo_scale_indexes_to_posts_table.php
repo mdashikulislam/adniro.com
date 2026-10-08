@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Schema;
  *
  * - idx_posts_live_cat_city: live listings counts per category × city
  *   (ListingCounts::forCountry(): which pages are indexable, sitemaps, sidebar)
- *   and the listings sitemap chunks (the primary key is part of every InnoDB index).
+ *   and the listings sitemaps' chunks & their "lastmod" (the primary key is part of
+ *   every InnoDB index).
  * - idx_posts_lastmod_cat_city: last change per category × city
  *   (ListingCounts::lastModifiedForCountry(): the sitemaps' "lastmod").
  *
@@ -25,7 +26,7 @@ return new class extends Migration
 		Schema::table('posts', function (Blueprint $table) {
 			if (!Schema::hasIndex('posts', 'idx_posts_live_cat_city')) {
 				$table->index(
-					['country_code', 'archived_at', 'deleted_at', 'category_id', 'city_id', 'email_verified_at', 'phone_verified_at', 'reviewed_at'],
+					['country_code', 'archived_at', 'deleted_at', 'category_id', 'city_id', 'email_verified_at', 'phone_verified_at', 'reviewed_at', 'updated_at', 'created_at'],
 					'idx_posts_live_cat_city'
 				);
 			}

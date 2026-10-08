@@ -275,6 +275,9 @@ if (!$isDomainmappingAvailable) {
 			Route::get('{countryCode}/sitemaps/categories.xml', 'getCategoriesSitemapByCountry')->name('xml.sitemaps.categories');
 			Route::get('{countryCode}/sitemaps/cities.xml', 'getCitiesSitemapByCountry')->name('xml.sitemaps.cities');
 			Route::get('{countryCode}/sitemaps/posts.xml', 'getListingsSitemapByCountry')->name('xml.sitemaps.listings');
+			Route::get('{countryCode}/sitemaps/posts-{chunk}.xml', 'getListingsChunkSitemapByCountry')
+				->where('chunk', '[0-9]+')
+				->name('xml.sitemaps.listings.chunk');
 			Route::get('{countryCode}/sitemaps/blog.xml', 'getBlogSitemapByCountry')->name('xml.sitemaps.blog');
             Route::get('{countryCode}/sitemaps/category/location.xml', 'getSitemapCategoryLocationByCountry');
             Route::get('{countryCode}/sitemaps/category/{catSlug}.xml', 'getCategoriesSitemapLocationByCountry');
