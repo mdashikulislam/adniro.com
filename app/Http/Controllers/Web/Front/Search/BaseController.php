@@ -120,6 +120,14 @@ class BaseController extends FrontController
 		$lastPage = max((int)data_get($apiResult, 'meta.last_page', 1), 1);
 		abort_if($currentPage > $lastPage, 404);
 		
+		// Filtered pages are "noindex" when the "no_index_filters_orders" option is enabled:
+		// no canonical URL then (noindex & a canonical URL pointing elsewhere are conflicting signals)
+		if (config('settings.seo.no_index_filters_orders') && $this->hasFilterParameters()) {
+			view()->share('hideCanonical', true);
+			
+			return null;
+		}
+		
 		$canonicalUrl = url($encodedPath);
 		if ($currentPage > 1) {
 			$canonicalUrl .= '?page=' . $currentPage;
@@ -127,5 +135,23 @@ class BaseController extends FrontController
 		view()->share('canonicalUrl', $canonicalUrl);
 		
 		return null;
+	}
+	
+	/**
+	 * Is the results page filtered or reordered (query string parameters other than the page number)?
+	 * Tracking parameters (utm_*, gclid...) don't count: a page reached from a campaign link
+	 * is the same page (its canonical URL is the page without them).
+	 *
+	 * @return bool
+	 */
+	protected function hasFilterParameters(): bool
+	{
+		$trackingParameters = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'yclid', 'ttclid', 'twclid', 'li_fat_id', 'mc_cid', 'mc_eid', 'ref', 'srsltid'];
+		
+		$parameters = collect(request()->query())
+			->except(array_merge(['page'], $trackingParameters))
+			->reject(fn ($value, $key) => str_starts_with((string)$key, 'utm_'));
+		
+		return $parameters->isNotEmpty();
 	}
 }

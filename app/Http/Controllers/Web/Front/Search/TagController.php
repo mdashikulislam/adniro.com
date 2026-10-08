@@ -86,7 +86,7 @@ class TagController extends BaseController
 		$noIndexFiltersOnEntriesPages = (
 			config('settings.seo.no_index_filters_orders')
 			&& routeActionHas('Search\\')
-			&& !empty(request()->except(['page']))
+			&& $this->hasFilterParameters()
 		);
 		// "No result" Pages (Empty Searches Results Pages)
 		$noIndexNoResultPages = (
