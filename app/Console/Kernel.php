@@ -40,6 +40,9 @@ class Kernel
 		
 		// Clear Listings
 		$schedule->command('listings:purge')->timezone($tz)->hourly();
+
+		// Rebuild the listings counts & last changes (sitemaps, sidebar, noindex rules)
+		$schedule->command('listings:warm-counts')->timezone($tz)->everyThirtyMinutes()->withoutOverlapping();
 		
 		// Backups
 		setBackupConfig();
