@@ -134,6 +134,23 @@ class SitemapsController extends FrontController
 	}
 	
 	/**
+	 * Add a URL to the sitemap. Non-ASCII characters (e.g. Arabic slugs) are percent-encoded,
+	 * as required in sitemaps and as in the pages' canonical URLs.
+	 *
+	 * @param string $url
+	 * @param \DateTimeInterface|null $lastModified
+	 * @param string|null $changeFrequency
+	 * @param string|null $priority
+	 * @return void
+	 */
+	protected function addUrl(string $url, ?\DateTimeInterface $lastModified = null, ?string $changeFrequency = null, ?string $priority = null): void
+	{
+		$url = preg_replace_callback('/[^\x21-\x7E]+/u', fn ($m) => rawurlencode($m[0]), $url);
+		
+		Sitemap::addTag($url, $lastModified, $changeFrequency, $priority);
+	}
+	
+	/**
 	 * Check if the given country is the app's default country
 	 *
 	 * @param string|null $countryCode
@@ -236,15 +253,25 @@ class SitemapsController extends FrontController
 		$pagesLastMod = $this->lastMod($listingsLastMod, $this->getPagesLastMod());
 		
 		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/pages.xml'), $pagesLastMod);
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'), $listingsLastMod);
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'), $listingsLastMod);
-        Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'), $listingsLastMod);
-
-        $countPosts = Post::verified()->inCountry($country['code'])->count();
-		if ($countPosts > 0) {
+		
+		// Only the sitemaps having at least one URL (an empty sitemap or sitemap index is invalid).
+		// The (cached) listing counts tell which ones, without querying the posts table again.
+		$counts = $this->getListingCounts($country['code']);
+		$isIndexable = fn ($total) => $total >= $this->minListingsToIndex;
+		
+		if (!empty(array_filter($counts['cat'] ?? [], $isIndexable))) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'), $listingsLastMod);
+		}
+		if (!empty(array_filter($counts['city'] ?? [], $isIndexable))) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'), $listingsLastMod);
+		}
+		if (!empty(array_filter($counts['catCity'] ?? [], $isIndexable))) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'), $listingsLastMod);
+		}
+		if (array_sum($counts['city'] ?? []) > 0) {
 			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/posts.xml'), $listingsLastMod);
 		}
-
+		
 		// The blog is not country specific: only referenced in the default country's sitemap index
 		if ($this->isDefaultCountry($country['code']) && $this->countBlogPosts($country['code']) > 0) {
 			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/blog.xml'), $this->lastMod($this->getBlogLastMod($country['code'])));
@@ -271,25 +298,33 @@ class SitemapsController extends FrontController
 			return Sitemap::render();
 		}
 		
-		$params = [];
-		if (!config('plugins.domainmapping.installed')) {
-			$params['country'] = $country['code'];
-		}
-		
 		// The homepage, the HTML sitemap & the search page list the latest listings
 		$listingsLastMod = $this->lastMod($this->getListingLastMod($country['code'])['country']);
+		$isDefaultCountry = $this->isDefaultCountry($country['code']);
 		
-		$url = url('/');
+		// Homepage: the site's root for the default country (its "/{countryCode}" homepage is
+		// canonicalized to the root), the "/{countryCode}" homepage for the other countries
+		$url = $isDefaultCountry ? url('/') : url($country['icode']);
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $listingsLastMod, 'daily', '1.0');
+		$this->addUrl($url, $listingsLastMod, 'daily', '1.0');
 		
 		$url = urlGen()->sitemap($country['icode']);
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $listingsLastMod, 'daily', '0.5');
+		$this->addUrl($url, $listingsLastMod, 'daily', '0.5');
 		
-		$url = urlGen()->search([], false, $country['icode']);
-		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $listingsLastMod, 'daily', '0.6');
+		// The search page is "noindex" below the indexing threshold
+		$totalListings = array_sum($this->getListingCounts($country['code'])['city'] ?? []);
+		if ($totalListings >= $this->minListingsToIndex) {
+			$url = urlGen()->search([], false, $country['icode']);
+			$url = urlBuilder($url)->toString();
+			$this->addUrl($url, $listingsLastMod, 'daily', '0.6');
+		}
+		
+		// The CMS pages & the contact page aren't country specific:
+		// only listed once, in the default country's sitemap
+		if (!$isDefaultCountry) {
+			return Sitemap::render();
+		}
 		
 		// Cache Parameters
 		$cacheParams = [
@@ -306,14 +341,14 @@ class SitemapsController extends FrontController
 		if ($pages->count() > 0) {
 			foreach ($pages as $page) {
 				$url = urlGen()->page($page);
-				Sitemap::addTag($url, $this->lastMod($page->updated_at ?? $page->created_at ?? null), 'monthly', '0.7');
+				$this->addUrl($url, $this->lastMod($page->updated_at ?? $page->created_at ?? null), 'monthly', '0.7');
 			}
 		}
 		
-		$url = urlGen()->contact();
-		$url = urlBuilder($url)->setParameters($params)->toString();
+		// Same URL as the page's canonical (without the "country" query string parameter)
+		$url = url(urlGen()->contact());
 		// Static form: no known change date, so no "lastmod" at all
-		Sitemap::addTag($url, null, 'monthly', '0.7');
+		$this->addUrl($url, null, 'monthly', '0.7');
 		
 		return Sitemap::render();
 	}
@@ -357,7 +392,7 @@ class SitemapsController extends FrontController
 
 		// Blog homepage & categories: last change of the posts they list
 		$blogLastMod = $this->lastMod($this->getBlogLastMod($country['code']));
-		Sitemap::addTag(urlGen()->blog(), $blogLastMod, 'daily', '0.8');
+		$this->addUrl(urlGen()->blog(), $blogLastMod, 'daily', '0.8');
 
 		$categories = caching()->remember(BlogCategory::class, ['action' => 'get.blog.categories', 'format' => 'xml'], function () {
 			return BlogCategory::query()->orderBy('lft')->orderBy('name')->get();
@@ -368,12 +403,12 @@ class SitemapsController extends FrontController
 			$categoryPosts = $postsByCategory->get($category->id, collect());
 			$dates = $categoryPosts->map(fn ($post) => $post->updated_at ?? $post->published_at)->all();
 			$url = urlGen()->blogCategory($category);
-			Sitemap::addTag($url, $this->lastMod(...$dates), 'weekly', '0.6');
+			$this->addUrl($url, $this->lastMod(...$dates), 'weekly', '0.6');
 		}
 
 		foreach ($posts as $post) {
 			$lastModified = $this->lastMod($post->updated_at ?? $post->published_at ?? null);
-			Sitemap::addTag($post->url, $lastModified, 'weekly', '0.7');
+			$this->addUrl($post->url, $lastModified, 'weekly', '0.7');
 		}
 
 		return Sitemap::render();
@@ -421,7 +456,7 @@ class SitemapsController extends FrontController
 					continue;
 				}
 				$url = urlGen()->category($cat, $country['icode']);
-				Sitemap::addTag($url, $this->lastMod($lastMods['cat'][$cat->id] ?? null), 'daily', '0.8');
+				$this->addUrl($url, $this->lastMod($lastMods['cat'][$cat->id] ?? null), 'daily', '0.8');
 			}
 		}
 
@@ -471,7 +506,7 @@ class SitemapsController extends FrontController
 		foreach ($cities as $city) {
 			// Same URL as the internal links (the city pages redirect any other slug to it)
 			$url = urlGen()->city($city, $country['icode']);
-			Sitemap::addTag($url, $this->lastMod($lastMods['city'][$city->id] ?? null), 'daily', '0.7');
+			$this->addUrl($url, $this->lastMod($lastMods['city'][$city->id] ?? null), 'daily', '0.7');
 		}
 		
 		return Sitemap::render();
@@ -529,7 +564,7 @@ class SitemapsController extends FrontController
 				$url = $isDomainMapped ? dmUrl($post->country_code, $path) : url($path);
 				$url = urlBuilder($url)->toString();
 				// "updated_at" is the last edit of the listing (visits don't touch it)
-				Sitemap::addTag($url, $this->lastMod($post->created_at, $post->updated_at), 'daily', '0.6');
+				$this->addUrl($url, $this->lastMod($post->created_at, $post->updated_at), 'daily', '0.6');
 			}
 		}
 		
@@ -614,7 +649,7 @@ class SitemapsController extends FrontController
             foreach ($cats as $cat) {
                 $url = urlGen()->category($cat, $country['icode']);
                 $url = $url.'/'.$citySLug.'/'.$cityId;
-                Sitemap::addTag($url, $this->lastMod($this->getListingLastMod($country['code'])['catCity'][$cat->id . '-' . (int)$cityId] ?? null), 'daily', '0.8');
+                $this->addUrl($url, $this->lastMod($this->getListingLastMod($country['code'])['catCity'][$cat->id . '-' . (int)$cityId] ?? null), 'daily', '0.8');
             }
         }
         return Sitemap::render();
@@ -666,7 +701,7 @@ class SitemapsController extends FrontController
         foreach ($cities as $city) {
             $citySlug = $city->slug;
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
-            Sitemap::addTag($url, $this->lastMod($lastMods['catCity'][$cat->id . '-' . $city->id] ?? null), 'daily', '0.8');
+            $this->addUrl($url, $this->lastMod($lastMods['catCity'][$cat->id . '-' . $city->id] ?? null), 'daily', '0.8');
         }
         return Sitemap::render();
     }

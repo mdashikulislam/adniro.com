@@ -162,6 +162,13 @@ class HomeController extends FrontController
         // Get SEO
         $searchFormOptions = data_get($sections, 'search_form.options') ?? [];
         $this->setSeo($searchFormOptions);
+        
+        // The default country's "/{countryCode}" homepage is the same page as the site's root
+        $defaultCountryCode = config('settings.localization.default_country_code');
+        if (!empty($defaultCountryCode) && strtolower((string)$countryCode) === strtolower($defaultCountryCode)) {
+            view()->share('canonicalUrl', url('/'));
+        }
+        
         return view('front.index', compact('sections', 'isFromHome'));
     }
 }
