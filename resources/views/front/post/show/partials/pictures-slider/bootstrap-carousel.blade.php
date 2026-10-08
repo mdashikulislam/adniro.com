@@ -1,5 +1,7 @@
 @php
 	$titleSlug ??= '';
+	// Images' alternative text: the listing's title (numbered from the 2nd picture)
+	$altTitle = trim(strip_tags((string)data_get($post ?? [], 'title')));
 @endphp
 {{-- bxSlider - Horizontal Thumbnails --}}
 <div id="picturesCarouselIndicators" class="gallery-container carousel carousel-dark slide" data-bs-ride="carousel">
@@ -41,7 +43,7 @@
 				@php
 					$src = data_get($image, 'url.large');
 					$webpSrc = data_get($image, 'url.webp.large');
-					$alt = $titleSlug . '-big-' . $key;
+					$alt = $altTitle . ($key > 0 ? ' - ' . ($key + 1) : '');
 					echo generateImageHtml($src, $alt, $webpSrc, ['class' => 'd-block']);
 				@endphp
 			</div>
