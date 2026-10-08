@@ -111,8 +111,12 @@ trait SearchTrait
 		}
 		
 		// Cache Parameters
+		// The query is filtered by the current country (inCountry()), which isn't part of
+		// the request input: it must be in the key, or countries sharing the same URL path
+		// & query string (e.g. "/in/search" & "/au/search") get each other's listings
 		$cacheParams = array_merge($input, $preSearch, [
-			'action' => 'get.listings',
+			'action'  => 'get.listings',
+			'country' => config('country.code'),
 		]);
 		
 		// Cached Query
