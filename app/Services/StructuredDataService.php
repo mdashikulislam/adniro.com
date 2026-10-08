@@ -134,7 +134,10 @@ class StructuredDataService
 	public function countryHomeUrl(): string
 	{
 		$countryCode = strtolower((string)config('country.icode'));
-		if (isMultiCountriesUrlsEnabled() && !empty($countryCode)) {
+		$defaultCountryCode = strtolower((string)config('settings.localization.default_country_code'));
+		
+		// The default country's homepage is the site root (its "/{countryCode}" page canonicalizes to it)
+		if (isMultiCountriesUrlsEnabled() && !empty($countryCode) && $countryCode !== $defaultCountryCode) {
 			return url('/' . $countryCode);
 		}
 
@@ -321,7 +324,7 @@ class StructuredDataService
 
 	// Listing schema builders
 
-	protected function product(array $post, array $pictures, array $customFields): array
+	protected function product(array $post, array $pictures, array $customFields): ?array
 	{
 		$schema = [
 			'@context'    => 'https://schema.org',
@@ -348,7 +351,12 @@ class StructuredDataService
 			$schema['datePosted'] = $this->isoDate(data_get($post, 'created_at'));
 		}
 
+		// Google requires "offers", "review" or "aggregateRating" on Product markup: listings without
+		// a price (e.g. "Contact us") get none, rather than an invalid Product reported as an error
 		$schema['offers'] = $this->offer($post, $customFields);
+		if (empty($schema['offers'])) {
+			return null;
+		}
 
 		return $this->filter($schema);
 	}
