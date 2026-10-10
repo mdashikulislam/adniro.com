@@ -30,6 +30,14 @@
 		@honeypot
 		
 		<div class="row gx-3">
+			<div class="col-12 auth-section-head">
+				<span class="auth-section-num">1</span>
+				<div>
+					<h3 class="auth-section-title">{{ t('register_section_details') }}</h3>
+					<p class="auth-section-text">{{ t('register_section_details_text') }}</p>
+				</div>
+			</div>
+			
 			{{-- name --}}
 			@include('helpers.forms.fields.text', [
 				'label'       => t('Name'),
@@ -117,9 +125,14 @@
 			{{-- phone --}}
 			@php
 				$phoneCountryValue = config('country.code');
+				$phoneIsRequired = (getAuthField() == 'phone');
+				$phoneLabel = trans('auth.phone_number');
+				if (!$phoneIsRequired && !$usersCanChooseNotifyChannel) {
+					$phoneLabel .= ' <span class="auth-optional">' . t('optional') . '</span>';
+				}
 			@endphp
 			@include('helpers.forms.fields.intl-tel-input', [
-				'label'       => trans('auth.phone_number'),
+				'label'       => $phoneLabel,
 				'id'          => 'phone',
 				'name'        => 'phone',
 				'required'    => (getAuthField() == 'phone'),
@@ -143,6 +156,14 @@
 				])
 			@endif
 			
+			<div class="col-12 auth-section-head auth-section-head-next">
+				<span class="auth-section-num">2</span>
+				<div>
+					<h3 class="auth-section-title">{{ t('register_section_security') }}</h3>
+					<p class="auth-section-text">{{ t('register_section_security_text') }}</p>
+				</div>
+			</div>
+			
 			{{-- password --}}
 			@include('helpers.forms.fields.password', [
 				'label'          => trans('auth.password'),
@@ -152,6 +173,7 @@
 				'value'          => null,
 				'prefix'         => '<i class="bi bi-lock"></i>',
 				'togglePassword' => 'icon',
+				'hint'           => '',
 				'baseClass'      => ['wrapper' => 'mb-3 col-md-6'],
 			])
 			
@@ -167,6 +189,33 @@
 				'hint'           => '',
 				'baseClass'      => ['wrapper' => 'mb-3 col-md-6'],
 			])
+			
+			{{-- password strength --}}
+			@php
+				$pwdMinLength = (int)config('settings.auth.password_min_length', 6);
+				$pwdMaxLength = (int)config('settings.auth.password_max_length', 30);
+			@endphp
+			<div class="col-12">
+				<div class="auth-pwd-meter" id="pwdMeter" data-min="{{ $pwdMinLength }}" data-max="{{ $pwdMaxLength }}">
+					<div class="auth-pwd-meter-top">
+						<div class="auth-pwd-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+						<span class="auth-pwd-label"
+						      data-empty="{{ t('pwd_strength') }}"
+						      data-weak="{{ t('pwd_weak') }}"
+						      data-fair="{{ t('pwd_fair') }}"
+						      data-good="{{ t('pwd_good') }}"
+						      data-strong="{{ t('pwd_strong') }}"
+						>{{ t('pwd_strength') }}</span>
+					</div>
+					<ul class="auth-pwd-rules">
+						<li data-rule="length"><i class="bi bi-check-circle-fill"></i>{{ trans('auth.password_tip_length', ['min' => $pwdMinLength, 'max' => $pwdMaxLength]) }}</li>
+						<li data-rule="case"><i class="bi bi-check-circle-fill"></i>{{ t('pwd_rule_case') }}</li>
+						<li data-rule="number"><i class="bi bi-check-circle-fill"></i>{{ t('pwd_rule_number') }}</li>
+						<li data-rule="symbol"><i class="bi bi-check-circle-fill"></i>{{ t('pwd_rule_symbol') }}</li>
+						<li data-rule="match"><i class="bi bi-check-circle-fill"></i>{{ t('pwd_rule_match') }}</li>
+					</ul>
+				</div>
+			</div>
 			
 			{{-- captcha --}}
 			<div class="auth-captcha col-12">
@@ -210,4 +259,53 @@
 @endsection
 
 @section('after_scripts')
+	<script>
+		(function () {
+			const meter = document.getElementById('pwdMeter');
+			const pwd = document.getElementById('password');
+			const confirmPwd = document.getElementById('password_confirmation');
+			if (!meter || !pwd) {
+				return;
+			}
+			
+			const min = parseInt(meter.dataset.min, 10) || 6;
+			const max = parseInt(meter.dataset.max, 10) || 30;
+			const label = meter.querySelector('.auth-pwd-label');
+			const rules = {};
+			meter.querySelectorAll('[data-rule]').forEach((el) => rules[el.dataset.rule] = el);
+			const levels = ['empty', 'weak', 'fair', 'good', 'strong'];
+			
+			const update = () => {
+				const value = pwd.value || '';
+				const passed = {
+					length: value.length >= min && value.length <= max,
+					case: /[a-z]/.test(value) && /[A-Z]/.test(value),
+					number: /\d/.test(value),
+					symbol: /[^A-Za-z0-9]/.test(value),
+					match: value.length > 0 && confirmPwd && confirmPwd.value === value,
+				};
+				Object.keys(rules).forEach((rule) => rules[rule].classList.toggle('is-met', !!passed[rule]));
+				
+				let score = 0;
+				if (value.length > 0) {
+					score = 1;
+					if (passed.length) {
+						score += ['case', 'number', 'symbol'].filter((rule) => passed[rule]).length;
+						if (value.length >= min + 4) {
+							score += 1;
+						}
+					}
+					score = Math.min(score, 4);
+				}
+				meter.dataset.level = levels[score];
+				label.textContent = label.dataset[levels[score]];
+			};
+			
+			pwd.addEventListener('input', update);
+			if (confirmPwd) {
+				confirmPwd.addEventListener('input', update);
+			}
+			update();
+		})();
+	</script>
 @endsection
