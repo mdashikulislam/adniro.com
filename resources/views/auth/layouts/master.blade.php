@@ -70,6 +70,15 @@
 	@endphp
 	<link href="{{ $styleCssUrl }}" rel="stylesheet">
 	
+	{{-- The site's theme colors (generated from the front settings) & the auth pages' design --}}
+	@php
+		$frontStyleCssUrl = url('common/css/style.css') . $skinQs . getPictureVersion(!empty($skinQs));
+		$authCustomCssPath = public_path('dist/auth/custom.css');
+		$authCustomCssVersion = file_exists($authCustomCssPath) ? '?v=' . filemtime($authCustomCssPath) : '';
+	@endphp
+	<link href="{{ $frontStyleCssUrl }}" rel="stylesheet">
+	<link href="{{ url()->asset('dist/auth/custom.css') . $authCustomCssVersion }}" rel="stylesheet">
+	
 	@yield('after_styles')
 	@stack('after_styles_stack')
 	
@@ -101,103 +110,106 @@
 </div>
 --}}
 
-<div id="main-wrapper" class="auth-login-register">
-	<div class="container-fluid px-0">
-		<div class="row g-0 min-vh-100">
-			
-			{{-- Welcome Text --}}
-			<div class="col-md-6">
-				<div class="hero-wrap d-flex align-items-start h-100">
-					<div class="hero-mask opacity-8 bg-primary"></div>
-					<div class="hero-bg hero-bg-scroll" style="{!! $heroBgStyle !!}"></div>
-					<div class="hero-content w-100 min-vh-100 d-flex flex-column">
-						<div class="row g-0">
-							<div class="col-11 col-sm-10 col-md-10 col-lg-9 mx-auto">
-								<div class="logo mt-5 mb-5 mb-md-0">
-									<a class="d-flex" href="{{ url('/') }}" title="{!! $logoLabel !!}">
-										<img src="{{ $logoUrl }}"
-										     alt="{{ $logoAlt }}"
-										     data-bs-placement="bottom"
-										     data-bs-toggle="tooltip"
-										     title="{!! $logoLabel !!}"
-										     style="{!! $logoCssSize !!}"
-										>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row g-0 my-auto">
-							<div class="col-11 col-sm-10 col-md-10 col-lg-9 mx-auto">
-								@php
-									$defaultCoverTitle = trans('auth.default_cover_title', ['appName' => config('app.name')]);
-									$defaultCoverDescription = trans('auth.default_cover_description');
-								@endphp
-								<h1 class="text-11 text-white mb-4">
-									{!! $coverTitle ?? $defaultCoverTitle !!}
-								</h1>
-								<p class="text-4 text-white lh-base mb-5">
-									{!! $coverDescription ?? $defaultCoverDescription !!}
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			
-			{{-- Login Form --}}
-			<div class="col-md-6 d-flex">
-				<div class="container my-auto py-5">
-					<div class="row g-0">
-						
-						@php
-							$hasNotifications = (
-								(isset($errors) && $errors->any())
-								|| session()->has('flash_messages')
-								|| session()->has('resendEmailVerificationData')
-								|| session()->has('resendPhoneVerificationData')
-								|| session()->has('status')
-								|| session()->has('email')
-								|| session()->has('phone')
-								|| session()->has('login')
-								|| session()->has('code')
-							);
-						@endphp
-						
-						@if (isset($errors) && $errors->any())
-							<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
-								<div class="alert alert-danger">
-									@if (request()->segment(2) == 'register')
-										<h5 class="fw-bold text-danger-emphasis mb-3">
-											{{ trans('auth.validation_errors_title') }}
-										</h5>
-									@endif
-									<ul class="mb-0 list-unstyled">
-										@foreach ($errors->all() as $error)
-											<li class="lh-lg"><i class="bi bi-check-lg me-1"></i>{!! $error !!}</li>
-										@endforeach
-									</ul>
-								</div>
-							</div>
-						@endif
-						
-						@include('helpers.flash.default')
-						
-						@yield('notifications')
-						
-						@if ($hasNotifications)
-							<div class="col-12 mx-auto mb-4">&nbsp;</div>
-						@endif
-						
-						@yield('content')
-						
-						@include('auth.layouts.partials.select-language')
-					
-					</div>
-				</div>
-			</div>
+<div id="main-wrapper" class="auth-login-register auth-shell">
+	
+	{{-- Brand panel --}}
+	<aside class="auth-brand d-none d-lg-flex">
+		<div class="auth-brand-bg" style="{!! $heroBgStyle !!}"></div>
+		<div class="auth-brand-overlay"></div>
 		
+		<div class="auth-brand-inner">
+			<a class="auth-brand-logo" href="{{ url('/') }}" title="{!! $logoLabel !!}">
+				<img src="{{ $logoUrl }}" alt="{{ $logoAlt }}" style="{!! $logoCssSize !!}">
+			</a>
+			
+			<div class="auth-brand-content">
+				@php
+					$defaultCoverTitle = trans('auth.default_cover_title', ['appName' => config('app.name')]);
+					$defaultCoverDescription = trans('auth.default_cover_description');
+				@endphp
+				<span class="auth-brand-eyebrow"><i class="fa-solid fa-shield-halved"></i> {{ t('auth_brand_eyebrow') }}</span>
+				<h1 class="auth-brand-title">{!! $coverTitle ?? $defaultCoverTitle !!}</h1>
+				<p class="auth-brand-text">{!! $coverDescription ?? $defaultCoverDescription !!}</p>
+				
+				<ul class="auth-brand-features">
+					<li>
+						<span class="auth-brand-feature-icon"><i class="fa-solid fa-bullhorn"></i></span>
+						<span>{{ t('auth_feature_post') }}</span>
+					</li>
+					<li>
+						<span class="auth-brand-feature-icon"><i class="fa-regular fa-comments"></i></span>
+						<span>{{ t('auth_feature_chat') }}</span>
+					</li>
+					<li>
+						<span class="auth-brand-feature-icon"><i class="fa-regular fa-heart"></i></span>
+						<span>{{ t('auth_feature_save') }}</span>
+					</li>
+				</ul>
+			</div>
+			
+			<div class="auth-brand-footer">
+				&copy; {{ date('Y') }} {{ $logoLabel }}
+			</div>
 		</div>
-	</div>
+	</aside>
+	
+	{{-- Form panel --}}
+	<main class="auth-main">
+		<div class="auth-topbar">
+			<a class="auth-topbar-logo d-lg-none" href="{{ url('/') }}" title="{!! $logoLabel !!}">
+				<img src="{{ $logoUrl }}" alt="{{ $logoAlt }}">
+			</a>
+			<a class="auth-topbar-home" href="{{ url('/') }}">
+				<i class="fa-solid fa-arrow-left"></i> {{ trans('auth.back_to_home') }}
+			</a>
+		</div>
+		
+		<div class="auth-main-body">
+			<div class="auth-card @yield('auth_card_class')">
+				@php
+					$hasNotifications = (
+						(isset($errors) && $errors->any())
+						|| session()->has('flash_messages')
+						|| session()->has('resendEmailVerificationData')
+						|| session()->has('resendPhoneVerificationData')
+						|| session()->has('status')
+						|| session()->has('email')
+						|| session()->has('phone')
+						|| session()->has('login')
+						|| session()->has('code')
+					);
+				@endphp
+				
+				<div class="auth-notifications">
+					@if (isset($errors) && $errors->any())
+						<div class="alert alert-danger">
+							@if (request()->segment(2) == 'register')
+								<h5 class="fw-bold text-danger-emphasis mb-2">
+									{{ trans('auth.validation_errors_title') }}
+								</h5>
+							@endif
+							<ul class="mb-0 list-unstyled">
+								@foreach ($errors->all() as $error)
+									<li class="lh-lg"><i class="bi bi-exclamation-circle me-1"></i>{!! $error !!}</li>
+								@endforeach
+							</ul>
+						</div>
+					@endif
+					
+					@include('helpers.flash.default')
+					
+					@yield('notifications')
+				</div>
+				
+				@yield('content')
+			</div>
+		</div>
+		
+		<div class="auth-main-footer">
+			@include('auth.layouts.partials.select-language')
+		</div>
+	</main>
+
 </div>
 
 @section('modal')

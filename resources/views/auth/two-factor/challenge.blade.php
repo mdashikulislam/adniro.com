@@ -25,61 +25,44 @@
 
 @section('notifications')
 	@if (session()->has('code'))
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
-			<div class="alert alert-danger">
-				<p>{{ session('code') }}</p>
-			</div>
+		<div class="alert alert-danger">
+			<p class="mb-0">{{ session('code') }}</p>
 		</div>
 	@endif
 @endsection
 
 @section('content')
-	<div class="col-11 col-sm-11 col-md-10 col-lg-9 col-xl-8 mx-auto">
-		<h3 class="fw-600 mb-4">{{ trans('auth.two_factor_title') }}</h3>
-		
-		<p class="text-muted mb-4">{!! $pageDescription !!}</p>
-		
-		<form id="twoFactorOtpForm" role="form" method="post" action="{{ urlGen()->twoFactorChallenge() }}" data-submitting="false">
-			@csrf
-			@honeypot
-			
-			{{-- code --}}
-			@php
-				$codeError = (isset($errors) && $errors->has('code')) ? ' is-invalid' : '';
-			@endphp
-			<div class="row g-3" id="otpInputs">
-				@for($i = 0; $i < $otpLength; $i++)
-					<div class="col">
-						<input type="text" class="form-control{{ $codeError }} text-center text-6 py-2" maxlength="1" autocomplete="off">
-					</div>
-				@endfor
-			</div>
-			<input type="hidden" name="code" id="otpCode">
-			{{--
-			<div class="mb-3">
-				<label for="code" class="col-form-label">{{ trans('auth.code') }}:</label>
-				<input id="code" name="code"
-				       type="text"
-				       placeholder="{{ trans('auth.enter_verification_code') }}"
-				       class="form-control{{ $codeError }}"
-				       value="{{ old('code') }}"
-				       autocomplete="one-time-code"
-				>
-			</div>
-			--}}
-			<div class="d-grid my-4">
-				<button type="submit" id="otpButton" class="btn btn-primary btn-lg btn-block">
-					{{ trans('auth.verify') }}
-				</button>
-			</div>
-		</form>
-		
-		<p class="text-center text-muted">
-			{{ trans('auth.not_received_code') }} <a href="{{ urlGen()->twoFactorResend() }}">{{ trans('auth.resend_code') }}</a>
-		</p>
-		
-		<p class="text-center text-muted">
-			<a href="{{ urlGen()->signIn() }}">{{ trans('auth.back_to_login') }}</a>
-		</p>
+	<div class="auth-head">
+		<span class="auth-head-icon"><i class="fa-solid fa-shield-halved"></i></span>
+		<h2 class="auth-title">{{ trans('auth.two_factor_title') }}</h2>
+		<p class="auth-subtitle">{!! $pageDescription !!}</p>
 	</div>
+	
+	<form id="twoFactorOtpForm" class="auth-form" role="form" method="post" action="{{ urlGen()->twoFactorChallenge() }}" data-submitting="false">
+		@csrf
+		@honeypot
+		
+		{{-- code --}}
+		@php
+			$codeError = (isset($errors) && $errors->has('code')) ? ' is-invalid' : '';
+		@endphp
+		<div class="auth-otp" id="otpInputs">
+			@for($i = 0; $i < $otpLength; $i++)
+				<input type="text" class="form-control{{ $codeError }} auth-otp-input" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="{{ trans('auth.code') }} {{ $i + 1 }}">
+			@endfor
+		</div>
+		<input type="hidden" name="code" id="otpCode">
+		
+		<button type="submit" id="otpButton" class="btn btn-primary auth-submit">
+			{{ trans('auth.verify') }} <i class="fa-solid fa-arrow-right"></i>
+		</button>
+	</form>
+	
+	<div class="auth-resend">
+		{{ trans('auth.not_received_code') }} <a href="{{ urlGen()->twoFactorResend() }}">{{ trans('auth.resend_code') }}</a>
+	</div>
+	
+	<a class="auth-back" href="{{ urlGen()->signIn() }}">
+		<i class="fa-solid fa-arrow-left"></i> {{ trans('auth.back_to_login') }}
+	</a>
 @endsection

@@ -41,30 +41,24 @@
 	$showIconOnly ??= false;
 @endphp
 @if ($isLangOrCountryCanBeSelected || isSettingsAppDarkModeEnabled())
-	<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto mt-5">
-		<div class="row d-flex justify-content-center align-items-end">
-			<div class="col-md-6 col-sm-12 text-md-start text-center">
-				@if (isSettingsAppDarkModeEnabled())
-					@include('front.layouts.partials.navs.themes', [
-						'showIconOnly' => $showIconOnly,
-					])
-				@endif
-			</div>
-			<div class="col-md-6 col-sm-12 text-md-end text-center">
-				@if ($isLangOrCountryCanBeSelected)
-					<div class="">
-						<a href="#selectLanguage"
-						   role="button"
-						   data-bs-toggle="modal"
-						   class="text-secondary auto-tooltip"
-						   title="{{ t('change_language') }}"
-						>
-							<i class="bi bi-translate"></i> {{ $currentLanguageName }} <i class="bi bi-chevron-expand"></i>
-						</a>
-					</div>
-				@endif
-			</div>
+	<div class="auth-prefs">
+		<div class="auth-prefs-theme">
+			@if (isSettingsAppDarkModeEnabled())
+				@include('front.layouts.partials.navs.themes', [
+					'showIconOnly' => $showIconOnly,
+				])
+			@endif
 		</div>
+		@if ($isLangOrCountryCanBeSelected)
+			<a href="#selectLanguage"
+			   role="button"
+			   data-bs-toggle="modal"
+			   class="auth-prefs-lang auto-tooltip"
+			   title="{{ t('change_language') }}"
+			>
+				<i class="bi bi-translate"></i> {{ $currentLanguageName }} <i class="bi bi-chevron-expand"></i>
+			</a>
+		@endif
 	</div>
 @endif
 

@@ -21,112 +21,102 @@
 	$authField = request()->query('field');
 @endphp
 @section('content')
-	@if (!(isset($paddingTopExists) && $paddingTopExists))
-		<div class="p-0 mt-lg-4 mt-md-3 mt-3"></div>
-	@endif
-	<div class="col-11 col-sm-11 col-md-10 col-lg-9 col-xl-8 mx-auto">
-		<h3 class="fw-600 mb-5">{{ trans('auth.reset_password') }}</h3>
-		
-		<p class="text-muted mb-4">{{ getResetPasswordDescription() }}</p>
-		
-		<form action="{{ urlGen()->passwordReset() }}" method="post">
-			@csrf
-			@honeypot
-			
-			<input type="hidden" name="token" value="{{ $token }}">
-			
-			<div class="row">
-				{{-- email --}}
-				@php
-					$labelRight = '';
-					if (isPhoneAsAuthFieldEnabled()) {
-						$labelRight .= '<a href="" class="auth-field" data-auth-field="phone">';
-						$labelRight .= trans('auth.use_phone');
-						$labelRight .= '</a>';
-					}
-				@endphp
-				@include('helpers.forms.fields.email', [
-					'label'             => trans('auth.email'),
-					'labelRightContent' => $labelRight,
-					'id'                => 'email',
-					'name'              => 'email',
-					'required'          => (getAuthField() == 'email'),
-					'placeholder'       => trans('auth.email_address'),
-					'value'             => data_get($passwordReset, 'email'),
-					'wrapper'           => [
-						'class' => 'mb-3 col-md-12 auth-field-item',
-					],
-				])
-				
-				{{-- phone --}}
-				@if (isPhoneAsAuthFieldEnabled())
-					@php
-						$labelRight = '<a href="" class="auth-field" data-auth-field="email">';
-						$labelRight .= trans('auth.use_email');
-						$labelRight .= '</a>';
-						
-						$phoneValue = data_get($passwordReset, 'phone');
-						$phoneCountryValue = data_get($passwordReset, 'phone_country', config('country.code'));
-					@endphp
-					@include('helpers.forms.fields.intl-tel-input', [
-						'label'             => trans('auth.phone_number'),
-						'labelRightContent' => $labelRight,
-						'id'                => 'phone',
-						'name'              => 'phone',
-						'required'          => (getAuthField() == 'phone'),
-						'value'             => $phoneValue,
-						'countryCode'       => $phoneCountryValue,
-						'hint'              => trans('auth.forgot_password_hint_phone'),
-						'wrapper'           => [
-							'class' => 'mb-3 col-md-12 auth-field-item',
-						],
-					])
-				@endif
-				
-				{{-- auth_field --}}
-				<input name="auth_field" type="hidden" value="{{ old('auth_field', getAuthField()) }}">
-				
-				{{-- password --}}
-				@include('helpers.forms.fields.password', [
-					'label'          => trans('auth.new_password'),
-					'name'           => 'password',
-					'placeholder'    => trans('auth.new_password'),
-					'required'       => true,
-					'value'          => null,
-					'togglePassword' => 'link',
-					'baseClass'      => ['wrapper' => 'mb-3 col-md-10'],
-				])
-				
-				{{-- password_confirmation --}}
-				@include('helpers.forms.fields.password', [
-					'label'          => trans('auth.confirm_new_password'),
-					'name'           => 'password_confirmation',
-					'placeholder'    => trans('auth.confirm_new_password'),
-					'required'       => true,
-					'value'          => null,
-					'togglePassword' => 'link',
-					'baseClass'      => ['wrapper' => 'mb-3 col-md-10'],
-				])
-				
-				{{-- captcha --}}
-				@include('helpers.forms.fields.captcha', ['label' => trans('auth.captcha_human_verification')])
-				
-				{{-- button --}}
-				<div class="d-grid my-4">
-					<button type="submit" class="btn btn-primary btn-lg btn-block">
-						{{ trans('auth.reset_password') }}
-					</button>
-				</div>
-			</div>
-		</form>
-		
-		<p class="text-center text-muted">
-			<a href="{{ urlGen()->signIn() }}">{{ trans('auth.back_to_login') }}</a>
-		</p>
-		<p class="text-center text-muted">
-			{{ trans('auth.dont_have_account') }} <a href="{{ urlGen()->signUp() }}">{{ trans('auth.create_account') }}</a>
-		</p>
+	<div class="auth-head">
+		<span class="auth-head-icon"><i class="fa-solid fa-unlock-keyhole"></i></span>
+		<h2 class="auth-title">{{ trans('auth.reset_password') }}</h2>
+		<p class="auth-subtitle">{{ getResetPasswordDescription() }}</p>
 	</div>
+	
+	<form class="auth-form" action="{{ urlGen()->passwordReset() }}" method="post">
+		@csrf
+		@honeypot
+		
+		<input type="hidden" name="token" value="{{ $token }}">
+		
+		{{-- email --}}
+		@php
+			$labelRight = '';
+			if (isPhoneAsAuthFieldEnabled()) {
+				$labelRight .= '<a href="" class="auth-field" data-auth-field="phone">';
+				$labelRight .= trans('auth.use_phone');
+				$labelRight .= '</a>';
+			}
+		@endphp
+		@include('helpers.forms.fields.email', [
+			'label'             => trans('auth.email'),
+			'labelRightContent' => $labelRight,
+			'id'                => 'email',
+			'name'              => 'email',
+			'required'          => (getAuthField() == 'email'),
+			'placeholder'       => trans('auth.email_address'),
+			'value'             => data_get($passwordReset, 'email'),
+			'prefix'            => '<i class="bi bi-envelope"></i>',
+			'wrapper'           => ['class' => 'auth-field-item'],
+		])
+		
+		{{-- phone --}}
+		@if (isPhoneAsAuthFieldEnabled())
+			@php
+				$labelRight = '<a href="" class="auth-field" data-auth-field="email">';
+				$labelRight .= trans('auth.use_email');
+				$labelRight .= '</a>';
+				
+				$phoneValue = data_get($passwordReset, 'phone');
+				$phoneCountryValue = data_get($passwordReset, 'phone_country', config('country.code'));
+			@endphp
+			@include('helpers.forms.fields.intl-tel-input', [
+				'label'             => trans('auth.phone_number'),
+				'labelRightContent' => $labelRight,
+				'id'                => 'phone',
+				'name'              => 'phone',
+				'required'          => (getAuthField() == 'phone'),
+				'value'             => $phoneValue,
+				'countryCode'       => $phoneCountryValue,
+				'hint'              => trans('auth.forgot_password_hint_phone'),
+				'wrapper'           => ['class' => 'auth-field-item'],
+			])
+		@endif
+		
+		{{-- auth_field --}}
+		<input name="auth_field" type="hidden" value="{{ old('auth_field', getAuthField()) }}">
+		
+		{{-- password --}}
+		@include('helpers.forms.fields.password', [
+			'label'          => trans('auth.new_password'),
+			'name'           => 'password',
+			'placeholder'    => trans('auth.new_password'),
+			'required'       => true,
+			'value'          => null,
+			'prefix'         => '<i class="bi bi-lock"></i>',
+			'togglePassword' => 'icon',
+		])
+		
+		{{-- password_confirmation --}}
+		@include('helpers.forms.fields.password', [
+			'label'          => trans('auth.confirm_new_password'),
+			'name'           => 'password_confirmation',
+			'placeholder'    => trans('auth.confirm_new_password'),
+			'required'       => true,
+			'value'          => null,
+			'prefix'         => '<i class="bi bi-shield-lock"></i>',
+			'togglePassword' => 'icon',
+			'hint'           => '',
+		])
+		
+		{{-- captcha --}}
+		<div class="auth-captcha">
+			@include('helpers.forms.fields.captcha', ['label' => trans('auth.captcha_human_verification')])
+		</div>
+		
+		{{-- button --}}
+		<button type="submit" class="btn btn-primary auth-submit">
+			{{ trans('auth.reset_password') }} <i class="fa-solid fa-arrow-right"></i>
+		</button>
+	</form>
+	
+	<a class="auth-back" href="{{ urlGen()->signIn() }}">
+		<i class="fa-solid fa-arrow-left"></i> {{ trans('auth.back_to_login') }}
+	</a>
 @endsection
 
 @section('after_scripts')
