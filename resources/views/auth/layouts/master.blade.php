@@ -182,17 +182,21 @@
 				
 				<div class="auth-notifications">
 					@if (isset($errors) && $errors->any())
-						<div class="alert alert-danger">
-							@if (request()->segment(2) == 'register')
-								<h5 class="fw-bold text-danger-emphasis mb-2">
-									{{ trans('auth.validation_errors_title') }}
-								</h5>
-							@endif
-							<ul class="mb-0 list-unstyled">
-								@foreach ($errors->all() as $error)
-									<li class="lh-lg"><i class="bi bi-exclamation-circle me-1"></i>{!! $error !!}</li>
-								@endforeach
-							</ul>
+						@php
+							$errorsTitle = (request()->segment(2) == 'register')
+								? trans('auth.validation_errors_title')
+								: t('auth_errors_title');
+						@endphp
+						<div class="auth-alert auth-alert-danger" role="alert">
+							<span class="auth-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+							<div class="auth-alert-body">
+								<p class="auth-alert-title">{{ $errorsTitle }}</p>
+								<ul class="auth-alert-list">
+									@foreach ($errors->all() as $error)
+										<li>{!! $error !!}</li>
+									@endforeach
+								</ul>
+							</div>
 						</div>
 					@endif
 					

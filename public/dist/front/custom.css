@@ -9708,3 +9708,297 @@ a.listing-step-link:hover {
 .login-modal-body .input-group:has(.is-invalid):focus-within {
 	box-shadow: 0 0 0 4px rgba(var(--bs-danger-rgb), .14);
 }
+
+/* =======================================================
+ * Toast notifications (PNotify, "custom" styling)
+ * ======================================================= */
+.pnotify .custom-container {
+	--toast-color: var(--bs-primary);
+	--toast-rgb: var(--bs-primary-rgb);
+	position: relative;
+	overflow: hidden;
+	padding: 1rem 2.75rem 1rem 4.1rem;
+	border: 1px solid var(--bs-border-color-translucent);
+	border-radius: 18px;
+	background-color: var(--bs-body-bg);
+	color: var(--bs-body-color);
+	box-shadow: 0 24px 48px -20px rgba(15, 23, 42, .35), 0 6px 16px -10px rgba(15, 23, 42, .15);
+}
+
+.pnotify .custom-container.custom-notice {
+	--toast-color: #d97706;
+	--toast-rgb: 245, 158, 11;
+}
+
+.pnotify .custom-container.custom-success {
+	--toast-color: #059669;
+	--toast-rgb: 16, 185, 129;
+}
+
+.pnotify .custom-container.custom-error {
+	--toast-color: #dc2626;
+	--toast-rgb: 239, 68, 68;
+}
+
+/* Accent bar */
+.pnotify .custom-container::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 4px;
+	background-color: var(--toast-color);
+}
+
+/* Icon */
+.pnotify .pnotify-container.custom-container::after {
+	content: "\f05a";
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 12px;
+	background-color: rgba(var(--toast-rgb), .14);
+	color: var(--toast-color);
+	font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+	font-weight: 900;
+	font-size: 1.15rem;
+	line-height: 1;
+	visibility: visible;
+	clear: none;
+}
+
+.pnotify .pnotify-container.custom-container.custom-notice::after { content: "\f0eb"; }
+.pnotify .pnotify-container.custom-container.custom-success::after { content: "\f058"; }
+.pnotify .pnotify-container.custom-container.custom-error::after { content: "\f06a"; }
+
+.pnotify .custom-container .custom-icon {
+	display: none;
+}
+
+.pnotify .custom-content {
+	margin: 0;
+}
+
+.pnotify .custom-title {
+	margin: 0 0 .2rem;
+	font-size: .95rem;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+}
+
+.pnotify .custom-text {
+	min-height: 38px;
+	font-size: .9rem;
+	line-height: 1.55;
+	color: var(--bs-body-color);
+}
+
+.pnotify .custom-text a {
+	font-weight: 700;
+	color: var(--toast-color) !important;
+	text-decoration: none;
+}
+
+.pnotify .custom-text a:hover {
+	text-decoration: underline;
+}
+
+/* Close button (always visible), no pin button */
+.pnotify .custom-closer {
+	position: absolute;
+	top: .75rem;
+	right: .75rem;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	margin: 0;
+	border-radius: 50%;
+	color: var(--bs-secondary-color);
+	font-size: .8rem;
+	cursor: pointer;
+	visibility: visible !important;
+	opacity: .75 !important;
+	transition: background-color .2s ease, opacity .2s ease;
+}
+
+.pnotify .custom-closer:hover {
+	opacity: 1 !important;
+	background-color: var(--bs-secondary-bg);
+}
+
+.pnotify .custom-sticker {
+	display: none !important;
+}
+
+/* Rich content (e.g. the log in tip) */
+.pnotify .toast-title {
+	display: block;
+	margin-bottom: .15rem;
+	font-size: .95rem;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+}
+
+.pnotify .toast-text {
+	display: block;
+	color: var(--bs-secondary-color);
+}
+
+.pnotify .toast-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	margin-top: .75rem;
+}
+
+.pnotify .custom-text .toast-btn {
+	display: inline-flex;
+	align-items: center;
+	padding: .4rem .95rem;
+	border-radius: 999px;
+	border: 1px solid var(--bs-border-color);
+	background-color: var(--bs-body-bg);
+	font-size: .82rem;
+	font-weight: 700;
+	color: var(--bs-emphasis-color) !important;
+	text-decoration: none;
+	transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+}
+
+.pnotify .custom-text .toast-btn:hover {
+	text-decoration: none;
+	border-color: rgba(var(--toast-rgb), .5);
+	transform: translateY(-1px);
+}
+
+.pnotify .custom-text .toast-btn-primary {
+	border-color: var(--toast-color);
+	background-color: var(--toast-color);
+	color: #fff !important;
+	box-shadow: 0 10px 20px -12px rgba(var(--toast-rgb), .9);
+}
+
+.pnotify .custom-text .toast-btn-primary:hover {
+	border-color: var(--toast-color);
+	filter: brightness(1.05);
+}
+
+[data-bs-theme="dark"] .pnotify .custom-container {
+	background-color: var(--bs-tertiary-bg);
+	border-color: rgba(255, 255, 255, .08);
+}
+
+@media (max-width: 575.98px) {
+	.pnotify.pnotify-positioned {
+		left: 12px !important;
+		right: 12px !important;
+	}
+	
+	.pnotify .custom-container {
+		width: auto !important;
+	}
+}
+
+/* =======================================================
+ * Form error card (log in modal; same design as the auth pages)
+ * ======================================================= */
+.auth-alert {
+	display: flex;
+	align-items: flex-start;
+	gap: .85rem;
+	margin-bottom: 1.5rem;
+	padding: 1rem 1.1rem;
+	border: 1px solid rgba(239, 68, 68, .22);
+	border-radius: 16px;
+	background: linear-gradient(135deg, rgba(254, 242, 242, 1) 0%, rgba(255, 247, 247, 1) 100%);
+	box-shadow: 0 12px 24px -20px rgba(220, 38, 38, .6);
+	animation: authAlertIn .35s ease both;
+}
+
+.auth-alert-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 38px;
+	height: 38px;
+	border-radius: 12px;
+	background-color: #ef4444;
+	box-shadow: 0 8px 16px -8px rgba(220, 38, 38, .8);
+	color: #fff;
+	font-size: 1rem;
+}
+
+.auth-alert-body {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.auth-alert-title {
+	margin: .45rem 0 .55rem;
+	font-size: .93rem;
+	font-weight: 700;
+	line-height: 1.35;
+	color: #991b1b;
+}
+
+.auth-alert-list {
+	display: grid;
+	gap: .35rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.auth-alert-list li {
+	position: relative;
+	padding-left: 1rem;
+	font-size: .86rem;
+	line-height: 1.45;
+	color: #7f1d1d;
+}
+
+.auth-alert-list li::before {
+	content: "";
+	position: absolute;
+	top: .55em;
+	left: .1rem;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background-color: #ef4444;
+}
+
+.auth-alert-list a {
+	font-weight: 700;
+	color: #b91c1c;
+}
+
+@keyframes authAlertIn {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+[data-bs-theme="dark"] .auth-alert {
+	background: rgba(239, 68, 68, .1);
+	border-color: rgba(239, 68, 68, .3);
+}
+
+[data-bs-theme="dark"] .auth-alert-title,
+[data-bs-theme="dark"] .auth-alert-list li {
+	color: var(--bs-emphasis-color);
+}

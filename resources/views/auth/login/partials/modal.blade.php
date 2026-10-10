@@ -15,16 +15,19 @@
 					<input type="hidden" name="language_code" value="{{ config('app.locale') }}">
 
 					@if (isset($errors) && $errors->any() && old('quickLoginForm')=='1')
-						<div class="alert alert-danger alert-dismissible login-modal-alert">
-							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('Close') }}"></button>
-							<ul class="mb-0 list-unstyled">
-								@foreach($errors->all() as $error)
-									<li class="lh-lg"><i class="bi bi-exclamation-circle me-1"></i>{!! $error !!}</li>
-								@endforeach
-							</ul>
+						<div class="auth-alert auth-alert-danger" role="alert">
+							<span class="auth-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+							<div class="auth-alert-body">
+								<p class="auth-alert-title">{{ t('auth_errors_title') }}</p>
+								<ul class="auth-alert-list">
+									@foreach($errors->all() as $error)
+										<li>{!! $error !!}</li>
+									@endforeach
+								</ul>
+							</div>
 						</div>
 					@endif
-
+					
 					{{-- social login --}}
 					@include('auth.login.partials.social-buttons')
 					
