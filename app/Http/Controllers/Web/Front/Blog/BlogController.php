@@ -44,6 +44,9 @@ class BlogController extends FrontController
 			})
 			->paginate($this->perPage)
 			->withQueryString();
+		
+		// A page number beyond the last page is a 404, not an empty page
+		abort_if($posts->currentPage() > max($posts->lastPage(), 1), 404);
 
 		$featuredPosts = empty($keyword) && $posts->currentPage() == 1
 			? $this->getFeaturedPosts()
@@ -66,7 +69,8 @@ class BlogController extends FrontController
 		);
 
 		// Keep the internal search results pages out of the search engines index
-		$noIndexBlogSearchPages = !empty($keyword);
+		// (and the empty pages, e.g. while the blog has no post yet)
+		$noIndexBlogSearchPages = (!empty($keyword) || $posts->total() == 0);
 
 		return view('front.blog.index', array_merge(
 			compact('posts', 'featuredPosts', 'title', 'subTitle', 'keyword', 'breadcrumbs', 'noIndexBlogSearchPages'),
@@ -91,6 +95,9 @@ class BlogController extends FrontController
 			->where('category_id', $category->getKey())
 			->paginate($this->perPage)
 			->withQueryString();
+		
+		// A page number beyond the last page is a 404, not an empty page
+		abort_if($posts->currentPage() > max($posts->lastPage(), 1), 404);
 
 		$title = $category->name;
 		$subTitle = strip_tags((string)$category->description);
@@ -109,7 +116,7 @@ class BlogController extends FrontController
 
 		return view('front.blog.index', array_merge(
 			compact('posts', 'category', 'title', 'subTitle', 'breadcrumbs'),
-			['featuredPosts' => collect(), 'keyword' => null],
+			['featuredPosts' => collect(), 'keyword' => null, 'noIndexBlogSearchPages' => ($posts->total() == 0)],
 			$this->getSidebarData()
 		));
 	}

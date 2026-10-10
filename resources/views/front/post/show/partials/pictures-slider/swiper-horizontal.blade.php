@@ -1,5 +1,7 @@
 @php
 	$titleSlug ??= '';
+	// Images' alternative text: the listing's title (numbered from the 2nd picture)
+	$altTitle = trim(strip_tags((string)data_get($post ?? [], 'title')));
 @endphp
 {{-- Swiper - Horizontal Thumbnails --}}
 <div class="gallery-container">
@@ -13,7 +15,7 @@
 					@php
 						$src = data_get($image, 'url.large');
 						$webpSrc = data_get($image, 'url.webp.large');
-						$alt = $titleSlug . '-big-' . $key;
+						$alt = $altTitle . ($key > 0 ? ' - ' . ($key + 1) : '');
 						$pictureAttr = ['class' => 'img-fluid'];
 						echo generateImageHtml($src, $alt, $webpSrc, $pictureAttr);
 					@endphp
@@ -34,7 +36,7 @@
 					@php
 						$src = data_get($image, 'url.small');
 						$webpSrc = data_get($image, 'url.webp.small');
-						$alt = $titleSlug . '-small-' . $key;
+						$alt = $altTitle . ($key > 0 ? ' - ' . ($key + 1) : '');
 						echo generateImageHtml($src, $alt, $webpSrc);
 					@endphp
 				</div>

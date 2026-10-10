@@ -93,26 +93,6 @@ class ShowController extends FrontController
 		$postId = $parameters[$idKey];
 		$slug = $parameters['slug'] ?? null;
 		
-		// Forcing redirection 301 for hashed (or non-hashed) ID to update links in search engine indexes
-		if (config('settings.seo.listing_hashed_id_seo_redirection')) {
-			if (config('settings.seo.listing_hashed_id_enabled') && !isHashedId($postId) && is_numeric($postId)) {
-				// Don't lose important notification, so we need to persist your flash data for the request (the redirect request)
-				request()->session()->reflash();
-				
-				$uri = urlGen()->postPathBasic(hashId($postId), $slug);
-				
-				return redirect()->to($uri, 301)->withHeaders(config('larapen.core.noCacheHeaders'));
-			}
-			if (!config('settings.seo.listing_hashed_id_enabled') && isHashedId($postId) && !is_numeric($postId)) {
-				// Don't lose important notification, so we need to persist your flash data for the request (the redirect request)
-				request()->session()->reflash();
-				
-				$uri = urlGen()->postPathBasic(hashId($postId, true), $slug);
-				
-				return redirect()->to($uri, 301)->withHeaders(config('larapen.core.noCacheHeaders'));
-			}
-		}
-		
 		// Decode Hashed ID
 		$postId = hashId($postId, true) ?? $postId;
 		
@@ -131,6 +111,14 @@ class ShowController extends FrontController
 		
 		// Listing isn't found
 		abort_if(empty($post), 410, $message ?? t('post_not_found'));
+		
+		// One URL per listing: any other URL leading to it (old numeric ID, hashed ID when
+		// IDs aren't hashed anymore, outdated or wrong slug, other letter case...) is
+		// permanently redirected to the listing's current URL, in a single hop
+		$canonicalRedirect = $this->redirectToCanonicalUrl($post);
+		if (!empty($canonicalRedirect)) {
+			return $canonicalRedirect;
+		}
 		
 		session()->put('isPostVisited', $postId);
 		
@@ -275,5 +263,36 @@ class ShowController extends FrontController
 		];
 		
 		return ajaxResponse()->json($data);
+	}
+	
+	/**
+	 * 301 redirection to the listing's current URL when it was reached through another one
+	 *
+	 * @param array|object $post
+	 * @return \Illuminate\Http\RedirectResponse|null
+	 */
+	private function redirectToCanonicalUrl(array|object $post): ?\Illuminate\Http\RedirectResponse
+	{
+		// Unverified listings are only shown as previews to their author
+		if (request()->filled('preview') || !isVerifiedPost($post)) {
+			return null;
+		}
+		
+		$canonicalPath = trim(rawurldecode(urlGen()->postPath($post)), '/');
+		$requestPath = trim(rawurldecode(request()->path()), '/');
+		if ($canonicalPath === '' || $canonicalPath === $requestPath) {
+			return null;
+		}
+		
+		// Don't lose important notification, so we need to persist your flash data for the request (the redirect request)
+		request()->session()->reflash();
+		
+		$url = urlGen()->post($post);
+		$queryString = request()->getQueryString();
+		if (!empty($queryString)) {
+			$url .= (str_contains($url, '?') ? '&' : '?') . $queryString;
+		}
+		
+		return redirect()->to($url, 301)->withHeaders(config('larapen.core.noCacheHeaders'));
 	}
 }

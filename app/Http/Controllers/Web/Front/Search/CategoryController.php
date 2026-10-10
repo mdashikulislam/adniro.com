@@ -53,6 +53,12 @@ class CategoryController extends BaseController
 		$apiExtra = data_get($data, 'extra');
 		$preSearch = data_get($apiExtra, 'preSearch');
 		
+		// Real URL, out-of-range pages & canonical URL (see BaseController::applySeoUrlRules())
+		$seoRedirect = $this->applySeoUrlRules(urlGen()->category(data_get($preSearch, 'cat')), $apiResult);
+		if (!empty($seoRedirect)) {
+			return $seoRedirect;
+		}
+		
 		// Sidebar
 		$this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
 		
@@ -81,7 +87,7 @@ class CategoryController extends BaseController
 		$noIndexFiltersOnEntriesPages = (
 			config('settings.seo.no_index_filters_orders')
 			&& routeActionHas('Search\\')
-			&& !empty(request()->except(['page']))
+			&& $this->hasFilterParameters()
 		);
 		// "No result" Pages (Empty Searches Results Pages)
 		$noIndexNoResultPages = (
@@ -127,6 +133,12 @@ class CategoryController extends BaseController
         $apiResult = data_get($data, 'result');
         $apiExtra = data_get($data, 'extra');
         $preSearch = data_get($apiExtra, 'preSearch');
+        
+        // Real URL, out-of-range pages & canonical URL (see BaseController::applySeoUrlRules())
+        $seoRedirect = $this->applySeoUrlRules(urlGen()->city(data_get($preSearch, 'city'), null, data_get($preSearch, 'cat')), $apiResult);
+        if (!empty($seoRedirect)) {
+        	return $seoRedirect;
+        }
         $this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
         // Get Titles
         $this->getBreadcrumb($preSearch);
@@ -142,15 +154,13 @@ class CategoryController extends BaseController
         }
         view()->share('og', $this->og);
         // SEO: noindex
-        $noIndexCitiesPermalinkPages = (
-            config('settings.seo.no_index_cities')
-            && routeActionHas('Search\CityController')
-        );
+        // (a category × city page is a city page too: the CityController check could never be true here)
+        $noIndexCitiesPermalinkPages = (bool)config('settings.seo.no_index_cities');
         // Filters (and Orders) on Listings Pages (Except Pagination)
         $noIndexFiltersOnEntriesPages = (
             config('settings.seo.no_index_filters_orders')
             && routeActionHas('Search\\')
-            && !empty(request()->except(['page']))
+            && $this->hasFilterParameters()
         );
         // "No result" Pages (Empty Searches Results Pages)
         $noIndexNoResultPages = (
@@ -198,6 +208,12 @@ class CategoryController extends BaseController
         $apiResult = data_get($data, 'result');
         $apiExtra = data_get($data, 'extra');
         $preSearch = data_get($apiExtra, 'preSearch');
+        
+        // Real URL, out-of-range pages & canonical URL (see BaseController::applySeoUrlRules())
+        $seoRedirect = $this->applySeoUrlRules(urlGen()->city(data_get($preSearch, 'city'), null, data_get($preSearch, 'cat')), $apiResult);
+        if (!empty($seoRedirect)) {
+        	return $seoRedirect;
+        }
         $this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
         // Get Titles
         $this->getBreadcrumb($preSearch);
@@ -215,15 +231,13 @@ class CategoryController extends BaseController
         }
         view()->share('og', $this->og);
         // SEO: noindex
-        $noIndexCitiesPermalinkPages = (
-            config('settings.seo.no_index_cities')
-            && routeActionHas('Search\CityController')
-        );
+        // (a category × city page is a city page too: the CityController check could never be true here)
+        $noIndexCitiesPermalinkPages = (bool)config('settings.seo.no_index_cities');
         // Filters (and Orders) on Listings Pages (Except Pagination)
         $noIndexFiltersOnEntriesPages = (
             config('settings.seo.no_index_filters_orders')
             && routeActionHas('Search\\')
-            && !empty(request()->except(['page']))
+            && $this->hasFilterParameters()
         );
         // "No result" Pages (Empty Searches Results Pages)
         $noIndexNoResultPages = (

@@ -24,7 +24,7 @@
 	<title>{!! MetaTag::get('title') !!}</title>
 	{!! MetaTag::tag('description') !!}{!! MetaTag::tag('keywords') !!}
 	@if (empty($hideCanonical))
-		<link rel="canonical" href="{{ url()->current() }}"/>
+		<link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}"/>
 	@endif
 	{{-- Specify a default target for all hyperlinks and forms on the page --}}
 	<base target="_top"/>

@@ -16,7 +16,7 @@
 
 @section('notifications')
 	@if (session()->has('status'))
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
+		<div>
 			<div class="alert alert-success alert-dismissible">
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('Close') }}"></button>
 				<p class="mb-0">{{ session('status') }}</p>
@@ -25,7 +25,7 @@
 	@endif
 	
 	@if (session()->has('email'))
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
+		<div>
 			<div class="alert alert-danger alert-dismissible">
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('Close') }}"></button>
 				<p class="mb-0">{{ session('email') }}</p>
@@ -34,7 +34,7 @@
 	@endif
 	
 	@if (session()->has('phone'))
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
+		<div>
 			<div class="alert alert-danger alert-dismissible">
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('Close') }}"></button>
 				<p class="mb-0">{{ session('phone') }}</p>
@@ -43,7 +43,7 @@
 	@endif
 	
 	@if (session()->has('login'))
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
+		<div>
 			<div class="alert alert-danger alert-dismissible">
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('Close') }}"></button>
 				<p class="mb-0">{{ session('login') }}</p>
@@ -53,83 +53,79 @@
 @endsection
 
 @section('content')
-	@if (!(isset($paddingTopExists) and $paddingTopExists))
-		<div class="p-0 mt-lg-4 mt-md-3 mt-3"></div>
-	@endif
-	<div class="col-11 col-sm-11 col-md-10 col-lg-9 col-xl-8 mx-auto">
-		<h3 class="fw-600 mb-5">{{ trans('auth.forgotten_password') }}</h3>
+	<div class="auth-head">
+		<span class="auth-head-icon"><i class="fa-solid fa-key"></i></span>
+		<h2 class="auth-title">{{ trans('auth.forgotten_password') }}</h2>
+		<p class="auth-subtitle">{{ getPasswordForgotDescription() }}</p>
+	</div>
+	
+	<form id="pwdForm" class="auth-form" action="{{ urlGen()->passwordForgot() }}" method="post" role="form">
+		@csrf
+		@honeypot
 		
-		<p class="text-muted mb-4">{{ getPasswordForgotDescription() }}</p>
+		{{-- email --}}
+		@php
+			$labelRight = '';
+			if (isPhoneAsAuthFieldEnabled()) {
+				$labelRight .= '<a href="" class="auth-field" data-auth-field="phone">';
+				$labelRight .= trans('auth.use_phone');
+				$labelRight .= '</a>';
+			}
+		@endphp
+		@include('helpers.forms.fields.email', [
+			'label'             => trans('auth.email'),
+			'labelRightContent' => $labelRight,
+			'id'                => 'email',
+			'name'              => 'email',
+			'required'          => (getAuthField() == 'email'),
+			'placeholder'       => trans('auth.email_or_username'),
+			'value'             => null,
+			'prefix'            => '<i class="bi bi-envelope"></i>',
+			'hint'              => trans('auth.forgot_password_hint_email'),
+			'wrapper'           => ['class' => 'auth-field-item'],
+		])
 		
-		<form id="pwdForm" action="{{ urlGen()->passwordForgot() }}" method="post" role="form">
-			@csrf
-			@honeypot
-			
-			<div class="row">
-				{{-- email --}}
-				@php
-					$labelRight = '';
-					if (isPhoneAsAuthFieldEnabled()) {
-						$labelRight .= '<a href="" class="auth-field" data-auth-field="phone">';
-						$labelRight .= trans('auth.use_phone');
-						$labelRight .= '</a>';
-					}
-				@endphp
-				@include('helpers.forms.fields.email', [
-					'label'             => trans('auth.email'),
-					'labelRightContent' => $labelRight,
-					'id'                => 'email',
-					'name'              => 'email',
-					'required'          => (getAuthField() == 'email'),
-					'placeholder'       => trans('auth.email_or_username'),
-					'value'             => null,
-					'hint'              => trans('auth.forgot_password_hint_email'),
-					'wrapper'           => ['class' => 'auth-field-item'],
-				])
+		{{-- phone --}}
+		@if (isPhoneAsAuthFieldEnabled())
+			@php
+				$labelRight = '<a href="" class="auth-field" data-auth-field="email">';
+				$labelRight .= trans('auth.use_email');
+				$labelRight .= '</a>';
 				
-				{{-- phone --}}
-				@if (isPhoneAsAuthFieldEnabled())
-					@php
-						$labelRight = '<a href="" class="auth-field" data-auth-field="email">';
-						$labelRight .= trans('auth.use_email');
-						$labelRight .= '</a>';
-						
-						$phoneCountryValue = config('country.code');
-					@endphp
-					@include('helpers.forms.fields.intl-tel-input', [
-						'label'             => trans('auth.phone_number'),
-						'labelRightContent' => $labelRight,
-						'id'                => 'phone',
-						'name'              => 'phone',
-						'required'          => (getAuthField() == 'phone'),
-						'value'             => null,
-						'countryCode'       => $phoneCountryValue,
-						'hint'              => trans('auth.forgot_password_hint_phone'),
-						'wrapper'           => ['class' => 'auth-field-item'],
-					])
-				@endif
-				
-				{{-- auth_field --}}
-				<input name="auth_field" type="hidden" value="{{ old('auth_field', getAuthField()) }}">
-				
-				{{-- captcha --}}
-				@include('helpers.forms.fields.captcha', ['label' => trans('auth.captcha_human_verification')])
-				
-				{{-- button --}}
-				<div class="d-grid my-4">
-					<button type="submit" id="pwdBtn" class="btn btn-primary btn-lg btn-block">
-						{{ trans('auth.continue') }}
-					</button>
-				</div>
-			</div>
-		</form>
+				$phoneCountryValue = config('country.code');
+			@endphp
+			@include('helpers.forms.fields.intl-tel-input', [
+				'label'             => trans('auth.phone_number'),
+				'labelRightContent' => $labelRight,
+				'id'                => 'phone',
+				'name'              => 'phone',
+				'required'          => (getAuthField() == 'phone'),
+				'value'             => null,
+				'countryCode'       => $phoneCountryValue,
+				'hint'              => trans('auth.forgot_password_hint_phone'),
+				'wrapper'           => ['class' => 'auth-field-item'],
+			])
+		@endif
 		
-		<p class="text-center text-muted">
-			<a href="{{ urlGen()->signIn() }}">{{ trans('auth.back_to_login') }}</a>
-		</p>
-		<p class="text-center text-muted">
-			{{ trans('auth.dont_have_account') }} <a href="{{ urlGen()->signUp() }}">{{ trans('auth.create_account') }}</a>
-		</p>
+		{{-- auth_field --}}
+		<input name="auth_field" type="hidden" value="{{ old('auth_field', getAuthField()) }}">
 		
+		{{-- captcha --}}
+		<div class="auth-captcha">
+			@include('helpers.forms.fields.captcha', ['label' => trans('auth.captcha_human_verification')])
+		</div>
+		
+		{{-- button --}}
+		<button type="submit" id="pwdBtn" class="btn btn-primary auth-submit">
+			{{ trans('auth.continue') }} <i class="fa-solid fa-arrow-right"></i>
+		</button>
+	</form>
+	
+	<a class="auth-back" href="{{ urlGen()->signIn() }}">
+		<i class="fa-solid fa-arrow-left"></i> {{ trans('auth.back_to_login') }}
+	</a>
+	
+	<div class="auth-alt">
+		{{ trans('auth.dont_have_account') }} <a href="{{ urlGen()->signUp() }}">{{ trans('auth.create_account') }}</a>
 	</div>
 @endsection

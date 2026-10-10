@@ -16,7 +16,6 @@
 
 namespace App\Models\Post;
 
-use App\Helpers\Common\PaginationHelper;
 use App\Jobs\GeneratePostCollectionThumbnails;
 use App\Models\Post;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -25,6 +24,8 @@ use Larapen\LaravelDistance\Distance;
 
 trait SimilarByLocation
 {
+	use SimilarNeighbors;
+
 	/**
 	 * Get Posts in the same Location
 	 *
@@ -129,10 +130,6 @@ trait SimilarByLocation
 		$posts->with('user');
 		$posts->with('user.permissions');
 		
-		if (isset($this->id)) {
-			$posts->where($postsTable . '.id', '!=', $this->id);
-		}
-		
 		// Set HAVING
 		$havingStr = '';
 		if (is_array($having) && count($having) > 0) {
@@ -155,15 +152,8 @@ trait SimilarByLocation
 			}
 		}
 		
-		// Set ORDER BY
-		// $orderBy[] = $tablesPrefix . $postsTable . '.created_at DESC';
-		// $posts->orderByRaw(implode(', ', $orderBy));
-		$seed = rand(1, 9999);
-		$posts->inRandomOrder($seed);
-		
-		// $posts = $posts->take((int)$limit)->get();
-		$posts = $posts->paginate((int)$limit);
-		$posts = PaginationHelper::adjustSides($posts);
+		// The listing's neighbors (instead of a random order, see SimilarNeighbors)
+		$posts = $this->takeNeighbors($posts, (int)$limit);
 		
 		// Generate listings images thumbnails
 		GeneratePostCollectionThumbnails::dispatch($posts);

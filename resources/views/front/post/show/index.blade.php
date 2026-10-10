@@ -172,12 +172,12 @@
 										<a href="{!! urlGen()->city(data_get($post, 'city')) !!}">{{ data_get($post, 'city.name') }}</a>
 									</li>
 									@if (!config('settings.listing_page.hide_date'))
-										<li><i class="bi bi-clock"></i> {!! data_get($post, 'created_at_formatted') !!}</li>
+										<li><i class="bi bi-clock"></i> <span data-etag-skip>{!! data_get($post, 'created_at_formatted') !!}</span></li>
 									@endif
 									@if (!empty($parentCatName) && $parentCatName != $catName)
 										<li><i class="bi bi-folder2-open"></i> {{ $parentCatName }}</li>
 									@endif
-									<li><i class="bi bi-eye"></i> {{ data_get($post, 'visits_formatted') }}</li>
+									<li><i class="bi bi-eye"></i> <span data-etag-skip>{{ data_get($post, 'visits_formatted') }}</span></li>
 								</ul>
 								<div class="listing-ref">
 									<i class="bi bi-upc-scan"></i> {{ t('reference') }}: <span>{{ data_get($post, 'reference') }}</span>

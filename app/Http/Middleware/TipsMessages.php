@@ -86,7 +86,7 @@ class TipsMessages
 		$message = $siteCountryInfo ?? $loginInfo ?? null;
 		
 		if (!empty($message)) {
-			flash($message)->now()->warning();
+			flash($message)->now()->info();
 		}
 		
 		return $next($request);

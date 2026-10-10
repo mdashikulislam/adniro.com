@@ -69,16 +69,21 @@ class UpdatePostVisits
 	private function incrementVisits($post): void
 	{
 		try {
-			// Remove|unset the 'pictures' attribute (added to limit pictures number related to a selected package)
-			$attributes = $post->getAttributes();
-			if (isset($attributes['pictures'])) {
-				unset($attributes['pictures']);
-				$post->setRawAttributes($attributes, true);
+			if (empty($post->id)) {
+				return;
 			}
 			
-			// Increment the listing's visit count
-			$post->visits = $post->visits + 1;
-			$post->save();
+			// A plain query, not $post->save(): it must neither touch "updated_at" (it's the
+			// "lastmod" of the XML sitemaps, it only changes when the listing's content does)
+			// nor fire the model events, whose cache invalidation flushes every cached listings
+			// query on each page view (search results, similar listings, sitemaps...)
+			$post->getConnection()
+				->table($post->getTable())
+				->where($post->getKeyName(), $post->getKey())
+				->increment('visits');
+			
+			// Keep the in-memory model in sync, without marking it as changed
+			$post->setRawAttributes(array_merge($post->getAttributes(), ['visits' => (int)$post->visits + 1]), true);
 		} catch (Throwable $e) {
 		}
 	}

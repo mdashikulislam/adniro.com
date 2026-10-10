@@ -42,6 +42,11 @@ class SitemapsController extends FrontController
 	protected bool $isDomainmappingAvailable = false;
 	protected int $minListingsToIndex = 3;
 	
+	/**
+	 * Google's limit of URLs per sitemap file
+	 */
+	public const MAX_URLS_PER_SITEMAP = 50000;
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -68,6 +73,86 @@ class SitemapsController extends FrontController
 	protected function getListingCounts(string $countryCode): array
 	{
 		return \App\Helpers\Services\ListingCounts::forCountry($countryCode);
+	}
+	
+	/**
+	 * Last time the listings of a country changed (see ListingCounts::lastModifiedForCountry())
+	 *
+	 * @param string $countryCode
+	 * @return array{country: int, cat: array<int, int>, city: array<int, int>, catCity: array<string, int>}
+	 */
+	protected function getListingLastMod(string $countryCode): array
+	{
+		return \App\Helpers\Services\ListingCounts::lastModifiedForCountry($countryCode);
+	}
+	
+	/**
+	 * The "lastmod" date of a sitemap entry: the real last change of its content.
+	 * Null (no "lastmod" tag) when that date is unknown, rather than a fake "now":
+	 * search engines stop trusting "lastmod" values that change on every fetch.
+	 *
+	 * @param \DateTimeInterface|int|string|null ...$dates
+	 * @return \Illuminate\Support\Carbon|null
+	 */
+	protected function lastMod(...$dates): ?Carbon
+	{
+		$latest = 0;
+		foreach ($dates as $date) {
+			if (empty($date)) {
+				continue;
+			}
+			$time = is_int($date) ? $date : Carbon::parse($date)->getTimestamp();
+			$latest = max($latest, $time);
+		}
+		
+		return ($latest > 0) ? Carbon::createFromTimestamp($latest, config('app.timezone', 'UTC')) : null;
+	}
+	
+	/**
+	 * Last change of the static pages (CMS pages)
+	 *
+	 * @return int
+	 */
+	protected function getPagesLastMod(): int
+	{
+		$date = caching()->remember(Page::class, ['action' => 'get.pages.lastmod'], function () {
+			return Page::query()->max('updated_at');
+		});
+		
+		return !empty($date) ? Carbon::parse($date)->getTimestamp() : 0;
+	}
+	
+	/**
+	 * Last change of the blog posts available in the given country
+	 *
+	 * @param string $countryCode
+	 * @return int
+	 */
+	protected function getBlogLastMod(string $countryCode): int
+	{
+		$cacheParams = ['action' => 'get.blog.lastmod', 'country' => $countryCode];
+		$date = caching()->remember(BlogPost::class, $cacheParams, function () use ($countryCode) {
+			return BlogPost::query()->published()->availableInCountry($countryCode)->max('updated_at');
+		});
+		
+		return !empty($date) ? Carbon::parse($date)->getTimestamp() : 0;
+	}
+	
+	/**
+	 * Add a URL to the sitemap. Non-ASCII characters (e.g. Arabic slugs) are percent-encoded,
+	 * as required in sitemaps and as in the pages' canonical URLs.
+	 *
+	 * @param string $url
+	 * @param \DateTimeInterface|null $lastModified
+	 * @param string|null $changeFrequency
+	 * @param string|null $priority
+	 * @return void
+	 */
+	protected function addUrl(string $url, ?\DateTimeInterface $lastModified = null, ?string $changeFrequency = null, ?string $priority = null): void
+	{
+		$url = preg_replace_callback('/[^\x21-\x7E]+/u', fn ($m) => rawurlencode($m[0]), $url);
+		
+		Sitemap::addTag($url, $lastModified, $changeFrequency, $priority);
 	}
 	
 	/**
@@ -123,6 +208,10 @@ class SitemapsController extends FrontController
 	 */
 	public function getAllCountriesSitemapIndex(): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		foreach ($this->countries as $item) {
 			// Get Country Settings
 			$country = $this->getCountrySettings($item->get('code'), false);
@@ -135,7 +224,12 @@ class SitemapsController extends FrontController
 				$basePath = '';
 			}
 			
-			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps.xml'));
+			$lastMod = $this->getListingLastMod($country['code']);
+			$lastModDates = [$lastMod['country'], $this->getPagesLastMod()];
+			if ($this->isDefaultCountry($country['code'])) {
+				$lastModDates[] = $this->getBlogLastMod($country['code']);
+			}
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps.xml'), $this->lastMod(...$lastModDates));
 		}
 		
 		return Sitemap::index();
@@ -147,6 +241,10 @@ class SitemapsController extends FrontController
 	 */
 	public function getSitemapIndexByCountry(string $countryCode = null): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		if (empty($countryCode)) {
 			$countryCode = config('country.code');
 		}
@@ -162,19 +260,38 @@ class SitemapsController extends FrontController
 			$basePath = '';
 		}
 		
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/pages.xml'));
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'));
-		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'));
-        Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'));
-
-        $countPosts = Post::verified()->inCountry($country['code'])->count();
-		if ($countPosts > 0) {
-			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/posts.xml'));
+		// Each child sitemap's "lastmod" is the last change of its content, so that
+		// search engines only re-fetch the sitemaps that actually changed
+		$listingsLastMod = $this->lastMod($this->getListingLastMod($country['code'])['country']);
+		$pagesLastMod = $this->lastMod($listingsLastMod, $this->getPagesLastMod());
+		
+		Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/pages.xml'), $pagesLastMod);
+		
+		// Only the sitemaps having at least one URL (an empty sitemap or sitemap index is invalid).
+		// The (cached) listing counts tell which ones, without querying the posts table again.
+		$counts = $this->getListingCounts($country['code']);
+		$isIndexable = fn ($total) => $total >= $this->minListingsToIndex;
+		
+		if (!empty(array_filter($counts['cat'] ?? [], $isIndexable))) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/categories.xml'), $listingsLastMod);
 		}
-
+		if (!empty(array_filter($counts['city'] ?? [], $isIndexable))) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/cities.xml'), $listingsLastMod);
+		}
+		if (!empty(array_filter($counts['catCity'] ?? [], $isIndexable))) {
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/category/location.xml'), $listingsLastMod);
+		}
+		// Listings: one sitemap per listing IDs range (see ListingCounts::LISTINGS_PER_SITEMAP)
+		foreach (\App\Helpers\Services\ListingCounts::listingSitemapChunks($country['code']) as $chunk => $chunkInfo) {
+			Sitemap::addSitemap(
+				dmUrl(collect($country), $basePath . 'sitemaps/posts-' . $chunk . '.xml'),
+				$this->lastMod($chunkInfo['lastmod'] ?? null)
+			);
+		}
+		
 		// The blog is not country specific: only referenced in the default country's sitemap index
 		if ($this->isDefaultCountry($country['code']) && $this->countBlogPosts($country['code']) > 0) {
-			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/blog.xml'));
+			Sitemap::addSitemap(dmUrl(collect($country), $basePath . 'sitemaps/blog.xml'), $this->lastMod($this->getBlogLastMod($country['code'])));
 		}
 
 		return Sitemap::index();
@@ -188,6 +305,10 @@ class SitemapsController extends FrontController
 	 */
 	public function getPagesSitemapByCountry(string $countryCode = null): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		if (empty($countryCode)) {
 			$countryCode = config('country.code');
 		}
@@ -198,22 +319,33 @@ class SitemapsController extends FrontController
 			return Sitemap::render();
 		}
 		
-		$params = [];
-		if (!config('plugins.domainmapping.installed')) {
-			$params['country'] = $country['code'];
-		}
+		// The homepage, the HTML sitemap & the search page list the latest listings
+		$listingsLastMod = $this->lastMod($this->getListingLastMod($country['code'])['country']);
+		$isDefaultCountry = $this->isDefaultCountry($country['code']);
 		
-		$url = url('/');
+		// Homepage: the site's root for the default country (its "/{countryCode}" homepage is
+		// canonicalized to the root), the "/{countryCode}" homepage for the other countries
+		$url = $isDefaultCountry ? url('/') : url($country['icode']);
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '1.0');
+		$this->addUrl($url, $listingsLastMod, 'daily', '1.0');
 		
 		$url = urlGen()->sitemap($country['icode']);
 		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.5');
+		$this->addUrl($url, $listingsLastMod, 'daily', '0.5');
 		
-		$url = urlGen()->search([], false, $country['icode']);
-		$url = urlBuilder($url)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.6');
+		// The search page is "noindex" below the indexing threshold
+		$totalListings = array_sum($this->getListingCounts($country['code'])['city'] ?? []);
+		if ($totalListings >= $this->minListingsToIndex) {
+			$url = urlGen()->search([], false, $country['icode']);
+			$url = urlBuilder($url)->toString();
+			$this->addUrl($url, $listingsLastMod, 'daily', '0.6');
+		}
+		
+		// The CMS pages & the contact page aren't country specific:
+		// only listed once, in the default country's sitemap
+		if (!$isDefaultCountry) {
+			return Sitemap::render();
+		}
 		
 		// Cache Parameters
 		$cacheParams = [
@@ -230,13 +362,14 @@ class SitemapsController extends FrontController
 		if ($pages->count() > 0) {
 			foreach ($pages as $page) {
 				$url = urlGen()->page($page);
-				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
+				$this->addUrl($url, $this->lastMod($page->updated_at ?? $page->created_at ?? null), 'monthly', '0.7');
 			}
 		}
 		
-		$url = urlGen()->contact();
-		$url = urlBuilder($url)->setParameters($params)->toString();
-		Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
+		// Same URL as the page's canonical (without the "country" query string parameter)
+		$url = url(urlGen()->contact());
+		// Static form: no known change date, so no "lastmod" at all
+		$this->addUrl($url, null, 'monthly', '0.7');
 		
 		return Sitemap::render();
 	}
@@ -251,6 +384,10 @@ class SitemapsController extends FrontController
 	 */
 	public function getBlogSitemapByCountry(string $countryCode = null): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		if (empty($countryCode)) {
 			$countryCode = config('country.code');
 		}
@@ -261,21 +398,8 @@ class SitemapsController extends FrontController
 			return Sitemap::render();
 		}
 
-		// Blog homepage
-		Sitemap::addTag(urlGen()->blog(), $this->defaultDate, 'daily', '0.8');
-
-		// Blog categories
-		$categories = caching()->remember(BlogCategory::class, ['action' => 'get.blog.categories', 'format' => 'xml'], function () {
-			return BlogCategory::query()->orderBy('lft')->orderBy('name')->get();
-		});
-
-		foreach ($categories as $category) {
-			$url = urlGen()->blogCategory($category);
-			Sitemap::addTag($url, $this->defaultDate, 'weekly', '0.6');
-		}
-
 		// Blog posts (the global ones & the ones targeting this country)
-		$limit = (int)env('XML_SITEMAP_LIMIT', 1000);
+		$limit = self::MAX_URLS_PER_SITEMAP;
 		$postsCacheParams = [
 			'action'  => 'get.blog.posts',
 			'country' => $country['code'],
@@ -291,9 +415,25 @@ class SitemapsController extends FrontController
 				->get();
 		});
 
+		// Blog homepage & categories: last change of the posts they list
+		$blogLastMod = $this->lastMod($this->getBlogLastMod($country['code']));
+		$this->addUrl(urlGen()->blog(), $blogLastMod, 'daily', '0.8');
+
+		$categories = caching()->remember(BlogCategory::class, ['action' => 'get.blog.categories', 'format' => 'xml'], function () {
+			return BlogCategory::query()->orderBy('lft')->orderBy('name')->get();
+		});
+
+		$postsByCategory = $posts->groupBy('category_id');
+		foreach ($categories as $category) {
+			$categoryPosts = $postsByCategory->get($category->id, collect());
+			$dates = $categoryPosts->map(fn ($post) => $post->updated_at ?? $post->published_at)->all();
+			$url = urlGen()->blogCategory($category);
+			$this->addUrl($url, $this->lastMod(...$dates), 'weekly', '0.6');
+		}
+
 		foreach ($posts as $post) {
-			$lastModified = $post->updated_at ?? $post->published_at ?? $this->defaultDate;
-			Sitemap::addTag($post->url, $lastModified, 'weekly', '0.7');
+			$lastModified = $this->lastMod($post->updated_at ?? $post->published_at ?? null);
+			$this->addUrl($post->url, $lastModified, 'weekly', '0.7');
 		}
 
 		return Sitemap::render();
@@ -305,6 +445,10 @@ class SitemapsController extends FrontController
 	 */
 	public function getCategoriesSitemapByCountry(string $countryCode = null): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		if (empty($countryCode)) {
 			$countryCode = config('country.code');
 		}
@@ -331,6 +475,7 @@ class SitemapsController extends FrontController
 		
 		if ($cats->count() > 0) {
 			$counts = $this->getListingCounts($country['code']);
+			$lastMods = $this->getListingLastMod($country['code']);
 			$cats = collect($cats)->keyBy('id');
 
 			foreach ($cats as $cat) {
@@ -340,7 +485,7 @@ class SitemapsController extends FrontController
 					continue;
 				}
 				$url = urlGen()->category($cat, $country['icode']);
-				Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+				$this->addUrl($url, $this->lastMod($lastMods['cat'][$cat->id] ?? null), 'daily', '0.8');
 			}
 		}
 
@@ -353,6 +498,10 @@ class SitemapsController extends FrontController
 	 */
 	public function getCitiesSitemapByCountry(string $countryCode = null): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		if (empty($countryCode)) {
 			$countryCode = config('country.code');
 		}
@@ -363,7 +512,7 @@ class SitemapsController extends FrontController
 			return Sitemap::render();
 		}
 		
-		$limit = (int)env('XML_SITEMAP_LIMIT', 1000);
+		$limit = self::MAX_URLS_PER_SITEMAP;
 		
 		// Only cities with at least one active listing belong in the sitemap.
 		// The (cached) listing counts give us that set of city IDs up front, so we
@@ -378,6 +527,7 @@ class SitemapsController extends FrontController
 		$cacheId = 'sitemaps.cities.' . strtolower($country['code']) . '.' . md5(implode(',', $cityIds));
 		$cities = Cache::remember($cacheId, $this->cacheExpiration, function () use ($country, $cityIds, $limit) {
 			return City::query()
+				->select(['id', 'country_code', 'name'])
 				->inCountry($country['code'])
 				->whereIn('id', $cityIds)
 				->orderByDesc('population')
@@ -386,71 +536,100 @@ class SitemapsController extends FrontController
 				->get();
 		});
 		
+		$lastMods = $this->getListingLastMod($country['code']);
 		foreach ($cities as $city) {
-			$city->name = trim(head(explode('/', $city->name)));
+			// Same URL as the internal links (the city pages redirect any other slug to it)
 			$url = urlGen()->city($city, $country['icode']);
-			Sitemap::addTag($url, $this->defaultDate, 'daily', '0.7');
+			$this->addUrl($url, $this->lastMod($lastMods['city'][$city->id] ?? null), 'daily', '0.7');
 		}
 		
 		return Sitemap::render();
 	}
 	
 	/**
+	 * Former single listings sitemap (newest listings only): the listings are now split
+	 * into several sitemaps, all referenced by the country's sitemap index
+	 *
 	 * @param string|null $countryCode
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	public function getListingsSitemapByCountry(string $countryCode = null): \Illuminate\Http\RedirectResponse
+	{
+		if (empty($countryCode)) {
+			$countryCode = config('country.code');
+		}
+		
+		$basePath = $this->isDomainmappingAvailable ? '' : strtolower((string)$countryCode) . '/';
+		
+		return redirect()->to(dmUrl($countryCode, $basePath . 'sitemaps.xml'), 301);
+	}
+	
+	/**
+	 * Listings sitemap of a listing IDs range: from (chunk × LISTINGS_PER_SITEMAP) to
+	 * ((chunk + 1) × LISTINGS_PER_SITEMAP - 1). Read through the primary key, a listing
+	 * always stays in the same sitemap, and a sitemap never exceeds Google's 50,000 URLs.
+	 *
+	 * @param string|null $countryCode
+	 * @param int|string $chunk
 	 * @return \Illuminate\Http\Response
 	 */
-	public function getListingsSitemapByCountry(string $countryCode = null): Response
+	public function getListingsChunkSitemapByCountry(?string $countryCode, int|string $chunk): Response
 	{
+		if ($cachedSitemap = $this->cachedSitemap()) {
+			return $cachedSitemap;
+		}
+		
 		if (empty($countryCode)) {
 			$countryCode = config('country.code');
 		}
 		
 		// Get Country Settings
 		$country = $this->getCountrySettings($countryCode);
-		if (empty($country)) {
-			return Sitemap::render();
-		}
+		abort_if(empty($country), 404);
 		
-		$limit = (int)env('XML_SITEMAP_LIMIT', 1000);
+		// Only the chunks having listings exist
+		$chunk = (int)$chunk;
+		$chunks = \App\Helpers\Services\ListingCounts::listingSitemapChunks($country['code']);
+		abort_unless(isset($chunks[$chunk]), 404);
 		
-		// Cache Parameters
-		$cacheParams = [
-			'action'      => 'get.listings',
-			'country'     => $country['code'],
-			'verified'    => true,
-			'unarchived'  => true,
-			'notTrashed'  => true,
-			'orderByDesc' => 'created_at',
-			'limit'       => $limit,
-			'format'      => 'xml',
-		];
+		$size = \App\Helpers\Services\ListingCounts::LISTINGS_PER_SITEMAP;
+		$isDomainMapped = (bool)config('plugins.domainmapping.installed');
 		
-		// Only active listings: verified (& reviewed), not archived, not soft-deleted
-		$posts = caching()->remember(Post::class, $cacheParams, function () use ($country, $limit) {
-			return Post::query()
-				->verified()
-				->unarchived()
-				->whereNull('deleted_at')
-				->inCountry($country['code'])
-				->take($limit)
-				->orderByDesc('created_at')
-				->get();
-		});
-		
-		if ($posts->count() > 0) {
-			$isDomainMapped = (bool)config('plugins.domainmapping.installed');
-			foreach ($posts as $post) {
-				// Every listing here is already active, so skip urlGen()->post():
-				// its isVerifiedPost() re-check serializes the whole model (with all
-				// appended accessors) per listing and dominates the sitemap's load time.
-				$path = urlGen()->postPathBasic(hashId($post->id), $post->slug);
-				$url = $isDomainMapped ? dmUrl($post->country_code, $path) : url($path);
-				$url = urlBuilder($url)->toString();
-				Sitemap::addTag($url, $post->created_at, 'daily', '0.6');
-			}
-		}
+		// Only active listings: verified (& reviewed), not archived, not soft-deleted.
+		// Only the columns needed to build the URLs (the slug is made from the title).
+		Post::query()
+			->verified()
+			->unarchived()
+			->whereNull('deleted_at')
+			->inCountry($country['code'])
+			->whereBetween('id', [$chunk * $size, (($chunk + 1) * $size) - 1])
+			->select(['id', 'country_code', 'title', 'created_at', 'updated_at'])
+			->orderBy('id')
+			->chunk(2000, function ($posts) use ($isDomainMapped) {
+				foreach ($posts as $post) {
+					// Every listing here is already active, so skip urlGen()->post():
+					// its isVerifiedPost() re-check serializes the whole model per listing
+					$path = urlGen()->postPathBasic(hashId($post->id), $post->slug);
+					$url = $isDomainMapped ? dmUrl($post->country_code, $path) : url($path);
+					$url = urlBuilder($url)->toString();
+					
+					// "updated_at" is the last edit of the listing (visits don't touch it)
+					$this->addUrl($url, $this->lastMod($post->created_at, $post->updated_at), 'daily', '0.6');
+				}
+			});
 		
 		return Sitemap::render();
+	}
+	
+	/**
+	 * The sitemap from the cache, when it's there: checked before running any query
+	 * (the sitemap package only checks it when rendering, after all the work is done)
+	 *
+	 * @return \Illuminate\Http\Response|null
+	 */
+	protected function cachedSitemap(): ?Response
+	{
+		return Sitemap::hasCachedView() ? Sitemap::render() : null;
 	}
 	
 	/**
@@ -531,13 +710,17 @@ class SitemapsController extends FrontController
             foreach ($cats as $cat) {
                 $url = urlGen()->category($cat, $country['icode']);
                 $url = $url.'/'.$citySLug.'/'.$cityId;
-                Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+                $this->addUrl($url, $this->lastMod($this->getListingLastMod($country['code'])['catCity'][$cat->id . '-' . (int)$cityId] ?? null), 'daily', '0.8');
             }
         }
         return Sitemap::render();
     }
     public function getCategoriesSitemapLocationByCountry(string $countryCode = null, $catSlug, $subCatSlug = null)
     {
+        if ($cachedSitemap = $this->cachedSitemap()) {
+        	return $cachedSitemap;
+        }
+        
         $countryCode = $countryCode ?? config('country.code');
         $country = $this->getCountrySettings($countryCode);
         if (empty($country)) {
@@ -567,10 +750,12 @@ class SitemapsController extends FrontController
         $cacheId = 'sitemaps.catCities.' . strtolower($country['code']) . '.' . $cat->id . '.' . md5(implode(',', $cityIds));
         $cities = Cache::remember($cacheId, $this->cacheExpiration, function () use ($country, $cityIds) {
             return City::query()
+                ->select(['id', 'country_code', 'name'])
                 ->inCountry($country['icode'])
                 ->whereIn('id', $cityIds)
                 ->orderByDesc('population')
                 ->orderBy('name')
+                ->take(self::MAX_URLS_PER_SITEMAP)
                 ->get();
         });
 
@@ -579,10 +764,11 @@ class SitemapsController extends FrontController
         if (!empty($subCatSlug)) {
             $basePath .= '/' . $subCatSlug;
         }
+        $lastMods = $this->getListingLastMod($country['code']);
         foreach ($cities as $city) {
-            $citySlug = slugify($city->name);
+            $citySlug = $city->slug;
             $url = url("{$basePath}/{$citySlug}/{$city->id}");
-            Sitemap::addTag($url, $this->defaultDate, 'daily', '0.8');
+            $this->addUrl($url, $this->lastMod($lastMods['catCity'][$cat->id . '-' . $city->id] ?? null), 'daily', '0.8');
         }
         return Sitemap::render();
     }
@@ -622,6 +808,10 @@ class SitemapsController extends FrontController
     }
     public function getSitemapCategoryLocationByCountry(string $countryCode = null)
     {
+        if ($cachedSitemap = $this->cachedSitemap()) {
+        	return $cachedSitemap;
+        }
+        
         if (empty($countryCode)) {
             $countryCode = config('country.code');
         }
@@ -640,6 +830,7 @@ class SitemapsController extends FrontController
         if ($cats->count() > 0) {
             // Categories having at least one city with an active listing
             $counts = $this->getListingCounts($country['code']);
+            $lastMods = $this->getListingLastMod($country['code']);
             $catsWithIndexableCity = [];
             foreach ($counts['catCity'] as $key => $total) {
                 if ($total >= $this->minListingsToIndex) {
@@ -662,7 +853,7 @@ class SitemapsController extends FrontController
                     $catUrl = trim(strtolower((string)$cat->slug));
                 }
                 $url = $basePath.'sitemaps/category/'.$catUrl.'.xml';
-                Sitemap::addSitemap(dmUrl(collect($country), $url));
+                Sitemap::addSitemap(dmUrl(collect($country), $url), $this->lastMod($lastMods['cat'][$cat->id] ?? null));
             }
         }
         return Sitemap::index();

@@ -53,7 +53,7 @@
 							@php
 								$src = data_get($post, 'picture.url.medium');
 								$webpSrc = data_get($post, 'picture.url.webp.medium');
-								$alt = str(data_get($post, 'title'))->slug();
+								$alt = trim(strip_tags((string)data_get($post, 'title')));
 								echo generateImageHtml($src, $alt, $webpSrc, $pictureAttr);
 							@endphp
 						</a>

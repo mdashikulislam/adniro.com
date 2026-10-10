@@ -22,27 +22,27 @@
 @endsection
 
 @section('content')
-	<div class="col-11 col-sm-11 col-md-10 col-lg-9 col-xl-8 mx-auto">
-		
-		@if (session()->has('message'))
-			<h3 class="fw-600"><i class="fa-regular fa-circle-check"></i> {{ trans('auth.congratulations') }}</h3>
-			
-			<p class="text-muted">
-				{{ session('message') }} <a href="{{ url('/') }}">{{ trans('auth.back_to_home') }}</a>
-			</p>
-		@endif
-		
-		@php
-			$withMessage = !session()->has('flash_messages');
-			$resendVerificationLink = getResendVerificationLink(withMessage: $withMessage);
-		@endphp
-		@if (!empty($resendVerificationLink))
-			<div class="alert alert-info text-center">
-				{!! $resendVerificationLink !!}
-			</div>
-		@endif
+	@if (session()->has('message'))
+		<div class="auth-head auth-head-success">
+			<span class="auth-head-icon"><i class="fa-solid fa-circle-check"></i></span>
+			<h2 class="auth-title">{{ trans('auth.congratulations') }}</h2>
+			<p class="auth-subtitle">{{ session('message') }}</p>
+		</div>
+	@endif
 	
-	</div>
+	@php
+		$withMessage = !session()->has('flash_messages');
+		$resendVerificationLink = getResendVerificationLink(withMessage: $withMessage);
+	@endphp
+	@if (!empty($resendVerificationLink))
+		<div class="alert alert-info text-center">
+			{!! $resendVerificationLink !!}
+		</div>
+	@endif
+	
+	<a href="{{ url('/') }}" class="btn btn-primary auth-submit">
+		<i class="fa-solid fa-house"></i> {{ trans('auth.back_to_home') }}
+	</a>
 @endsection
 
 @php

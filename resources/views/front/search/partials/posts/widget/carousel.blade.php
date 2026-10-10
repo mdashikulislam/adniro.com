@@ -40,7 +40,10 @@
 	$carouselNavPosition = in_array($carouselNavPosition, $carouselNavPositions) ? $carouselNavPosition : 'bottom';
 	
 	// Carousel Other Variables
-	$carouselSlug = 'carousel-' . createRandomString();
+	// Unique per page, but the same on every render (a random value would change the page's ETag)
+	$carouselIndex = (int)request()->attributes->get('carousel_index', 0) + 1;
+	request()->attributes->set('carousel_index', $carouselIndex);
+	$carouselSlug = 'carousel-' . $carouselIndex;
 	$carouselCtrlContainerClass = 'carousel-controls';
 	$carouselCtrlFlexClass = str_contains($carouselCtrlPosition, 'start') ? ' d-flex justify-content-start' : '';
 	$carouselCtrlFlexClass = str_contains($carouselCtrlPosition, 'end') ? ' d-flex justify-content-end' : $carouselCtrlFlexClass;
@@ -100,7 +103,7 @@
 										@php
 											$src = data_get($post, 'picture.url.medium');
 											$webpSrc = data_get($post, 'picture.url.webp.medium');
-											$alt = str(data_get($post, 'title'))->slug();
+											$alt = trim(strip_tags((string)data_get($post, 'title')));
 											$attr = ['class' => 'lazyload listing-card-picture'];
 											echo generateImageHtml($src, $alt, $webpSrc, $attr);
 										@endphp

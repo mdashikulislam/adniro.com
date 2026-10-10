@@ -17,6 +17,21 @@ return [
 	
 	/*
 	|--------------------------------------------------------------------------
+	| Invalidation Strategy
+	|--------------------------------------------------------------------------
+	|
+	| 'versioning': invalidating a model's cache increments a version key that is
+	| part of the model's cache keys (O(1), the old entries expire by their TTL).
+	| 'tags': cache tags on the drivers supporting them (Redis, Memcached...),
+	| a flush deletes every entry of the model one by one (O(entries)).
+	| Default: 'versioning' (the listings' cache is invalidated on every listing
+	| save, a tag flush becomes very costly with millions of listings)
+	|
+	*/
+	'invalidation_strategy' => env('CACHE_MANAGER_INVALIDATION_STRATEGY', 'versioning'),
+	
+	/*
+	|--------------------------------------------------------------------------
 	| Version Cache TTL
 	|--------------------------------------------------------------------------
 	|

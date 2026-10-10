@@ -74,6 +74,13 @@ class UserController extends BaseController
 		$apiExtra = data_get($data, 'extra');
 		$preSearch = data_get($apiExtra, 'preSearch');
 		
+		// Real URL (lowercase tag / the seller's username URL), out-of-range pages & canonical URL
+		// (see BaseController::applySeoUrlRules())
+		$seoRedirect = $this->applySeoUrlRules(!empty(data_get($preSearch, 'user')) ? urlGen()->user(data_get($preSearch, 'user')) : null, $apiResult);
+		if (!empty($seoRedirect)) {
+			return $seoRedirect;
+		}
+		
 		// Sidebar
 		$this->bindSidebarVariables((array)data_get($apiExtra, 'sidebar'));
 		
@@ -113,13 +120,18 @@ class UserController extends BaseController
 		$noIndexFiltersOnEntriesPages = (
 			config('settings.seo.no_index_filters_orders')
 			&& routeActionHas('Search\\')
-			&& !empty(request()->except(['page']))
+			&& $this->hasFilterParameters()
 		);
 		// "No result" Pages (Empty Searches Results Pages)
 		$noIndexNoResultPages = (
 			config('settings.seo.no_index_no_result')
 			&& routeActionHas('Search\\')
 			&& empty(data_get($apiResult, 'data'))
+		);
+		
+		// Thin Pages (Fewer live listings than the indexing threshold), as on the category & city pages
+		$noIndexLowContentPages = (
+			(int)data_get($apiResult, 'meta.total', 0) < (int)config('seo.min_listings_to_index', 3)
 		);
 		
 		return view(
@@ -131,7 +143,8 @@ class UserController extends BaseController
 				'noIndexUsersByIdPages',
 				'noIndexUsersByUsernamePages',
 				'noIndexFiltersOnEntriesPages',
-				'noIndexNoResultPages'
+				'noIndexNoResultPages',
+				'noIndexLowContentPages'
 			)
 		);
 	}

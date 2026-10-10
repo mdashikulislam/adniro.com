@@ -13,10 +13,10 @@
 	
 	$showCityCount = (bool)config('settings.listings_list.count_cities_listings');
 
-	// On a category page each city link opens a category×city page. Only the
-	// combinations with enough live listings deserve to be crawled; the others
-	// stay usable but are marked "nofollow" so crawlers don't waste budget on them.
-	$sidebarCatId = !empty($cat) ? (int)data_get($cat, 'id') : 0;
+	// Each city link opens a city page (a category×city page on a category page), whose
+	// live listings count is the city's "posts_count" here (see SidebarTrait). Only the pages
+	// with enough live listings deserve to be crawled; the others stay usable but are
+	// marked "nofollow" so crawlers don't waste budget on them.
 	$minListingsToIndex = \App\Helpers\Services\ListingCounts::minListingsToIndex();
 @endphp
 {{-- City --}}
@@ -34,10 +34,8 @@
 							|| request()->input('l') == data_get($iCity, 'id')
 						);
 						$iCityCount = data_get($iCity, 'posts_count') ?? 0;
-						$isThinCombo = (
-							!empty($sidebarCatId)
-							&& \App\Helpers\Services\ListingCounts::forCategoryCity($sidebarCatId, data_get($iCity, 'id')) < $minListingsToIndex
-						);
+						// The city's page (or category×city page) is "noindex" below the threshold
+						$isThinCombo = ((int)$iCityCount < $minListingsToIndex);
 					@endphp
 					<li class="{{ $isActiveCity ? 'active' : '' }}">
 						<a href="{!! urlGen()->city($iCity, null, $cat ?? null) !!}" class="filter-item" title="{{ data_get($iCity, 'name') }}"{!! $isThinCombo ? ' rel="nofollow"' : '' !!}>

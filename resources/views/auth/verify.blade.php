@@ -27,52 +27,48 @@
 
 @section('notifications')
 	@if (session()->has('code'))
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-11 col-xxl-10 mx-auto">
-			<div class="alert alert-danger">
-				<p>{{ session('code') }}</p>
-			</div>
+		<div class="alert alert-danger">
+			<p class="mb-0">{{ session('code') }}</p>
 		</div>
 	@endif
 @endsection
 
 @section('content')
-	<div class="col-11 col-sm-11 col-md-10 col-lg-9 col-xl-8 mx-auto">
-		<h3 class="fw-600 mb-4">{{ trans('auth.otp_validation') }}</h3>
-		
-		<p class="text-muted mb-4">{!! getOtpValidationDescription($fieldHiddenValue) !!}</p>
-		
-		<form id="tokenForm" action="{{ url(getRequestPath('.*/verify/.*')) }}" method="post" role="form">
-			@csrf
-			@honeypot
-			
-			{{-- code --}}
-			@include('helpers.forms.fields.text', [
-				'label'       => trans('auth.code'),
-				'id'          => 'code',
-				'name'        => 'code',
-				'placeholder' => trans('auth.enter_verification_code'),
-				'required'    => true,
-				'value'       => null,
-				'attributes'  => ['autocomplete' => 'one-time-code'],
-				'baseClass'   => ['wrapper' => 'mb-3 col-md-8'],
-			])
-			
-			{{-- button --}}
-			<div class="d-grid my-4">
-				<button type="submit" id="tokenBtn" class="btn btn-primary btn-lg btn-block">
-					{{ trans('auth.verify') }}
-				</button>
-			</div>
-		</form>
-		
-		@if (!empty($resendUrl))
-			<p class="text-center text-muted">
-				{{ trans('auth.not_received_code') }} <a href="{{ $resendUrl }}">{{ trans('auth.resend_it') }}</a>
-			</p>
-		@endif
-		
-		<p class="text-center text-muted">
-			<a href="{{ urlGen()->signIn() }}">{{ trans('auth.back_to_login') }}</a>
-		</p>
+	<div class="auth-head">
+		<span class="auth-head-icon"><i class="fa-solid fa-envelope-circle-check"></i></span>
+		<h2 class="auth-title">{{ trans('auth.otp_validation') }}</h2>
+		<p class="auth-subtitle">{!! getOtpValidationDescription($fieldHiddenValue) !!}</p>
 	</div>
+	
+	<form id="tokenForm" class="auth-form" action="{{ url(getRequestPath('.*/verify/.*')) }}" method="post" role="form">
+		@csrf
+		@honeypot
+		
+		{{-- code --}}
+		@include('helpers.forms.fields.text', [
+			'label'       => trans('auth.code'),
+			'id'          => 'code',
+			'name'        => 'code',
+			'placeholder' => trans('auth.enter_verification_code'),
+			'required'    => true,
+			'value'       => null,
+			'prefix'      => '<i class="bi bi-123"></i>',
+			'attributes'  => ['autocomplete' => 'one-time-code', 'class' => 'auth-code-input'],
+		])
+		
+		{{-- button --}}
+		<button type="submit" id="tokenBtn" class="btn btn-primary auth-submit">
+			{{ trans('auth.verify') }} <i class="fa-solid fa-arrow-right"></i>
+		</button>
+	</form>
+	
+	@if (!empty($resendUrl))
+		<div class="auth-resend">
+			{{ trans('auth.not_received_code') }} <a href="{{ $resendUrl }}">{{ trans('auth.resend_it') }}</a>
+		</div>
+	@endif
+	
+	<a class="auth-back" href="{{ urlGen()->signIn() }}">
+		<i class="fa-solid fa-arrow-left"></i> {{ trans('auth.back_to_login') }}
+	</a>
 @endsection

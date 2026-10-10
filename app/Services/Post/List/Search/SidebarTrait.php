@@ -18,6 +18,7 @@ namespace App\Services\Post\List\Search;
 
 use App\Enums\PostType;
 use App\Helpers\Common\Date\TimeZoneManager;
+use App\Helpers\Services\ListingCounts;
 use App\Models\Category;
 use App\Models\City;
 use Larapen\LaravelDistance\Libraries\mysql\DistanceHelper;
@@ -50,7 +51,7 @@ trait SidebarTrait
 		}
 		
 		$data['countPostsPerCat'] = $this->countListingsPerCategory($data['city'], $params);
-		$data['cities'] = $this->getMostPopulateCities($citiesLimit, $params);
+		$data['cities'] = $this->getMostPopulateCities($citiesLimit, $params, data_get($data['cat'], 'id'));
 		$data['periodList'] = $this->getPeriodList($params);
 		$data['postTypes'] = $this->getPostTypes($params);
 		$data['orderByOptions'] = $this->orderByOptions($data['city'], $params);
@@ -90,37 +91,76 @@ trait SidebarTrait
 	}
 	
 	/**
+	 * Cities linked in the sidebar: the ones with the most live listings (in the current
+	 * category, on a category page), then the most populated ones to fill the list.
+	 * Ranking by live listings links the pages worth crawling, wherever their city ranks
+	 * by population, instead of the same most populated cities whether they have listings or not.
+	 *
 	 * @param int $limit
 	 * @param array $params
+	 * @param int|string|null $categoryId
 	 * @return array
 	 */
-	private function getMostPopulateCities(int $limit = 50, array $params = []): array
+	private function getMostPopulateCities(int $limit = 50, array $params = [], int|string|null $categoryId = null): array
 	{
 		if (!config('settings.listings_list.show_left_sidebar')) {
 			return [];
 		}
 		
-		$isListingsCountEnabled = config('settings.listings_list.count_cities_listings');
+		// Live listings per city (in the category), from the cached listings counts
+		$counts = ListingCounts::forCountry(config('country.code'));
+		$listingsPerCity = [];
+		if (!empty($categoryId)) {
+			$prefix = (int)$categoryId . '-';
+			foreach ($counts['catCity'] ?? [] as $key => $total) {
+				if (str_starts_with((string)$key, $prefix)) {
+					$listingsPerCity[(int)substr((string)$key, strlen($prefix))] = (int)$total;
+				}
+			}
+		} else {
+			$listingsPerCity = $counts['city'] ?? [];
+		}
+		unset($listingsPerCity[0]);
+		arsort($listingsPerCity);
+		$topCityIds = array_slice(array_keys($listingsPerCity), 0, $limit);
 		
 		// Cache Parameters
 		$cacheParams = [
-			'action'                 => 'get.cities',
-			'country'                => config('country.code'),
-			'isListingsCountEnabled' => $isListingsCountEnabled,
-			'limit'                  => $limit,
+			'action'  => 'get.sidebar.cities',
+			'country' => config('country.code'),
+			'cityIds' => implode(',', $topCityIds),
+			'limit'   => $limit,
 		];
 		
-		$cities = caching()->remember(City::class, $cacheParams, function () use ($isListingsCountEnabled, $limit) {
-			$cities = City::query()->inCountry();
-			
-			if ($isListingsCountEnabled) {
-				$cities->withCount('posts');
+		$cities = caching()->remember(City::class, $cacheParams, function () use ($topCityIds, $limit) {
+			$cities = collect();
+			if (!empty($topCityIds)) {
+				$cities = City::query()->inCountry()->whereIn('id', $topCityIds)->get()
+					->sortBy(fn ($city) => array_search($city->id, $topCityIds))
+					->values();
 			}
 			
-			return $cities->take($limit)->orderByDesc('population')->orderBy('name')->get();
+			// Fill the list with the most populated cities
+			if ($cities->count() < $limit) {
+				$moreCities = City::query()->inCountry()
+					->whereNotIn('id', $cities->pluck('id')->all())
+					->orderByDesc('population')
+					->orderBy('name')
+					->take($limit - $cities->count())
+					->get();
+				$cities = $cities->concat($moreCities)->values();
+			}
+			
+			return $cities;
 		});
 		
-		return $cities->toArray();
+		// Live listings counts (in the category)
+		return $cities->map(function ($city) use ($listingsPerCity) {
+			$city = $city->toArray();
+			$city['posts_count'] = $listingsPerCity[$city['id']] ?? 0;
+			
+			return $city;
+		})->all();
 	}
 	
 	/**
