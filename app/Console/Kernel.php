@@ -38,8 +38,10 @@ class Kernel
 		// Doc: https://laravel.com/docs/11.x/passwords
 		$schedule->command('auth:clear-resets')->timezone($tz)->everyFifteenMinutes();
 		
-		// Clear Listings
-		$schedule->command('listings:purge')->timezone($tz)->hourly();
+		// Clear Listings (auto-archive & delete old listings)
+		// Disabled on 2026-10-24 at the owner's request: listings must stay visible.
+		// It can still be run by hand with "php artisan listings:purge".
+		// $schedule->command('listings:purge')->timezone($tz)->hourly();
 
 		// Rebuild the listings counts & last changes (sitemaps, sidebar, noindex rules)
 		$schedule->command('listings:warm-counts')->timezone($tz)->everyThirtyMinutes()->withoutOverlapping();
