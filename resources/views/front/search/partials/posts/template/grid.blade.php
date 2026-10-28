@@ -134,6 +134,14 @@
 								{{ str(data_get($post, 'title'))->limit(70) }}
 							</a>
 						</h5>
+
+						@php
+							$cardExcerpt = singleLineStringCleaner(strip_tags((string)data_get($post, 'description')));
+							$cardExcerpt = str($cardExcerpt)->limit(160)->toString();
+						@endphp
+						@if (!empty($cardExcerpt))
+							<p class="listing-card-desc">{{ $cardExcerpt }}</p>
+						@endif
 						
 						@if (config('plugins.reviews.installed'))
 							@if (view()->exists('reviews::ratings-list'))

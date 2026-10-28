@@ -127,6 +127,15 @@
 								</ul>
 							</div>
 						@endif
+						
+						{{-- Description excerpt --}}
+						@php
+							$cardExcerpt = singleLineStringCleaner(strip_tags((string)data_get($post, 'description')));
+							$cardExcerpt = str($cardExcerpt)->limit(160)->toString();
+						@endphp
+						@if (!empty($cardExcerpt))
+							<p class="listing-card-desc">{{ $cardExcerpt }}</p>
+						@endif
 					</div>
 					
 					{{-- Reviews Stars --}}

@@ -1195,6 +1195,17 @@
 	transition: color .2s ease;
 }
 
+.listing-card-desc {
+	margin: .35rem 0 0;
+	font-size: .82rem;
+	line-height: 1.45;
+	color: var(--bs-secondary-color);
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
 .listing-card:hover .listing-card-title a {
 	color: var(--bs-primary) !important;
 }

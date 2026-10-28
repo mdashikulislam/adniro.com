@@ -42,9 +42,9 @@ trait Select
 			'email_verified_at',
 			'phone_verified_at',
 			'reviewed_at',
+			$this->postsTable . '.description', // needed for the listing cards' excerpt
 		];
 		if (isFromApi() && !doesRequestIsFromWebClient()) {
-			$select[] = $this->postsTable . '.description';
 			$select[] = 'contact_name';
 			$select[] = $this->postsTable . '.auth_field';
 			$select[] = $this->postsTable . '.phone';
