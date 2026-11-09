@@ -9350,6 +9350,7 @@ a.listing-step-link:hover {
 
 .login-modal-hero {
 	position: relative;
+	flex-shrink: 0; /* Never squeezed by the scrollable body (its text was cut on short screens) */
 	overflow: hidden;
 	padding: 2rem 1.75rem 1.6rem;
 	text-align: center;
@@ -9430,6 +9431,9 @@ a.listing-step-link:hover {
 
 .login-modal-body {
 	padding: 1.6rem 1.75rem 1.4rem;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(var(--bs-body-color-rgb), .25) transparent;
+	overscroll-behavior: contain;
 }
 
 .login-modal-alert {
@@ -9675,6 +9679,7 @@ a.listing-step-link:hover {
 }
 
 .login-modal-footer {
+	flex-shrink: 0;
 	padding: 1rem 1.75rem;
 	border-top: 1px solid var(--bs-border-color);
 	background-color: var(--bs-tertiary-bg);
@@ -9709,6 +9714,62 @@ a.listing-step-link:hover {
 	
 	.login-modal-footer {
 		padding: .9rem 1.25rem;
+	}
+}
+
+/* Short screens: compact header, so the form keeps most of the height */
+@media (max-height: 820px) {
+	.login-modal .modal-dialog {
+		--bs-modal-margin: .75rem;
+	}
+	
+	.login-modal-hero {
+		padding: 1.15rem 3rem 1.05rem;
+	}
+	
+	.login-modal-hero-icon {
+		width: 42px;
+		height: 42px;
+		margin-bottom: .5rem;
+		border-radius: 13px;
+		font-size: 1.05rem;
+	}
+	
+	.login-modal-title {
+		margin-bottom: .2rem;
+		font-size: 1.25rem;
+	}
+	
+	.login-modal-subtitle {
+		max-width: none;
+		font-size: .84rem;
+		line-height: 1.45;
+	}
+	
+	.login-modal-body {
+		padding-top: 1.2rem;
+		padding-bottom: 1.1rem;
+	}
+	
+	.login-modal-footer {
+		padding-top: .75rem;
+		padding-bottom: .75rem;
+	}
+}
+
+@media (max-height: 640px) {
+	.login-modal-hero {
+		padding-top: .9rem;
+		padding-bottom: .85rem;
+	}
+	
+	.login-modal-hero-icon,
+	.login-modal-subtitle {
+		display: none;
+	}
+	
+	.login-modal-title {
+		margin-bottom: 0;
 	}
 }
 
