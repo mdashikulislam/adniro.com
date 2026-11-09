@@ -9623,7 +9623,7 @@ a.listing-step-link:hover {
 /* Just the widget: no box around it, and the label is kept for screen readers only */
 .login-modal-captcha > div {
 	margin-bottom: 1rem !important;
-	text-align: center;
+	text-align: start;
 }
 
 .login-modal-captcha .form-label {
@@ -9638,10 +9638,11 @@ a.listing-step-link:hover {
 	border: 0;
 }
 
+/* Lined up with the fields above it */
 .login-modal-captcha .cf-turnstile,
 .login-modal-captcha .g-recaptcha {
 	display: flex;
-	justify-content: center;
+	justify-content: flex-start;
 }
 
 /* Submit */
