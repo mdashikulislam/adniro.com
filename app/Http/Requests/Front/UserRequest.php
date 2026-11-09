@@ -30,7 +30,10 @@ use Illuminate\Validation\Rule;
 class UserRequest extends Request
 {
 	use HasEmailInput, HasPhoneInput, HasPasswordInput, HasCaptchaInput;
-	
+
+	public const USERNAME_MIN_LENGTH = 3;
+	public const USERNAME_MAX_LENGTH = 30;
+
 	/**
 	 * Determine if the user is authorized to make this request.
 	 *
@@ -68,7 +71,13 @@ class UserRequest extends Request
 		}
 		
 		$input = $this->all();
-		
+
+		// username (signup)
+		if (in_array($this->method(), ['POST', 'CREATE']) && $this->has('username')) {
+			$username = self::normalizeUsername($this->input('username'));
+			$input['username'] = ($username !== '') ? $username : null;
+		}
+
 		// name
 		if ($this->filled('name')) {
 			$input['name'] = singleLineStringCleaner($this->input('name'));
@@ -184,25 +193,66 @@ class UserRequest extends Request
 			$rules['phone'][] = 'unique:users,phone';
 		}
 		
-		// username
-		$usernameIsEnabled = !config('larapen.core.disable.username');
-		if ($usernameIsEnabled) {
-			if ($this->filled('username')) {
-				$rules['username'] = [
-					'between:3,50',
-					'unique:users,username',
-					new UsernameIsValidRule(),
-					new UsernameIsAllowedRule(),
-				];
-			}
+		// username (key of the seller's public page: /user/{username})
+		// - Signup form: chosen by the user (required).
+		// - API: optional. When it's missing, a unique one is generated from the name (UserObserver).
+		$usernameIsRequired = !isFromApi();
+		if ($usernameIsRequired || $this->filled('username')) {
+			$rules['username'] = self::signupUsernameRules($usernameIsRequired);
 		}
-		
+
 		// password
 		$rules = $this->passwordRules($rules);
-		
+
 		return $this->captchaRules($rules);
 	}
 	
+	/**
+	 * Rules of the username chosen at signup.
+	 * Shared with the signup form's live availability check (RegisterController::checkUsername).
+	 *
+	 * @param bool $required
+	 * @return array
+	 */
+	public static function signupUsernameRules(bool $required = true): array
+	{
+		return [
+			$required ? 'required' : 'nullable',
+			'string',
+			'between:' . self::USERNAME_MIN_LENGTH . ',' . self::USERNAME_MAX_LENGTH,
+			new UsernameIsValidRule(),
+			new UsernameIsAllowedRule(),
+			'unique:users,username',
+			// Not the username of the poster of listings published without account (same public URL: /user/{username})
+			'unique:posts,guest_username',
+		];
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function signupUsernameMessages(): array
+	{
+		return [
+			'username.required' => t('username_required'),
+			'username.between'  => t('username_length', ['min' => self::USERNAME_MIN_LENGTH, 'max' => self::USERNAME_MAX_LENGTH]),
+			'username.unique'   => t('username_taken'),
+		];
+	}
+
+	/**
+	 * Usernames are stored in lowercase, without surrounding spaces or leading "@"
+	 *
+	 * @param mixed $username
+	 * @return string
+	 */
+	public static function normalizeUsername(mixed $username): string
+	{
+		$username = is_scalar($username) ? (string)$username : '';
+
+		return ltrim(mb_strtolower(trim($username)), '@');
+	}
+
 	/**
 	 * @param array $authFields
 	 * @return array
@@ -296,7 +346,11 @@ class UserRequest extends Request
 	public function messages(): array
 	{
 		$messages = [];
-		
+
+		if (in_array($this->method(), ['POST', 'CREATE'])) {
+			$messages = self::signupUsernameMessages();
+		}
+
 		if ($this->hasFile('photo_path')) {
 			// uploaded
 			$maxSize = (int)config('settings.upload.max_image_size', 1000); // In KB

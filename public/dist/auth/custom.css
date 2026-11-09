@@ -1136,6 +1136,68 @@ body {
 	color: var(--bs-secondary-color);
 }
 
+/* Signup: username live availability check */
+.auth-username-status {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .3rem .45rem;
+	margin-top: .45rem;
+	font-size: .8rem;
+	line-height: 1.45;
+	color: var(--bs-secondary-color);
+}
+
+.auth-username-status:empty {
+	display: none;
+}
+
+.auth-username-status.is-ok {
+	color: #0f8a5f;
+}
+
+.auth-username-status.is-bad {
+	color: var(--bs-form-invalid-color, #dc3545);
+}
+
+.auth-username-status.is-checking .bi {
+	animation: auth-username-spin .9s linear infinite;
+}
+
+.auth-username-suggestion {
+	padding: .1rem .6rem;
+	border: 1px solid rgba(var(--bs-primary-rgb), .3);
+	border-radius: 999px;
+	background-color: rgba(var(--bs-primary-rgb), .06);
+	color: var(--bs-primary);
+	font-size: .78rem;
+	font-weight: 600;
+	line-height: 1.5;
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.auth-username-suggestion:hover,
+.auth-username-suggestion:focus-visible {
+	background-color: var(--bs-primary);
+	color: #fff;
+}
+
+[data-bs-theme="dark"] .auth-username-status.is-ok {
+	color: #34d399;
+}
+
+@keyframes auth-username-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.auth-username-status.is-checking .bi {
+		animation: none;
+	}
+}
+
 .auth-optional {
 	display: inline-block;
 	margin-left: .35rem;

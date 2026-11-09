@@ -48,6 +48,34 @@
 				'prefix'      => '<i class="bi bi-person"></i>',
 			])
 			
+			{{-- username (key of the public profile link: /user/{username}), with a live availability check --}}
+			@php
+				$usernameMinLength = \App\Http\Requests\Front\UserRequest::USERNAME_MIN_LENGTH;
+				$usernameMaxLength = \App\Http\Requests\Front\UserRequest::USERNAME_MAX_LENGTH;
+			@endphp
+			@include('helpers.forms.fields.text', [
+				'label'       => trans('auth.username'),
+				'id'          => 'username',
+				'name'        => 'username',
+				'placeholder' => t('enter_your_username'),
+				'required'    => true,
+				'value'       => null,
+				'prefix'      => '<i class="bi bi-at"></i>',
+				'hint'        => t('username_signup_hint', ['min' => $usernameMinLength, 'max' => $usernameMaxLength]),
+				'attributes'  => [
+					'minlength'         => $usernameMinLength,
+					'maxlength'         => $usernameMaxLength,
+					'autocomplete'      => 'username',
+					'autocapitalize'    => 'none',
+					'spellcheck'        => 'false',
+					'data-check-url'    => route('auth.register.checkUsername'),
+					'data-msg-checking' => t('username_checking'),
+					'data-msg-failed'   => t('username_check_failed'),
+					'data-msg-try'      => t('username_try'),
+				],
+				'wrapper'     => ['class' => 'auth-username-field'],
+			])
+			
 			{{-- country_code --}}
 			@if (empty(config('country.code')))
 				@php
@@ -141,20 +169,6 @@
 				'countryCode' => $phoneCountryValue,
 				'wrapper'     => ['class' => "auth-field-item{$forceToDisplay}"],
 			])
-			
-			{{-- username --}}
-			@php
-				$usernameIsEnabled = !config('larapen.core.disable.username');
-			@endphp
-			@if ($usernameIsEnabled)
-				@include('helpers.forms.fields.text', [
-					'label'       => trans('auth.username'),
-					'name'        => 'username',
-					'placeholder' => t('enter_your_username'),
-					'value'       => null,
-					'prefix'      => '<i class="bi bi-at"></i>',
-				])
-			@endif
 			
 			<div class="col-12 auth-section-head auth-section-head-next">
 				<span class="auth-section-num">2</span>
@@ -306,6 +320,157 @@
 				confirmPwd.addEventListener('input', update);
 			}
 			update();
+		})();
+	</script>
+	<script>
+		{{-- Username: live availability check --}}
+		(function () {
+			const input = document.querySelector('#signupForm [name="username"]');
+			if (!input || !input.dataset.checkUrl || typeof window.fetch !== 'function') {
+				return;
+			}
+			
+			const nameInput = document.querySelector('#signupForm [name="name"]');
+			const minLength = parseInt(input.getAttribute('minlength'), 10) || 3;
+			const maxLength = parseInt(input.getAttribute('maxlength'), 10) || 30;
+			const group = input.closest('.input-group') || input;
+			
+			const status = document.createElement('div');
+			status.id = 'usernameStatus';
+			status.className = 'auth-username-status';
+			status.setAttribute('role', 'status');
+			status.setAttribute('aria-live', 'polite');
+			group.insertAdjacentElement('afterend', status);
+			
+			let timer = null;
+			let controller = null;
+			let lastChecked = null;
+			let isTouched = (input.value !== '');
+			
+			const normalize = (value) => (value || '').toLowerCase().replace(/\s+/g, '').replace(/^@+/, '');
+			
+			const render = (state, message, suggestion) => {
+				input.classList.toggle('is-valid', state === 'ok');
+				input.classList.toggle('is-invalid', state === 'bad');
+				group.classList.toggle('is-invalid', state === 'bad');
+				status.className = 'auth-username-status' + (state ? ' is-' + state : '');
+				status.textContent = '';
+				if (!message) {
+					return;
+				}
+				
+				const icons = {ok: 'bi-check-circle-fill', bad: 'bi-x-circle-fill', checking: 'bi-arrow-repeat', warn: 'bi-exclamation-circle'};
+				const icon = document.createElement('i');
+				icon.className = 'bi ' + (icons[state] || 'bi-info-circle');
+				icon.setAttribute('aria-hidden', 'true');
+				const text = document.createElement('span');
+				text.textContent = message;
+				status.append(icon, text);
+				
+				if (suggestion) {
+					const button = document.createElement('button');
+					button.type = 'button';
+					button.className = 'auth-username-suggestion';
+					button.textContent = input.dataset.msgTry + ' @' + suggestion;
+					button.addEventListener('click', () => {
+						input.value = suggestion;
+						isTouched = true;
+						check();
+						input.focus();
+					});
+					status.append(button);
+				}
+			};
+			
+			const check = () => {
+				const username = normalize(input.value);
+				
+				if (controller) {
+					controller.abort();
+					controller = null;
+				}
+				if (username.length < minLength) {
+					lastChecked = null;
+					render(null, '');
+					return;
+				}
+				if (username === lastChecked) {
+					return;
+				}
+				
+				lastChecked = username;
+				render('checking', input.dataset.msgChecking);
+				
+				controller = (typeof AbortController === 'function') ? new AbortController() : null;
+				const url = input.dataset.checkUrl + '?username=' + encodeURIComponent(username);
+				
+				fetch(url, {
+					headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
+					credentials: 'same-origin',
+					signal: controller ? controller.signal : undefined,
+				})
+					.then((response) => {
+						if (!response.ok) {
+							throw new Error('HTTP ' + response.status);
+						}
+						return response.json();
+					})
+					.then((data) => {
+						// The field has changed while waiting for the answer
+						if (normalize(input.value) !== username) {
+							return;
+						}
+						render(data.available ? 'ok' : 'bad', data.message, data.available ? null : data.suggestion);
+					})
+					.catch((error) => {
+						if (error && error.name === 'AbortError') {
+							return;
+						}
+						if (normalize(input.value) !== username) {
+							return;
+						}
+						// Not blocking: the username is checked again when the form is submitted
+						lastChecked = null;
+						render('warn', input.dataset.msgFailed);
+					});
+			};
+			
+			input.addEventListener('input', () => {
+				isTouched = true;
+				const username = normalize(input.value);
+				if (input.value !== username) {
+					input.value = username;
+				}
+				clearTimeout(timer);
+				timer = setTimeout(check, 400);
+			});
+			input.addEventListener('blur', () => {
+				clearTimeout(timer);
+				check();
+			});
+			
+			// Suggest a username from the name, as long as the user hasn't typed one
+			if (nameInput) {
+				nameInput.addEventListener('blur', () => {
+					if (isTouched || input.value !== '') {
+						return;
+					}
+					let suggested = nameInput.value;
+					if (typeof suggested.normalize === 'function') {
+						suggested = suggested.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+					}
+					suggested = suggested.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, maxLength);
+					if (suggested.length >= minLength && !/^\d+$/.test(suggested)) {
+						input.value = suggested;
+						check();
+					}
+				});
+			}
+			
+			// Value kept after a failed submission: the server's error is already displayed
+			if (input.value !== '' && !input.classList.contains('is-invalid')) {
+				check();
+			}
 		})();
 	</script>
 @endsection

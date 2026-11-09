@@ -619,13 +619,16 @@ class User extends BaseUser
 			$base = 'user' . (!empty($userId) ? $userId : random_int(100000, 999999));
 		}
 		
+		// Unique, and not a reserved name (admin, support...): same rule as for the usernames chosen at signup
+		$allowedRule = new \App\Rules\UsernameIsAllowedRule();
+
 		$username = $base;
 		$suffix = 1;
-		while (self::isUsernameTaken($username, $userId)) {
+		while (self::isUsernameTaken($username, $userId) || !$allowedRule->passes('username', $username)) {
 			$suffix++;
 			$username = $base . $suffix;
 		}
-		
+
 		return $username;
 	}
 	

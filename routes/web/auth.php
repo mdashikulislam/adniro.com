@@ -33,6 +33,9 @@ Route::middleware(['guest', 'no.http.cache'])
 			->group(function ($router) {
 				Route::get('register', 'showForm')->name('auth.register.showForm');
 				Route::post('register', 'postForm')->name('auth.register.postForm');
+				Route::get('register/username', 'checkUsername')
+					->middleware('throttle:40,1')
+					->name('auth.register.checkUsername');
 				Route::get('register/finished', 'finished')->name('auth.register.finished');
 			});
 		

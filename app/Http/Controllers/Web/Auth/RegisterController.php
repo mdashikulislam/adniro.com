@@ -19,9 +19,13 @@ namespace App\Http\Controllers\Web\Auth;
 use App\Helpers\Services\Referrer;
 use App\Http\Controllers\Web\Front\FrontController;
 use App\Http\Requests\Front\UserRequest;
+use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
 
 class RegisterController extends FrontController
@@ -137,6 +141,41 @@ class RegisterController extends FrontController
 		return redirect()->to($nextUrl);
 	}
 	
+	/**
+	 * Signup form: live check of the username (valid & not taken).
+	 * The same rules are applied again when the form is submitted.
+	 *
+	 * @param \Illuminate\Http\Request $request
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function checkUsername(Request $request): JsonResponse
+	{
+		$username = UserRequest::normalizeUsername($request->query('username'));
+
+		$validator = Validator::make(
+			['username' => $username],
+			['username' => UserRequest::signupUsernameRules()],
+			UserRequest::signupUsernameMessages(),
+			['username' => mb_strtolower(trans('auth.username'))]
+		);
+
+		$isAvailable = !$validator->fails();
+		$isTaken = (!$isAvailable && array_key_exists('Unique', $validator->failed()['username'] ?? []));
+
+		// Username taken: suggest a free one, built on it
+		$suggestion = null;
+		if ($isTaken) {
+			$suggestion = User::generateUsername(substr($username, 0, UserRequest::USERNAME_MAX_LENGTH - 3));
+		}
+
+		return response()->json([
+			'username'   => $username,
+			'available'  => $isAvailable,
+			'message'    => $isAvailable ? t('username_available') : $validator->errors()->first('username'),
+			'suggestion' => $suggestion,
+		]);
+	}
+
 	/**
 	 * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
 	 */
