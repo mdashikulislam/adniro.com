@@ -9620,21 +9620,22 @@ a.listing-step-link:hover {
 	display: none;
 }
 
+/* Just the widget: no box around it, and the label is kept for screen readers only */
 .login-modal-captcha > div {
-	margin-bottom: 1.1rem !important;
-	padding: .9rem 1rem 1rem;
-	border: 1px dashed var(--bs-border-color);
-	border-radius: 14px;
-	background-color: var(--bs-tertiary-bg);
+	margin-bottom: 1rem !important;
 	text-align: center;
 }
 
 .login-modal-captcha .form-label {
-	display: block;
-	margin-bottom: .6rem;
-	font-size: .8rem;
-	font-weight: 600;
-	color: var(--bs-secondary-color);
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
 }
 
 .login-modal-captcha .cf-turnstile,
