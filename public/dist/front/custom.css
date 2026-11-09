@@ -10914,3 +10914,107 @@ a.listing-step-link:hover {
 	font-size: .72em;
 	opacity: .85;
 }
+
+/* =======================================================
+ * Home: "Recently viewed" listings (one row)
+ * ======================================================= */
+.recently-viewed-tools {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+}
+
+.recently-viewed-nav,
+.recently-viewed-nav:focus {
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	display: inline-grid;
+	place-items: center;
+	border-radius: 50%;
+	color: var(--bs-primary);
+	border: 1px solid rgba(var(--bs-primary-rgb), .25);
+	background-color: rgba(var(--bs-primary-rgb), .06);
+	transition: background-color .2s ease, color .2s ease, opacity .2s ease;
+}
+
+.recently-viewed-nav:hover:not(:disabled) {
+	color: #fff;
+	background-color: var(--bs-primary);
+	border-color: var(--bs-primary);
+}
+
+.recently-viewed-nav:disabled {
+	opacity: .35;
+	border-color: rgba(var(--bs-primary-rgb), .25);
+}
+
+.recently-viewed-nav[hidden] {
+	display: none;
+}
+
+/* One row: the cards never wrap, the row scrolls sideways */
+.recently-viewed-row > .row {
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x proximity;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	margin-left: 0;
+	margin-right: 0;
+	padding-bottom: .75rem;
+}
+
+.recently-viewed-row > .row::-webkit-scrollbar {
+	display: none;
+}
+
+.recently-viewed-row > .row > * {
+	scroll-snap-align: start;
+}
+
+.recently-viewed-skeleton {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: calc(25% - .75rem);
+	gap: 1rem;
+	overflow: hidden;
+	padding-bottom: .75rem;
+}
+
+.recently-viewed-skeleton-card {
+	height: 432px;
+	border-radius: 18px;
+	border: 1px solid var(--bs-border-color-translucent);
+	background: linear-gradient(100deg, var(--bs-tertiary-bg) 30%, var(--bs-secondary-bg) 50%, var(--bs-tertiary-bg) 70%);
+	background-size: 300% 100%;
+	animation: recentlyViewedShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes recentlyViewedShimmer {
+	0% { background-position: 100% 0; }
+	100% { background-position: 0 0; }
+}
+
+@media (max-width: 991.98px) {
+	.recently-viewed-skeleton {
+		grid-auto-columns: calc(33.333% - .7rem);
+	}
+}
+
+@media (max-width: 767.98px) {
+	.recently-viewed-skeleton {
+		grid-auto-columns: calc(50% - .5rem);
+	}
+	
+	.recently-viewed-skeleton-card {
+		height: 325px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.recently-viewed-skeleton-card {
+		animation: none;
+	}
+}

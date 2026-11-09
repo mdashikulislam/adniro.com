@@ -4,6 +4,9 @@
 @endsection
 @section('content')
 	<div class="main-container sectionable" id="homepage">
+		@php
+			$isRecentlyViewedShown = false;
+		@endphp
 		@if (!empty($sections))
 			@foreach($sections as $section)
 				@php
@@ -11,6 +14,13 @@
 					$sectionView = data_get($section, 'view');
 					$sectionData = (array)data_get($section, 'data');
 				@endphp
+				{{-- Recently viewed listings (one row), just before the latest listings --}}
+				@if (!$isRecentlyViewedShown && str_ends_with((string)$sectionView, 'latest-listings'))
+					@include('front.sections.home.recently-viewed')
+					@php
+						$isRecentlyViewedShown = true;
+					@endphp
+				@endif
 				@if (!empty($sectionView) && view()->exists($sectionView))
 					@include($sectionView, [
 						'sectionData'  => $sectionData,
@@ -18,6 +28,9 @@
 					])
 				@endif
 			@endforeach
+		@endif
+		@if (!$isRecentlyViewedShown)
+			@include('front.sections.home.recently-viewed')
 		@endif
 		
 	</div>

@@ -257,6 +257,22 @@
 @endsection
 
 @section('after_scripts')
+	{{-- Recently viewed listings (shown on the homepage): remembered in the visitor's browser --}}
+	@if (!empty(data_get($post, 'id')))
+		<script>
+			(function () {
+				try {
+					var storageKey = 'adn_recently_viewed';
+					var postId = '{{ (int)data_get($post, 'id') }}';
+					var ids = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+					ids = Array.isArray(ids) ? ids.map(String).filter(function (id) { return id !== postId; }) : [];
+					ids.unshift(postId);
+					window.localStorage.setItem(storageKey, JSON.stringify(ids.slice(0, {{ \App\Http\Controllers\Web\Front\RecentlyViewedController::MAX_ITEMS }})));
+				} catch (e) {
+				}
+			})();
+		</script>
+	@endif
 	<script>
 		{{-- Favorites Translation --}}
         var lang = {

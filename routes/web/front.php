@@ -22,6 +22,7 @@ use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Edit\PostControl
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\SingleStep\CreateController as SingleCreateController;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\SingleStep\EditController as SingleEditController;
 use App\Http\Controllers\Web\Front\Post\ReportController;
+use App\Http\Controllers\Web\Front\RecentlyViewedController;
 use App\Http\Controllers\Web\Front\Post\Show\ShowController;
 use App\Http\Controllers\Web\Front\Search\CategoryController;
 use App\Http\Controllers\Web\Front\Search\CityController;
@@ -298,6 +299,11 @@ Route::namespace('Page')
 				Route::post(dynamicRoute('routes.contact'), 'postForm')->name('contact.postForm');
 			});
 	});
+
+// Homepage: "Recently viewed" listings row (AJAX)
+Route::get('listings/recently-viewed', RecentlyViewedController::class)
+	->middleware('throttle:60,1')
+	->name('listings.recentlyViewed');
 
 // SITEMAP (HTML)
 Route::middleware('custom.cache.header')->get(dynamicRoute('routes.sitemap'), SitemapController::class)->name('sitemap');
