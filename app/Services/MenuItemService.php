@@ -25,6 +25,7 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Throwable;
 
@@ -45,19 +46,28 @@ class MenuItemService extends BaseService
 		$embed = castCommaSeparatedStrToArray($params['embed'] ?? []);
 		$areNestedEntriesIncluded = castIntToBool($params['nestedIncluded'] ?? 0);
 		$sort = $params['sort'] ?? [];
-		
+
+		// Page to load: an explicit 'page' param wins over the current URL's "?page=N",
+		// and the page is part of the cache key. Otherwise a visit to any paginated URL
+		// (e.g. /search?page=2) right after a cache invalidation would cache an empty
+		// page of menu items under the key used by every other page.
+		$page = (int)($params['page'] ?? 0);
+		$page = ($page > 0) ? $page : (int)Paginator::resolveCurrentPage();
+		$page = max($page, 1);
+
 		// Cache Parameters
 		$cacheParams = array_merge($params, [
 			'action'   => 'get.menuItems',
 			'location' => $location,
 			'parentId' => $parentId,
 			'locale'   => $locale,
+			'page'     => $page,
 		]);
-		
+
 		// Cached Query
 		/** @var \Illuminate\Pagination\LengthAwarePaginator $menuItems */
 		$menuItems = caching()->remember(MenuItem::class, $cacheParams, function () use (
-			$perPage, $embed, $areNestedEntriesIncluded, $sort, $location
+			$perPage, $embed, $areNestedEntriesIncluded, $sort, $location, $page
 		) {
 			$menuItems = MenuItem::query();
 			$menuItems->whereHas('menu', fn (Builder $query) => $query->forLocation($location));
@@ -84,7 +94,7 @@ class MenuItemService extends BaseService
 			// Sorting
 			$menuItems = $this->applySorting($menuItems, ['lft', 'label'], $sort);
 			
-			$menuItemsPaginator = $menuItems->paginate($perPage);
+			$menuItemsPaginator = $menuItems->paginate($perPage, ['*'], 'page', $page);
 			
 			return PaginationHelper::adjustSides($menuItemsPaginator);
 		});

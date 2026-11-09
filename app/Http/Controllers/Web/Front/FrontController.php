@@ -101,6 +101,7 @@ class FrontController extends Controller
 		$params = [
 			'embed' => 'menu,parent,ancestors,children',
 			'sort'  => '-lft',
+			'page'  => 1, // Site menus must never follow the current URL's "?page=N"
 		];
 		
 		foreach ($menuLocation as $location => $locationVar) {
