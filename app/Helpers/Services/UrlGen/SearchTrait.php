@@ -350,8 +350,9 @@ trait SearchTrait
 		}
 		
 		if (!empty($user->username)) {
-			$path = str_replace(['{countryCode}/', '{username}'], ['', $user->username], config('routes.searchPostsByUsername'));
-			$url = url($countryCodePath . $path);
+			// The seller's page has no country segment (it lists the listings from every country)
+			$path = str_replace('{username}', $user->username, config('seo.user_route', 'user/{username}'));
+			$url = url($path);
 		} else {
 			if (isset($user->id)) {
 				$path = str_replace(['{countryCode}/', '{id}'], ['', $user->id], config('routes.searchPostsByUserId'));

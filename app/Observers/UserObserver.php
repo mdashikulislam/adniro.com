@@ -46,6 +46,22 @@ class UserObserver extends BaseObserver
 	use Metadata, HasImageWithThumbs;
 	
 	/**
+	 * Listen to the Entry saving event.
+	 *
+	 * @param User $user
+	 * @return void
+	 */
+	public function saving(User $user)
+	{
+		// Every user needs a username: it's the key of the seller's public page (/user/{username})
+		// (Models retrieved without their "username" column are left as they are)
+		$isUsernameLoaded = (!$user->exists || array_key_exists('username', $user->getAttributes()));
+		if ($isUsernameLoaded && empty($user->username)) {
+			$user->username = User::generateUsername($user->name, $user->id);
+		}
+	}
+	
+	/**
 	 * Listen to the Entry created event.
 	 *
 	 * @param User $user

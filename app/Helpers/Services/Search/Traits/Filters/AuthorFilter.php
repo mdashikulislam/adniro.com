@@ -18,6 +18,19 @@ namespace App\Helpers\Services\Search\Traits\Filters;
 
 trait AuthorFilter
 {
+	/**
+	 * Is the search limited to a given seller (by ID or username)?
+	 *
+	 * @return bool
+	 */
+	protected function isAuthorSearch(): bool
+	{
+		$userId = data_get($this->input, 'userId');
+		$username = data_get($this->input, 'username');
+		
+		return ((is_numeric($userId) && !empty($userId)) || (is_string($username) && trim($username) !== ''));
+	}
+	
 	protected function applyAuthorFilter(): void
 	{
 		if (!isset($this->posts)) {
@@ -39,8 +52,15 @@ trait AuthorFilter
 		}
 		
 		if (!empty($username)) {
-			// Use withWhereHas() to load the 'user' model/relationship
-			$this->posts->whereHas('user', fn ($query) => $query->where('username', $username));
+			// Listings of the user having this username,
+			// or listings published without account by the poster having this username
+			$postsTable = $this->postsTable;
+			$this->posts->where(function ($query) use ($username, $postsTable) {
+				$query->whereHas('user', fn ($query) => $query->where('username', $username))
+					->orWhere(function ($query) use ($username, $postsTable) {
+						$query->whereNull($postsTable . '.user_id')->where($postsTable . '.guest_username', $username);
+					});
+			});
 		}
 	}
 }

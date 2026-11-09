@@ -50,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Feed\Feedable;
 
@@ -131,6 +132,7 @@ class Post extends BaseModel implements Feedable
 		'currency_code',
 		'negotiable',
 		'contact_name',
+		'guest_username',
 		'address',
 		'city_id',
 		'lat',
@@ -780,6 +782,56 @@ class Post extends BaseModel implements Feedable
 				return round($this->distance, 2) . getDistanceUnit();
 			},
 		);
+	}
+	
+	/*
+	|--------------------------------------------------------------------------
+	| GUEST USERNAME
+	|--------------------------------------------------------------------------
+	*/
+	/**
+	 * Get the username of the poster of a listing published without account (guest listing).
+	 * It's the key of the seller's public page (/user/{username}).
+	 *
+	 * The guest listings published under the same contact name with the same email address
+	 * (or the same phone number, when there is no email address) share the same username;
+	 * otherwise a new unique one is generated from the contact name.
+	 * (The contact name is part of the key, so that the seller's page always matches the name
+	 * shown on the listing, also when several names are used with one email address.)
+	 *
+	 * @param string|null $email
+	 * @param string|null $phone
+	 * @param string|null $contactName
+	 * @return string
+	 */
+	public static function guestUsernameFor(?string $email, ?string $phone, ?string $contactName): string
+	{
+		$email = trim((string)$email);
+		$phone = trim((string)$phone);
+		$contactName = trim((string)$contactName);
+		
+		$contact = match (true) {
+			($email !== '') => ['email', $email],
+			($phone !== '') => ['phone', $phone],
+			default => null,
+		};
+		
+		if (!empty($contact)) {
+			$username = DB::table((new self())->getTable())
+				->whereNull('user_id')
+				->where($contact[0], $contact[1])
+				->where('contact_name', $contactName)
+				->whereNotNull('guest_username')
+				->where('guest_username', '!=', '')
+				->orderBy('id')
+				->value('guest_username');
+			
+			if (!empty($username)) {
+				return $username;
+			}
+		}
+		
+		return User::generateUsername($contactName);
 	}
 	
 	/*

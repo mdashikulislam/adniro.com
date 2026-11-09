@@ -39,7 +39,11 @@ trait Filters
 		}
 		
 		// Default Filters
-		$this->posts->inCountry()->verified()->unarchived();
+		// A seller's page lists the seller's listings from every country
+		if (!$this->isAuthorSearch()) {
+			$this->posts->inCountry();
+		}
+		$this->posts->verified()->unarchived();
 		if (config('settings.listing_form.listings_review_activation')) {
 			$this->posts->reviewed();
 		}

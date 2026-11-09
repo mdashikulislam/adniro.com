@@ -594,4 +594,63 @@ class User extends BaseUser
 	| OTHER PRIVATE METHODS
 	|--------------------------------------------------------------------------
 	*/
+	
+	/*
+	|--------------------------------------------------------------------------
+	| USERNAME GENERATION
+	|--------------------------------------------------------------------------
+	*/
+	/**
+	 * Generate a unique & valid username (alphanumeric, not numeric, 3 to 50 characters)
+	 * from the user's name. The username is the key of the seller's public page: /user/{username}
+	 *
+	 * @param string|null $name
+	 * @param int|null $userId
+	 * @return string
+	 */
+	public static function generateUsername(?string $name, ?int $userId = null): string
+	{
+		$base = \Illuminate\Support\Str::ascii((string)$name);
+		$base = strtolower((string)preg_replace('/[^A-Za-z0-9]+/', '', $base));
+		$base = substr($base, 0, 30);
+		
+		// No usable letter in the name (empty, non-latin script without transliteration, digits only...)
+		if (strlen($base) < 3 || is_numeric($base)) {
+			$base = 'user' . (!empty($userId) ? $userId : random_int(100000, 999999));
+		}
+		
+		$username = $base;
+		$suffix = 1;
+		while (self::isUsernameTaken($username, $userId)) {
+			$suffix++;
+			$username = $base . $suffix;
+		}
+		
+		return $username;
+	}
+	
+	/**
+	 * Is the username already used by another user,
+	 * or by the poster of a listing published without account (posts.guest_username)?
+	 *
+	 * @param string $username
+	 * @param int|null $userId
+	 * @return bool
+	 */
+	public static function isUsernameTaken(string $username, ?int $userId = null): bool
+	{
+		$isUsedByUser = self::query()
+			->withoutGlobalScopes()
+			->where('username', $username)
+			->when(!empty($userId), fn ($query) => $query->where('id', '!=', $userId))
+			->exists();
+		
+		if ($isUsedByUser) {
+			return true;
+		}
+		
+		return \Illuminate\Support\Facades\DB::table((new Post())->getTable())
+			->where('guest_username', $username)
+			->exists();
+	}
 }

@@ -50,6 +50,9 @@
 					])
 					
 					<div class="row g-4 account-profile-layout">
+						<div class="col-12">
+							@include('front.account.partials.profile-cover')
+						</div>
 						<div class="col-lg-4">
 							@include('front.account.partials.profile-photo')
 						</div>

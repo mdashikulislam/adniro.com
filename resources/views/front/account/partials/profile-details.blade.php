@@ -11,6 +11,36 @@
 						@csrf
 						@method('PUT')
 						
+						{{-- Public profile link --}}
+						@php
+							$detailsUsername = $authUser->username ?? null;
+							$detailsProfileUrl = !empty($detailsUsername) ? urlGen()->user(['username' => $detailsUsername]) : null;
+						@endphp
+						@if (!empty($detailsProfileUrl))
+							<div class="account-public-link">
+								<span class="account-public-link-icon"><i class="bi bi-link-45deg"></i></span>
+								<span class="account-public-link-text">
+									<span class="account-public-link-label">{{ t('public_profile') }}</span>
+									<a href="{{ $detailsProfileUrl }}" target="_blank" rel="noopener" class="account-public-link-url">
+										{{ preg_replace('#^https?://(www\.)?#i', '', $detailsProfileUrl) }}
+									</a>
+								</span>
+								<span class="account-public-link-actions">
+									<button type="button"
+									        class="btn account-public-link-btn"
+									        id="copyProfileLinkBtn"
+									        data-url="{{ $detailsProfileUrl }}"
+									        data-copied="{{ t('link_copied') }}"
+									>
+										<i class="bi bi-clipboard"></i> <span>{{ t('copy_link') }}</span>
+									</button>
+									<a href="{{ $detailsProfileUrl }}" target="_blank" rel="noopener" class="btn account-public-link-btn is-primary">
+										<i class="bi bi-box-arrow-up-right"></i> <span>{{ t('view_public_profile') }}</span>
+									</a>
+								</span>
+							</div>
+						@endif
+						
 						<div class="row">
 							{{-- gender_id --}}
 							@include('helpers.forms.fields.select2', [
@@ -36,15 +66,29 @@
 								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
 							])
 							
-							{{-- username --}}
-							@include('helpers.forms.fields.text', [
-								'label'       => trans('auth.username'),
-								'name'        => 'username',
-								'placeholder' => trans('auth.username'),
-								'required'    => true,
-								'value'       => $authUser->username ?? null,
-								'prefix'      => '<i class="fa-regular fa-user"></i>',
-								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
+							{{-- username (read-only: it can't be changed) --}}
+							<div class="mb-3 col-md-12">
+								<label class="form-label" for="usernameLocked">{{ trans('auth.username') }}</label>
+								<div class="account-locked-field" id="usernameLocked">
+									<span class="account-locked-field-at">@</span>
+									<span class="account-locked-field-value">{{ $authUser->username ?? '--' }}</span>
+									<span class="account-locked-field-lock"><i class="bi bi-lock-fill"></i></span>
+								</div>
+								<div class="form-text">{{ t('username_locked_hint') }}</div>
+							</div>
+							
+							{{-- about --}}
+							@include('helpers.forms.fields.textarea', [
+								'label'         => t('profile_description'),
+								'id'            => 'about',
+								'name'          => 'about',
+								'placeholder'   => t('profile_description_placeholder'),
+								'required'      => false,
+								'value'         => $authUser->about ?? null,
+								'attributes'    => ['maxlength' => 500, 'rows' => 4],
+								'pluginOptions' => ['height' => 130],
+								'hint'          => t('profile_description_hint', ['max' => 500]) . ' <span id="aboutCounter" class="fw-semibold"></span>',
+								'baseClass'     => ['wrapper' => 'mb-3 col-md-12'],
 							])
 							
 							{{-- auth_field (as notification channel) --}}
@@ -89,7 +133,7 @@
 								'prefix'      => '<i class="fa-regular fa-envelope"></i>',
 								'suffix'      => null,
 								'wrapper'     => ['class' => "auth-field-item{$forceToDisplay}"],
-								'baseClass'   => ['wrapper' => 'mb-3 col-md-6'],
+								'baseClass'   => ['wrapper' => 'mb-3 col-md-12'],
 							])
 							
 							{{-- phone --}}
@@ -138,5 +182,36 @@
 	@parent
 	<script>
 		phoneCountry = '{{ old('phone_country', ($phoneCountryValue ?? '')) }}';
+		
+		{{-- Public profile link: copy --}}
+		onDocumentReady((event) => {
+			const copyBtn = document.getElementById('copyProfileLinkBtn');
+			if (!copyBtn) {
+				return;
+			}
+			copyBtn.addEventListener('click', async () => {
+				try {
+					await navigator.clipboard.writeText(copyBtn.dataset.url);
+					jsAlert(copyBtn.dataset.copied, 'success');
+				} catch (error) {
+					window.prompt('', copyBtn.dataset.url);
+				}
+			});
+		});
+		
+		{{-- Description: characters counter --}}
+		onDocumentReady((event) => {
+			const aboutEl = document.getElementById('about');
+			const counterEl = document.getElementById('aboutCounter');
+			if (!aboutEl || !counterEl) {
+				return;
+			}
+			const max = parseInt(aboutEl.getAttribute('maxlength') || '500', 10);
+			const refresh = () => {
+				counterEl.textContent = aboutEl.value.length + ' / ' + max;
+			};
+			aboutEl.addEventListener('input', refresh);
+			refresh();
+		});
 	</script>
 @endsection

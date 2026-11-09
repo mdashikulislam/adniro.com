@@ -48,8 +48,15 @@
 					<div class="seller-info">
 						<span class="seller-label">{{ t('Posted by') }}</span>
 						<span class="seller-name">
-							@if (!empty($user))
-								<a href="{{ urlGen()->user($user) }}">{{ data_get($post, 'contact_name') }}</a>
+							@php
+								// Seller's page: the user's one, or the poster's one for a listing published without account
+								$sellerUrl = !empty($user) ? urlGen()->user($user) : null;
+								if (empty($sellerUrl) && !empty(data_get($post, 'guest_username'))) {
+									$sellerUrl = urlGen()->user(['username' => data_get($post, 'guest_username')]);
+								}
+							@endphp
+							@if (!empty($sellerUrl))
+								<a href="{{ $sellerUrl }}">{{ data_get($post, 'contact_name') }}</a>
 							@else
 								{{ data_get($post, 'contact_name') }}
 							@endif
@@ -79,6 +86,41 @@
 						@endif
 					@endif
 				</ul>
+			@endif
+			
+			{{-- Seller: follow & profile page (for Guests & Non-Owner Users) --}}
+			@php
+				$sellerUsername = data_get($user, 'username') ?: data_get($post, 'guest_username');
+				$sellerPageUrl = !empty($sellerUsername) ? urlGen()->user(['username' => $sellerUsername]) : null;
+				$isFollowingSeller = false;
+				if (!empty($sellerPageUrl) && !$isPostOwner && !empty($authUserId)) {
+					try {
+						$isFollowingSeller = \App\Services\SellerService::isFollowedBy(
+							['user_id' => data_get($user, 'id'), 'username' => $sellerUsername],
+							(int)$authUserId
+						);
+					} catch (\Throwable $e) {
+					}
+				}
+			@endphp
+			@if (!$isPostOwner && !empty($sellerPageUrl))
+				<div class="seller-quick-actions">
+					<button type="button"
+					        class="btn profile-btn profile-btn-primary profile-follow-btn js-follow-btn{{ $isFollowingSeller ? ' is-following' : '' }}"
+					        data-username="{{ $sellerUsername }}"
+					        data-url="{{ url(urlGen()->getAccountBasePath() . '/follows/toggle') }}"
+					        data-auth="{{ !empty($authUserId) ? '1' : '0' }}"
+					        aria-pressed="{{ $isFollowingSeller ? 'true' : 'false' }}"
+					>
+						<span class="profile-follow-state profile-follow-state-off"><i class="bi bi-person-plus-fill"></i> {{ t('follow') }}</span>
+						<span class="profile-follow-state profile-follow-state-on"><i class="bi bi-check2"></i> {{ t('following') }}</span>
+						<span class="profile-follow-state profile-follow-state-hover"><i class="bi bi-person-dash"></i> {{ t('unfollow') }}</span>
+					</button>
+					<a href="{{ $sellerPageUrl }}" class="btn profile-btn profile-btn-accent" target="_blank" rel="noopener">
+						<i class="bi bi-person-lines-fill"></i> <span>{{ t('view_public_profile') }}</span>
+						<i class="bi bi-box-arrow-up-right profile-btn-ext" aria-hidden="true"></i>
+					</a>
+				</div>
 			@endif
 			
 			{{-- Actions Buttons --}}
@@ -238,6 +280,7 @@
 
 @section('after_scripts')
 	@parent
+	@include('front.user.partials.follow-script')
 	@if ($isMapEnabled)
 		@if ($useGeocodingApi)
 			{{-- Google Geocoding API script --}}

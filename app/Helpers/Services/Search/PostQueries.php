@@ -169,6 +169,15 @@ class PostQueries
 		$this->preSearch['user'] = null;
 		if ($searchBasedOnUser) {
 			$this->preSearch['user'] = data_get($postsResult, 'data.0.user');
+			
+			// Listings published without account: the poster stands for the user
+			$guestUsername = data_get($postsResult, 'data.0.guest_username');
+			if (empty($this->preSearch['user']) && !empty($guestUsername)) {
+				$this->preSearch['user'] = [
+					'name'     => data_get($postsResult, 'data.0.contact_name'),
+					'username' => $guestUsername,
+				];
+			}
 		}
 		
 		$this->preSearch['tag'] = $this->input['tag'] ?? null;

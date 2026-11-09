@@ -37,6 +37,31 @@ use Throwable;
 class PostObserver extends BaseObserver
 {
 	/**
+	 * Listen to the Entry saving event.
+	 *
+	 * @param Post $post
+	 * @return void
+	 */
+	public function saving(Post $post)
+	{
+		// A listing published without account gets its poster's username:
+		// the key of the seller's public page (/user/{username})
+		// (Models retrieved without the columns below are left as they are)
+		$attributes = $post->getAttributes();
+		$areColumnsLoaded = (
+			!$post->exists
+			|| (array_key_exists('user_id', $attributes) && array_key_exists('guest_username', $attributes))
+		);
+		if ($areColumnsLoaded && empty($attributes['user_id']) && empty($attributes['guest_username'])) {
+			$post->guest_username = Post::guestUsernameFor(
+				$attributes['email'] ?? null,
+				$attributes['phone'] ?? null,
+				$attributes['contact_name'] ?? null
+			);
+		}
+	}
+	
+	/**
 	 * Listen to the Entry created event.
 	 *
 	 * @param Post $post

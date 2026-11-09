@@ -17,10 +17,12 @@
 use App\Http\Controllers\Web\Front\Account\ClosingController;
 use App\Http\Controllers\Web\Front\Account\LinkedAccountsController;
 use App\Http\Controllers\Web\Front\Account\MessagesController;
+use App\Http\Controllers\Web\Front\Account\FollowsController;
 use App\Http\Controllers\Web\Front\Account\OverviewController;
 use App\Http\Controllers\Web\Front\Account\PostsController;
 use App\Http\Controllers\Web\Front\Account\PreferencesController;
 use App\Http\Controllers\Web\Front\Account\ProfileController;
+use App\Http\Controllers\Web\Front\Account\ProfileCoverController;
 use App\Http\Controllers\Web\Front\Account\SavedPostsController;
 use App\Http\Controllers\Web\Front\Account\SavedSearchesController;
 use App\Http\Controllers\Web\Front\Account\SecurityController;
@@ -133,6 +135,18 @@ Route::middleware($accountMiddlewares)
 				Route::get('pending-approval/{id}/delete', 'destroy')->name('account.listings.pendingApproval.delete');
 				Route::post('pending-approval/delete', 'destroy')->name('account.listings.pendingApproval.delete.bulk');
 			});
+		
+		// Cover image (seller's public page)
+		Route::controller(ProfileCoverController::class)
+			->group(function ($router) {
+				Route::post('profile/cover', 'update')->middleware('throttle:20,1')->name('account.profile.cover.update');
+				Route::post('profile/cover/delete', 'destroy')->name('account.profile.cover.delete');
+			});
+		
+		// Followed sellers
+		Route::post('follows/toggle', [FollowsController::class, 'toggle'])
+			->middleware('throttle:30,1')
+			->name('account.follows.toggle');
 		
 		// Saved Posts
 		Route::controller(SavedPostsController::class)

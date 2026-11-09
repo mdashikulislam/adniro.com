@@ -16,6 +16,9 @@
 
 namespace App\Http\Controllers\Web\Front\Search;
 
+use App\Models\User;
+use App\Services\SellerService;
+use Illuminate\Http\RedirectResponse;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
 use Throwable;
 
@@ -24,9 +27,30 @@ class UserController extends BaseController
 	public ?array $user;
 	
 	/**
+	 * Seller's listings page: /user/{username}
+	 * (The seller's live listings from every country)
+	 *
+	 * @param string $username
+	 * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+	 */
+	public function profile(string $username)
+	{
+		// Username of a user, or of the poster of listings published without account
+		$seller = SellerService::find($username);
+		abort_if(empty($seller), 404, t('user_not_found'));
+		
+		return $this->searchByUserId(null, $username, $seller);
+	}
+	
+	/**
+	 * Former URL: /{countryCode}/users/{id}/ads
+	 * Permanently redirected to /user/{username}.
+	 * It's still served as it is for a user without username (that should no longer exist:
+	 * the usernames are generated on saving, see UserObserver & the "users:generate-usernames" command).
+	 *
 	 * @param string|null $countryCode
 	 * @param int|null $userId
-	 * @return \Illuminate\Contracts\View\View
+	 * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
 	 */
 	public function index(?string $countryCode, ?int $userId = null)
 	{
@@ -35,22 +59,47 @@ class UserController extends BaseController
 			$userId = $countryCode;
 		}
 		
-		return $this->searchByUserId($userId);
+		$user = User::query()->withoutGlobalScopes()->where('id', (int)$userId)->first(['id', 'username']);
+		abort_if(empty($user), 404, t('user_not_found'));
+		
+		if (!empty($user->username)) {
+			return $this->redirectToProfile($user->username);
+		}
+		
+		return $this->searchByUserId($userId, null, SellerService::findByUserId((int)$userId));
 	}
 	
 	/**
+	 * Former URL: /{countryCode}/profile/{username}
+	 * Permanently redirected to /user/{username}.
+	 *
 	 * @param string|null $countryCode
 	 * @param string|null $username
-	 * @return \Illuminate\Contracts\View\View
+	 * @return \Illuminate\Http\RedirectResponse
 	 */
-	public function profile(?string $countryCode, ?string $username = null)
+	public function legacyProfile(?string $countryCode, ?string $username = null): RedirectResponse
 	{
 		// Check if the multi-country site option is enabled
 		if (!isMultiCountriesUrlsEnabled()) {
 			$username = $countryCode;
 		}
 		
-		return $this->searchByUserId(null, $username);
+		return $this->redirectToProfile((string)$username);
+	}
+	
+	/**
+	 * @param string $username
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	private function redirectToProfile(string $username): RedirectResponse
+	{
+		$url = urlGen()->user(['username' => $username]);
+		$queryString = request()->getQueryString();
+		if (!empty($queryString)) {
+			$url .= '?' . $queryString;
+		}
+		
+		return redirect()->to($url, 301)->withHeaders(config('larapen.core.noCacheHeaders'));
 	}
 	
 	/**
@@ -58,7 +107,7 @@ class UserController extends BaseController
 	 * @param string|null $username
 	 * @return \Illuminate\Contracts\View\View
 	 */
-	private function searchByUserId(?int $userId = null, ?string $username = null)
+	private function searchByUserId(?int $userId = null, ?string $username = null, ?array $seller = null)
 	{
 		// Get Posts
 		$queryParams = [
@@ -73,6 +122,12 @@ class UserController extends BaseController
 		$apiResult = data_get($data, 'result');
 		$apiExtra = data_get($data, 'extra');
 		$preSearch = data_get($apiExtra, 'preSearch');
+		
+		// A seller without live listing is still the page's subject (title, real URL)
+		if (empty(data_get($preSearch, 'user')) && !empty($seller['username'])) {
+			$preSearch = (array)$preSearch;
+			$preSearch['user'] = ['name' => $seller['name'] ?? null, 'username' => $seller['username']];
+		}
 		
 		// Real URL (lowercase tag / the seller's username URL), out-of-range pages & canonical URL
 		// (see BaseController::applySeoUrlRules())
@@ -134,9 +189,21 @@ class UserController extends BaseController
 			(int)data_get($apiResult, 'meta.total', 0) < (int)config('seo.min_listings_to_index', 3)
 		);
 		
+		// Seller's page data
+		$authUserId = auth()->check() ? (int)auth()->id() : null;
+		$sellerStats = SellerService::stats((array)$seller, (int)data_get($apiResult, 'meta.total', 0));
+		$isOwnProfile = (!empty($authUserId) && !empty($seller['user_id']) && $seller['user_id'] == $authUserId);
+		$isFollowing = SellerService::isFollowedBy((array)$seller, $authUserId);
+		$sellerCountryName = SellerService::countryName((array)$seller);
+		
 		return view(
-			'front.search.results',
+			'front.user.profile',
 			compact(
+				'seller',
+				'sellerStats',
+				'isOwnProfile',
+				'isFollowing',
+				'sellerCountryName',
 				'apiMessage',
 				'apiResult',
 				'apiExtra',

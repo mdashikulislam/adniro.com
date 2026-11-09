@@ -59,12 +59,31 @@ class UserRequest extends Request
 			return;
 		}
 		
+		// username: set once (generated from the name), it can no longer be changed by the user:
+		// it's the key of the seller's public page (/user/{username}) & of the links shared to it.
+		// (The admin panel has its own request class)
+		if (in_array($this->method(), ['PUT', 'PATCH', 'UPDATE'])) {
+			$this->offsetUnset('username');
+			request()->offsetUnset('username');
+		}
+		
 		$input = $this->all();
 		
 		// name
 		if ($this->filled('name')) {
 			$input['name'] = singleLineStringCleaner($this->input('name'));
 			$input['name'] = ensureContainsLetters($input['name']);
+		}
+		
+		// about (plain text shown on the seller's public page: no HTML, line breaks kept)
+		if ($this->has('about')) {
+			$about = strip_tags((string)$this->input('about'));
+			$about = str_replace(["\r\n", "\r"], "\n", $about);
+			$about = (string)preg_replace('/[^\S\n]+/u', ' ', $about);
+			$about = (string)preg_replace('/ ?\n ?/u', "\n", $about);
+			$about = (string)preg_replace('/\n{3,}/u', "\n\n", $about);
+			$about = trim($about);
+			$input['about'] = ($about !== '') ? $about : null;
 		}
 		
 		// auth_field
@@ -199,6 +218,7 @@ class UserRequest extends Request
 			'phone'         => ['max:30'],
 			'phone_country' => ['required_with:phone'],
 			'username'      => [new UsernameIsValidRule()],
+			'about'         => ['nullable', 'string', 'max:500'],
 		];
 		
 		// Check if these fields have changed
@@ -235,6 +255,8 @@ class UserRequest extends Request
 			$rules['username'][] = 'required';
 			$rules['username'][] = new UsernameIsAllowedRule();
 			$rules['username'][] = 'unique:users,username';
+			// Not the username of the poster of listings published without account (same public URL: /user/{username})
+			$rules['username'][] = 'unique:posts,guest_username';
 		}
 		
 		// password

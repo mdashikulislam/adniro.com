@@ -50,6 +50,16 @@ trait Select
 			$select[] = $this->postsTable . '.phone';
 			$select[] = $this->postsTable . '.email';
 		}
+		// A seller's page mixes listings from several countries:
+		// each price must be formatted with its own currency (instead of the current country's one)
+		if ($this->isAuthorSearch()) {
+			$select[] = $this->postsTable . '.currency_code';
+			$this->posts->with('currency');
+			
+			// Poster of the listings published without account
+			$select[] = 'contact_name';
+			$select[] = $this->postsTable . '.guest_username';
+		}
 		if (config('settings.listings_list.show_listings_tags')) {
 			$select[] = 'tags';
 		}
@@ -62,6 +72,7 @@ trait Select
 		$groupBy = [$this->postsTable . '.id'];
 		
 		// Merge Columns
+		$select = array_values(array_unique($select));
 		$this->select = array_merge($this->select, $select);
 		$this->groupBy = array_merge($this->groupBy, $groupBy);
 		

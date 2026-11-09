@@ -69,6 +69,9 @@
 				} else {
 					$h1Title = data_get($cat, 'name') . ' ' . t('in') . ' ' . config('country.name');
 				}
+			} elseif (!empty(data_get($apiExtra ?? [], 'preSearch.user.name'))) {
+				// Seller's page (listings from every country)
+				$h1Title = t('all_listings') . ' ' . t('of') . ' ' . data_get($apiExtra, 'preSearch.user.name');
 			} elseif (request()->filled('q')) {
 				// Search query page
 				$h1Title = t('blog_search_results_for', ['keyword' => request()->query('q')]);

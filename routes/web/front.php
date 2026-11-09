@@ -309,8 +309,11 @@ Route::namespace('Search')
 		$router->pattern('id', '[0-9]+');
 		$router->pattern('username', '[a-zA-Z0-9]+');
 		Route::get(dynamicRoute('routes.search'), [SearchController::class, 'index'])->name('browse.listings');
+		// Seller's listings page (all countries): /user/{username}
+		Route::get(config('seo.user_route', 'user/{username}'), [UserController::class, 'profile'])->name('browse.listings.byUsername');
+		// Former URLs of that page (permanently redirected to the URL above)
 		Route::get(dynamicRoute('routes.searchPostsByUserId'), [UserController::class, 'index'])->name('browse.listings.byUserId');
-		Route::get(dynamicRoute('routes.searchPostsByUsername'), [UserController::class, 'profile'])->name('browse.listings.byUsername');
+		Route::get(dynamicRoute('routes.searchPostsByUsername'), [UserController::class, 'legacyProfile'])->name('browse.listings.byUsername.legacy');
 		Route::get(dynamicRoute('routes.searchPostsByTag'), [TagController::class, 'index'])->name('browse.listings.byTag');
 		Route::get(dynamicRoute('routes.searchPostsByCity'), [CityController::class, 'index'])->name('browse.listings.byCity');
 		Route::get(dynamicRoute('routes.searchPostsBySubCat'), [CategoryController::class, 'index'])->name('browse.listings.bySubCategory');

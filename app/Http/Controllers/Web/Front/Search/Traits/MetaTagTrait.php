@@ -161,8 +161,10 @@ trait MetaTagTrait
 		}
 
 
-		// Country
-		$fallbackTitle .= ', ' . config('country.name');
+		// Country (except on a seller's page, that lists the seller's listings from every country)
+		if (empty($user) || !empty($category) || !empty($location)) {
+			$fallbackTitle .= ', ' . config('country.name');
+		}
 		
 		$title = replaceGlobalPatterns($title);
 		$description = replaceGlobalPatterns($description);
