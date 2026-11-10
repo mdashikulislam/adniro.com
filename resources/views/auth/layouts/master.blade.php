@@ -39,9 +39,39 @@
     } catch (\Throwable $e) {}
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $htmlLang }}"{!! $htmlDir . $htmlTheme !!} data-bs-theme="dark">
+<html lang="{{ $htmlLang }}"{!! $htmlDir . $htmlTheme !!}>
 <head>
 	<meta charset="{{ config('larapen.core.charset', 'utf-8') }}"/>
+	{{--
+		Theme (light/dark), set before the first paint: same decision as the ThemeDetector (theme cookie, else the
+		system's theme when enabled). The page used to start in dark mode & switch to light once its scripts were
+		loaded: a dark flash at each (re)load.
+	--}}
+	<script>
+		(function () {
+			try {
+				var isDarkModeEnabled = {{ isSettingsAppDarkModeEnabled() ? 'true' : 'false' }};
+				var isSystemThemeEnabled = {{ isSettingsAppSystemThemeEnabled() ? 'true' : 'false' }};
+				var isDark = false;
+				if (isDarkModeEnabled) {
+					var validThemes = isSystemThemeEnabled ? ['dark', 'light', 'system'] : ['dark', 'light'];
+					var cookie = document.cookie.match(/(?:^|;\s*)themePreference=([^;]*)/);
+					var theme = cookie ? decodeURIComponent(cookie[1]) : null;
+					if (validThemes.indexOf(theme) === -1) {
+						theme = isSystemThemeEnabled ? 'system' : null;
+					}
+					isDark = (theme === 'dark')
+						|| (theme === 'system' && !!window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				}
+				if (isDark) {
+					document.documentElement.setAttribute('data-bs-theme', 'dark');
+				} else {
+					document.documentElement.removeAttribute('data-bs-theme');
+				}
+			} catch (e) {
+			}
+		})();
+	</script>
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
