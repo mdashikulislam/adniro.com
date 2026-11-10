@@ -172,9 +172,8 @@ body {
 	flex: 1 1 auto;
 	min-width: 0;
 	min-height: 100vh;
-	background:
-		radial-gradient(circle at 100% 0, rgba(var(--bs-primary-rgb), .07) 0, rgba(var(--bs-primary-rgb), 0) 40%),
-		var(--bs-tertiary-bg);
+	/* One plain surface filling the whole panel, like the brand panel: no tinted backdrop behind a card */
+	background: var(--bs-body-bg);
 }
 
 .auth-topbar {
@@ -221,14 +220,11 @@ body {
 	padding: 2rem clamp(1rem, 4vw, 2.5rem);
 }
 
+/* The form sits directly on the panel (a centered column, not a boxed card) */
 .auth-card {
 	width: 100%;
 	max-width: 460px;
-	padding: 2.25rem 2.25rem 2rem;
-	border: 1px solid var(--bs-border-color-translucent);
-	border-radius: 24px;
-	background-color: var(--bs-body-bg);
-	box-shadow: 0 30px 60px -30px rgba(15, 23, 42, .25), 0 8px 20px -12px rgba(15, 23, 42, .08);
+	padding: .5rem 0 1rem;
 }
 
 .auth-card.auth-card-wide {
@@ -604,10 +600,10 @@ body {
 
 /* Links under the form */
 .auth-alt {
-	margin: 1.6rem -2.25rem -2rem;
-	padding: 1.1rem 2.25rem;
-	border-top: 1px solid var(--bs-border-color);
-	border-radius: 0 0 24px 24px;
+	margin: 1.6rem 0 0;
+	padding: 1rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 14px;
 	background-color: var(--bs-tertiary-bg);
 	text-align: center;
 	font-size: .9rem;
@@ -728,11 +724,6 @@ body {
  * ------------------------------------------------------- */
 [data-bs-theme="dark"] .auth-main {
 	background: var(--bs-body-bg);
-}
-
-[data-bs-theme="dark"] .auth-card {
-	background-color: var(--bs-tertiary-bg);
-	border-color: rgba(255, 255, 255, .08);
 }
 
 [data-bs-theme="dark"] .auth-alt {
