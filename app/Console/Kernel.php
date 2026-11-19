@@ -46,6 +46,9 @@ class Kernel
 		// Rebuild the listings counts & last changes (sitemaps, sidebar, noindex rules)
 		$schedule->command('listings:warm-counts')->timezone($tz)->everyThirtyMinutes()->withoutOverlapping();
 		
+		// AI moderation: re-queue or hand over listings stuck waiting for a check (adniro:ai)
+		$schedule->command('ai:moderation-sweep')->timezone($tz)->everyFiveMinutes()->withoutOverlapping();
+		
 		// Backups
 		setBackupConfig();
 		$disableNotifications = (config('settings.backup.disable_notifications')) ? ' --disable-notifications' : '';

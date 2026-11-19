@@ -71,4 +71,26 @@ class AiSettings
 	{
 		return max(0, (int)($this->all()['daily_call_limit'] ?? 0));
 	}
+	
+	/**
+	 * off: no check. shadow: every listing is checked and logged, nothing is hidden.
+	 */
+	public function moderationMode(): string
+	{
+		$mode = (string)($this->all()['moderation_mode'] ?? 'off');
+		
+		return in_array($mode, ['off', 'shadow'], true) ? $mode : 'off';
+	}
+	
+	/** Checks per user (or IP for guests) per day. 0 means no limit. */
+	public function moderationUserDailyLimit(): int
+	{
+		return max(0, (int)($this->all()['moderation_user_daily_limit'] ?? 30));
+	}
+	
+	/** Checks per listing per day. 0 means no limit. */
+	public function moderationPostDailyLimit(): int
+	{
+		return max(0, (int)($this->all()['moderation_post_daily_limit'] ?? 10));
+	}
 }

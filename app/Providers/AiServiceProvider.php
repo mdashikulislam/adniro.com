@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Picture;
+use App\Models\Post;
+use App\Models\PostValue;
+use App\Observers\Ai\PictureModerationObserver;
+use App\Observers\Ai\PostModerationObserver;
+use App\Observers\Ai\PostValueModerationObserver;
 use App\Services\Ai\AiBudget;
 use App\Services\Ai\AiModelResolver;
 use App\Services\Ai\AiSettings;
@@ -27,6 +33,9 @@ class AiServiceProvider extends ServiceProvider
 	
 	public function boot(): void
 	{
-		//
+		// Listing moderation: added next to the app's own observers, so no core observer changes
+		Post::observe(PostModerationObserver::class);
+		Picture::observe(PictureModerationObserver::class);
+		PostValue::observe(PostValueModerationObserver::class);
 	}
 }

@@ -32,6 +32,9 @@ class AiSetting extends BaseSetting
 			'transcription_model_id'       => null,
 			'daily_budget_usd'             => '5',
 			'daily_call_limit'             => '500',
+			'moderation_mode'              => 'off',
+			'moderation_user_daily_limit'  => '30',
+			'moderation_post_daily_limit'  => '10',
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -125,6 +128,53 @@ class AiSetting extends BaseSetting
 			'hint'        => trans('ai.setting_transcription_model_hint'),
 			'wrapper'     => ['class' => 'col-md-6'],
 			'tab'         => $tabName,
+		];
+		
+		// Moderation
+		$tabName = trans('ai.setting_tab_moderation');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'ai_moderation_sep',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'  => 'ai_moderation_info',
+			'type'  => 'custom_html',
+			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_moderation_info')) . '</div>',
+			'tab'   => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'moderation_mode',
+			'label'   => trans('ai.setting_moderation_mode_label'),
+			'type'    => 'select2_from_array',
+			'options' => [
+				'off'    => trans('ai.setting_moderation_mode_off'),
+				'shadow' => trans('ai.setting_moderation_mode_shadow'),
+			],
+			'hint'    => trans('ai.setting_moderation_mode_hint'),
+			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'       => 'moderation_user_daily_limit',
+			'label'      => trans('ai.setting_moderation_user_limit_label'),
+			'type'       => 'number',
+			'attributes' => ['min' => 0, 'step' => 1],
+			'hint'       => trans('ai.setting_moderation_user_limit_hint'),
+			'wrapper'    => ['class' => 'col-md-6'],
+			'tab'        => $tabName,
+		];
+		$fields[] = [
+			'name'       => 'moderation_post_daily_limit',
+			'label'      => trans('ai.setting_moderation_post_limit_label'),
+			'type'       => 'number',
+			'attributes' => ['min' => 0, 'step' => 1],
+			'hint'       => trans('ai.setting_moderation_post_limit_hint'),
+			'wrapper'    => ['class' => 'col-md-6'],
+			'tab'        => $tabName,
 		];
 		
 		// Budget

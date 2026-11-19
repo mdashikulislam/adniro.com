@@ -41,6 +41,7 @@ Core files touched, each marked `adniro:ai`:
 Known gap: the panel's generic inline toggle endpoint lets any admin switch the `active` flag of a table. The AI lists do not show that toggle, but the endpoint itself is not restricted.
 
 ### Phase 2, moderation data model and hiding: built on branch `ai` (2026-11-20)
+Committed as `225567a7`.
 No AI call is made yet, and nothing sets a status other than `approved` automatically. Covered by 11 more tests in `tests/Feature/Ai/ModerationVisibilityTest.php`, so 45 in all.
 
 What exists:
@@ -66,6 +67,34 @@ Core files touched, each marked `adniro:ai`:
 - `app/Console/Commands/ListingsPurge.php` and `app/Rules/UniquenessOfPostRule.php`
 
 Not done in this phase: owner banners and the "online" mail gate are phase 4. The admin queue is phase 5. The owner's view of a hidden listing was checked by tests, not in a signed-in browser.
+
+### Phase 3, moderation in shadow mode: built on branch `ai` (2026-11-20)
+Shadow mode only. Every check is recorded in `post_moderations`, and the listing itself is never changed. Moderation is off by default, so nothing runs until an admin picks shadow mode in Settings > AI > Moderation. Covered by 30 more tests in `tests/Unit/Ai/VerdictMapperTest.php` and `tests/Feature/Ai/ModerationShadowTest.php`, so 75 in all. No real provider was called, because no API key is set up.
+
+What exists:
+- **Policy and prompt.** `resources/ai/moderation-policy.md` holds the instructions, versioned by `Policy::VERSION`. `Policy` holds the 14 categories, their severity and the answer schema. Category names are translated in `lang/en/ai.php`.
+- **Fingerprint.** `ContentHash` covers the title, description, tags, price, currency, category, seller type, contact name, custom field values and the sorted photo paths.
+- **What the model sees.** `ListingPayload` sends plain text without HTML, category and city names, readable custom field values and up to five photos. Email and phone are never sent. The listing is JSON-encoded with `<` and `>` escaped, so it cannot close its tag.
+- **Fixed rules.** `VerdictMapper` applies the five rules from section 5 and cleans the reason shown to users.
+- **Scheduling.** Three observers, on listings, photos and custom field values, are registered from `AiServiceProvider`, so the app's own observers are unchanged. `ModerationService::schedule()` queues one `ModeratePost` job per listing, 15 seconds later, unique until it starts.
+- **The check.** `ModerationService::moderate()` follows the job steps in section 5, including the re-check of the fingerprint after the answer and the per-listing and per-user daily limits.
+- **Commands.** `ai:moderation-sweep` is scheduled every 5 minutes. `ai:moderation-eval {model?}` runs the 60 labelled listings in `resources/ai/eval/moderation.json` and sets or clears the model's `moderation_eval_passed_at`.
+- **Settings > AI > Moderation.** Mode (off or shadow), checks per user per day (30) and checks per listing per day (10).
+
+Differences from the plan above:
+- **Extra columns.** `post_moderations` gained `mode`, `decided_status` and `rule`. `decided_status` records what the rules decided even in shadow mode, while `applied_status` stays empty until a decision is written to the listing.
+- **Repeat checks in shadow mode.** Shadow mode leaves `posts.moderation_hash` alone, so an unchanged listing is recognised by an earlier AI row with the same fingerprint instead.
+- **No worker locally.** When the AI queue connection uses the sync driver, the check runs after the response is sent instead of 15 seconds later. Locally `AI_QUEUE_CONNECTION` is not set, so checks go to the `ai` queue on Redis and wait for `php artisan queue:work redis --queue=ai`.
+- **Not in the evaluation set: child safety.** Such content is never written into test data. The other 13 categories are covered, plus 5 attempts to instruct the moderator, in 7 languages.
+- **Limits in shadow mode.** A listing over its limit gets a system row with `needs_review` and no AI call.
+
+Core files touched, each marked `adniro:ai`:
+- `app/Console/Kernel.php`: one schedule line for the sweep
+
+Before phase 4:
+- Add a provider and model, then run `php artisan ai:moderation-eval` on the model. It makes 60 real calls.
+- Run shadow mode for about a week with a queue worker, and compare the `post_moderations` rows with your own judgement.
+- Phase 4 should only offer the enforce mode for a model whose evaluation passed.
 
 ## 1. What we are building
 
