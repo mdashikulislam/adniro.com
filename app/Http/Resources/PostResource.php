@@ -46,6 +46,7 @@ class PostResource extends BaseResource
 			$entity[$column] = $this->{$column} ?? null;
 		}
 		
+		$entity['moderation_status'] = $this->moderation_status ?? 'approved'; // adniro:ai
 		$entity['price_label'] = $this->price_label ?? t('price');
 		$entity['count_pictures'] = $this->count_pictures ?? 0;
 		

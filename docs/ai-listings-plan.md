@@ -8,7 +8,7 @@ Revised 2026-11-20: the admin sets an AI post limit per day, week or month for m
 ## Implementation status
 
 ### Phase 1, shared foundation: built on branch `ai` (2026-11-20)
-Not committed yet. Covered by 34 automated tests in `tests/Unit/Ai` and `tests/Feature/Ai`, run against a separate `adniro_test` database.
+Committed as `224ad918`. Covered by 34 automated tests in `tests/Unit/Ai` and `tests/Feature/Ai`, run against a separate `adniro_test` database.
 
 What exists:
 - Admin > AI > AI providers and AI models, super admins only, with Test connection and Test model buttons.
@@ -39,6 +39,33 @@ Core files touched, each marked `adniro:ai`:
 - `composer.json` and `composer.lock`
 
 Known gap: the panel's generic inline toggle endpoint lets any admin switch the `active` flag of a table. The AI lists do not show that toggle, but the endpoint itself is not restricted.
+
+### Phase 2, moderation data model and hiding: built on branch `ai` (2026-11-20)
+No AI call is made yet, and nothing sets a status other than `approved` automatically. Covered by 11 more tests in `tests/Feature/Ai/ModerationVisibilityTest.php`, so 45 in all.
+
+What exists:
+- `posts.moderation_status` (default `approved`, indexed), `posts.moderation_hash` and `posts.moderated_at`. None of them is fillable.
+- `post_moderations` table and `App\Models\PostModeration`, with `Post::moderations()`.
+- `App\Services\Ai\Moderation\ModerationStatus` with the four values, and `ModerationVisibility::canSee()`, which allows the owner, staff and the admin panel.
+
+Verified on the local site by setting one listing to `rejected` and back. The show page and its `?preview=1` link returned 410, the API show returned 404, and the listing left the API list, the home page and the listings sitemap. All came back after restoring `approved`.
+
+Differences from the plan above:
+- **Two more leaks closed.** The `?preview=1` show page and the API show endpoint with `unactivatedIncluded=1` load a listing without the visibility scopes for any visitor. Both now drop a hidden listing unless `ModerationVisibility::canSee()` allows it. The phone reveal uses the API path, so it is covered too.
+- **`isVerifiedPost()` has a second argument.** Passing `false` checks email and phone only. The purge command uses it, so a listing waiting for moderation is never deleted as "never activated". The duplicate-title rule uses it, so its email and phone meaning is unchanged.
+- **The `unverified` scope is now grouped.** With human review on, the old scope added a bare "or reviewed_at is null" that ignored other filters such as the owner. All its conditions now sit in one group.
+- **The `reviewed` local scope** also requires `approved`. The feed, city counts and similar listings use it.
+- **The settings page re-approval skips hidden listings.** Its bulk update runs through the global scopes, so a hidden listing keeps an empty `reviewed_at`. When human review is on, an admin approval in phase 5 must also set `reviewed_at`.
+
+Core files touched, each marked `adniro:ai`:
+- `app/Models/Scopes/ReviewedScope.php`
+- `app/Models/Post.php`: the `verified`, `unverified` and `reviewed` scopes, a cast and the relation
+- `app/Helpers/Services/Functions/admin.php`: `isVerifiedPost()`
+- `app/Http/Resources/PostResource.php`
+- `app/Services/Post/Show/DetailedTrait.php` and `app/Services/Post/ShowTrait.php`
+- `app/Console/Commands/ListingsPurge.php` and `app/Rules/UniquenessOfPostRule.php`
+
+Not done in this phase: owner banners and the "online" mail gate are phase 4. The admin queue is phase 5. The owner's view of a hidden listing was checked by tests, not in a signed-in browser.
 
 ## 1. What we are building
 

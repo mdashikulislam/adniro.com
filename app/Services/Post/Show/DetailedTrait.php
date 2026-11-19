@@ -114,6 +114,11 @@ trait DetailedTrait
 				->first();
 		}
 		
+		// adniro:ai - a listing hidden by moderation is visible to its owner and staff only
+		if (!empty($post) && !\App\Services\Ai\Moderation\ModerationVisibility::canSee($post)) {
+			$post = null;
+		}
+		
 		// Listing isn't found
 		if (empty($post) || empty($post->category) || empty($post->city)) {
 			abort(410, t('post_not_found'));

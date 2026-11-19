@@ -166,10 +166,14 @@ function getCountryFlag($entry, bool $withLink = false): string
 /**
  * Check if the Listing is verified
  *
+ * adniro:ai - Listings hidden by moderation are not verified, so they are shown as previews
+ * to their owner only. Pass $withModeration = false to check the email and phone only.
+ *
  * @param $post
+ * @param bool $withModeration
  * @return bool
  */
-function isVerifiedPost($post): bool
+function isVerifiedPost($post, bool $withModeration = true): bool
 {
 	$post = (is_array($post)) ? Arr::toObject($post) : $post;
 	
@@ -185,6 +189,11 @@ function isVerifiedPost($post): bool
 		$verified = (!empty($post->email_verified_at) && !empty($post->phone_verified_at) && !empty($post->reviewed_at));
 	} else {
 		$verified = (!empty($post->email_verified_at) && !empty($post->phone_verified_at));
+	}
+	
+	// adniro:ai - a missing "moderation_status" key counts as approved
+	if ($verified && $withModeration) {
+		$verified = \App\Services\Ai\Moderation\ModerationStatus::isPublic(data_get($post, 'moderation_status'));
 	}
 	
 	return $verified;

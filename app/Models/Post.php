@@ -205,6 +205,7 @@ class Post extends BaseModel implements Feedable
 			'archived_at'           => NullableDateTimeCast::class,
 			'archived_manually_at'  => NullableDateTimeCast::class,
 			'deletion_mail_sent_at' => NullableDateTimeCast::class,
+			'moderated_at'          => NullableDateTimeCast::class, // adniro:ai
 		];
 		
 		$versionIntroducingTwoFactor = (config('larapen.core.item.slug') == 'jobclass') ? '16.0.0' : '17.0.0';
@@ -350,6 +351,12 @@ class Post extends BaseModel implements Feedable
 		return $this->hasMany(PostValue::class, 'post_id');
 	}
 	
+	// adniro:ai
+	public function moderations(): HasMany
+	{
+		return $this->hasMany(PostModeration::class, 'post_id')->orderByDesc('id');
+	}
+	
 	public function subscription(): BelongsTo
 	{
 		return $this->belongsTo(Payment::class, 'payment_id');
@@ -370,18 +377,24 @@ class Post extends BaseModel implements Feedable
 		if (config('settings.listing_form.listings_review_activation') == '1') {
 			$query->whereNotNull('reviewed_at');
 		}
+		
+		$query->where('moderation_status', 'approved'); // adniro:ai
 	}
 	
 	#[Scope]
 	protected function unverified(Builder $query): void
 	{
+		// adniro:ai - all conditions are grouped, so the "or" cannot escape other filters
+		// such as "user_id", and listings hidden by moderation count as not activated
 		$query->where(function (Builder $query) {
 			$query->whereNull('email_verified_at')->orWhereNull('phone_verified_at');
+			
+			if (config('settings.listing_form.listings_review_activation') == '1') {
+				$query->orWhereNull('reviewed_at');
+			}
+			
+			$query->orWhere('moderation_status', '!=', 'approved');
 		});
-		
-		if (config('settings.listing_form.listings_review_activation') == '1') {
-			$query->orWhereNull('reviewed_at');
-		}
 	}
 	
 	#[Scope]
@@ -402,6 +415,8 @@ class Post extends BaseModel implements Feedable
 		if (config('settings.listing_form.listings_review_activation') == '1') {
 			$query->whereNotNull('reviewed_at');
 		}
+		
+		$query->where('moderation_status', 'approved'); // adniro:ai
 	}
 	
 	#[Scope]

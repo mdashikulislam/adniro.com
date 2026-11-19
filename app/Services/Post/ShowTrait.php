@@ -139,6 +139,11 @@ trait ShowTrait
 		// Reset caching parameters
 		$this->resetCachingParameters();
 		
+		// adniro:ai - a listing hidden by moderation is visible to its owner and staff only
+		if (!empty($post) && !\App\Services\Ai\Moderation\ModerationVisibility::canSee($post)) {
+			$post = null;
+		}
+		
 		abort_if(empty($post), 404, t('post_not_found'));
 		
 		// Increment the listing's visit counter

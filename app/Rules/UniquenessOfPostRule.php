@@ -124,7 +124,7 @@ class UniquenessOfPostRule implements ValidationRule
 		if ($posts->count() > 0) {
 			$post = $posts->orderByDesc('id')->first();
 			
-			if (!isVerifiedPost($post)) {
+			if (!isVerifiedPost($post, false)) { // adniro:ai - email and phone only
 				// Conditions to Verify User's Email or Phone
 				if (!empty($authUser)) {
 					$emailVerificationRequired = config('settings.mail.email_verification') == 1

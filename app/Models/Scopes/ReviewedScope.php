@@ -35,6 +35,9 @@ class ReviewedScope implements Scope
 			return;
 		}
 		
+		// adniro:ai - only listings approved by moderation are public
+		$builder->where('moderation_status', 'approved');
+		
 		if (config('settings.listing_form.listings_review_activation') == '1') {
 			$builder->whereNotNull('reviewed_at');
 		}

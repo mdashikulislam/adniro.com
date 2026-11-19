@@ -169,7 +169,7 @@ class ListingsPurge extends Command
 		// dd($createdAt->diffInDays($today));
 		
 		/* For non-activated items */
-		if (!isVerifiedPost($post)) {
+		if (!isVerifiedPost($post, false)) { // adniro:ai - email and phone only, held listings wait for moderation
 			// Delete non-active items after '$this->unactivatedPostsExpiration' days
 			if ($createdAt->diffInDays($today) >= $this->unactivatedPostsExpiration) {
 				$post->delete();
