@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Models\Setting;
+
+use App\Models\AiModel;
+use App\Models\AiUsageLog;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
+
+/*
+ * settings.ai.option (adniro:ai)
+ *
+ * Providers, keys and models are managed in Admin > AI Providers and Admin > AI Models.
+ * This screen turns AI on or off, assigns a model to each feature and sets the daily budget.
+ *
+ * The AI client reads these values fresh from the database on every call
+ * (see App\Services\Ai\AiSettings), so queue workers never use stale values.
+ */
+
+class AiSetting extends BaseSetting
+{
+	public static function getFieldValues($value, $disk)
+	{
+		$value = is_array($value) ? $value : [];
+		
+		$defaultValue = [
+			'enabled'                      => '0',
+			'moderation_model_id'          => null,
+			'moderation_fallback_model_id' => null,
+			'quickpost_model_id'           => null,
+			'quickpost_fallback_model_id'  => null,
+			'transcription_model_id'       => null,
+			'daily_budget_usd'             => '5',
+			'daily_call_limit'             => '500',
+		];
+		
+		return array_merge($defaultValue, $value);
+	}
+	
+	public static function setFieldValues($value, $setting)
+	{
+		return $value;
+	}
+	
+	public static function getFields($diskName): array
+	{
+		$fields = [];
+		
+		// General
+		$tabName = trans('ai.setting_tab_general');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'ai_general_sep',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'  => 'ai_general_info',
+			'type'  => 'custom_html',
+			'value' => self::generalInfoHtml(),
+			'tab'   => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'enabled',
+			'label'   => trans('ai.setting_enabled_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('ai.setting_enabled_hint'),
+			'wrapper' => ['class' => 'col-md-12 mt-3'],
+			'tab'     => $tabName,
+		];
+		
+		// Models
+		$tabName = trans('ai.setting_tab_models');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'ai_models_sep',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'  => 'ai_models_info',
+			'type'  => 'custom_html',
+			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_models_info')) . '</div>',
+			'tab'   => $tabName,
+		];
+		
+		$visionOptions = self::modelOptions('moderation');
+		$transcriptionOptions = self::modelOptions('transcription');
+		
+		foreach ([
+			'moderation' => 'moderation',
+			'quickpost'  => 'quickpost_draft',
+		] as $prefix => $feature) {
+			$fields[] = [
+				'name'        => $prefix . '_model_id',
+				'label'       => trans('ai.setting_' . $prefix . '_model_label'),
+				'type'        => 'select2_from_array',
+				'options'     => $visionOptions,
+				'allows_null' => true,
+				'hint'        => trans('ai.setting_' . $prefix . '_model_hint'),
+				'wrapper'     => ['class' => 'col-md-6'],
+				'tab'         => $tabName,
+			];
+			$fields[] = [
+				'name'        => $prefix . '_fallback_model_id',
+				'label'       => trans('ai.setting_fallback_model_label'),
+				'type'        => 'select2_from_array',
+				'options'     => $visionOptions,
+				'allows_null' => true,
+				'hint'        => trans('ai.setting_fallback_model_hint'),
+				'wrapper'     => ['class' => 'col-md-6'],
+				'tab'         => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'        => 'transcription_model_id',
+			'label'       => trans('ai.setting_transcription_model_label'),
+			'type'        => 'select2_from_array',
+			'options'     => $transcriptionOptions,
+			'allows_null' => true,
+			'hint'        => trans('ai.setting_transcription_model_hint'),
+			'wrapper'     => ['class' => 'col-md-6'],
+			'tab'         => $tabName,
+		];
+		
+		// Budget
+		$tabName = trans('ai.setting_tab_budget');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'ai_budget_sep',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'       => 'daily_budget_usd',
+			'label'      => trans('ai.setting_daily_budget_label'),
+			'type'       => 'number',
+			'attributes' => ['min' => 0, 'step' => '0.01'],
+			'hint'       => trans('ai.setting_daily_budget_hint'),
+			'wrapper'    => ['class' => 'col-md-6'],
+			'tab'        => $tabName,
+		];
+		$fields[] = [
+			'name'       => 'daily_call_limit',
+			'label'      => trans('ai.setting_daily_call_limit_label'),
+			'type'       => 'number',
+			'attributes' => ['min' => 0, 'step' => 1],
+			'hint'       => trans('ai.setting_daily_call_limit_hint'),
+			'wrapper'    => ['class' => 'col-md-6'],
+			'tab'        => $tabName,
+		];
+		
+		return $fields;
+	}
+	
+	/**
+	 * Models that can be assigned to the given feature: active, of an active provider,
+	 * with the right capabilities, and (for structured features) a passed "Test model".
+	 */
+	private static function modelOptions(string $feature): array
+	{
+		try {
+			if (!Schema::hasTable('ai_models')) {
+				return [];
+			}
+			
+			return AiModel::query()
+				->with('provider')
+				->where('active', 1)
+				->orderBy('ai_provider_id')
+				->orderBy('model_id')
+				->get()
+				->filter(fn (AiModel $model) => $model->isEligibleFor($feature))
+				->mapWithKeys(fn (AiModel $model) => [(string)$model->id => $model->fullName()])
+				->toArray();
+		} catch (Throwable $e) {
+			return [];
+		}
+	}
+	
+	private static function generalInfoHtml(): string
+	{
+		$providersUrl = urlGen()->adminUrl('ai_providers');
+		$modelsUrl = urlGen()->adminUrl('ai_models');
+		
+		$usage = '';
+		try {
+			if (Schema::hasTable('ai_usage_logs')) {
+				$today = AiUsageLog::query()->where('created_at', '>=', now()->startOfDay());
+				$calls = (clone $today)->count();
+				$cost = (float)(clone $today)->sum('cost_usd');
+				$usage = '<p class="mb-0">' . e(trans('ai.setting_usage_today', [
+						'calls' => $calls,
+						'cost'  => number_format($cost, 4),
+					])) . '</p>';
+			}
+		} catch (Throwable $e) {
+		}
+		
+		return '<div class="alert alert-light">'
+			. '<p>' . e(trans('ai.setting_general_info')) . '</p>'
+			. '<p>'
+			. '<a class="btn btn-sm btn-primary" href="' . e($providersUrl) . '">' . e(trans('ai.providers')) . '</a> '
+			. '<a class="btn btn-sm btn-primary" href="' . e($modelsUrl) . '">' . e(trans('ai.models')) . '</a>'
+			. '</p>'
+			. $usage
+			. '</div>';
+	}
+}

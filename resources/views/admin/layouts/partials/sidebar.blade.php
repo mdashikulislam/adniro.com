@@ -103,6 +103,40 @@
 						</li>
 					@endif
 					
+					{{-- AI providers, models and settings (adniro:ai) --}}
+					@if (userHasSuperAdminPermissions())
+						<li class="sidebar-item">
+							<a href="#collapseAi"
+							   class="sidebar-link has-arrow waves-effect waves-dark"
+							   data-bs-toggle="collapse"
+							   aria-expanded="false"
+							   aria-controls="collapseAi"
+							>
+								<i data-feather="cpu"></i> <span class="hide-menu">AI</span>
+							</a>
+							<ul class="collapse first-level" id="collapseAi">
+								<li class="sidebar-item">
+									<a href="{{ urlGen()->adminUrl('ai_providers') }}" class="sidebar-link">
+										<i class="mdi mdi-adjust"></i>
+										<span class="hide-menu">{{ trans('ai.providers') }}</span>
+									</a>
+								</li>
+								<li class="sidebar-item">
+									<a href="{{ urlGen()->adminUrl('ai_models') }}" class="sidebar-link">
+										<i class="mdi mdi-adjust"></i>
+										<span class="hide-menu">{{ trans('ai.models') }}</span>
+									</a>
+								</li>
+								<li class="sidebar-item">
+									<a href="{{ urlGen()->adminUrl('settings/find/ai') }}" class="sidebar-link">
+										<i class="mdi mdi-adjust"></i>
+										<span class="hide-menu">{{ trans('admin.settings') }}</span>
+									</a>
+								</li>
+							</ul>
+						</li>
+					@endif
+					
 					@if (
 						doesUserHavePermission($authUser, 'admin.user.view')
 						|| doesUserHavePermission($authUser, 'admin.role.view')

@@ -205,4 +205,7 @@ Route::middleware(['admin', 'clearance', 'banned.user', 'no.http.cache'])
 		Route::get('system/phpinfo', [SystemPhpInfoController::class, 'index'])->name('admin.system.phpinfo');
 		Route::get('system/phpinfo/raw', [SystemPhpInfoController::class, 'rawVersion'])
 			->name('admin.system.phpinfo.raw');
+
+		// AI providers and models (adniro:ai)
+		require __DIR__ . '/ai-admin.php';
 	});

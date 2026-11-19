@@ -9,7 +9,8 @@ return [
 	App\Providers\PluginServiceProvider::class,
 	App\Providers\MacroServiceProvider::class,
 	App\Providers\ExtensionServiceProvider::class,
-	
+	App\Providers\AiServiceProvider::class, // adniro:ai
+
 	Larapen\TextToImage\TextToImageServiceProvider::class,
 	Larapen\LaravelMetaTags\MetaTagsServiceProvider::class,
 	Larapen\Honeypot\HoneypotServiceProvider::class,
