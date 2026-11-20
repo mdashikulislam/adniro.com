@@ -3,11 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Post;
-use App\Models\PostModeration;
 use App\Services\Ai\Moderation\ModerationService;
 use App\Services\Ai\Moderation\ModerationStatus;
 use App\Services\Ai\Moderation\ModerationTrigger;
-use App\Services\Ai\Moderation\Policy;
 use Illuminate\Console\Command;
 
 /*
@@ -56,20 +54,12 @@ class AiModerationSweep extends Command
 		$handedOver = 0;
 		$base()
 			->where('updated_at', '<', now()->subMinutes(self::GIVE_UP_AFTER_MINUTES))
-			->chunkById(100, function ($posts) use (&$handedOver) {
+			->chunkById(100, function ($posts) use ($service, &$handedOver) {
 				foreach ($posts as $post) {
-					$row = PostModeration::query()->create([
-						'post_id'        => $post->getKey(),
-						'trigger'        => ModerationTrigger::SWEEP,
-						'mode'           => 'enforce',
-						'source'         => 'system',
-						'policy_version' => Policy::VERSION,
-						'decided_status' => ModerationStatus::NEEDS_REVIEW,
-						'applied_status' => ModerationStatus::NEEDS_REVIEW,
-						'rule'           => 'sweep_timeout',
-						'error'          => 'No AI decision after ' . self::GIVE_UP_AFTER_MINUTES . ' minutes',
+					$service->handOver($post, 'sweep_timeout', [
+						'trigger' => ModerationTrigger::SWEEP,
+						'error'   => 'No AI decision after ' . self::GIVE_UP_AFTER_MINUTES . ' minutes',
 					]);
-					$post->forceFill(['moderation_status' => ModerationStatus::NEEDS_REVIEW, 'moderated_at' => now()])->save();
 					$handedOver++;
 				}
 			});

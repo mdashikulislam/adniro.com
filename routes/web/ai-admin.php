@@ -1,14 +1,17 @@
 <?php
 
 /*
- * Admin > AI Providers and AI Models (adniro:ai).
+ * Admin > AI Providers and AI Models, and the AI review queue (adniro:ai).
  * Included from routes/web/admin.php, inside the admin group (prefix, middleware and namespace).
- * These screens hold API keys, so they are limited to super admins.
+ * Providers and models hold API keys, so they are limited to super admins.
+ * The review queue is open to super admins and to staff allowed to edit listings.
  */
 
 use App\Http\Controllers\Web\Admin\AiModelController;
 use App\Http\Controllers\Web\Admin\AiProviderController;
+use App\Http\Controllers\Web\Admin\ModerationQueueController;
 use App\Http\Controllers\Web\Admin\Panel\Library\PanelRoutes;
+use App\Http\Middleware\ModerationQueueAccess;
 use App\Http\Middleware\SuperAdminOnly;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +22,15 @@ Route::middleware([SuperAdminOnly::class])
 		
 		PanelRoutes::resource('ai_providers', AiProviderController::class);
 		PanelRoutes::resource('ai_models', AiModelController::class);
+	});
+
+Route::middleware([ModerationQueueAccess::class])
+	->controller(ModerationQueueController::class)
+	->group(function () {
+		Route::get('moderation', 'queue');
+		Route::get('moderation/{id}/history', 'history')->whereNumber('id');
+		Route::get('moderation/{id}/reject', 'rejectForm')->whereNumber('id');
+		Route::post('moderation/{id}/approve', 'approve')->whereNumber('id');
+		Route::post('moderation/{id}/reject', 'reject')->whereNumber('id');
+		Route::post('moderation/{id}/rerun', 'rerun')->whereNumber('id');
 	});

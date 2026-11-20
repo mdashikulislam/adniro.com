@@ -30,6 +30,7 @@ class ModeratePost implements ShouldQueue, ShouldBeUniqueUntilProcessing
 		public readonly int $postId,
 		public readonly string $trigger,
 		public readonly ?string $locale = null,
+		public readonly bool $force = false,
 	)
 	{
 	}
@@ -44,7 +45,7 @@ class ModeratePost implements ShouldQueue, ShouldBeUniqueUntilProcessing
 		$isSync = $this->job === null || $this->job instanceof SyncJob;
 		$finalAttempt = $isSync || $this->attempts() >= $this->tries;
 		
-		$outcome = $service->moderate($this->postId, $this->trigger, $this->locale, $finalAttempt);
+		$outcome = $service->moderate($this->postId, $this->trigger, $this->locale, $finalAttempt, $this->force);
 		
 		if ($outcome === ModerationService::RETRY) {
 			$this->release($this->attempts() <= 1 ? 30 : 120);

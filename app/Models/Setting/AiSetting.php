@@ -36,6 +36,7 @@ class AiSetting extends BaseSetting
 			'moderation_user_daily_limit'  => '30',
 			'moderation_post_daily_limit'  => '10',
 			'moderation_when_unavailable'  => 'approve',
+			'moderation_alert_admins'      => '1',
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -170,6 +171,14 @@ class AiSetting extends BaseSetting
 			],
 			'hint'    => trans('ai.setting_moderation_unavailable_hint'),
 			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'moderation_alert_admins',
+			'label'   => trans('ai.setting_moderation_alert_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('ai.setting_moderation_alert_hint'),
+			'wrapper' => ['class' => 'col-md-6 mt-4'],
 			'tab'     => $tabName,
 		];
 		$fields[] = [

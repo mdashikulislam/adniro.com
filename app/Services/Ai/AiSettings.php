@@ -115,6 +115,11 @@ class AiSettings
 	 * When the AI cannot be used (over budget, or no usable model): approve the listing,
 	 * or hold it for an admin.
 	 */
+	public function moderationAlertAdmins(): bool
+	{
+		return ($this->all()['moderation_alert_admins'] ?? '1') == '1';
+	}
+	
 	public function moderationWhenUnavailable(): string
 	{
 		return ($this->all()['moderation_when_unavailable'] ?? 'approve') === 'review' ? 'review' : 'approve';

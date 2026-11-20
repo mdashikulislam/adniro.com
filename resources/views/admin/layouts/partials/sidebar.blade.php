@@ -75,6 +75,23 @@
 										</a>
 									</li>
 								@endif
+								@if (\App\Http\Middleware\ModerationQueueAccess::allows($authUser))
+									{{-- AI review queue (adniro:ai) --}}
+									@php
+										$aiReviewCount = cache()->remember('ai:moderation_queue_count', 60, fn () => \App\Models\Post::query()
+											->withoutGlobalScopes()->where('moderation_status', 'needs_review')->count());
+									@endphp
+									<li class="sidebar-item">
+										<a href="{{ urlGen()->adminUrl('moderation') }}" class="sidebar-link">
+											<i class="mdi mdi-adjust"></i>
+											<span class="hide-menu">{{ trans('ai.queue_sidebar') }}
+												@if ($aiReviewCount > 0)
+													<span class="badge rounded-pill bg-warning text-dark ms-1">{{ $aiReviewCount }}</span>
+												@endif
+											</span>
+										</a>
+									</li>
+								@endif
 								@if (doesUserHavePermission($authUser, 'admin.category.view') || userHasSuperAdminPermissions())
 									<li class="sidebar-item">
 										<a href="{{ urlGen()->adminUrl('categories') }}" class="sidebar-link">

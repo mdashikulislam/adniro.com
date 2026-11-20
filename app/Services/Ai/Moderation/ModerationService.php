@@ -5,13 +5,18 @@ namespace App\Services\Ai\Moderation;
 use App\Jobs\Ai\ModeratePost;
 use App\Models\AiUsageLog;
 use App\Models\Post;
+use App\Models\Permission;
 use App\Models\PostModeration;
+use App\Models\User;
+use App\Notifications\AdminModerationAlert;
 use App\Notifications\PostNotApproved;
 use App\Services\Ai\AiRequest;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSettings;
 use App\Services\Ai\Contracts\AiClientContract;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Throwable;
 
 /*
@@ -26,6 +31,7 @@ class ModerationService
 {
 	public const FEATURE = 'moderation';
 	public const DELAY_SECONDS = 15;
+	public const ALERTS_PER_HOUR = 20;
 	public const MAX_OUTPUT_TOKENS = 2000;
 	
 	// Outcomes of moderate()
@@ -117,27 +123,112 @@ class ModerationService
 			return false;
 		}
 		
-		$job = new ModeratePost((int)$post->getKey(), $trigger, $locale ?: app()->getLocale());
-		
-		$connection = (string)config('ai_features.queue.connection');
-		if (config('queue.connections.' . $connection . '.driver') === 'sync') {
-			// No worker: run after the response is sent, once the photos and fields are saved too
-			dispatch($job)->onConnection($connection)->afterResponse();
-		} else {
-			dispatch($job)
-				->onConnection($connection)
-				->onQueue((string)config('ai_features.queue.name', 'ai'))
-				->delay(now()->addSeconds(self::DELAY_SECONDS))
-				->afterCommit();
-		}
+		$this->dispatch(new ModeratePost((int)$post->getKey(), $trigger, $locale ?: app()->getLocale()));
 		
 		return true;
 	}
 	
 	/**
+	 * Admin queue: ask the AI again, even if this content was decided before.
+	 */
+	public function rerun(Post $post): bool
+	{
+		if (!$this->isActive() || !$this->isCheckable($post)) {
+			return false;
+		}
+		
+		$this->dispatch(new ModeratePost((int)$post->getKey(), ModerationTrigger::RERUN, $this->localeFor($post), true), 0);
+		
+		return true;
+	}
+	
+	/**
+	 * Admin queue: approve or reject the listing as it is now. Stored with its fingerprint,
+	 * so the same content is never flagged again. Applied in any mode.
+	 */
+	public function decideByAdmin(Post $post, string $status, User $admin, array $categories = [], ?string $reason = null): PostModeration
+	{
+		$categories = array_values(array_unique(array_filter($categories, fn ($code) => is_string($code) && Policy::severity($code) !== null)));
+		$hash = ContentHash::for($post);
+		
+		$row = $this->record([
+			'post_id'        => $post->getKey(),
+			'trigger'        => 'admin',
+			'mode'           => $this->mode(),
+			'source'         => 'human',
+			'content_hash'   => $hash,
+			'decided_status' => $status,
+			'rule'           => 'admin_' . $status,
+			'categories'     => $status === ModerationStatus::REJECTED ? $categories : [],
+			'user_reason'    => $status === ModerationStatus::REJECTED ? VerdictMapper::cleanUserReason($reason) : null,
+			'locale'         => $this->localeFor($post),
+			'policy_version' => Policy::VERSION,
+			'reviewer_id'    => $admin->getKey(),
+		]);
+		
+		// With human review on, an approved listing also needs "reviewed_at" to go live
+		$extra = [];
+		if (
+			$status === ModerationStatus::APPROVED
+			&& config('settings.listing_form.listings_review_activation') == '1'
+			&& empty($post->reviewed_at)
+		) {
+			$extra['reviewed_at'] = now();
+		}
+		
+		$this->apply($post, $status, $hash, $row, $extra);
+		
+		return $row;
+	}
+	
+	/**
+	 * Hand a listing to the admins, with a recorded reason (sweep timeout and similar).
+	 */
+	public function handOver(Post $post, string $rule, array $attributes = []): PostModeration
+	{
+		$row = $this->record(array_merge([
+			'post_id'        => $post->getKey(),
+			'mode'           => $this->mode(),
+			'policy_version' => Policy::VERSION,
+		], $attributes, [
+			'source'         => 'system',
+			'decided_status' => ModerationStatus::NEEDS_REVIEW,
+			'rule'           => $rule,
+		]));
+		
+		$this->apply($post, ModerationStatus::NEEDS_REVIEW, null, $row);
+		
+		return $row;
+	}
+	
+	private function dispatch(ModeratePost $job, ?int $delaySeconds = null): void
+	{
+		$connection = (string)config('ai_features.queue.connection');
+		if (config('queue.connections.' . $connection . '.driver') === 'sync') {
+			// No worker: run after the response is sent, once the photos and fields are saved too
+			dispatch($job)->onConnection($connection)->afterResponse();
+			
+			return;
+		}
+		
+		dispatch($job)
+			->onConnection($connection)
+			->onQueue((string)config('ai_features.queue.name', 'ai'))
+			->delay(now()->addSeconds($delaySeconds ?? self::DELAY_SECONDS))
+			->afterCommit();
+	}
+	
+	private function localeFor(Post $post): string
+	{
+		$locale = PostModeration::query()->where('post_id', $post->getKey())->whereNotNull('locale')->orderByDesc('id')->value('locale');
+		
+		return (string)($locale ?: ($post->user?->language_code ?: config('app.locale')));
+	}
+	
+	/**
 	 * Run the check. Called by the ModeratePost job.
 	 */
-	public function moderate(int $postId, string $trigger, ?string $locale = null, bool $finalAttempt = true): string
+	public function moderate(int $postId, string $trigger, ?string $locale = null, bool $finalAttempt = true, bool $force = false): string
 	{
 		$post = Post::query()->withoutGlobalScopes()->find($postId);
 		if (!$post instanceof Post || !$this->isCheckable($post)) {
@@ -153,7 +244,7 @@ class ModerationService
 		$enforce = $mode === 'enforce';
 		
 		// The same content was decided before: reuse that decision, no AI call
-		$previous = $this->previousDecision($post, $hash);
+		$previous = $force ? null : $this->previousDecision($post, $hash);
 		if (!is_null($previous)) {
 			if ($enforce) {
 				[$status, $row] = $previous;
@@ -174,7 +265,7 @@ class ModerationService
 			'policy_version' => Policy::VERSION,
 		];
 		
-		$limit = $this->limitReached($post);
+		$limit = $force ? null : $this->limitReached($post);
 		if (!is_null($limit)) {
 			$row = $this->record($base + [
 					'source'         => 'system',
@@ -268,6 +359,8 @@ class ModerationService
 		
 		if ($enforce) {
 			$this->apply($fresh, $mapped->status, $hash, $row);
+		} else if (in_array('child_safety', $mapped->categories, true)) {
+			$this->alertAdmins($fresh, $row, true);
 		}
 		
 		return self::DECIDED;
@@ -376,13 +469,23 @@ class ModerationService
 	 * cleared and the "listing is online" email goes out when it becomes approved.
 	 * A rejection is emailed once per decision.
 	 */
-	private function apply(Post $post, string $status, ?string $hash, ?PostModeration $row): void
+	private function apply(Post $post, string $status, ?string $hash, ?PostModeration $row, array $extra = []): void
 	{
-		$attributes = ['moderation_status' => $status, 'moderated_at' => now()];
+		$previousStatus = $post->moderation_status;
+		
+		$attributes = array_merge(['moderation_status' => $status, 'moderated_at' => now()], $extra);
 		if (!is_null($hash)) {
 			$attributes['moderation_hash'] = $hash;
 		}
 		$post->forceFill($attributes)->save();
+		
+		if ($row && $row->source !== 'human') {
+			$isNewReview = ($status === ModerationStatus::NEEDS_REVIEW && $previousStatus !== ModerationStatus::NEEDS_REVIEW);
+			$isChildSafety = in_array('child_safety', (array)($row->categories ?? []), true);
+			if ($isNewReview || $isChildSafety) {
+				$this->alertAdmins($post, $row, $isChildSafety);
+			}
+		}
 		
 		if (!$row) {
 			return;
@@ -402,6 +505,38 @@ class ModerationService
 			} catch (Throwable $e) {
 				report($e);
 			}
+		}
+	}
+	
+	/**
+	 * Email the staff about a listing that needs a person. At most 20 alerts an hour;
+	 * the next alert after that says how many were left out. Child safety is always sent.
+	 */
+	private function alertAdmins(Post $post, PostModeration $row, bool $urgent = false): void
+	{
+		try {
+			if (!$this->settings->moderationAlertAdmins() && !$urgent) {
+				return;
+			}
+			
+			$hourKey = 'ai:moderation_alerts:' . now()->format('YmdH');
+			$sent = (int)Cache::get($hourKey, 0);
+			if (!$urgent && $sent >= self::ALERTS_PER_HOUR) {
+				Cache::increment('ai:moderation_alerts_skipped');
+				
+				return;
+			}
+			
+			$admins = User::query()->permission(Permission::getStaffPermissions())->get();
+			if ($admins->isEmpty()) {
+				return;
+			}
+			
+			$skipped = (int)Cache::pull('ai:moderation_alerts_skipped', 0);
+			Notification::send($admins, new AdminModerationAlert($post, $row, $skipped, $urgent));
+			Cache::put($hourKey, $sent + 1, now()->addHours(2));
+		} catch (Throwable $e) {
+			report($e);
 		}
 	}
 	

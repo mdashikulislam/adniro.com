@@ -98,6 +98,7 @@ Before phase 4:
 - Phase 4 should only offer the enforce mode for a model whose evaluation passed.
 
 ### Phase 4, enforce and notify: built on branch `ai` (2026-11-20)
+Committed as `e7d45c1b`.
 Covered by 13 more tests in `tests/Feature/Ai/ModerationEnforceTest.php`, so 88 in all. Moderation is still off locally, and no real provider was called.
 
 What exists:
@@ -124,6 +125,30 @@ Core files touched, each marked `adniro:ai`:
 - `resources/views/front/post/createOrEdit/multiSteps/create/finish.blade.php` and `.../singleStep/finish.blade.php`: the finish line
 
 Not checked in a signed-in browser: the banner, badge and finish line were checked by rendering the views in tests.
+
+### Phase 5, admin queue: built on branch `ai` (2026-11-20)
+Covered by 14 more tests in `tests/Feature/Ai/ModerationQueueTest.php`, so 102 in all. The fake AI client used by the tests now has its own file, `tests/Feature/Ai/FakeAiClient.php`.
+
+What exists:
+- **Admin > Listings > AI review queue** at `/admin/moderation`. Its filters are needs review (the default), rejected, being checked, shadow flags and all hidden. It has a title or ID search, oldest first, 25 per page. Each row shows the status, the categories, the confidence, why it was decided, the model, the note for admins and the reason for the owner.
+- **Shadow flags.** This lists live listings whose latest AI check would have held or rejected them, unless an admin approved them since. It is meant for the shadow week.
+- **Approve** stores a human decision with the current fingerprint, publishes the listing and sends the "online" email when it was hidden. It also sets `reviewed_at` when human review is on. The same content is never sent to the AI again.
+- **Reject** opens a form with the 14 categories and a message to the owner, prefilled from the AI. It needs at least one category. The message is cleaned like the AI's, and the owner gets the rejection email.
+- **Re-run AI** queues a forced check that ignores earlier decisions and the per-listing limit. It is refused when moderation is off, or the listing is unverified or archived.
+- **History** lists every decision on a listing: who decided (AI with its model, an admin by name, or the system), the decision, whether it was applied and emailed, and tokens and time.
+- **Sidebar item** under Listings, with a count of listings needing review. The count is cached for 60 seconds.
+- **Access.** The queue is open to super admins and to staff with the existing "edit listings" permission (`admin.post.edit`). Its action names are not CRUD names, so the panel's route-permission parser adds nothing, and the `ModerationQueueAccess` middleware decides.
+- **Admin alerts.** `AdminModerationAlert` emails staff when a listing goes to review. It sends at most 20 an hour, and the next alert after that says how many were left out. A child safety flag is always sent, marked urgent, even in shadow mode. It can be switched off in Settings > AI > Moderation.
+- **Sweep.** Hand-overs now go through the same path, so they alert too.
+
+Differences from the plan above:
+- **A plain admin page, not a panel list.** The queue needs custom buttons, a form and a history view, and the panel's list would have needed methods on the core `Post` model.
+- **Alert recipients.** The alerts go to every staff user, the same group as the app's "new listing" admin email.
+
+Core files touched, each marked `adniro:ai`:
+- `resources/views/admin/layouts/partials/sidebar.blade.php`: the queue item under Listings
+
+Not checked in a signed-in browser: the queue, reject form and history were checked through HTTP tests as a super admin, a listing editor and other staff. Signed-out requests to `/admin/moderation` and the approve action were checked on the local site and are sent to the login page.
 
 ## 1. What we are building
 
