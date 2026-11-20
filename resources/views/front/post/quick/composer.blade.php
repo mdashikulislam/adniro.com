@@ -20,6 +20,15 @@
 
 @section('after_scripts')
 	@parent
+	@php
+		$voiceMessages = [
+			'listening'   => trans('ai.qp_voice_listening'),
+			'denied'      => trans('ai.qp_voice_denied'),
+			'no_speech'   => trans('ai.qp_voice_no_speech'),
+			'unavailable' => trans('ai.qp_voice_unavailable'),
+			'time_up'     => trans('ai.qp_voice_time_up'),
+		];
+	@endphp
 	<script>
 		(function () {
 			const form = document.getElementById('quickPostForm');
@@ -174,6 +183,121 @@
 				}
 				refresh();
 			});
+			
+			/* Voice: the browser's speech recognition writes into the text box, live and editable.
+			   Where the browser has none, the mic is hidden and a hint points to the keyboard's
+			   dictation key. The recognizer is looked up when the mic is tapped. */
+			const voiceBox = document.getElementById('qpVoice');
+			const mic = document.getElementById('qpMic');
+			const voiceLang = document.getElementById('qpVoiceLang');
+			const voiceStatus = document.getElementById('qpVoiceStatus');
+			const Recognizer = () => window.SpeechRecognition || window.webkitSpeechRecognition || null;
+			const voiceSupported = !!Recognizer() && window.isSecureContext !== false;
+			const voiceMessages = @json($voiceMessages);
+			const VOICE_MAX_MS = 60000;
+			let recognition = null;
+			let voiceTimer = null;
+			let voiceBase = '';
+			let voiceFinal = '';
+			
+			const setVoiceStatus = (msg) => {
+				voiceStatus.textContent = msg || '';
+				voiceStatus.classList.toggle('d-none', !msg);
+			};
+			const setListening = (on) => {
+				mic.classList.toggle('btn-danger', on);
+				mic.classList.toggle('btn-outline-primary', !on);
+				mic.setAttribute('aria-pressed', on ? 'true' : 'false');
+				mic.setAttribute('aria-label', on ? mic.dataset.labelStop : mic.dataset.labelStart);
+				mic.querySelector('i').className = on ? 'bi bi-stop-fill' : 'bi bi-mic-fill';
+				voiceLang.disabled = on;
+			};
+			const stopVoice = () => {
+				clearTimeout(voiceTimer);
+				if (recognition) {
+					try { recognition.stop(); } catch (e) {}
+				}
+			};
+			const joinText = (a, b) => (a && b && !/\s$/.test(a) ? a + ' ' + b : a + b);
+			
+			if (voiceSupported) {
+				voiceBox.classList.replace('d-none', 'd-flex');
+				document.getElementById('qpVoicePrivacy').classList.remove('d-none');
+				try {
+					const saved = window.localStorage.getItem('qpVoiceLang');
+					if (saved && Array.from(voiceLang.options).some((o) => o.value === saved)) {
+						voiceLang.value = saved;
+					}
+				} catch (e) {}
+				voiceLang.addEventListener('change', () => {
+					try { window.localStorage.setItem('qpVoiceLang', voiceLang.value); } catch (e) {}
+				});
+			} else {
+				document.getElementById('qpVoiceHint').classList.remove('d-none');
+			}
+			
+			mic.addEventListener('click', () => {
+				if (recognition) {
+					stopVoice();
+					return;
+				}
+				const SR = Recognizer();
+				if (!SR) {
+					return;
+				}
+				recognition = new SR();
+				recognition.lang = voiceLang.value || voiceBox.dataset.default;
+				recognition.continuous = true;
+				recognition.interimResults = true;
+				voiceBase = text.value;
+				voiceFinal = '';
+				
+				recognition.onstart = () => {
+					setListening(true);
+					setVoiceStatus(voiceMessages.listening);
+					voiceTimer = setTimeout(() => {
+						setVoiceStatus(voiceMessages.time_up);
+						stopVoice();
+					}, VOICE_MAX_MS);
+				};
+				recognition.onresult = (event) => {
+					let interim = '';
+					for (let i = event.resultIndex; i < event.results.length; i++) {
+						const piece = event.results[i][0].transcript;
+						if (event.results[i].isFinal) {
+							voiceFinal = joinText(voiceFinal, piece.trim());
+						} else {
+							interim += piece;
+						}
+					}
+					text.value = joinText(voiceBase, joinText(voiceFinal, interim.trim())).slice(0, maxText);
+					refresh();
+				};
+				recognition.onerror = (event) => {
+					const map = {'not-allowed': 'denied', 'service-not-allowed': 'denied', 'no-speech': 'no_speech'};
+					setVoiceStatus(voiceMessages[map[event.error] || 'unavailable']);
+				};
+				recognition.onend = () => {
+					clearTimeout(voiceTimer);
+					recognition = null;
+					setListening(false);
+					if (voiceStatus.textContent === voiceMessages.listening) {
+						setVoiceStatus('');
+					}
+					text.value = joinText(voiceBase, voiceFinal).slice(0, maxText);
+					refresh();
+					text.focus();
+				};
+				try {
+					recognition.start();
+				} catch (e) {
+					recognition = null;
+					setVoiceStatus(voiceMessages.unavailable);
+				}
+			});
+			
+			/* Stop listening before the draft is sent */
+			form.addEventListener('submit', stopVoice, true);
 			
 			if (!('geolocation' in navigator)) {
 				locationBtn.classList.add('d-none');

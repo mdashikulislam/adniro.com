@@ -51,6 +51,7 @@ class QuickPostController extends BaseController
 				'photoUrl'     => url('posts/create/quick/photos'),
 				'photoLimit'   => $this->photoLimit(),
 				'photoMaxKb'   => (int)config('settings.upload.max_image_size', 1000),
+				'voice'        => $this->voiceLanguages(),
 			])
 			->withHeaders(config('larapen.core.noCacheHeaders'));
 	}
@@ -190,6 +191,42 @@ class QuickPostController extends BaseController
 		}
 		
 		return redirect()->to(urlGen()->addPost())->withHeaders(config('larapen.core.noCacheHeaders'));
+	}
+	
+	/**
+	 * Languages for the browser's speech recognition, as BCP 47 tags. The default is the site
+	 * language in the current country (for example bn-BD or en-US), then the other site languages.
+	 *
+	 * @return array{default: string, languages: array<int, array{tag: string, label: string}>}
+	 */
+	public static function voiceLanguages(): array
+	{
+		$locale = strtolower((string)app()->getLocale());
+		$country = strtoupper((string)config('country.code'));
+		
+		$languages = [];
+		try {
+			foreach (getSupportedLanguages() as $code => $language) {
+				$tag = str_replace('_', '-', (string)data_get($language, 'locale', $code));
+				$label = (string)(data_get($language, 'native') ?: data_get($language, 'name') ?: $code);
+				$languages[strtolower((string)$code)] = ['tag' => $tag, 'label' => $label];
+			}
+		} catch (Throwable $e) {
+		}
+		
+		$default = $languages[$locale]['tag'] ?? $locale;
+		if ($country !== '' && preg_match('/^[a-z]{2,3}$/', $locale)) {
+			$default = $locale . '-' . $country;
+		}
+		
+		$list = [['tag' => $default, 'label' => ($languages[$locale]['label'] ?? $locale) . ' (' . $country . ')']];
+		foreach ($languages as $code => $language) {
+			if ($language['tag'] !== $default) {
+				$list[] = $language;
+			}
+		}
+		
+		return ['default' => $default, 'languages' => $list];
 	}
 	
 	private function photoLimit(): int

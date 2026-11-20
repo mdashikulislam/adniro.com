@@ -159,6 +159,7 @@ class QuickPostPhotosTest extends TestCase
 	{
 		/* The full page needs the site layout, which a test cannot render: check the compiled template */
 		$compiled = app('blade.compiler')->compileString(file_get_contents(resource_path('views/front/post/quick/composer.blade.php')));
+		token_get_all($compiled, TOKEN_PARSE); // throws a ParseError if the compiled template is not valid PHP
 		
 		$this->assertStringContainsString('front.post.quick.partials.form', $compiled);
 		$this->assertStringContainsString('front.post.quick.partials.overlay', $compiled);

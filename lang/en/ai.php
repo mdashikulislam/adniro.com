@@ -302,6 +302,18 @@ return [
 	'qp_photo_too_big' => 'This photo is too large. Please choose a smaller one.',
 	'qp_photo_failed'  => 'This photo could not be added. Please try another one.',
 	
+	// Quick post: voice
+	'qp_voice_start'       => 'Speak instead of typing',
+	'qp_voice_stop'        => 'Stop listening',
+	'qp_voice_language'    => 'Speech language',
+	'qp_voice_listening'   => 'Listening... Tap the button again when you are done (60 seconds at most).',
+	'qp_voice_denied'      => 'Microphone access is blocked. Allow it in your browser settings, or type instead.',
+	'qp_voice_no_speech'   => 'We did not hear anything. Tap the microphone and try again.',
+	'qp_voice_unavailable' => 'Voice input is not available right now. Please type instead.',
+	'qp_voice_time_up'     => 'That is the 60 second limit. You can tap the microphone again to add more.',
+	'qp_voice_hint'        => 'Tip: on a phone, you can tap the microphone key on your keyboard to dictate.',
+	'qp_voice_privacy'     => 'Voice input uses your browser\'s speech service; in Chrome, the audio is processed by Google.',
+	
 	// Quick post: banner on the listing form
 	'qp_banner_title' => 'We filled this in for you.',
 	'qp_banner_text'  => 'Check the highlighted fields and add anything missing before you continue.',

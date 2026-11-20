@@ -188,6 +188,7 @@ Core files touched, each marked `adniro:ai`:
 - `app/Services/Ai/Support/SchemaRules.php` (from phase 1): nested empty values are valid too
 
 ### Phase 7, quick post photos: built on branch `ai` (2026-11-20)
+Committed as `5466c9bc`.
 Covered by 11 more tests in `tests/Feature/Ai/QuickPostPhotosTest.php`, so 134 in all. The quick post fixtures are now shared in `tests/Feature/Ai/QuickPostFixtures.php`.
 
 Checked in the browser on the local site against the local mock model, as in phase 6:
@@ -212,6 +213,24 @@ Found and fixed while checking:
 
 Core files touched, each marked `adniro:ai`:
 - `app/Console/Kernel.php`: one schedule line for the purge
+
+### Phase 8, quick post voice: built on branch `ai` (2026-11-20)
+Browser speech-to-text only; nothing is sent to the server except the resulting text. Covered by 3 more tests in `tests/Feature/Ai/QuickPostVoiceTest.php`, so 137 in all.
+
+Checked in the browser on the local site. The pane's Chromium has speech recognition, so the mic and the language picker appeared, with "English (US)" first and the site's other languages after it. Real speech needs a microphone and Google's service, which the pane cannot provide, so a scripted recognizer stood in. It showed that interim words appear live and final words stay, that text typed earlier is kept, and that the chosen language is passed to the recognizer. The picker is locked while listening, and stopping resets the button. A blocked microphone shows its message. The layout was also checked at phone width. Not checked: real Chrome on Android, iOS Safari and Firefox.
+
+What exists:
+- **A mic button inside the text box,** with a speech language picker. It is shown only when the browser has `SpeechRecognition` or `webkitSpeechRecognition` and the page is in a secure context. Otherwise a hint points to the keyboard's dictation key.
+- **Live transcript.** Interim results show as the person speaks, final results are kept, and the text stays editable. It joins what was already typed and respects the length limit.
+- **Hard stop after 60 seconds,** with a message. Tapping the mic again stops it, and so does sending the draft.
+- **Clear messages** for a blocked microphone, no speech heard and an unavailable service.
+- **Speech language.** The site language in the current country comes first, for example `bn-BD` or `en-US`, then the other active site languages by their locale tag. The choice is remembered in the browser.
+- **A privacy line** that appears with the mic: in Chrome, the audio is processed by Google.
+
+Found and fixed while checking:
+- **A multi-line array inside `@json(...)`.** It compiled into invalid PHP, and the composer returned a 500. The array now lives in a `@php` block, and the template guard tests parse the compiled composer with `token_get_all(..., TOKEN_PARSE)`.
+
+No core files were touched in this phase.
 
 ## 1. What we are building
 
