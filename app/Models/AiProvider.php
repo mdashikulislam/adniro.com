@@ -27,12 +27,15 @@ class AiProvider extends BaseModel
 		'active',
 	];
 	
+	/*
+	 * The key is stored as plain text and shown to admins, at the owner's request (2026-11-20):
+	 * encrypted keys became unreadable when APP_KEY changed. It stays out of toArray()/JSON.
+	 */
 	protected $hidden = ['api_key'];
 	
 	protected function casts(): array
 	{
 		return [
-			'api_key'        => 'encrypted',
 			'active'         => 'boolean',
 			'last_test_ok'   => 'boolean',
 			'last_tested_at' => 'datetime',
@@ -100,15 +103,13 @@ class AiProvider extends BaseModel
 	}
 	
 	/**
-	 * Read the stored key. An APP_KEY change makes it unreadable: treat that as "no key".
+	 * The key saved in admin, or null.
 	 */
 	public function readApiKey(): ?string
 	{
-		try {
-			return $this->api_key;
-		} catch (\Throwable $e) {
-			return null;
-		}
+		$key = trim((string)$this->getAttribute('api_key'));
+		
+		return $key === '' ? null : $key;
 	}
 	
 	public function hasApiKey(): bool
@@ -117,16 +118,16 @@ class AiProvider extends BaseModel
 	}
 	
 	/**
-	 * The last four characters of the key, for display only.
+	 * The key as admins see it: the saved key, or where the key comes from when none is saved.
 	 */
-	public function maskedApiKey(): string
+	public function displayApiKey(): string
 	{
 		$key = $this->readApiKey();
-		if (empty($key)) {
-			return !empty($this->resolvedApiKey()) ? trans('ai.key_from_env') : trans('ai.key_missing');
+		if (!is_null($key)) {
+			return $key;
 		}
 		
-		return '•••• ' . mb_substr($key, -4);
+		return !empty($this->resolvedApiKey()) ? trans('ai.key_from_env') : trans('ai.key_missing');
 	}
 	
 	public function driverLabel(): string
@@ -147,7 +148,11 @@ class AiProvider extends BaseModel
 	
 	public function crudKeyColumn(): string
 	{
-		return e($this->maskedApiKey());
+		$key = $this->readApiKey();
+		
+		return is_null($key)
+			? e($this->displayApiKey())
+			: '<code class="text-break user-select-all">' . e($key) . '</code>';
 	}
 	
 	public function crudStatusColumn(): string

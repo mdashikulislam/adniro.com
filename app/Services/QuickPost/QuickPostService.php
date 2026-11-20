@@ -66,16 +66,22 @@ class QuickPostService
 	}
 	
 	/**
-	 * @param array{session_id?: string, lat?: float|null, lon?: float|null, redraft_of?: string|null, photos?: array<int, string>} $context
+	 * Context: session_id, lat, lon, redraft_of, photos (stored paths, web), image_files (uploaded
+	 * files sent directly by the mobile app, not stored), web (false for the API: nothing is put
+	 * into the browser session).
+	 *
+	 * @param array<string, mixed> $context
 	 * @return array{ok: bool, reason?: string, message?: string, draft?: PostDraft, limit: LimitStatus}
 	 */
 	public function draft(string $text, ?User $user, ?string $ip, string $locale, array $context = []): array
 	{
 		$text = trim($text);
 		$photos = array_slice(array_values(array_filter((array)($context['photos'] ?? []))), 0, self::MAX_PHOTOS);
+		$imageFiles = array_slice(array_values(array_filter((array)($context['image_files'] ?? []))), 0, self::MAX_PHOTOS);
+		$isWeb = (bool)($context['web'] ?? true);
 		
 		// With a photo, the text is optional
-		$min = empty($photos) ? (int)config('ai_features.quickpost.min_text', 10) : 0;
+		$min = (empty($photos) && empty($imageFiles)) ? (int)config('ai_features.quickpost.min_text', 10) : 0;
 		if (mb_strlen($text) < $min) {
 			return ['ok' => false, 'reason' => 'too_short', 'limit' => $this->limit->status($user, $ip)];
 		}
@@ -120,6 +126,12 @@ class QuickPostService
 					$images[] = $image;
 				}
 			}
+			foreach ($imageFiles as $file) {
+				$image = method_exists($file, 'getRealPath') ? AiImage::fromLocalPath((string)$file->getRealPath()) : null;
+				if ($image && count($images) < self::MAX_PHOTOS) {
+					$images[] = $image;
+				}
+			}
 			
 			$result = $this->client->structured(new AiRequest(
 				feature: self::FEATURE,
@@ -144,7 +156,7 @@ class QuickPostService
 				$draft->save();
 				
 				// The form still works: the person's text goes into the description, the photos stay
-				if ($text !== '') {
+				if ($text !== '' && $isWeb) {
 					$this->toPostInput->applyText($text);
 				}
 				

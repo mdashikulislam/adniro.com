@@ -43,6 +43,9 @@
 				{{-- Latest Users --}}
 				@include('admin.dashboard.latest-users')
 				
+				{{-- AI spend and activity (adniro:ai) --}}
+				@include('admin.ai.spend-widget')
+				
 				{{-- Posts Chart (ChartJs) --}}
 				@include('admin.dashboard.charts.chartjs.pie.posts-per-country')
 				

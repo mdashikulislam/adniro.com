@@ -53,18 +53,16 @@ class AiAdminScreensTest extends TestCase
 		$html = $this->rowsHtml($rows);
 		$this->assertStringContainsString('Main Anthropic', $html);
 		$this->assertStringContainsString('Anthropic (Claude)', $html);
-		$this->assertStringContainsString('•••• 9876', $html);
+		$this->assertStringContainsString('secret-key-9876', $html, 'admins see the full key');
 		$this->assertStringContainsString('Test connection', $html);
-		$this->assertStringNotContainsString('secret-key-9876', $rows->getContent());
 		$this->actingAs($this->admin)->get('/admin/ai_providers/create')->assertOk()->assertSee('Anthropic (Claude)');
 		
 		$edit = $this->actingAs($this->admin)->get('/admin/ai_providers/' . AiProvider::query()->value('id') . '/edit');
 		$edit->assertOk();
-		$edit->assertSee('•••• 9876', false);
-		$edit->assertDontSee('secret-key-9876');
+		$edit->assertSee('value="secret-key-9876"', false);
 	}
 	
-	public function test_a_provider_is_created_with_an_encrypted_key(): void
+	public function test_a_provider_is_created_with_its_key_as_plain_text(): void
 	{
 		$this->actingAs($this->admin)->post('/admin/ai_providers', [
 			'name'    => 'OpenAI account',
@@ -75,24 +73,41 @@ class AiAdminScreensTest extends TestCase
 		
 		$provider = AiProvider::query()->sole();
 		$this->assertSame('sk-test-abcdef123456', $provider->api_key);
-		$this->assertStringNotContainsString('abcdef123456', DB::table('ai_providers')->value('api_key'));
+		$this->assertSame('sk-test-abcdef123456', DB::table('ai_providers')->value('api_key'));
+		$this->assertArrayNotHasKey('api_key', $provider->toArray(), 'never in JSON output');
 	}
 	
-	public function test_saving_a_provider_with_an_empty_key_keeps_the_stored_key(): void
+	public function test_the_key_can_be_changed_or_removed_from_the_form(): void
 	{
-		$provider = AiProvider::query()->create(['name' => 'Main', 'driver' => 'anthropic', 'api_key' => 'keep-me-1111', 'active' => true]);
-		
-		$this->actingAs($this->admin)->put('/admin/ai_providers/' . $provider->id, [
-			'id'      => $provider->id,
-			'name'    => 'Main renamed',
-			'driver'  => 'anthropic',
-			'api_key' => '',
-			'active'  => 1,
+		$provider = AiProvider::query()->create(['name' => 'Main', 'driver' => 'anthropic', 'api_key' => 'old-key-1111', 'active' => true]);
+		$save = fn (string $key) => $this->actingAs($this->admin)->put('/admin/ai_providers/' . $provider->id, [
+			'id' => $provider->id, 'name' => 'Main renamed', 'driver' => 'anthropic', 'api_key' => $key, 'active' => 1,
 		])->assertRedirect();
 		
+		$save('  new-key-2222 ');
 		$provider->refresh();
 		$this->assertSame('Main renamed', $provider->name);
-		$this->assertSame('keep-me-1111', $provider->api_key);
+		$this->assertSame('new-key-2222', $provider->api_key);
+		
+		$save('');
+		$this->assertNull($provider->fresh()->readApiKey(), 'an emptied field removes the key; the .env key is used then');
+	}
+	
+	public function test_the_migration_turns_encrypted_keys_into_plain_text(): void
+	{
+		$readable = AiProvider::query()->create(['name' => 'A', 'driver' => 'anthropic', 'active' => true]);
+		$lost = AiProvider::query()->create(['name' => 'B', 'driver' => 'openai', 'active' => true]);
+		$plain = AiProvider::query()->create(['name' => 'C', 'driver' => 'openai', 'api_key' => 'plain-3333', 'active' => true]);
+		$other = new \Illuminate\Encryption\Encrypter(random_bytes(32), 'AES-256-CBC');
+		DB::table('ai_providers')->where('id', $readable->id)->update(['api_key' => \Illuminate\Support\Facades\Crypt::encryptString('readable-1111')]);
+		DB::table('ai_providers')->where('id', $lost->id)->update(['api_key' => $other->encryptString('lost-2222')]);
+		
+		$migration = require database_path('migrations/2026_11_20_001000_store_ai_provider_keys_as_plain_text.php');
+		$migration->up();
+		
+		$this->assertSame('readable-1111', DB::table('ai_providers')->where('id', $readable->id)->value('api_key'));
+		$this->assertNull(DB::table('ai_providers')->where('id', $lost->id)->value('api_key'), 'a key nobody can read is cleared');
+		$this->assertSame('plain-3333', DB::table('ai_providers')->where('id', $plain->id)->value('api_key'));
 	}
 	
 	public function test_a_custom_url_is_required_for_an_openai_compatible_provider(): void

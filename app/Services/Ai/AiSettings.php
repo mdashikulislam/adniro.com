@@ -120,6 +120,15 @@ class AiSettings
 		return ($this->all()['quickpost_enabled'] ?? '0') == '1';
 	}
 	
+	/**
+	 * Review the draft and publish from one screen (photos shown with the form),
+	 * instead of continuing to the photos step.
+	 */
+	public function quickpostOneScreen(): bool
+	{
+		return ($this->all()['quickpost_one_screen'] ?? '1') == '1';
+	}
+	
 	public function quickpostGuests(): bool
 	{
 		return ($this->all()['quickpost_guests'] ?? '0') == '1';

@@ -70,6 +70,12 @@ class AiModelController extends PanelController
 				'function_name' => 'crudPricesColumn',
 			]);
 			$this->xPanel->addColumn([
+				'name'          => 'moderation_eval_passed_at',
+				'label'         => trans('ai.col_evaluations'),
+				'type'          => 'model_function',
+				'function_name' => 'crudEvaluationsColumn',
+			]);
+			$this->xPanel->addColumn([
 				'name'          => 'active',
 				'label'         => trans('ai.col_status'),
 				'type'          => 'model_function',

@@ -463,6 +463,15 @@ Route::prefix('captcha')
 Route::any('/webhooks/aws-ses', [WebhookController::class, 'awsSes']);
 
 
+// quick post: AI-drafted listings (adniro:ai)
+Route::prefix('quickpost')
+	->controller(\App\Http\Controllers\Api\QuickPostController::class)
+	->group(function ($router) {
+		Route::get('limit', 'limit')->name('api.quickpost.limit');
+		Route::post('drafts', 'draft')->name('api.quickpost.drafts');
+	});
+
+
 // fallback
 // catch all routes where the path does not start with 'plugins'
 // regex: ^(?!plugins).*$

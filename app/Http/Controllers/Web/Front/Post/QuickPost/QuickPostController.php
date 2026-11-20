@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Web\Front\Post\QuickPost;
 
 use App\Helpers\Common\Files\TmpUpload;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\BaseController;
+use App\Http\Requests\Front\PostRequest;
+use App\Models\CategoryField;
+use App\Services\Ai\AiSettings;
+use App\Services\QuickPost\DraftToPostInput;
 use App\Services\QuickPost\LimitStatus;
 use App\Services\QuickPost\QuickPostService;
 use Illuminate\Http\JsonResponse;
@@ -190,7 +194,87 @@ class QuickPostController extends BaseController
 			return redirect()->to(url('posts/create/quick'))->withHeaders(config('larapen.core.noCacheHeaders'));
 		}
 		
-		return redirect()->to(urlGen()->addPost())->withHeaders(config('larapen.core.noCacheHeaders'));
+		$next = app(AiSettings::class)->quickpostOneScreen() ? url('posts/create/quick/review') : urlGen()->addPost();
+		
+		return redirect()->to($next)->withHeaders(config('larapen.core.noCacheHeaders'));
+	}
+	
+	/**
+	 * One-screen review: the normal listing form, prefilled, with the photos shown on the same
+	 * page and a Publish button (adniro:ai).
+	 */
+	public function review(QuickPostService $service)
+	{
+		if (!$service->available(auth()->user()) || !session()->has(DraftToPostInput::MARKS_KEY) || empty(session('postInput'))) {
+			return redirect()->to(urlGen()->addPost())->withHeaders(config('larapen.core.noCacheHeaders'));
+		}
+		
+		// Same preconditions as the form's own first step
+		$pricingUrl = $this->getPricingPage($this->getSelectedPackage());
+		if (!empty($pricingUrl)) {
+			return redirect()->to($pricingUrl)->withHeaders(config('larapen.core.noCacheHeaders'));
+		}
+		if (!session()->has('cfUid')) {
+			session()->put('cfUid', 'cf-' . generateUniqueCode(9));
+		}
+		$this->syncSessionCountryData();
+		
+		$postInput = session('postInput');
+		
+		view()->share('previousStepUrl', null);
+		view()->share('previousStepLabel', null);
+		view()->share('formActionUrl', url('posts/create/quick/publish'));
+		view()->share('nextStepUrl', null);
+		view()->share('nextStepLabel', '<i class="bi bi-send"></i> ' . e(trans('ai.qp_review_publish')));
+		view()->share('quickPostOneScreen', true);
+		view()->share('quickPostPhotos', $this->sessionPhotos());
+		
+		return response()
+			->view('front.post.createOrEdit.multiSteps.create.post', compact('postInput'))
+			->withHeaders(config('larapen.core.noCacheHeaders'));
+	}
+	
+	/**
+	 * Publish from the one-screen review. The form is validated by the step 1 request and saved by
+	 * the same code as the last step of the normal form. When a package or payment step is needed,
+	 * the person continues to the photos step as usual.
+	 */
+	public function publish(PostRequest $request, QuickPostService $service): RedirectResponse
+	{
+		if (!$service->available(auth()->user())) {
+			return redirect()->to(urlGen()->addPost());
+		}
+		
+		// Save the step 1 input exactly as the form's first step does (including uploaded files)
+		$postInput = $request->except($this->unwantedFields());
+		$cfDir = $this->cfTmpUploadDir . (session()->has('cfUid') ? '/' . session('cfUid') : '');
+		foreach (CategoryField::getFields($request->input('category_id')) as $field) {
+			if ($field->type == 'file' && $request->hasFile('cf.' . $field->id) && $request->file('cf.' . $field->id)->isValid()) {
+				$postInput['cf'][$field->id] = TmpUpload::file($request->file('cf.' . $field->id), $cfDir);
+			}
+		}
+		session()->put('postInput', $postInput);
+		
+		if (config('settings.listing_form.picture_mandatory') && empty(array_filter((array)session('picturesInput', [])))) {
+			flash(trans('ai.qp_photos_required'))->error();
+			
+			return redirect()->to(url('posts/create/quick/review'));
+		}
+		
+		$needsPaymentStep = (
+			isset($this->countPackages, $this->countPaymentMethods)
+			&& $this->countPackages > 0
+			&& $this->countPaymentMethods > 0
+			&& doesNoPackageOrPremiumOneSelected()
+		);
+		if ($needsPaymentStep) {
+			return redirect()->to(url('posts/create/photos'));
+		}
+		
+		session()->forget(DraftToPostInput::MARKS_KEY);
+		session()->flash('message', t('your_listing_is_created'));
+		
+		return $this->storeInputDataInDatabase($request);
 	}
 	
 	/**

@@ -215,6 +215,7 @@ Core files touched, each marked `adniro:ai`:
 - `app/Console/Kernel.php`: one schedule line for the purge
 
 ### Phase 8, quick post voice: built on branch `ai` (2026-11-20)
+Committed as `5d5e64b3`.
 Browser speech-to-text only; nothing is sent to the server except the resulting text. Covered by 3 more tests in `tests/Feature/Ai/QuickPostVoiceTest.php`, so 137 in all.
 
 Checked in the browser on the local site. The pane's Chromium has speech recognition, so the mic and the language picker appeared, with "English (US)" first and the site's other languages after it. Real speech needs a microphone and Google's service, which the pane cannot provide, so a scripted recognizer stood in. It showed that interim words appear live and final words stay, that text typed earlier is kept, and that the chosen language is passed to the recognizer. The picker is locked while listening, and stopping resets the button. A blocked microphone shows its message. The layout was also checked at phone width. Not checked: real Chrome on Android, iOS Safari and Firefox.
@@ -231,6 +232,47 @@ Found and fixed while checking:
 - **A multi-line array inside `@json(...)`.** It compiled into invalid PHP, and the composer returned a 500. The array now lives in a `@php` block, and the template guard tests parse the compiled composer with `token_get_all(..., TOKEN_PARSE)`.
 
 No core files were touched in this phase.
+
+### Phase 9, polish: built on branch `ai` (2026-11-20)
+Covered by 11 more tests in `tests/Feature/Ai/AiPolishTest.php`, so 148 in all.
+
+What exists:
+- **Translations.** The user-facing AI texts are translated into the 8 other active languages (fr, es, ar, de, it, ru, hi, bn) in `lang/{code}/ai.php`: the rejection email and SMS, owner banners and badges, the finish line, statuses, category names, and every quick post screen. That is 91 texts per language. Admin screens fall back to English key by key. A test checks that every language has every text with the same placeholders and plural parts. For Arabic, Russian, Hindi and Bengali, counts are phrased like "left today: 3 of 5" so they read correctly for every number.
+- **Mobile API.**
+  - `GET /api/quickpost/limit` gives whether quick post is available and the person's limit.
+  - `POST /api/quickpost/drafts` takes text, up to 4 photos, an optional position and a re-draft token. The photos are sent to the model and not stored.
+  - The draft comes back in the same field names as `POST /api/posts`, plus the city, marks, policy flags and the limit.
+  - At the limit it answers 429 with `Retry-After` and the reset time. When quick post is off it answers 403.
+  - Members are identified by their Sanctum token, guests by IP.
+- **AI spend widget** on the admin dashboard, for super admins. It shows today's spend, calls and failures, this month's spend, the share of the daily budget used, calls and cost per feature, the last 7 days, listings needing review, rejections today and quick post drafts today.
+- **Quick post evaluation.** `php artisan ai:quickpost-eval {model?}` runs the 40 inputs in `resources/ai/eval/quickpost.json`. They cover 36 listings in 7 languages and 4 non-listings, and category answers are matched by English leaf name because ids differ between sites. The gate is at least 80% right categories, no invented price, every non-listing recognised and at most one listing refused. A full run sets or clears `quickpost_eval_passed_at`.
+- **Evaluations column.** The AI model list shows each model's last passed moderation and quick post evaluation.
+- **One-screen review**, on by default and controlled by Settings > AI > Quick post > "Review and publish on one screen". After a draft, the step 1 form opens at `/posts/create/quick/review`, with the photos shown above it and a Publish button.
+  - Publishing validates with the step 1 request and saves with the same code as the last step of the normal form.
+  - When photos are mandatory and there are none, it returns to the review.
+  - When a package or payment step is needed, it continues to the photos step as usual.
+
+Checked in the browser against the local mock:
+- A draft with a photo opened the one-screen review, with the photo shown, the category and custom fields loaded, and a "Publish listing" button.
+- Publishing was not pressed. The local site sends real email through SMTP, and a real listing would have emailed real addresses. Publishing is covered by the step 1 request and the existing save code, and the photo check is covered by a test.
+
+Found and fixed while checking:
+- **The button label.** The category script resets the step button to "Next" whenever a category is applied. On the one-screen review, the banner script restores "Publish listing".
+- **API wording.** The API reused a web message that said the text was put in the normal form. A neutral "not available" message, `qp_off`, is used instead, in all 9 languages.
+- **Controller reuse.** The router keeps controller instances between requests, so the API controller looks up the quick post service on each call instead of holding it.
+
+Not done:
+- **GeoIP city lookup.** The installed GeoIP data gives the country only.
+- **Translations of admin screens.** Admins see English.
+
+Core files touched, each marked `adniro:ai`:
+- `routes/api.php`: the quick post route group, before the catch-all
+- `resources/views/admin/dashboard.blade.php`: one include for the spend widget
+
+### After phase 9 (2026-11-20)
+- **API keys are now plain text.** At the owner's request, provider keys are stored and shown in full to admins: in the provider list and prefilled in the edit form. Before this, keys were encrypted with `APP_KEY`. Keys saved before an `APP_KEY` change could no longer be read, and saving a new key over them failed with "The MAC is invalid". Migration `2026_11_20_001000_store_ai_provider_keys_as_plain_text` decrypts readable keys and clears unreadable ones. The two local keys were unreadable and have to be entered again. Keys are still left out of JSON output and redacted from error messages. Emptying the field removes the key, and the provider then uses the `.env` key. Trade-off: anyone with database, backup or super admin access can read the keys.
+- **Honest evaluations.** In both evaluation commands, a failed call now always counts as a failure, shows its reason, and blocks a pass. A run stops after the first 3 calls fail the same way, and leaves the model's result unchanged.
+- **Unsent calls are not counted.** A call stopped before sending, such as with a missing key, no longer counts toward the daily call limit.
 
 ## 1. What we are building
 

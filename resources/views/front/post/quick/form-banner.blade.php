@@ -25,6 +25,30 @@
 		</div>
 	</div>
 	
+	{{-- One-screen review: the photos are shown here instead of in a separate step --}}
+	@if (!empty($quickPostOneScreen))
+		@php
+			$qpPhotos = (array)($quickPostPhotos ?? []);
+		@endphp
+		<div class="col-12">
+			<div class="border rounded p-3 mb-3 bg-body" id="qpReviewPhotos">
+				<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+					<span class="fw-bold">{{ trans('ai.qp_review_photos') }}</span>
+					<a class="small" href="{{ url('posts/create/quick') }}">{{ trans('ai.qp_review_photos_edit') }}</a>
+				</div>
+				@if (empty($qpPhotos))
+					<p class="small text-muted mb-0">{{ trans('ai.qp_review_no_photos') }}</p>
+				@else
+					<div class="d-flex flex-wrap gap-2">
+						@foreach ($qpPhotos as $qpPhoto)
+							<img src="{{ $qpPhoto['url'] }}" alt="" class="rounded border" style="width: 72px; height: 72px; object-fit: cover;">
+						@endforeach
+					</div>
+				@endif
+			</div>
+		</div>
+	@endif
+	
 	@push('after_scripts_stack')
 		<script>
 			/* The form only restores the chosen category (and loads its custom fields) after a
@@ -36,6 +60,31 @@
 						getCategories(siteUrl, languageCode);
 					}
 				});
+			@endif
+			
+			@if (!empty($quickPostOneScreen))
+				/* One-screen review: the category script sets the button back to "Next"; keep "Publish" */
+				(function () {
+					const label = @json('<i class="bi bi-send"></i> ' . e(trans('ai.qp_review_publish')));
+					const keep = () => {
+						const button = document.getElementById('nextStepBtn');
+						if (button && button.innerHTML.trim() !== label) {
+							button.innerHTML = label;
+						}
+					};
+					const watch = () => {
+						const button = document.getElementById('nextStepBtn');
+						if (button) {
+							keep();
+							new MutationObserver(keep).observe(button, {childList: true, characterData: true, subtree: true});
+						}
+					};
+					if (document.readyState === 'loading') {
+						document.addEventListener('DOMContentLoaded', watch);
+					} else {
+						watch();
+					}
+				})();
 			@endif
 			
 			(function () {

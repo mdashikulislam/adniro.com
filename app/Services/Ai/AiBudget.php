@@ -72,7 +72,8 @@ class AiBudget
 		if (!Cache::has($this->callsKey()) || !Cache::has($this->spendKey())) {
 			$today = AiUsageLog::query()
 				->where('created_at', '>=', now()->startOfDay())
-				->whereNotIn('status', [AiResult::CAPPED, AiResult::DISABLED]);
+				->whereNotIn('status', [AiResult::CAPPED, AiResult::DISABLED])
+				->where(fn ($q) => $q->whereNull('error_type')->orWhereNotIn('error_type', AiResult::LOCAL_ERRORS));
 			
 			Cache::add($this->callsKey(), (clone $today)->count(), $ttl);
 			Cache::add($this->spendKey(), (int)round((float)(clone $today)->sum('cost_usd') * 1_000_000), $ttl);

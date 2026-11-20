@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\AiModel;
 use App\Services\Ai\AiRequest;
+use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSettings;
 use App\Services\Ai\Contracts\AiClientContract;
 use App\Services\Ai\Moderation\ListingPayload;
@@ -54,8 +55,9 @@ class AiModerationEval extends Command
 		
 		$rows = [];
 		$stats = ['clean' => 0, 'clean_held' => 0, 'bad' => 0, 'bad_approved' => 0, 'no_answer' => 0, 'cost' => 0.0, 'ms' => 0];
+		$firstErrors = [];
 		
-		foreach ($cases as $case) {
+		foreach ($cases as $index => $case) {
 			$result = $client->structured(new AiRequest(
 				feature: ModerationService::FEATURE,
 				instructions: Policy::instructions(),
@@ -70,41 +72,57 @@ class AiModerationEval extends Command
 			
 			$stats['cost'] += (float)$result->costUsd;
 			$stats['ms'] += $result->latencyMs;
-			if (!$result->ok()) {
+			
+			$expectAllow = ($case['expect'] ?? '') === 'allow';
+			
+			// A call that failed says nothing about the model: it always counts as a failure.
+			// A refusal is a real answer: right for a violating listing, wrong for a clean one.
+			$failedCall = !$result->ok() && $result->status !== AiResult::REFUSAL;
+			if ($failedCall) {
 				$stats['no_answer']++;
 			}
 			
-			$expectAllow = ($case['expect'] ?? '') === 'allow';
 			if ($expectAllow) {
 				$stats['clean']++;
-				$pass = $mapped->isApproved();
-				$stats['clean_held'] += $pass ? 0 : 1;
+				$pass = !$failedCall && $mapped->isApproved();
+				$stats['clean_held'] += ($failedCall || $pass) ? 0 : 1;
 			} else {
 				$stats['bad']++;
-				$pass = !$mapped->isApproved();
-				$stats['bad_approved'] += $pass ? 0 : 1;
+				$pass = !$failedCall && !$mapped->isApproved();
+				$stats['bad_approved'] += (!$failedCall && $mapped->isApproved()) ? 1 : 0;
 			}
 			
 			$rows[] = [
 				$case['id'],
 				$expectAllow ? 'allow' : 'block (' . ($case['category'] ?? '?') . ')',
-				$mapped->status . ($mapped->categories ? ' [' . implode(', ', $mapped->categories) . ']' : ''),
-				$mapped->confidence ?? $result->status,
+				$failedCall ? '-' : $mapped->status . ($mapped->categories ? ' [' . implode(', ', $mapped->categories) . ']' : ''),
+				$failedCall ? self::reason($result) : ($mapped->confidence ?? $result->status),
 				$pass ? 'pass' : 'FAIL',
 			];
 			$this->output->write($pass ? '.' : 'F');
+			
+			// The first calls all failed the same way: stop instead of repeating it for every case
+			if ($index < 3) {
+				$firstErrors[] = $failedCall ? self::reason($result) : null;
+				if ($index === 2 && count(array_unique($firstErrors)) === 1 && !is_null($firstErrors[0])) {
+					$this->newLine(2);
+					$this->error('Stopped: the first 3 calls failed with "' . $firstErrors[0] . '". Fix this, then run the evaluation again. The model\'s result was not changed.');
+					
+					return self::FAILURE;
+				}
+			}
 		}
 		$this->newLine(2);
 		
 		$this->table(['Case', 'Expected', 'Decided', 'Confidence', 'Result'], $rows);
 		
 		$heldRate = $stats['clean'] > 0 ? $stats['clean_held'] / $stats['clean'] : 0;
-		$passed = $stats['bad_approved'] === 0 && $heldRate <= self::MAX_CLEAN_HELD_RATE;
+		$passed = $stats['bad_approved'] === 0 && $heldRate <= self::MAX_CLEAN_HELD_RATE && $stats['no_answer'] === 0;
 		
 		$this->table(['Measure', 'Value'], [
 			['Violating listings approved', $stats['bad_approved'] . ' of ' . $stats['bad'] . ' (must be 0)'],
 			['Clean listings held or rejected', $stats['clean_held'] . ' of ' . $stats['clean'] . ' (' . round($heldRate * 100, 1) . '%, at most 5%)'],
-			['Calls without a usable answer', $stats['no_answer']],
+			['Failed calls', $stats['no_answer'] . ' (must be 0)'],
 			['Average time', count($cases) ? round($stats['ms'] / count($cases)) . ' ms' : '-'],
 			['Total cost', '$' . number_format($stats['cost'], 4)],
 		]);
@@ -118,6 +136,11 @@ class AiModerationEval extends Command
 		$passed ? $this->info('PASSED') : $this->error('FAILED');
 		
 		return $passed ? self::SUCCESS : self::FAILURE;
+	}
+	
+	public static function reason(AiResult $result): string
+	{
+		return (string)str($result->status . ': ' . ($result->errorMessage ?: $result->errorType ?: '?'))->limit(80);
 	}
 	
 	private function resolveModel(AiSettings $settings): ?AiModel

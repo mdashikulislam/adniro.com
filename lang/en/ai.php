@@ -53,8 +53,7 @@ return [
 	'field_driver'        => 'Service',
 	'field_driver_hint'   => 'The AI service this key belongs to. Use "OpenAI-compatible" for any service with an OpenAI-style API and a custom URL.',
 	'field_api_key'       => 'API key',
-	'field_api_key_hint_new'  => 'Paste the key from the provider\'s dashboard. It is stored encrypted and never shown again.',
-	'field_api_key_hint_edit' => 'Current key: :masked. Leave empty to keep it, or paste a new key to replace it.',
+	'field_api_key_hint' => 'Paste the key from the provider\'s dashboard. It is visible to admins on this screen. Leave empty to use the key from .env instead (for example ANTHROPIC_API_KEY).',
 	'field_base_url'      => 'Base URL',
 	'field_base_url_hint' => 'Only needed for Ollama, OpenAI-compatible services, gateways or proxies. Leave empty to use the provider\'s standard address.',
 	'field_active'        => 'Active',
@@ -81,6 +80,29 @@ return [
 	'field_model_active_hint' => 'When off, this model is not used, even if it is assigned to a feature.',
 	'model_unique'          => 'This provider already has a model with this ID.',
 	'model_retest_needed'   => 'The model settings changed. Run "Test model" again before using it.',
+	
+	// Admin > AI models: evaluations
+	'col_evaluations' => 'Evaluations',
+	'eval_moderation' => 'Moderation',
+	'eval_quickpost'  => 'Quick post',
+	
+	// Admin dashboard: AI spend widget
+	'spend_title'          => 'AI usage',
+	'spend_settings'       => 'AI settings',
+	'spend_off'            => 'AI features are switched off in Settings > AI.',
+	'spend_today'          => 'Spent today',
+	'spend_calls'          => 'Calls today',
+	'spend_failed'         => ':count failed',
+	'spend_month'          => 'This month',
+	'spend_budget'         => ':used% of today\'s $:budget budget used',
+	'spend_feature_moderation'      => 'Listing moderation',
+	'spend_feature_quickpost_draft' => 'Quick post drafts',
+	'spend_feature_test'            => 'Model tests and evaluations',
+	'spend_calls_short'    => 'calls',
+	'spend_week'           => 'Spend over the last 7 days',
+	'spend_needs_review'   => ':count listings need review',
+	'spend_rejected_today' => ':count rejected today',
+	'spend_drafts_today'   => ':count quick post drafts today',
 	
 	// Settings > AI
 	'setting_tab_general' => 'General',
@@ -241,6 +263,8 @@ return [
 	'setting_quickpost_info' => 'Quick post lets people describe what they sell in a sentence; the AI fills in the listing form and they check it before publishing. It uses the quick post model from the Models tab, and only works with the multi-step listing form.',
 	'setting_quickpost_enabled_label' => 'Enable quick post',
 	'setting_quickpost_enabled_hint'  => 'When on, "Post an ad" opens the quick post composer. The normal form stays one tap away.',
+	'setting_quickpost_one_screen_label' => 'Review and publish on one screen',
+	'setting_quickpost_one_screen_hint'  => 'The draft opens in the listing form with its photos and a Publish button. When a package or payment step is needed, people continue to the photos step as usual.',
 	'setting_quickpost_guests_label'  => 'Allow guests',
 	'setting_quickpost_guests_hint'   => 'Guests are counted by IP address. Keep this off until a captcha is configured.',
 	'setting_quickpost_member_limit_label' => 'AI posts per member',
@@ -286,6 +310,7 @@ return [
 	'qp_rate'             => 'Too many requests. Please try again in :seconds seconds.',
 	'qp_unusable'         => 'We could not understand what you want to sell. Please describe the item in one sentence.',
 	'qp_unavailable'      => 'The AI assistant is not available right now. We put your text in the normal form.',
+	'qp_off' => 'Posting with AI is not available right now. You can still create the listing yourself.',
 	'qp_timeout'          => 'This is taking too long. Please try again, or fill the form yourself.',
 	'qp_limit_reached'    => 'You have used all your AI posts for now. They reset on :when. You can still fill the form yourself.',
 	'qp_draft_expired'    => 'This draft is no longer available. Please describe your item again.',
@@ -313,6 +338,13 @@ return [
 	'qp_voice_time_up'     => 'That is the 60 second limit. You can tap the microphone again to add more.',
 	'qp_voice_hint'        => 'Tip: on a phone, you can tap the microphone key on your keyboard to dictate.',
 	'qp_voice_privacy'     => 'Voice input uses your browser\'s speech service; in Chrome, the audio is processed by Google.',
+	
+	// Quick post: one-screen review
+	'qp_review_publish'     => 'Publish listing',
+	'qp_review_photos'      => 'Photos',
+	'qp_review_photos_edit' => 'Add or remove photos',
+	'qp_review_no_photos'   => 'No photos yet.',
+	'qp_photos_required'    => 'Please add at least one photo before publishing.',
 	
 	// Quick post: banner on the listing form
 	'qp_banner_title' => 'We filled this in for you.',

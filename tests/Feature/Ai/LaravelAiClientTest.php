@@ -205,14 +205,10 @@ class LaravelAiClientTest extends TestCase
 		$this->assertStringContainsString('Invalid model name', $this->primary->fresh()->last_test_error);
 	}
 	
-	public function test_the_api_key_is_encrypted_at_rest_and_only_shown_masked(): void
+	public function test_the_api_key_is_stored_as_plain_text_but_never_in_json(): void
 	{
-		$raw = DB::table('ai_providers')->value('api_key');
-		
-		$this->assertNotSame('test-key-1234', $raw);
-		$this->assertStringNotContainsString('test-key-1234', $raw);
-		$this->assertSame('test-key-1234', AiProvider::query()->first()->api_key);
-		$this->assertSame('•••• 1234', AiProvider::query()->first()->maskedApiKey());
+		$this->assertSame('test-key-1234', DB::table('ai_providers')->value('api_key'));
+		$this->assertSame('test-key-1234', AiProvider::query()->first()->displayApiKey());
 		$this->assertArrayNotHasKey('api_key', AiProvider::query()->first()->toArray());
 	}
 	

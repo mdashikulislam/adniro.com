@@ -12,6 +12,8 @@ Route::controller(QuickPostController::class)
 		Route::get('posts/create/quick', 'composer')->name('listing.create.quick');
 		Route::post('posts/create/quick/draft', 'draft')->name('listing.create.quick.draft');
 		Route::post('posts/create/quick/photos', 'photo')->name('listing.create.quick.photo');
+		Route::get('posts/create/quick/review', 'review')->name('listing.create.quick.review');
+		Route::post('posts/create/quick/publish', 'publish')->name('listing.create.quick.publish');
 		Route::get('posts/create/quick/{token}/apply', 'apply')
 			->where('token', '[A-Za-z0-9]{32}')
 			->name('listing.create.quick.apply');

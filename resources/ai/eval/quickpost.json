@@ -1,0 +1,364 @@
+{
+ "about": "Inputs for php artisan ai:quickpost-eval (adniro:ai). 'categories' lists the acceptable leaf category names in English (matched by name, since ids differ between sites); empty means the input is not a listing and must be marked not listable. 'price' is the stated price, or null when the person gave none (any price in the draft is then invented).",
+ "cases": [
+  {
+   "id": "phone-en",
+   "lang": "en",
+   "text": "iPhone 13, 128GB, blue, small scratch on the back, battery 86%, 420 dollars",
+   "categories": [
+    "Mobile Phones"
+   ],
+   "price": 420
+  },
+  {
+   "id": "phone-bn",
+   "lang": "bn",
+   "text": "স্যামসাং গ্যালাক্সি এ৫৪, ৮ জিবি র‍্যাম, ১২৮ জিবি, বক্সসহ, দাম ৩৫০০০ টাকা",
+   "categories": [
+    "Mobile Phones"
+   ],
+   "price": 35000
+  },
+  {
+   "id": "phone-noprice",
+   "lang": "en",
+   "text": "Selling my Google Pixel 7, works perfectly, comes with charger",
+   "categories": [
+    "Mobile Phones"
+   ],
+   "price": null
+  },
+  {
+   "id": "tablet-fr",
+   "lang": "fr",
+   "text": "iPad Air 5e génération, 64 Go, gris sidéral, avec étui, 380 euros",
+   "categories": [
+    "Tablets"
+   ],
+   "price": 380
+  },
+  {
+   "id": "watch-en",
+   "lang": "en",
+   "text": "Apple Watch Series 8, 45mm, midnight, like new, 250",
+   "categories": [
+    "Smart Watches & Trackers",
+    "Watches"
+   ],
+   "price": 250
+  },
+  {
+   "id": "case-en",
+   "lang": "en",
+   "text": "Brand new silicone cases for iPhone 15, 5 dollars each",
+   "categories": [
+    "Accessories for Mobile Phones & Tablets"
+   ],
+   "price": 5
+  },
+  {
+   "id": "car-en",
+   "lang": "en",
+   "text": "Toyota Corolla 2015, automatic, 92,000 km, petrol, full service history, 9800",
+   "categories": [
+    "Cars"
+   ],
+   "price": 9800
+  },
+  {
+   "id": "car-ar",
+   "lang": "ar",
+   "text": "هيونداي النترا 2018، أوتوماتيك، 70 ألف كم، صيانة وكالة، السعر 11000 دولار",
+   "categories": [
+    "Cars"
+   ],
+   "price": 11000
+  },
+  {
+   "id": "bike-hi",
+   "lang": "hi",
+   "text": "हीरो स्प्लेंडर प्लस 2020, 25000 किमी चली, सारे कागज़ पूरे, 45000 रुपये",
+   "categories": [
+    "Motorcycles & Scooters"
+   ],
+   "price": 45000
+  },
+  {
+   "id": "tyres-en",
+   "lang": "en",
+   "text": "Set of 4 winter tyres 205/55 R16, used one season",
+   "categories": [
+    "Vehicle Parts & Accessories"
+   ],
+   "price": null
+  },
+  {
+   "id": "laptop-en",
+   "lang": "en",
+   "text": "Dell Latitude 7490 laptop, i5, 16GB RAM, 256GB SSD, Windows 11, 260 dollars",
+   "categories": [
+    "Laptops & Computers"
+   ],
+   "price": 260
+  },
+  {
+   "id": "laptop-de",
+   "lang": "de",
+   "text": "MacBook Pro 14 Zoll, M1 Pro, 16 GB, 512 GB, kaum benutzt, 1200 Euro",
+   "categories": [
+    "Laptops & Computers"
+   ],
+   "price": 1200
+  },
+  {
+   "id": "tv-en",
+   "lang": "en",
+   "text": "Samsung 55 inch 4K smart TV with remote, 300",
+   "categories": [
+    "TV & DVD Equipment"
+   ],
+   "price": 300
+  },
+  {
+   "id": "ps5-es",
+   "lang": "es",
+   "text": "PlayStation 5 con dos mandos y tres juegos, 400 euros",
+   "categories": [
+    "Game Consoles",
+    "Video Games"
+   ],
+   "price": 400
+  },
+  {
+   "id": "headphones-en",
+   "lang": "en",
+   "text": "Sony WH-1000XM4 noise cancelling headphones, black, 150",
+   "categories": [
+    "Headphones",
+    "Audio & Music Equipment"
+   ],
+   "price": 150
+  },
+  {
+   "id": "camera-en",
+   "lang": "en",
+   "text": "Canon EOS 250D with 18-55 lens, 8000 shutter count",
+   "categories": [
+    "Photo & Video Cameras"
+   ],
+   "price": null
+  },
+  {
+   "id": "monitor-en",
+   "lang": "en",
+   "text": "27 inch LG monitor, 1440p, 144Hz, 180",
+   "categories": [
+    "Computer Monitors"
+   ],
+   "price": 180
+  },
+  {
+   "id": "printer-bn",
+   "lang": "bn",
+   "text": "এইচপি লেজার প্রিন্টার, ভালো অবস্থায়, টোনার আছে, ১২০০০ টাকা",
+   "categories": [
+    "Printers & Scanners"
+   ],
+   "price": 12000
+  },
+  {
+   "id": "sofa-en",
+   "lang": "en",
+   "text": "Grey fabric 3-seater sofa, no stains, smoke-free home, 150",
+   "categories": [
+    "Furniture - Tableware"
+   ],
+   "price": 150
+  },
+  {
+   "id": "fridge-fr",
+   "lang": "fr",
+   "text": "Réfrigérateur Samsung 300 L, fonctionne parfaitement, 200 euros",
+   "categories": [
+    "Appliances"
+   ],
+   "price": 200
+  },
+  {
+   "id": "washer-de",
+   "lang": "de",
+   "text": "Waschmaschine Bosch 7 kg, wegen Umzug abzugeben, 120 Euro",
+   "categories": [
+    "Appliances"
+   ],
+   "price": 120
+  },
+  {
+   "id": "mower-en",
+   "lang": "en",
+   "text": "Electric lawn mower 1400W with grass box",
+   "categories": [
+    "Garden"
+   ],
+   "price": null
+  },
+  {
+   "id": "lego-en",
+   "lang": "en",
+   "text": "LEGO Star Wars Millennium Falcon set 75257, complete with box, 90",
+   "categories": [
+    "Toys - Games - Figurines"
+   ],
+   "price": 90
+  },
+  {
+   "id": "rent-en",
+   "lang": "en",
+   "text": "2-bedroom apartment for rent near the park, furnished kitchen, 950 per month",
+   "categories": [
+    "Houses & Apartments For Rent"
+   ],
+   "price": 950
+  },
+  {
+   "id": "rent-bn",
+   "lang": "bn",
+   "text": "মিরপুরে ৩ রুমের ফ্ল্যাট ভাড়া হবে, ২ বাথ, লিফট আছে, মাসিক ২৫০০০ টাকা",
+   "categories": [
+    "Houses & Apartments For Rent"
+   ],
+   "price": 25000
+  },
+  {
+   "id": "land-en",
+   "lang": "en",
+   "text": "Plot of land for sale, 5 katha, near the main road, clear documents",
+   "categories": [
+    "Land & Plots For Sale"
+   ],
+   "price": null
+  },
+  {
+   "id": "puppy-en",
+   "lang": "en",
+   "text": "Golden retriever puppies, vaccinated and microchipped, 700 each",
+   "categories": [
+    "Dogs"
+   ],
+   "price": 700
+  },
+  {
+   "id": "cat-es",
+   "lang": "es",
+   "text": "Regalo gatitos de 2 meses, ya comen solos",
+   "categories": [
+    "Cats & Kittens"
+   ],
+   "price": null
+  },
+  {
+   "id": "dress-hi",
+   "lang": "hi",
+   "text": "लाल रंग का लहंगा, सिर्फ एक बार पहना, साइज़ M, 8000 रुपये",
+   "categories": [
+    "Wedding Wear & Accessories",
+    "Clothing"
+   ],
+   "price": 8000
+  },
+  {
+   "id": "shoes-en",
+   "lang": "en",
+   "text": "Nike Air Max 90, size 43, worn twice, 70",
+   "categories": [
+    "Shoes"
+   ],
+   "price": 70
+  },
+  {
+   "id": "bag-en",
+   "lang": "en",
+   "text": "Michael Kors handbag, authentic with receipt, light wear, 120",
+   "categories": [
+    "Bags"
+   ],
+   "price": 120
+  },
+  {
+   "id": "perfume-fr",
+   "lang": "fr",
+   "text": "Parfum Chanel N°5 100 ml, neuf sous blister, 90 euros",
+   "categories": [
+    "Fragrance"
+   ],
+   "price": 90
+  },
+  {
+   "id": "job-en",
+   "lang": "en",
+   "text": "We are hiring a junior PHP developer for our web agency, full time, office based, apply with your CV",
+   "categories": [
+    "Computers - Internet - Telecommunications"
+   ],
+   "price": null
+  },
+  {
+   "id": "job-bn",
+   "lang": "bn",
+   "text": "রেস্টুরেন্টে ওয়েটার নিয়োগ চলছে, অভিজ্ঞতা লাগবে না, বেতন ১২০০০ টাকা",
+   "categories": [
+    "Tourism - Hotels - Restaurants - Leisure"
+   ],
+   "price": 12000
+  },
+  {
+   "id": "tutor-en",
+   "lang": "en",
+   "text": "Maths tutoring for high school students, qualified teacher, 25 per hour",
+   "categories": [
+    "Maths, Physics, Chemistry",
+    "Tutoring, Private Lessons"
+   ],
+   "price": 25
+  },
+  {
+   "id": "cleaning-es",
+   "lang": "es",
+   "text": "Servicio de limpieza de casas, semanal o puntual, llevamos nuestros productos",
+   "categories": [
+    "Household Services - Housekeeping",
+    "Service Provision",
+    "Other services"
+   ],
+   "price": null
+  },
+  {
+   "id": "unusable-hello",
+   "lang": "en",
+   "text": "hello how are you today",
+   "categories": [],
+   "price": null
+  },
+  {
+   "id": "unusable-random",
+   "lang": "en",
+   "text": "asdkjh qweoiu zxcmnb",
+   "categories": [],
+   "price": null
+  },
+  {
+   "id": "unusable-question",
+   "lang": "en",
+   "text": "what is the best phone to buy this year?",
+   "categories": [],
+   "price": null
+  },
+  {
+   "id": "unusable-bn",
+   "lang": "bn",
+   "text": "আসসালামু আলাইকুম, কেমন আছেন?",
+   "categories": [],
+   "price": null
+  }
+ ]
+}

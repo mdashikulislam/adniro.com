@@ -89,7 +89,7 @@ class QuickPostPhotosTest extends TestCase
 		
 		// Applying the draft leaves the photos where the photos step reads them
 		$photos = session('picturesInput');
-		$this->actingAs($user)->get($response->json('redirect'))->assertRedirect(urlGen()->addPost());
+		$this->actingAs($user)->get($response->json('redirect'))->assertRedirect(url('posts/create/quick/review'));
 		$this->assertSame($photos, session('picturesInput'));
 		$this->assertSame(2, session('postInput')['category_id']);
 	}

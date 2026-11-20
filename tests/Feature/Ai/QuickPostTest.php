@@ -116,7 +116,7 @@ class QuickPostTest extends TestCase
 		$this->assertStringContainsString('2 | Phones > Mobile phones', $this->ai->lastRequest->instructions);
 		$this->assertSame('quickpost_draft', $this->ai->lastRequest->feature);
 		
-		$this->actingAs($user)->get($response->json('redirect'))->assertRedirect(urlGen()->addPost());
+		$this->actingAs($user)->get($response->json('redirect'))->assertRedirect(url('posts/create/quick/review'));
 		
 		$input = session('postInput');
 		$this->assertSame(2, $input['category_id']);
@@ -416,7 +416,7 @@ class QuickPostTest extends TestCase
 		$request = $user ? $this->actingAs($user) : $this;
 		$response = $request->postJson('/posts/create/quick/draft', ['text' => $text]);
 		$response->assertJson(['ok' => true]);
-		$request->get($response->json('redirect'))->assertRedirect(urlGen()->addPost());
+		$request->get($response->json('redirect'))->assertRedirect(url('posts/create/quick/review'));
 	}
 	
 	

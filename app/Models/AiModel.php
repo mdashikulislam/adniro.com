@@ -166,6 +166,21 @@ class AiModel extends BaseModel
 		return e('$' . rtrim(rtrim((string)$this->input_price_per_mtok, '0'), '.') . ' / $' . rtrim(rtrim((string)$this->output_price_per_mtok, '0'), '.'));
 	}
 	
+	/**
+	 * Last passed evaluations: "php artisan ai:moderation-eval" and "php artisan ai:quickpost-eval".
+	 */
+	public function crudEvaluationsColumn(): string
+	{
+		$badge = function (string $label, $passedAt): string {
+			return $passedAt
+				? '<span class="badge bg-success" title="' . e($passedAt->format('Y-m-d H:i')) . '">' . e($label) . ' ✓</span>'
+				: '<span class="badge bg-light text-dark border">' . e($label) . ' –</span>';
+		};
+		
+		return $badge(trans('ai.eval_moderation'), $this->moderation_eval_passed_at)
+			. ' ' . $badge(trans('ai.eval_quickpost'), $this->quickpost_eval_passed_at);
+	}
+	
 	public function crudStatusColumn(): string
 	{
 		return AdminHtml::statusBadge($this->isUsable(), $this->last_test_ok, $this->last_tested_at, $this->last_test_error);

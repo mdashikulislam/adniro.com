@@ -74,12 +74,9 @@ class AiProviderController extends PanelController
 			$this->xPanel->addField([
 				'name'       => 'api_key',
 				'label'      => trans('ai.field_api_key'),
-				'type'       => 'password',
-				'value'      => '',
-				'attributes' => ['autocomplete' => 'new-password'],
-				'hint'       => $entry instanceof AiProvider
-					? trans('ai.field_api_key_hint_edit', ['masked' => $entry->maskedApiKey()])
-					: trans('ai.field_api_key_hint_new'),
+				'type'       => 'text',
+				'attributes' => ['autocomplete' => 'off', 'spellcheck' => 'false'],
+				'hint'       => trans('ai.field_api_key_hint'),
 				'wrapper'    => ['class' => 'col-md-12'],
 			]);
 			$this->xPanel->addField([
@@ -106,10 +103,8 @@ class AiProviderController extends PanelController
 	
 	public function update(UpdateRequest $request): RedirectResponse
 	{
-		// The key is write-only: an empty field keeps the stored key.
-		if (blank($request->input('api_key'))) {
-			$request->request->remove('api_key');
-		}
+		// The form shows the saved key: an emptied field removes it (the .env key is used then)
+		$request->merge(['api_key' => trim((string)$request->input('api_key')) ?: null]);
 		
 		return parent::updateCrud($request);
 	}

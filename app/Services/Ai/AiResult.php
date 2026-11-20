@@ -46,9 +46,13 @@ final class AiResult
 	/**
 	 * Did the request reach a provider? (Used for the daily call count.)
 	 */
+	/** Error types that stop a call before anything is sent. */
+	public const LOCAL_ERRORS = ['missing_api_key'];
+	
 	public function reachedProvider(): bool
 	{
-		return !in_array($this->status, [self::CAPPED, self::DISABLED], true);
+		return !in_array($this->status, [self::CAPPED, self::DISABLED], true)
+			&& !in_array($this->errorType, self::LOCAL_ERRORS, true);
 	}
 	
 	public static function disabled(string $reason): self
