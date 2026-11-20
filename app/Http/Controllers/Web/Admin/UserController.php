@@ -105,6 +105,7 @@ class UserController extends PanelController
 		$this->xPanel->addButtonFromModelFunction('line', 'impersonate', 'impersonateInLineButton', 'beginning');
 		$this->xPanel->removeButton('delete');
 		$this->xPanel->addButtonFromModelFunction('line', 'delete', 'deleteInLineButton', 'end');
+		$this->xPanel->addButtonFromView('line', 'ai_post_limit', 'ai-post-limit', 'end'); // adniro:ai
 		
 		/*
 		|--------------------------------------------------------------------------

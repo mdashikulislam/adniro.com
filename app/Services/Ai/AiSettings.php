@@ -115,6 +115,34 @@ class AiSettings
 	 * When the AI cannot be used (over budget, or no usable model): approve the listing,
 	 * or hold it for an admin.
 	 */
+	public function quickpostEnabled(): bool
+	{
+		return ($this->all()['quickpost_enabled'] ?? '0') == '1';
+	}
+	
+	public function quickpostGuests(): bool
+	{
+		return ($this->all()['quickpost_guests'] ?? '0') == '1';
+	}
+	
+	/**
+	 * The AI post limit for members or guests: [number per period, period].
+	 * Period: day, week, month, or none (no limit).
+	 *
+	 * @return array{0: int, 1: string}
+	 */
+	public function quickpostLimit(string $who): array
+	{
+		$values = $this->all();
+		$who = $who === 'guest' ? 'guest' : 'member';
+		$default = $who === 'guest' ? 5 : 20;
+		
+		$limit = max(0, (int)($values['quickpost_' . $who . '_limit'] ?? $default));
+		$period = (string)($values['quickpost_' . $who . '_period'] ?? 'day');
+		
+		return [$limit, in_array($period, ['day', 'week', 'month', 'none'], true) ? $period : 'day'];
+	}
+	
 	public function moderationAlertAdmins(): bool
 	{
 		return ($this->all()['moderation_alert_admins'] ?? '1') == '1';

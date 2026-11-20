@@ -53,4 +53,16 @@ return [
 	'test' => [
 		'max_tokens' => 2000,
 	],
+	
+	// Quick post (drafting a listing from the user's text)
+	'quickpost' => [
+		'timeout'        => (int)env('AI_QUICKPOST_TIMEOUT', 25), // seconds, the browser waits 30
+		'min_text'       => 10,
+		'max_text'       => 2000,
+		'max_tokens'     => 3000,
+		'free_redrafts'  => 2,
+		'draft_ttl'      => 48, // hours
+		'rate_per_ip'    => 6,  // drafts a minute
+		'rate_per_user'  => 10, // drafts a minute
+	],
 ];

@@ -127,6 +127,7 @@ Core files touched, each marked `adniro:ai`:
 Not checked in a signed-in browser: the banner, badge and finish line were checked by rendering the views in tests.
 
 ### Phase 5, admin queue: built on branch `ai` (2026-11-20)
+Committed as `edfe3a53`.
 Covered by 14 more tests in `tests/Feature/Ai/ModerationQueueTest.php`, so 102 in all. The fake AI client used by the tests now has its own file, `tests/Feature/Ai/FakeAiClient.php`.
 
 What exists:
@@ -149,6 +150,41 @@ Core files touched, each marked `adniro:ai`:
 - `resources/views/admin/layouts/partials/sidebar.blade.php`: the queue item under Listings
 
 Not checked in a signed-in browser: the queue, reject form and history were checked through HTTP tests as a super admin, a listing editor and other staff. Signed-out requests to `/admin/moderation` and the approve action were checked on the local site and are sent to the login page.
+
+### Phase 6, quick post from text: built on branch `ai` (2026-11-20)
+Off by default. Covered by 21 more tests in `tests/Feature/Ai/QuickPostTest.php`, so 123 in all.
+
+The whole path was also checked in the browser on the local site. A temporary local model pointed at a mock OpenAI-compatible server on `127.0.0.1`, so no outside service was called. "Create Listing" opened the composer, a sentence went through a real HTTP request, and the step 1 form opened with the banner. It had the category, title, description, price, tags, city, and both custom fields filled, with Check badges where confidence was below high. Stopping the mock showed the fallback, with the text in the description of the normal form. The composer was also checked at phone width. The temporary model, settings and rows were removed afterwards.
+
+What exists:
+- **Composer** at `/posts/create/quick`. It has a text box with a counter, "Use my location", "Create my listing", the remaining AI posts, and "Fill the form myself". A progress overlay shows while drafting, with a 25-second server limit and a 30-second browser limit.
+- **"Post an ad"** links open the composer when quick post is available, through a guarded change in `getCreateListingLinkInfo()`.
+- **Draft.** One synchronous call to the quick post model. `DraftPrompt` sends the fixed instructions in `resources/ai/quickpost-instructions.md` plus the catalog as one stable system block, and the user's text inside `<listing_input>` tags.
+- **Catalog.** `CatalogBuilder` lists active leaf categories with their inherited field ids, then fields with option ids. It is in English, sorted and cached, and rebuilt when categories, fields, options or category fields change. File, video, date-range and URL fields are left out. From local data it is about 10 KB, roughly 3,000 tokens.
+- **Sanitizer.** `DraftSanitizer` enforces the rules in section 6, adds Check and Please add marks, strips links, emails and phone numbers, and takes the leading number from values like "128 GB".
+- **Location.** `LocationResolver` tries, in order, the nearest active city to the browser position within about 100 km, then a city named in the text, then the user's last listing. Everything stays inside the current country.
+- **Into the form.** `DraftToPostInput` writes `postInput` in the exact step 1 shape, including the city keys the request adds and `cf` in the form's own format. It keeps contact details already typed. The marks go in `quickPostMarks`.
+- **Step 1 banner** (`front.post.quick.form-banner`) with field highlights, a multiple-item note, soft policy warnings and "Not right? Describe it again". It also loads the draft's category, because the form only restores a chosen category after a validation error.
+- **Fallbacks.** When the AI fails, the text goes into the description of the normal form, and fields from an earlier draft are dropped. Input that is not a listing stays on the composer with a request for one sentence. Text that is too short is refused with no AI call.
+- **AI post limit.** It is set in Settings > AI > Quick post, separately for members (by account) and guests (by IP), per day, week, month or with no limit. It uses calendar periods in the site timezone. A per-person lock stops parallel drafts. A changed limit applies at once.
+- **Per-user override and reset.** An "AI limit" button on Admin > Users opens `/admin/users/{id}/ai-post-limit`, for super admins and staff who can edit users. This adds `users.ai_post_limit` and `users.ai_post_reset_at`.
+- **Burst limit.** At most 6 drafts a minute per IP and 10 per user.
+- **`post_drafts` table** with the input, the raw and sanitised output, status, counted flag, re-draft count, linked usage log and expiry.
+
+Differences from the plan above:
+- **What is counted.** The limit counts successful drafts in `post_drafts`, not rows in `ai_usage_logs`, because only the drafts know which re-drafts are free.
+- **Guests are off by default.** The site has no captcha configured, so the guests setting starts off, as decision 3 recommends.
+- **No GeoIP step yet.** The installed GeoIP data gives the country, not a city.
+- **No quick post evaluation set yet.** The person checks every draft, so assigning a quick post model only requires a passed "Test model". The 40-input evaluation from section 9 is still to do.
+- **Draft purge.** Expired drafts are not purged yet. That comes with the photo uploads in phase 7.
+- **Front-end tests.** These tests leave out the app's localization middleware and set the country themselves. The test database has no countries or languages, and front-end requests there end in the app's `redirectUrl()` exit.
+
+Core files touched, each marked `adniro:ai`:
+- `routes/web/front.php`: one include line
+- `app/Helpers/Services/Functions/core.php`: "Post an ad" points to the composer when available
+- `resources/views/front/post/createOrEdit/multiSteps/create/post.blade.php`: one banner include
+- `app/Http/Controllers/Web/Admin/UserController.php`: one line for the "AI limit" button
+- `app/Services/Ai/Support/SchemaRules.php` (from phase 1): nested empty values are valid too
 
 ## 1. What we are building
 

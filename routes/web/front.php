@@ -116,6 +116,9 @@ Route::namespace('Post')
 			$router->pattern('slug', '^(?=.*)((?!\/).)*$');
 		}
 		
+		// Quick post: AI-drafted listings (adniro:ai)
+		require __DIR__ . '/front/quick-post.php';
+		
 		// SingleStep Listing creation
 		Route::namespace('CreateOrEdit\SingleStep')
 			->controller(SingleCreateController::class)

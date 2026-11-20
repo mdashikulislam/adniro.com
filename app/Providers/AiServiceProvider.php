@@ -29,6 +29,8 @@ class AiServiceProvider extends ServiceProvider
 		$this->app->singleton(AiModelResolver::class);
 		$this->app->singleton(AiBudget::class);
 		$this->app->singleton(AiClientContract::class, LaravelAiClient::class);
+		$this->app->singleton(\App\Services\QuickPost\QuickPostService::class);
+		$this->app->singleton(\App\Services\QuickPost\CatalogBuilder::class);
 	}
 	
 	public function boot(): void
@@ -37,5 +39,12 @@ class AiServiceProvider extends ServiceProvider
 		Post::observe(PostModerationObserver::class);
 		Picture::observe(PictureModerationObserver::class);
 		PostValue::observe(PostValueModerationObserver::class);
+		
+		// Quick post: rebuild the catalog given to the AI when an admin changes it
+		foreach ([\App\Models\Category::class, \App\Models\Field::class, \App\Models\FieldOption::class, \App\Models\CategoryField::class] as $model) {
+			foreach (['saved', 'deleted'] as $event) {
+				$model::$event(fn () => \App\Services\QuickPost\CatalogBuilder::invalidate());
+			}
+		}
 	}
 }

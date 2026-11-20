@@ -42,6 +42,8 @@
 				
 				@include('front.post.partials.notification')
 				
+				@include('front.post.quick.form-banner') {{-- adniro:ai --}}
+				
 				<div class="col-md-9">
 					<div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3">
 						<h3 class="fw-bold border-bottom pb-3 mb-4">

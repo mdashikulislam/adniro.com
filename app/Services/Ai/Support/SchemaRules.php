@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Validator;
  * Validates an AI answer against the request's JSON schema (adniro:ai).
  *
  * Built on Illuminate\JsonSchema\JsonSchema::rules(), adjusted to JSON schema meaning:
- * "required" means the key is present, so an empty list or an empty string is still valid.
+ * "required" means the key is present, so an empty list or an empty string is still valid,
+ * at the top level and in nested objects.
  */
 
 class SchemaRules
@@ -22,7 +23,12 @@ class SchemaRules
 		foreach ($rules as $field => $fieldRules) {
 			$fieldRules = is_array($fieldRules) ? $fieldRules : explode('|', (string)$fieldRules);
 			
-			$fieldRules = array_values(array_filter($fieldRules, fn ($rule) => !$rule instanceof RejectEmptyString));
+			// Nested keys are already required by "required_array_keys"; "filled" would also reject
+			// an empty string or list, which JSON schema allows
+			$fieldRules = array_values(array_filter(
+				$fieldRules,
+				fn ($rule) => !$rule instanceof RejectEmptyString && $rule !== 'filled'
+			));
 			$fieldRules = array_map(fn ($rule) => $rule === 'required' ? 'present' : $rule, $fieldRules);
 			
 			$rules[$field] = $fieldRules;

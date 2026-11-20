@@ -8,6 +8,7 @@
  */
 
 use App\Http\Controllers\Web\Admin\AiModelController;
+use App\Http\Controllers\Web\Admin\AiPostLimitController;
 use App\Http\Controllers\Web\Admin\AiProviderController;
 use App\Http\Controllers\Web\Admin\ModerationQueueController;
 use App\Http\Controllers\Web\Admin\Panel\Library\PanelRoutes;
@@ -33,4 +34,11 @@ Route::middleware([ModerationQueueAccess::class])
 		Route::post('moderation/{id}/approve', 'approve')->whereNumber('id');
 		Route::post('moderation/{id}/reject', 'reject')->whereNumber('id');
 		Route::post('moderation/{id}/rerun', 'rerun')->whereNumber('id');
+	});
+
+// AI post limit of one user (access checked in the controller)
+Route::controller(AiPostLimitController::class)
+	->group(function () {
+		Route::get('users/{id}/ai-post-limit', 'limitForm')->whereNumber('id');
+		Route::post('users/{id}/ai-post-limit', 'saveLimit')->whereNumber('id');
 	});

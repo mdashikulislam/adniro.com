@@ -37,6 +37,12 @@ class AiSetting extends BaseSetting
 			'moderation_post_daily_limit'  => '10',
 			'moderation_when_unavailable'  => 'approve',
 			'moderation_alert_admins'      => '1',
+			'quickpost_enabled'            => '0',
+			'quickpost_guests'             => '0',
+			'quickpost_member_limit'       => '20',
+			'quickpost_member_period'      => 'day',
+			'quickpost_guest_limit'        => '5',
+			'quickpost_guest_period'       => 'day',
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -199,6 +205,65 @@ class AiSetting extends BaseSetting
 			'wrapper'    => ['class' => 'col-md-6'],
 			'tab'        => $tabName,
 		];
+		
+		// Quick post
+		$tabName = trans('ai.setting_tab_quickpost');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'ai_quickpost_sep',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'  => 'ai_quickpost_info',
+			'type'  => 'custom_html',
+			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_quickpost_info')) . '</div>',
+			'tab'   => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'quickpost_enabled',
+			'label'   => trans('ai.setting_quickpost_enabled_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('ai.setting_quickpost_enabled_hint'),
+			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'quickpost_guests',
+			'label'   => trans('ai.setting_quickpost_guests_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('ai.setting_quickpost_guests_hint'),
+			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$periodOptions = [
+			'day'   => trans('ai.period_day'),
+			'week'  => trans('ai.period_week'),
+			'month' => trans('ai.period_month'),
+			'none'  => trans('ai.period_none'),
+		];
+		foreach (['member', 'guest'] as $who) {
+			$fields[] = [
+				'name'       => 'quickpost_' . $who . '_limit',
+				'label'      => trans('ai.setting_quickpost_' . $who . '_limit_label'),
+				'type'       => 'number',
+				'attributes' => ['min' => 0, 'step' => 1],
+				'hint'       => trans('ai.setting_quickpost_limit_hint'),
+				'wrapper'    => ['class' => 'col-md-3'],
+				'tab'        => $tabName,
+			];
+			$fields[] = [
+				'name'    => 'quickpost_' . $who . '_period',
+				'label'   => trans('ai.setting_quickpost_period_label'),
+				'type'    => 'select2_from_array',
+				'options' => $periodOptions,
+				'hint'    => trans('ai.setting_quickpost_period_hint'),
+				'wrapper' => ['class' => 'col-md-3'],
+				'tab'     => $tabName,
+			];
+		}
 		
 		// Budget
 		$tabName = trans('ai.setting_tab_budget');
