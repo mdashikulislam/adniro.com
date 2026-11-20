@@ -45,7 +45,10 @@
 			{{-- Voice: shown by the script only where the browser has speech recognition --}}
 			<div class="position-absolute bottom-0 end-0 m-2 d-none align-items-center gap-1" id="qpVoice"
 			     data-default="{{ $voice['default'] }}"
-			     data-languages="{{ json_encode($voice['languages']) }}">
+			     data-languages="{{ json_encode($voice['languages']) }}"
+			     data-server="{{ !empty($voice['server']) ? '1' : '0' }}"
+			     data-server-url="{{ $voice['serverUrl'] ?? '' }}"
+			     data-max-seconds="{{ (int)($voice['maxSeconds'] ?? 60) }}">
 				<select id="qpVoiceLang" class="form-select form-select-sm w-auto" aria-label="{{ trans('ai.qp_voice_language') }}">
 					@foreach ($voice['languages'] as $language)
 						<option value="{{ $language['tag'] }}" @selected($language['tag'] === $voice['default'])>{{ $language['label'] }}</option>
@@ -92,4 +95,5 @@
 	
 	<p class="small text-muted mt-4 mb-0">{{ trans('ai.qp_privacy') }}</p>
 	<p class="small text-muted mt-1 mb-0 d-none" id="qpVoicePrivacy">{{ trans('ai.qp_voice_privacy') }}</p>
+	<p class="small text-muted mt-1 mb-0 d-none" id="qpVoiceServerPrivacy">{{ trans('ai.qp_voice_server_privacy') }}</p>
 </div>

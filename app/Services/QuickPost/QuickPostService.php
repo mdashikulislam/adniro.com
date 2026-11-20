@@ -60,6 +60,34 @@ class QuickPostService
 		return $this->client->enabled(self::FEATURE);
 	}
 	
+	/**
+	 * Voice through a speech-to-text model on the server, for browsers without their own speech
+	 * recognition. Needs quick post and an assigned speech-to-text model.
+	 */
+	public function serverVoiceAvailable(?User $user): bool
+	{
+		return $this->available($user) && $this->client->enabled('transcription');
+	}
+	
+	/**
+	 * @return array{ok: bool, text?: string, reason?: string}
+	 */
+	public function transcribe(string $audioPath, ?string $mimeType, ?string $language, ?User $user, ?string $ip): array
+	{
+		// "bn-BD" -> "bn": providers take an ISO 639-1 code
+		$language = $language ? strtolower(explode('-', str_replace('_', '-', $language))[0]) : null;
+		$language = ($language && preg_match('/^[a-z]{2,3}$/', $language)) ? $language : null;
+		
+		$result = $this->client->transcribe($audioPath, $mimeType, $language, $user?->getKey() ? (int)$user->getKey() : null, $ip);
+		if (!$result->ok()) {
+			return ['ok' => false, 'reason' => $result->status];
+		}
+		
+		$text = DraftSanitizer::clean((string)($result->data['text'] ?? ''), (int)config('ai_features.quickpost.max_text', 2000));
+		
+		return $text === '' ? ['ok' => false, 'reason' => 'empty'] : ['ok' => true, 'text' => $text];
+	}
+	
 	public function limitStatus(?User $user, ?string $ip): LimitStatus
 	{
 		return $this->limit->status($user, $ip);

@@ -10,6 +10,7 @@ use App\Services\Ai\Contracts\AiClientContract;
 use App\Services\Ai\Support\SchemaRules;
 use Illuminate\Support\Str;
 use Laravel\Ai\Ai;
+use Laravel\Ai\Transcription;
 use Laravel\Ai\Exceptions\FailoverableException;
 use Laravel\Ai\Files\Image;
 use Laravel\Ai\Responses\AgentResponse;
@@ -80,9 +81,95 @@ class LaravelAiClient implements AiClientContract
 		return $result;
 	}
 	
+	public function transcribe(string $audioPath, ?string $mimeType = null, ?string $language = null, ?int $userId = null, ?string $ip = null, ?AiModel $model = null): AiResult
+	{
+		$isAdminTest = $model instanceof AiModel;
+		$request = new AiRequest(
+			feature: 'transcription',
+			instructions: '',
+			prompt: '',
+			schema: [],
+			userId: $userId,
+			ip: $ip,
+			subjectType: $isAdminTest ? 'ai_model' : 'quickpost_voice',
+			subjectId: $model?->id,
+			meta: array_filter(['language' => $language]),
+			model: $model,
+		);
+		
+		if (!$isAdminTest && !$this->settings->enabled()) {
+			return AiResult::disabled('ai_disabled');
+		}
+		
+		$candidates = $isAdminTest ? [$model] : $this->resolver->candidatesFor('transcription');
+		if (empty($candidates)) {
+			return AiResult::disabled('no_model');
+		}
+		
+		if (!$isAdminTest) {
+			$reason = $this->budget->check();
+			if (!is_null($reason)) {
+				$result = AiResult::capped($reason);
+				$this->log($request, null, $result);
+				
+				return $result;
+			}
+		}
+		
+		$speechModel = $candidates[0];
+		$speechModel->loadMissing('provider');
+		$provider = $speechModel->provider;
+		$started = hrtime(true);
+		$base = ['provider' => $provider?->driver, 'model' => $speechModel->model_id, 'aiModelId' => $speechModel->id];
+		
+		if (!$provider instanceof AiProvider) {
+			return $this->finish($request, $speechModel, self::make(['status' => AiResult::ERROR, 'errorType' => 'no_provider'], $base));
+		}
+		if (!$provider->hasApiKey() && !in_array($provider->driver, ['ollama'], true)) {
+			return $this->finish($request, $speechModel, self::make(['status' => AiResult::ERROR, 'errorType' => 'missing_api_key', 'errorMessage' => trans('ai.key_missing')], $base));
+		}
+		
+		try {
+			Ai::build($provider->sdkConfig());
+			
+			$pending = Transcription::fromPath($audioPath, $mimeType)->timeout((int)config('ai_features.timeout', 60));
+			if (!empty($language)) {
+				$pending->language($language);
+			}
+			$response = $pending->generate($provider->sdkName(), $speechModel->model_id);
+		} catch (Throwable $e) {
+			return $this->finish($request, $speechModel, self::make(['status' => AiResult::ERROR, 'errorType' => class_basename($e), 'errorMessage' => $this->safeMessage($e), 'retryable' => $e instanceof FailoverableException, 'latencyMs' => $this->elapsedMs($started)], $base));
+		}
+		
+		$inputTokens = (int)($response->usage->inputTokens ?? 0);
+		$outputTokens = (int)($response->usage->outputTokens ?? 0);
+		
+		return $this->finish($request, $speechModel, self::make(['status' => AiResult::OK, 'data' => ['text' => trim((string)$response->text)]], $base, [
+			'inputTokens'  => $inputTokens,
+			'outputTokens' => $outputTokens,
+			'costUsd'      => CostCalculator::cost($speechModel, $inputTokens, $outputTokens),
+			'latencyMs'    => $this->elapsedMs($started),
+		]));
+	}
+	
 	public function testModel(AiModel $model): AiResult
 	{
 		$model->loadMissing('provider');
+		
+		// A speech-to-text model is tested with a second of silence: any answer, even empty, is fine
+		if ($model->supports_transcription && !$model->supports_structured_output) {
+			$path = $this->testAudio();
+			$result = $this->transcribe($path, 'audio/wav', null, auth()->id(), request()?->ip(), $model);
+			@unlink($path);
+			
+			$model->forceFill([
+				'last_tested_at'  => now(),
+				'last_test_ok'    => $result->ok(),
+				'last_test_error' => $result->ok() ? null : $this->describe($result),
+			])->save();
+			
+			return $result;
+		}
 		
 		$images = [];
 		$prompt = 'This is a connection test. Reply with ok set to true and the word "pong" as the answer.';
@@ -244,6 +331,23 @@ class LaravelAiClient implements AiClientContract
 		}
 		
 		return $this->finish($request, $model, self::make(['status' => AiResult::OK, 'data' => $data], $base, $tokens));
+	}
+	
+	/**
+	 * One second of 16 kHz mono silence as a WAV file, for testing speech-to-text models.
+	 */
+	private function testAudio(): string
+	{
+		$rate = 16000;
+		$samples = str_repeat("\x00\x00", $rate);
+		$wav = 'RIFF' . pack('V', 36 + strlen($samples)) . 'WAVE'
+			. 'fmt ' . pack('VvvVVvv', 16, 1, 1, $rate, $rate * 2, 2, 16)
+			. 'data' . pack('V', strlen($samples)) . $samples;
+		
+		$path = tempnam(sys_get_temp_dir(), 'ai-test-') . '.wav';
+		file_put_contents($path, $wav);
+		
+		return $path;
 	}
 	
 	private static function make(array ...$parts): AiResult

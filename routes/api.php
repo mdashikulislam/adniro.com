@@ -469,6 +469,7 @@ Route::prefix('quickpost')
 	->group(function ($router) {
 		Route::get('limit', 'limit')->name('api.quickpost.limit');
 		Route::post('drafts', 'draft')->name('api.quickpost.drafts');
+		Route::post('transcriptions', 'transcription')->name('api.quickpost.transcriptions');
 	});
 
 

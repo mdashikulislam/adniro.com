@@ -41,6 +41,7 @@ return [
 		'openrouter'        => ['label' => 'OpenRouter', 'url_required' => false],
 		'ollama'            => ['label' => 'Ollama (self-hosted)', 'url_required' => true],
 		'openai-compatible' => ['label' => 'OpenAI-compatible (custom URL)', 'url_required' => true],
+		'eleven'            => ['label' => 'ElevenLabs (speech-to-text only)', 'url_required' => false],
 	],
 	
 	// Images sent to the model are resized to this long edge (px) and re-encoded as JPEG
@@ -59,6 +60,8 @@ return [
 		'timeout'        => (int)env('AI_QUICKPOST_TIMEOUT', 25), // seconds, the browser waits 30
 		'min_text'       => 10,
 		'max_text'       => 2000,
+		'max_audio_kb'   => 5120, // a minute of compressed speech is far below this
+		'max_audio_seconds' => 60,
 		'max_tokens'     => 3000,
 		'free_redrafts'  => 2,
 		'draft_ttl'      => 48, // hours

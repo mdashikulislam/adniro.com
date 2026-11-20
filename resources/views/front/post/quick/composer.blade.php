@@ -27,6 +27,9 @@
 			'no_speech'   => trans('ai.qp_voice_no_speech'),
 			'unavailable' => trans('ai.qp_voice_unavailable'),
 			'time_up'     => trans('ai.qp_voice_time_up'),
+			'recording'   => trans('ai.qp_voice_recording'),
+			'transcribing' => trans('ai.qp_voice_transcribing'),
+			'failed'      => trans('ai.qp_voice_failed'),
 		];
 	@endphp
 	<script>
@@ -220,6 +223,83 @@
 			};
 			const joinText = (a, b) => (a && b && !/\s$/.test(a) ? a + ' ' + b : a + b);
 			
+			/* Server speech-to-text: MediaRecorder upload, used only where the browser cannot listen itself */
+			const serverVoice = !voiceSupported
+				&& voiceBox.dataset.server === '1'
+				&& !!window.MediaRecorder
+				&& !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+				&& window.isSecureContext !== false;
+			const maxRecordMs = (parseInt(voiceBox.dataset.maxSeconds, 10) || 60) * 1000;
+			let recorder = null;
+			let recordTimer = null;
+			
+			const toggleRecording = async () => {
+				if (recorder) {
+					clearTimeout(recordTimer);
+					try { recorder.stop(); } catch (e) {}
+					return;
+				}
+				let stream;
+				try {
+					stream = await navigator.mediaDevices.getUserMedia({audio: true});
+				} catch (e) {
+					setVoiceStatus(e && e.name === 'NotAllowedError' ? voiceMessages.denied : voiceMessages.unavailable);
+					return;
+				}
+				const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+				const type = types.find((t) => window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+				const chunks = [];
+				recorder = type ? new MediaRecorder(stream, {mimeType: type}) : new MediaRecorder(stream);
+				recorder.ondataavailable = (event) => { if (event.data && event.data.size) chunks.push(event.data); };
+				recorder.onstop = async () => {
+					stream.getTracks().forEach((track) => track.stop());
+					const mime = (recorder && recorder.mimeType) || type || 'audio/webm';
+					recorder = null;
+					setListening(false);
+					const blob = new Blob(chunks, {type: mime.split(';')[0]});
+					if (!blob.size) {
+						setVoiceStatus(voiceMessages.no_speech);
+						return;
+					}
+					setVoiceStatus(voiceMessages.transcribing);
+					mic.disabled = true;
+					uploading++;
+					refresh();
+					try {
+						const body = new FormData();
+						const extension = mime.includes('mp4') ? 'm4a' : (mime.includes('ogg') ? 'ogg' : 'webm');
+						body.append('audio', blob, 'voice.' + extension);
+						body.append('language', voiceLang.value || voiceBox.dataset.default);
+						const response = await fetch(voiceBox.dataset.serverUrl, {
+							method: 'POST',
+							headers: {'Accept': 'application/json', 'X-CSRF-TOKEN': csrf(), 'X-Requested-With': 'XMLHttpRequest'},
+							body,
+						});
+						const data = await response.json().catch(() => ({}));
+						if (data.ok && data.text) {
+							text.value = joinText(text.value, data.text).slice(0, maxText);
+							setVoiceStatus('');
+							text.focus();
+						} else {
+							setVoiceStatus(data.message || voiceMessages.failed);
+						}
+					} catch (e) {
+						setVoiceStatus(voiceMessages.failed);
+					} finally {
+						mic.disabled = false;
+						uploading--;
+						refresh();
+					}
+				};
+				recorder.start();
+				setListening(true);
+				setVoiceStatus(voiceMessages.recording);
+				recordTimer = setTimeout(() => {
+					setVoiceStatus(voiceMessages.time_up);
+					try { recorder && recorder.stop(); } catch (e) {}
+				}, maxRecordMs);
+			};
+			
 			if (voiceSupported) {
 				voiceBox.classList.replace('d-none', 'd-flex');
 				document.getElementById('qpVoicePrivacy').classList.remove('d-none');
@@ -232,11 +312,19 @@
 				voiceLang.addEventListener('change', () => {
 					try { window.localStorage.setItem('qpVoiceLang', voiceLang.value); } catch (e) {}
 				});
+			} else if (serverVoice) {
+				/* No speech recognition in this browser: record, and let the server's speech-to-text model write it */
+				voiceBox.classList.replace('d-none', 'd-flex');
+				document.getElementById('qpVoiceServerPrivacy').classList.remove('d-none');
 			} else {
 				document.getElementById('qpVoiceHint').classList.remove('d-none');
 			}
 			
 			mic.addEventListener('click', () => {
+				if (!voiceSupported) {
+					toggleRecording();
+					return;
+				}
 				if (recognition) {
 					stopVoice();
 					return;

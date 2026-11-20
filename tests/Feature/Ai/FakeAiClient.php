@@ -62,6 +62,23 @@ class FakeAiClient implements AiClientContract
 		return $result;
 	}
 	
+	public int $transcriptions = 0;
+	public ?array $lastTranscription = null;
+	private ?Closure $transcriber = null;
+	
+	public function transcribeWith(Closure $transcriber): void
+	{
+		$this->transcriber = $transcriber;
+	}
+	
+	public function transcribe(string $audioPath, ?string $mimeType = null, ?string $language = null, ?int $userId = null, ?string $ip = null, ?AiModel $model = null): AiResult
+	{
+		$this->transcriptions++;
+		$this->lastTranscription = ['path' => $audioPath, 'mime' => $mimeType, 'language' => $language, 'user' => $userId, 'ip' => $ip, 'bytes' => is_file($audioPath) ? filesize($audioPath) : 0];
+		
+		return $this->transcriber ? ($this->transcriber)($audioPath, $language) : AiResult::disabled('no_model');
+	}
+	
 	public function testModel(AiModel $model): AiResult
 	{
 		return new AiResult(AiResult::OK);

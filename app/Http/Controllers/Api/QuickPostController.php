@@ -39,6 +39,7 @@ class QuickPostController extends BaseController
 			'message' => null,
 			'result'  => [
 				'available' => $this->service()->available($user),
+				'voice'     => $this->service()->serverVoiceAvailable($user),
 				'limit'     => $this->service()->limitStatus($user, $request->ip())->toArray(),
 			],
 		]);
@@ -138,6 +139,43 @@ class QuickPostController extends BaseController
 			],
 			'extra'   => ['limit' => $limit->toArray()],
 		]);
+	}
+	
+	/**
+	 * Turn a voice recording into text with the assigned speech-to-text model.
+	 *
+	 * @bodyParam audio file required Recording of at most a minute (webm, ogg, mp4/m4a, mp3, wav).
+	 * @bodyParam language string Language of the speech, for example bn or bn-BD.
+	 */
+	public function transcription(Request $request): JsonResponse
+	{
+		$user = auth('sanctum')->user();
+		
+		if (!$this->service()->serverVoiceAvailable($user)) {
+			return $this->fail(trans('ai.qp_voice_unavailable'), 'off', 403);
+		}
+		
+		$rateKey = 'quickpost-voice:' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
+		if (RateLimiter::tooManyAttempts($rateKey, 10)) {
+			$seconds = RateLimiter::availableIn($rateKey);
+			
+			return $this->fail(trans('ai.qp_rate', ['seconds' => $seconds]), 'rate', 429)->header('Retry-After', (string)$seconds);
+		}
+		RateLimiter::hit($rateKey, 60);
+		
+		$request->validate([
+			'audio'    => ['required', 'file', 'mimetypes:audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave', 'max:' . (int)config('ai_features.quickpost.max_audio_kb', 5120)],
+			'language' => ['nullable', 'string', 'max:20'],
+		]);
+		
+		$file = $request->file('audio');
+		$outcome = $this->service()->transcribe((string)$file->getRealPath(), $file->getMimeType(), $request->input('language'), $user, $request->ip());
+		
+		if (!$outcome['ok']) {
+			return $this->fail(trans($outcome['reason'] === 'empty' ? 'ai.qp_voice_no_speech' : 'ai.qp_voice_failed'), $outcome['reason'], 200);
+		}
+		
+		return response()->json(['success' => true, 'message' => null, 'result' => ['text' => $outcome['text']]]);
 	}
 	
 	private function fail(string $message, ?string $reason, int $status, ?LimitStatus $limit = null): JsonResponse

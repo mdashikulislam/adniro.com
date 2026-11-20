@@ -96,6 +96,7 @@ class AiProvider extends BaseModel
 			'openrouter'        => 'OPENROUTER_API_KEY',
 			'ollama'            => 'OLLAMA_API_KEY',
 			'openai-compatible' => 'OPENAI_COMPATIBLE_API_KEY',
+			'eleven'            => 'ELEVENLABS_API_KEY',
 			default             => null,
 		};
 		

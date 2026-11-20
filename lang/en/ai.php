@@ -338,6 +338,10 @@ return [
 	'qp_voice_time_up'     => 'That is the 60 second limit. You can tap the microphone again to add more.',
 	'qp_voice_hint'        => 'Tip: on a phone, you can tap the microphone key on your keyboard to dictate.',
 	'qp_voice_privacy'     => 'Voice input uses your browser\'s speech service; in Chrome, the audio is processed by Google.',
+	'qp_voice_recording' => 'Recording... Tap the button again when you are done (60 seconds at most).',
+	'qp_voice_transcribing' => 'Turning your voice into text...',
+	'qp_voice_failed' => 'We could not turn the recording into text. Please try again, or type instead.',
+	'qp_voice_server_privacy' => 'Your recording is sent to the AI service chosen by this site to turn it into text.',
 	
 	// Quick post: one-screen review
 	'qp_review_publish'     => 'Publish listing',

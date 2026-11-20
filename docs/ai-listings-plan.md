@@ -234,6 +234,7 @@ Found and fixed while checking:
 No core files were touched in this phase.
 
 ### Phase 9, polish: built on branch `ai` (2026-11-20)
+Committed as `afed6057`, together with the fixes listed under "After phase 9".
 Covered by 11 more tests in `tests/Feature/Ai/AiPolishTest.php`, so 148 in all.
 
 What exists:
@@ -273,6 +274,23 @@ Core files touched, each marked `adniro:ai`:
 - **API keys are now plain text.** At the owner's request, provider keys are stored and shown in full to admins: in the provider list and prefilled in the edit form. Before this, keys were encrypted with `APP_KEY`. Keys saved before an `APP_KEY` change could no longer be read, and saving a new key over them failed with "The MAC is invalid". Migration `2026_11_20_001000_store_ai_provider_keys_as_plain_text` decrypts readable keys and clears unreadable ones. The two local keys were unreadable and have to be entered again. Keys are still left out of JSON output and redacted from error messages. Emptying the field removes the key, and the provider then uses the `.env` key. Trade-off: anyone with database, backup or super admin access can read the keys.
 - **Honest evaluations.** In both evaluation commands, a failed call now always counts as a failure, shows its reason, and blocks a pass. A run stops after the first 3 calls fail the same way, and leaves the model's result unchanged.
 - **Unsent calls are not counted.** A call stopped before sending, such as with a missing key, no longer counts toward the daily call limit.
+
+### Phase 10, server-side speech-to-text: built on branch `ai` (2026-11-20)
+Optional, and off until an admin assigns a speech-to-text model in Settings > AI > Models. Covered by 10 more tests in `tests/Feature/Ai/TranscriptionTest.php` and `tests/Feature/Ai/QuickPostVoiceServerTest.php`, so 161 in all.
+
+What exists:
+- **`AiClientContract::transcribe()`,** implemented in `LaravelAiClient` with the Laravel AI SDK's `Transcription`. It uses the same provider registration, master switch, budget and call limit, usage log (feature `transcription`) and error redaction as the other features. The language is sent as an ISO 639-1 code, for example `bn` from `bn-BD`.
+- **Test model for speech models.** A model that handles speech-to-text and no structured output is tested with one second of generated silence. Any answer, even an empty one, passes.
+- **ElevenLabs.** It is added as a provider driver (`eleven`, key `ELEVENLABS_API_KEY`), for speech-to-text only. OpenAI, Gemini, Mistral, Groq, OpenRouter and OpenAI-compatible providers also offer speech-to-text through the SDK. Anthropic does not.
+- **Recorder fallback in the composer.** Browsers with their own speech recognition keep using it, because it is free and live. Others, such as Firefox and some in-app browsers, show the mic when a speech model is assigned.
+  - It records with `MediaRecorder` for up to 60 seconds and uploads to `POST posts/create/quick/transcribe`.
+  - The text is added to the box, with contact details removed.
+  - A line says the recording goes to the AI service chosen by the site.
+- **API:** `POST /api/quickpost/transcriptions`. The limit endpoint now also reports whether server voice is available.
+- **Limits.** Recordings are capped at 5 MB, with 10 a minute per person. They are not counted as AI posts. They are counted in the AI budget and the daily call limit.
+- **Texts.** The recorder's four messages are in all 9 languages.
+
+Not checked in a browser: the browser pane has its own speech recognition, so it never shows the recorder. That path is covered by tests of the endpoint and the composer template, and should be tried once in Firefox.
 
 ## 1. What we are building
 

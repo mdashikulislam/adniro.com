@@ -24,6 +24,12 @@ interface AiClientContract
 	public function structured(AiRequest $request): AiResult;
 	
 	/**
+	 * Turn a recording into text with the assigned speech-to-text model (or the given one, for
+	 * admin tests). The text is in AiResult::$data['text'].
+	 */
+	public function transcribe(string $audioPath, ?string $mimeType = null, ?string $language = null, ?int $userId = null, ?string $ip = null, ?AiModel $model = null): AiResult;
+	
+	/**
 	 * Send a small test request to a model and store the outcome on the model.
 	 */
 	public function testModel(AiModel $model): AiResult;

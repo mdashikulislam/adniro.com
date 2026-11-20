@@ -55,7 +55,11 @@ class QuickPostController extends BaseController
 				'photoUrl'     => url('posts/create/quick/photos'),
 				'photoLimit'   => $this->photoLimit(),
 				'photoMaxKb'   => (int)config('settings.upload.max_image_size', 1000),
-				'voice'        => $this->voiceLanguages(),
+				'voice'        => array_merge(self::voiceLanguages(), [
+					'server'    => $service->serverVoiceAvailable($user),
+					'serverUrl' => url('posts/create/quick/transcribe'),
+					'maxSeconds' => (int)config('ai_features.quickpost.max_audio_seconds', 60),
+				]),
 			])
 			->withHeaders(config('larapen.core.noCacheHeaders'));
 	}
@@ -182,6 +186,41 @@ class QuickPostController extends BaseController
 			'photo' => ['key' => array_key_last($photos), 'url' => $this->thumbUrl($path)],
 			'count' => count($photos),
 		], 200, $headers);
+	}
+	
+	/**
+	 * Voice for browsers without speech recognition: a recording becomes text through the
+	 * speech-to-text model assigned in Settings > AI (adniro:ai). Not counted as an AI post.
+	 */
+	public function transcribe(Request $request, QuickPostService $service): JsonResponse
+	{
+		$user = auth()->user();
+		$headers = config('larapen.core.noCacheHeaders');
+		
+		if (!$service->serverVoiceAvailable($user)) {
+			return response()->json(['ok' => false, 'message' => trans('ai.qp_voice_unavailable')], 403, $headers);
+		}
+		
+		$rateKey = 'quickpost-voice:' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
+		if (RateLimiter::tooManyAttempts($rateKey, 10)) {
+			return response()->json(['ok' => false, 'message' => trans('ai.qp_rate', ['seconds' => RateLimiter::availableIn($rateKey)])], 429, $headers);
+		}
+		RateLimiter::hit($rateKey, 60);
+		
+		$validator = validator($request->all(), [
+			'audio'    => ['required', 'file', 'mimetypes:audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave', 'max:' . (int)config('ai_features.quickpost.max_audio_kb', 5120)],
+			'language' => ['nullable', 'string', 'max:20'],
+		]);
+		if ($validator->fails()) {
+			return response()->json(['ok' => false, 'message' => trans('ai.qp_voice_failed')], 422, $headers);
+		}
+		
+		$file = $request->file('audio');
+		$outcome = $service->transcribe((string)$file->getRealPath(), $file->getMimeType(), $request->input('language'), $user, $request->ip());
+		
+		return $outcome['ok']
+			? response()->json(['ok' => true, 'text' => $outcome['text']], 200, $headers)
+			: response()->json(['ok' => false, 'message' => trans($outcome['reason'] === 'empty' ? 'ai.qp_voice_no_speech' : 'ai.qp_voice_failed')], 200, $headers);
 	}
 	
 	public function apply(Request $request, string $token, QuickPostService $service): RedirectResponse
