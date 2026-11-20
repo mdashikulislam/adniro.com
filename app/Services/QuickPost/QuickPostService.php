@@ -4,6 +4,7 @@ namespace App\Services\QuickPost;
 
 use App\Models\PostDraft;
 use App\Models\User;
+use App\Services\Ai\AiImage;
 use App\Services\Ai\AiRequest;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSettings;
@@ -18,6 +19,7 @@ use Illuminate\Support\Str;
 class QuickPostService
 {
 	public const FEATURE = 'quickpost_draft';
+	public const MAX_PHOTOS = 4;
 	
 	/** Remembered for the request: "Post an ad" links ask on every page. */
 	private array $availability = [];
@@ -64,13 +66,16 @@ class QuickPostService
 	}
 	
 	/**
-	 * @param array{session_id?: string, lat?: float|null, lon?: float|null, redraft_of?: string|null} $context
+	 * @param array{session_id?: string, lat?: float|null, lon?: float|null, redraft_of?: string|null, photos?: array<int, string>} $context
 	 * @return array{ok: bool, reason?: string, message?: string, draft?: PostDraft, limit: LimitStatus}
 	 */
 	public function draft(string $text, ?User $user, ?string $ip, string $locale, array $context = []): array
 	{
 		$text = trim($text);
-		$min = (int)config('ai_features.quickpost.min_text', 10);
+		$photos = array_slice(array_values(array_filter((array)($context['photos'] ?? []))), 0, self::MAX_PHOTOS);
+		
+		// With a photo, the text is optional
+		$min = empty($photos) ? (int)config('ai_features.quickpost.min_text', 10) : 0;
 		if (mb_strlen($text) < $min) {
 			return ['ok' => false, 'reason' => 'too_short', 'limit' => $this->limit->status($user, $ip)];
 		}
@@ -102,16 +107,26 @@ class QuickPostService
 				'country_code' => $countryCode ?: null,
 				'input_text'   => mb_substr($text, 0, (int)config('ai_features.quickpost.max_text', 2000)),
 				'input_meta'   => array_filter(['lat' => $context['lat'] ?? null, 'lon' => $context['lon'] ?? null], fn ($v) => !is_null($v)),
+				'picture_paths' => $photos ?: null,
 				'status'       => PostDraft::NEW,
 				'redraft_of'   => $parent?->id,
 				'expires_at'   => now()->addHours((int)config('ai_features.quickpost.draft_ttl', 48)),
 			]);
 			
+			$images = [];
+			foreach ($photos as $path) {
+				$image = AiImage::fromStorage((string)$path);
+				if ($image) {
+					$images[] = $image;
+				}
+			}
+			
 			$result = $this->client->structured(new AiRequest(
 				feature: self::FEATURE,
 				instructions: $this->prompt->instructions(),
-				prompt: $this->prompt->prompt($text, $locale, (string)config('country.name'), $currency),
+				prompt: $this->prompt->prompt($text, $locale, (string)config('country.name'), $currency, count($images)),
 				schema: DraftSchema::schema(),
+				images: $images,
 				maxTokens: (int)config('ai_features.quickpost.max_tokens', 3000),
 				timeoutSeconds: (int)config('ai_features.quickpost.timeout', 25),
 				userId: $user?->getKey() ? (int)$user->getKey() : null,
@@ -128,8 +143,10 @@ class QuickPostService
 				$draft->error = mb_substr($result->status . ($result->errorType ? ': ' . $result->errorType : ''), 0, 500);
 				$draft->save();
 				
-				// The form still works: the person's text goes into the description
-				$this->toPostInput->applyText($text);
+				// The form still works: the person's text goes into the description, the photos stay
+				if ($text !== '') {
+					$this->toPostInput->applyText($text);
+				}
 				
 				return ['ok' => false, 'reason' => 'ai_unavailable', 'draft' => $draft, 'limit' => $status];
 			}

@@ -4,6 +4,30 @@
 	<p class="text-muted mb-4">{{ trans('ai.qp_intro') }}</p>
 	
 	<form id="quickPostForm" novalidate>
+		{{-- Photos --}}
+		@php
+			$photos ??= [];
+			$photoLimit ??= 5;
+		@endphp
+		<div class="mb-3">
+			<div class="d-flex flex-wrap gap-2" id="qpPhotos" data-limit="{{ $photoLimit }}">
+				@foreach ($photos as $photo)
+					<div class="qp-photo position-relative" data-key="{{ $photo['key'] }}" style="width: 88px; height: 88px;">
+						<img src="{{ $photo['url'] }}" alt="" class="rounded border w-100 h-100" style="object-fit: cover;">
+						<button type="button" class="btn btn-sm btn-light rounded-circle position-absolute top-0 end-0 m-1 p-0 qp-photo-remove" style="width: 24px; height: 24px; line-height: 1;" aria-label="{{ trans('ai.qp_photo_remove') }}">&times;</button>
+					</div>
+				@endforeach
+				<label for="qpPhotoInput" id="qpPhotoTile"
+				       class="d-flex flex-column align-items-center justify-content-center rounded border border-2 text-center text-primary bg-body {{ count($photos) >= $photoLimit ? 'd-none' : '' }}"
+				       style="width: 88px; height: 88px; border-style: dashed !important; cursor: pointer;">
+					<i class="bi bi-camera fs-4"></i>
+					<span class="small lh-sm">{{ trans('ai.qp_photo_add') }}</span>
+				</label>
+			</div>
+			<input type="file" id="qpPhotoInput" class="d-none" accept="image/*" multiple>
+			<div class="form-text">{{ trans('ai.qp_photo_hint', ['limit' => $photoLimit]) }}</div>
+		</div>
+		
 		<label for="qpText" class="form-label fw-bold">{{ trans('ai.qp_text_label') }}</label>
 		<textarea id="qpText"
 		          name="text"

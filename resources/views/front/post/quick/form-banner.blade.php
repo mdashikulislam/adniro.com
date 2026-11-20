@@ -27,8 +27,8 @@
 	
 	@push('after_scripts_stack')
 		<script>
-			// The form only restores the chosen category (and loads its custom fields) after a
-			// validation error; a draft's category is shown the same way, once the page is ready
+			/* The form only restores the chosen category (and loads its custom fields) after a
+			   validation error; a draft's category is shown the same way, once the page is ready */
 			@if (!empty($qpInput['category_id']))
 				window.addEventListener('load', function () {
 					if (typeof getCategories === 'function' && typeof categoryWasSelected !== 'undefined' && !categoryWasSelected) {
@@ -47,7 +47,7 @@
 					post_type_id: () => document.getElementById('postTypeBloc'),
 					price: () => document.getElementById('priceBloc') || scope().querySelector('[name="price"]'),
 				};
-				// Only inside the listing form: the page head also has a <meta name="description">
+				/* Only inside the listing form: the page head also has a meta tag named "description" */
 				const scope = () => document.getElementById('payableForm') || document.body;
 				const find = (key) => {
 					if (targets[key]) {
@@ -88,7 +88,7 @@
 					});
 				};
 				apply();
-				// Custom fields arrive after the category loads them
+				/* Custom fields arrive after the category loads them */
 				const observer = new MutationObserver(apply);
 				observer.observe(document.body, {childList: true, subtree: true});
 				setTimeout(() => observer.disconnect(), 15000);

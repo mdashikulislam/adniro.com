@@ -269,7 +269,7 @@ return [
 	
 	// Quick post composer
 	'qp_title'            => 'Post with AI',
-	'qp_intro'            => 'Describe what you\'re selling in your own words. We fill in the listing for you, and you check it before it goes live.',
+	'qp_intro'            => 'Add a photo, describe what you\'re selling in your own words, or both. We fill in the listing for you, and you check it before it goes live.',
 	'qp_text_label'       => 'Describe what you\'re selling',
 	'qp_text_placeholder' => 'Example: iPhone 13, 128 GB, blue, small scratch on the back, battery 86%, 420 dollars, Dhaka',
 	'qp_use_location'     => 'Use my location',
@@ -277,11 +277,11 @@ return [
 	'qp_location_denied'  => 'Location not available',
 	'qp_submit'           => 'Create my listing',
 	'qp_fill_myself'      => 'Fill the form myself',
-	'qp_privacy'          => 'Your text is sent to the AI service chosen by this site to prepare your listing. Do not include phone numbers or emails; you add contact details in the form.',
+	'qp_privacy'          => 'Your text and photos are sent to the AI service chosen by this site to prepare your listing. Do not include phone numbers or emails; you add contact details in the form.',
 	'qp_progress_1'       => 'Reading your description...',
 	'qp_progress_2'       => 'Choosing the category and details...',
 	'qp_progress_3'       => 'Almost done...',
-	'qp_too_short'        => 'Please write at least :min characters about what you\'re selling.',
+	'qp_too_short'        => 'Please add a photo, or write at least :min characters about what you\'re selling.',
 	'qp_busy'             => 'Your previous request is still being prepared. Please wait a moment.',
 	'qp_rate'             => 'Too many requests. Please try again in :seconds seconds.',
 	'qp_unusable'         => 'We could not understand what you want to sell. Please describe the item in one sentence.',
@@ -292,6 +292,15 @@ return [
 	'qp_left_day'         => '{0} No AI posts left today|{1} 1 of :limit AI posts left today|[2,*] :left of :limit AI posts left today',
 	'qp_left_week'        => '{0} No AI posts left this week|{1} 1 of :limit AI posts left this week|[2,*] :left of :limit AI posts left this week',
 	'qp_left_month'       => '{0} No AI posts left this month|{1} 1 of :limit AI posts left this month|[2,*] :left of :limit AI posts left this month',
+	
+	// Quick post: photos
+	'qp_photo_add'     => 'Add photos',
+	'qp_photo_hint'    => 'Optional, up to :limit photos. A clear photo is often enough on its own. They go straight into your listing.',
+	'qp_photo_remove'  => 'Remove photo',
+	'qp_photo_limit'   => 'You can add up to :limit photos.',
+	'qp_photo_heic'    => 'This photo format (HEIC) cannot be read here. Please choose a JPEG or PNG photo, or set your camera to "Most compatible".',
+	'qp_photo_too_big' => 'This photo is too large. Please choose a smaller one.',
+	'qp_photo_failed'  => 'This photo could not be added. Please try another one.',
 	
 	// Quick post: banner on the listing form
 	'qp_banner_title' => 'We filled this in for you.',

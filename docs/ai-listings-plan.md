@@ -152,6 +152,7 @@ Core files touched, each marked `adniro:ai`:
 Not checked in a signed-in browser: the queue, reject form and history were checked through HTTP tests as a super admin, a listing editor and other staff. Signed-out requests to `/admin/moderation` and the approve action were checked on the local site and are sent to the login page.
 
 ### Phase 6, quick post from text: built on branch `ai` (2026-11-20)
+Committed as `32820647`.
 Off by default. Covered by 21 more tests in `tests/Feature/Ai/QuickPostTest.php`, so 123 in all.
 
 The whole path was also checked in the browser on the local site. A temporary local model pointed at a mock OpenAI-compatible server on `127.0.0.1`, so no outside service was called. "Create Listing" opened the composer, a sentence went through a real HTTP request, and the step 1 form opened with the banner. It had the category, title, description, price, tags, city, and both custom fields filled, with Check badges where confidence was below high. Stopping the mock showed the fallback, with the text in the description of the normal form. The composer was also checked at phone width. The temporary model, settings and rows were removed afterwards.
@@ -185,6 +186,32 @@ Core files touched, each marked `adniro:ai`:
 - `resources/views/front/post/createOrEdit/multiSteps/create/post.blade.php`: one banner include
 - `app/Http/Controllers/Web/Admin/UserController.php`: one line for the "AI limit" button
 - `app/Services/Ai/Support/SchemaRules.php` (from phase 1): nested empty values are valid too
+
+### Phase 7, quick post photos: built on branch `ai` (2026-11-20)
+Covered by 11 more tests in `tests/Feature/Ai/QuickPostPhotosTest.php`, so 134 in all. The quick post fixtures are now shared in `tests/Feature/Ai/QuickPostFixtures.php`.
+
+Checked in the browser on the local site against the local mock model, as in phase 6:
+- A 3000 × 2000 test image was given to the photo input. It was shrunk in the browser and uploaded, and its server thumbnail appeared in the composer.
+- With no text, "Create my listing" was enabled. The draft request carried the photo as a JPEG.
+- The form opened prefilled, and the photos step already showed the photo with no second upload. It was stored at 1000 × 667, about 52 KB, after the site's own resize.
+- Removing the photo from the composer deleted it.
+
+The temporary local setup was removed afterwards.
+
+What exists:
+- **Photo tile in the composer.** It has "Add photos" with up to the site's picture limit, thumbnails and remove buttons. The browser shrinks each photo to a 1600 px JPEG before upload, which also converts HEIC where the browser can read it. Photos are uploaded one per request.
+- **`POST posts/create/quick/photos`.** It validates against the site's image formats and size, stores through `TmpUpload::image()` in `temporary/{session uid}`, and appends to `session('picturesInput')`. Those are the folder and key the photos step uses. A HEIC file the server cannot read gets a clear message. Removing a photo uses the photos step's own delete action.
+- **Photos to the model.** Up to 4 photos are re-encoded at 1024 px. The prompt says how many are attached. With a photo, the text is optional. The draft row keeps the photo paths.
+- **Photo rules** in `resources/ai/quickpost-instructions.md`. The model uses what is clearly visible, trusts the text when the two disagree, and never copies contact details from photos or describes people. A blurry photo leads to a request for a clearer one. The prompt version is now `2026-11-20.2`.
+- **Fallbacks keep the photos.** When the AI fails, the photos stay for the normal form. When there is no text, the description is left alone.
+- **`ai:quickpost-purge`, run hourly.** It deletes expired drafts, and temporary uploads older than 48 hours from quick post and the normal form alike, with any folders left empty. It has a `--dry-run` option. This is decision 13, and it ends the old leak of abandoned uploads.
+
+Found and fixed while checking:
+- **An emptied template.** An editing slip emptied the composer template. The tests did not see it because they render only the form partial, while the page needs the site layout. A new test checks the compiled composer template for its form, overlay and script hooks.
+- **Line comments in inline scripts.** The app's HTML minifier removes line breaks when it is switched on, which would break `//` comments in inline scripts. The quick post scripts use block comments only, and the new test checks this.
+
+Core files touched, each marked `adniro:ai`:
+- `app/Console/Kernel.php`: one schedule line for the purge
 
 ## 1. What we are building
 
