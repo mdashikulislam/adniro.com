@@ -45,6 +45,8 @@
 		</div>
 	@endif
 	
+	@include('front.ai.moderation-banner', ['post' => $post]) {{-- adniro:ai --}}
+	
 	{{-- Archived listings message --}}
 	@if (!empty(data_get($post, 'archived_at')))
 		@include('front.common.spacer')

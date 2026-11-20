@@ -191,6 +191,7 @@
 																	</span>
 																@endif
 															@endif
+															@include('front.ai.moderation-badge', ['post' => $post]) {{-- adniro:ai --}}
 														</div>
 														@php
 															$listingDates = getListingDates($post, $pagePath);

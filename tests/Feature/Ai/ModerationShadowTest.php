@@ -327,20 +327,16 @@ class ModerationShadowTest extends TestCase
 	
 	// --- Sweep and evaluation ----------------------------------------------
 	
-	public function test_the_sweep_requeues_and_hands_over_stuck_listings(): void
+	public function test_outside_enforce_mode_the_sweep_releases_listings_left_waiting(): void
 	{
 		Queue::fake();
-		$recent = $this->insertPost(['moderation_status' => 'pending', 'updated_at' => now()->subMinutes(2)]);
-		$stuck = $this->insertPost(['moderation_status' => 'pending', 'updated_at' => now()->subMinutes(20)]);
-		$lost = $this->insertPost(['moderation_status' => 'pending', 'updated_at' => now()->subMinutes(90)]);
+		$waiting = $this->insertPost(['moderation_status' => 'pending', 'updated_at' => now()->subMinutes(2)]);
 		
 		$this->artisan('ai:moderation-sweep')->assertSuccessful();
 		
-		Queue::assertPushed(ModeratePost::class, 1);
-		Queue::assertPushed(ModeratePost::class, fn (ModeratePost $job) => $job->postId === $stuck->id);
-		$this->assertSame('pending', $recent->fresh()->moderation_status);
-		$this->assertSame('needs_review', $lost->fresh()->moderation_status);
-		$this->assertSame('sweep_timeout', PostModeration::query()->where('post_id', $lost->id)->sole()->rule);
+		Queue::assertNothingPushed();
+		$this->assertSame('approved', $waiting->fresh()->moderation_status);
+		$this->assertSame('enforce_off', PostModeration::query()->where('post_id', $waiting->id)->sole()->rule);
 	}
 	
 	public function test_the_evaluation_passes_a_model_that_labels_correctly_and_fails_one_that_does_not(): void

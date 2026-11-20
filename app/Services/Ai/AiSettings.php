@@ -73,13 +73,51 @@ class AiSettings
 	}
 	
 	/**
-	 * off: no check. shadow: every listing is checked and logged, nothing is hidden.
+	 * The mode chosen in Settings > AI > Moderation: off, shadow or enforce.
 	 */
-	public function moderationMode(): string
+	public function moderationModeSetting(): string
 	{
 		$mode = (string)($this->all()['moderation_mode'] ?? 'off');
 		
-		return in_array($mode, ['off', 'shadow'], true) ? $mode : 'off';
+		return in_array($mode, ['off', 'shadow', 'enforce'], true) ? $mode : 'off';
+	}
+	
+	/**
+	 * The mode in effect. off: no check. shadow: every listing is checked and logged, nothing is hidden.
+	 * enforce: decisions are applied. Enforce falls back to shadow until every assigned
+	 * moderation model has passed "php artisan ai:moderation-eval".
+	 */
+	public function moderationMode(): string
+	{
+		$mode = $this->moderationModeSetting();
+		
+		if ($mode === 'enforce' && !$this->moderationModelsPassedEval()) {
+			return 'shadow';
+		}
+		
+		return $mode;
+	}
+	
+	public function moderationModelsPassedEval(): bool
+	{
+		$ids = $this->modelIdsFor('moderation');
+		if (empty($ids)) {
+			return false;
+		}
+		
+		return \App\Models\AiModel::query()
+			->whereIn('id', $ids)
+			->whereNotNull('moderation_eval_passed_at')
+			->count() === count(array_unique($ids));
+	}
+	
+	/**
+	 * When the AI cannot be used (over budget, or no usable model): approve the listing,
+	 * or hold it for an admin.
+	 */
+	public function moderationWhenUnavailable(): string
+	{
+		return ($this->all()['moderation_when_unavailable'] ?? 'approve') === 'review' ? 'review' : 'approve';
 	}
 	
 	/** Checks per user (or IP for guests) per day. 0 means no limit. */

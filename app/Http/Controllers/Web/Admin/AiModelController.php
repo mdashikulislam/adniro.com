@@ -157,7 +157,13 @@ class AiModelController extends PanelController
 		
 		$model->refresh();
 		if ($model->only(self::RETEST_FIELDS) != $before) {
-			$model->forceFill(['last_test_ok' => null, 'last_tested_at' => null, 'last_test_error' => null])->save();
+			$model->forceFill([
+				'last_test_ok'              => null,
+				'last_tested_at'            => null,
+				'last_test_error'           => null,
+				'moderation_eval_passed_at' => null,
+				'quickpost_eval_passed_at'  => null,
+			])->save();
 			notification(trans('ai.model_retest_needed'), 'warning');
 		}
 		

@@ -35,6 +35,7 @@
 										<p class="mb-0">
 											{{ session('message') }} <a href="{{ url('/') }}">{{ t('Homepage') }}</a>
 										</p>
+										@include('front.ai.moderation-finish-note') {{-- adniro:ai --}}
 									</div>
 								</div>
 							</div>

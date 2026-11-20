@@ -33,6 +33,7 @@
 							<span class="listing-finish-icon"><i class="bi bi-check-lg"></i></span>
 							<h2 class="listing-finish-title">{{ t('congratulations') }}</h2>
 							<p class="listing-finish-text">{{ session('message') }}</p>
+							@include('front.ai.moderation-finish-note') {{-- adniro:ai --}}
 							<div class="listing-finish-actions">
 								<a href="{{ url('/') }}" class="btn btn-primary listing-finish-btn"><i class="bi bi-house-door"></i> {{ t('Homepage') }}</a>
 								@if (auth()->check())

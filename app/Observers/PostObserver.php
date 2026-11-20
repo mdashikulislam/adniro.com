@@ -226,6 +226,17 @@ class PostObserver extends BaseObserver
 			$postIsReviewed = (!empty($post->reviewed_at));
 			$postHasJustBeenReviewed = ($postIsReviewed && $postWasNotReviewed);
 			
+			// adniro:ai - the "listing is online" email waits until AI moderation approves the listing
+			$moderationGate = \App\Services\Ai\Moderation\OnlineEmailGate::decide($post);
+			if ($moderationGate !== \App\Services\Ai\Moderation\OnlineEmailGate::DEFAULT) {
+				$isLive = (config('settings.listing_form.listings_review_activation') != '1' || $postIsReviewed);
+				if ($moderationGate === \App\Services\Ai\Moderation\OnlineEmailGate::ANNOUNCE && $postIsVerified && $isLive) {
+					$post->notify(new PostReviewed($post));
+				}
+				
+				return;
+			}
+			
 			if ($postIsVerified) {
 				if (config('settings.listing_form.listings_review_activation') == '1') {
 					if ($postHasJustBeenReviewed) {

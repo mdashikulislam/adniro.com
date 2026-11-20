@@ -9,6 +9,7 @@ use Throwable;
 
 /*
  * A custom field value added, changed or removed sends the listing for a new check (adniro:ai).
+ * In enforce mode the listing is hidden until that check.
  */
 
 class PostValueModerationObserver
@@ -33,7 +34,16 @@ class PostValueModerationObserver
 	private function schedule(PostValue $value): void
 	{
 		try {
-			app(ModerationService::class)->schedule($value->post_id, ModerationTrigger::FIELDS);
+			$service = app(ModerationService::class);
+			
+			if (isFromAdminPanel()) {
+				$service->acceptAdminContent($value->post_id);
+				
+				return;
+			}
+			
+			$service->markPending($value->post_id);
+			$service->schedule($value->post_id, ModerationTrigger::FIELDS);
 		} catch (Throwable $e) {
 			report($e);
 		}

@@ -6,17 +6,20 @@ use App\Jobs\Ai\ModeratePost;
 use App\Models\AiUsageLog;
 use App\Models\Post;
 use App\Models\PostModeration;
+use App\Notifications\PostNotApproved;
 use App\Services\Ai\AiRequest;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSettings;
 use App\Services\Ai\Contracts\AiClientContract;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /*
  * Schedules and runs the AI check of a listing (adniro:ai).
  *
- * Phase 3 runs in shadow mode only: every decision is recorded in post_moderations,
- * and the listing itself is never changed.
+ * shadow: every decision is recorded in post_moderations, the listing is never changed.
+ * enforce: new and edited listings wait as "pending", then the decision is applied to the
+ * listing, and a rejection is emailed to its owner.
  */
 
 class ModerationService
@@ -50,6 +53,51 @@ class ModerationService
 	public function isActive(): bool
 	{
 		return $this->mode() !== 'off';
+	}
+	
+	public function isEnforcing(): bool
+	{
+		return $this->mode() === 'enforce';
+	}
+	
+	/**
+	 * In enforce mode, hide a listing whose photos or fields just changed until it is checked again.
+	 * (Text changes are marked in the same save by the post observer.)
+	 */
+	public function markPending(Post|int|string|null $post): void
+	{
+		if (isFromAdminPanel() || !$this->isEnforcing()) {
+			return;
+		}
+		
+		if (!$post instanceof Post) {
+			$post = empty($post) ? null : Post::query()->withoutGlobalScopes()->find($post);
+		}
+		if (!$post instanceof Post || $post->moderation_status === ModerationStatus::PENDING) {
+			return;
+		}
+		
+		$post->forceFill(['moderation_status' => ModerationStatus::PENDING])->save();
+	}
+	
+	/**
+	 * An admin's edit counts as a decision on that content, so it is never re-checked (enforce mode).
+	 */
+	public function acceptAdminContent(Post|int|string|null $post): void
+	{
+		if (!isFromAdminPanel() || !$this->isEnforcing()) {
+			return;
+		}
+		
+		if (!$post instanceof Post) {
+			$post = empty($post) ? null : Post::query()->withoutGlobalScopes()->find($post);
+		}
+		if (!$post instanceof Post) {
+			return;
+		}
+		
+		// No visible change, so no need to go through the model events
+		DB::table($post->getTable())->where('id', $post->getKey())->update(['moderation_hash' => ContentHash::for($post)]);
 	}
 	
 	/**
@@ -102,7 +150,18 @@ class ModerationService
 		}
 		
 		$hash = ContentHash::for($post);
-		if ($this->alreadyChecked($post, $hash)) {
+		$enforce = $mode === 'enforce';
+		
+		// The same content was decided before: reuse that decision, no AI call
+		$previous = $this->previousDecision($post, $hash);
+		if (!is_null($previous)) {
+			if ($enforce) {
+				[$status, $row] = $previous;
+				if ($post->moderation_status !== $status) {
+					$this->apply($post, $status, $hash, $row);
+				}
+			}
+			
 			return self::ALREADY_CHECKED;
 		}
 		
@@ -117,12 +176,15 @@ class ModerationService
 		
 		$limit = $this->limitReached($post);
 		if (!is_null($limit)) {
-			$this->record($base + [
+			$row = $this->record($base + [
 					'source'         => 'system',
 					'decided_status' => ModerationStatus::NEEDS_REVIEW,
 					'rule'           => $limit,
 					'error'          => $limit,
 				]);
+			if ($enforce) {
+				$this->apply($post, ModerationStatus::NEEDS_REVIEW, null, $row);
+			}
 			
 			return self::LIMITED;
 		}
@@ -142,18 +204,23 @@ class ModerationService
 			meta: ['trigger' => $trigger, 'policy' => Policy::VERSION],
 		));
 		
-		if ($result->status === AiResult::DISABLED) {
-			return self::SKIPPED;
-		}
-		
-		if ($result->status === AiResult::CAPPED) {
-			$this->record($base + [
-					'source' => 'system',
-					'rule'   => 'capped',
-					'error'  => 'capped: ' . $result->errorType,
+		// The AI cannot be used: over budget, or no usable model
+		if (in_array($result->status, [AiResult::DISABLED, AiResult::CAPPED], true)) {
+			if (!$enforce) {
+				if ($result->status === AiResult::CAPPED) {
+					$this->record($base + ['source' => 'system', 'rule' => 'capped', 'error' => 'capped: ' . $result->errorType]);
+					
+					return self::CAPPED;
+				}
+				
+				return self::SKIPPED;
+			}
+			
+			$this->release($post, $result->status === AiResult::CAPPED ? 'capped' : 'unavailable', $base + [
+					'error' => $result->status . ($result->errorType ? ': ' . $result->errorType : ''),
 				]);
 			
-			return self::CAPPED;
+			return $result->status === AiResult::CAPPED ? self::CAPPED : self::SKIPPED;
 		}
 		
 		if ($result->status === AiResult::ERROR) {
@@ -161,12 +228,15 @@ class ModerationService
 				return self::RETRY;
 			}
 			
-			$this->record($base + $this->modelColumns($result) + [
+			$row = $this->record($base + $this->modelColumns($result) + [
 					'source'         => 'system',
 					'decided_status' => ModerationStatus::NEEDS_REVIEW,
 					'rule'           => 'error',
 					'error'          => mb_substr(trim($result->errorType . ': ' . $result->errorMessage), 0, 500),
 				]);
+			if ($enforce) {
+				$this->apply($post, ModerationStatus::NEEDS_REVIEW, null, $row);
+			}
 			
 			return self::FAILED;
 		}
@@ -184,7 +254,7 @@ class ModerationService
 		
 		$mapped = VerdictMapper::map($result);
 		
-		$this->record($base + $this->modelColumns($result) + [
+		$row = $this->record($base + $this->modelColumns($result) + [
 				'source'          => 'ai',
 				'verdict'         => $mapped->verdict,
 				'decided_status'  => $mapped->status,
@@ -196,10 +266,37 @@ class ModerationService
 				'error'           => $result->ok() ? null : $result->status,
 			]);
 		
+		if ($enforce) {
+			$this->apply($fresh, $mapped->status, $hash, $row);
+		}
+		
 		return self::DECIDED;
 	}
 	
 	/**
+	 * Enforce mode, AI not usable: publish the listing or hold it for an admin,
+	 * as chosen in Settings > AI > Moderation. Also used by the sweep when enforce is switched off.
+	 */
+	public function release(Post $post, string $rule, array $attributes = []): void
+	{
+		$status = $this->settings->moderationWhenUnavailable() === 'review'
+			? ModerationStatus::NEEDS_REVIEW
+			: ModerationStatus::APPROVED;
+		
+		$row = $this->record(array_merge([
+			'post_id'        => $post->getKey(),
+			'mode'           => $this->mode(),
+			'policy_version' => Policy::VERSION,
+		], $attributes, [
+			'source'         => 'system',
+			'decided_status' => $status,
+			'rule'           => $rule,
+		]));
+		
+		$this->apply($post, $status, null, $row);
+	}
+	
+		/**
 	 * Called when the job itself crashed on its last try.
 	 */
 	public function recordFailure(int $postId, string $trigger, ?string $locale, Throwable $e): void
@@ -209,7 +306,7 @@ class ModerationService
 				return;
 			}
 			
-			$this->record([
+			$row = $this->record([
 				'post_id'        => $postId,
 				'trigger'        => $trigger,
 				'mode'           => $this->mode(),
@@ -220,6 +317,11 @@ class ModerationService
 				'rule'           => 'job_failed',
 				'error'          => mb_substr(class_basename($e) . ': ' . $e->getMessage(), 0, 500),
 			]);
+			
+			$post = Post::query()->withoutGlobalScopes()->find($postId);
+			if ($post && $this->isEnforcing() && $post->moderation_status === ModerationStatus::PENDING) {
+				$this->apply($post, ModerationStatus::NEEDS_REVIEW, null, $row);
+			}
 		} catch (Throwable $e) {
 			report($e);
 		}
@@ -240,20 +342,67 @@ class ModerationService
 	}
 	
 	/**
-	 * The same content was decided already: by an admin or an enforced decision (the hash on the
-	 * listing), or by an earlier AI check (shadow mode leaves the listing untouched).
+	 * The decision taken earlier on exactly this content, by the AI or an admin.
+	 * A matching hash on the listing without a recorded row is an admin edit, which counts as approved.
+	 *
+	 * @return array{0: string, 1: PostModeration|null}|null
 	 */
-	private function alreadyChecked(Post $post, string $hash): bool
+	private function previousDecision(Post $post, string $hash): ?array
 	{
-		if ($post->moderation_hash === $hash) {
-			return true;
-		}
-		
-		return PostModeration::query()
+		$row = PostModeration::query()
 			->where('post_id', $post->getKey())
 			->where('content_hash', $hash)
-			->where('source', 'ai')
-			->exists();
+			->whereIn('source', ['ai', 'human'])
+			->whereNotNull('decided_status')
+			->orderByDesc('id')
+			->first();
+		if ($row) {
+			return [$row->decided_status, $row];
+		}
+		
+		if ($post->moderation_hash === $hash) {
+			$status = $post->moderation_status === ModerationStatus::PENDING
+				? ModerationStatus::APPROVED
+				: $post->moderation_status;
+			
+			return [$status, null];
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Write a decision to the listing. save() goes through the model events, so cached queries are
+	 * cleared and the "listing is online" email goes out when it becomes approved.
+	 * A rejection is emailed once per decision.
+	 */
+	private function apply(Post $post, string $status, ?string $hash, ?PostModeration $row): void
+	{
+		$attributes = ['moderation_status' => $status, 'moderated_at' => now()];
+		if (!is_null($hash)) {
+			$attributes['moderation_hash'] = $hash;
+		}
+		$post->forceFill($attributes)->save();
+		
+		if (!$row) {
+			return;
+		}
+		
+		if (is_null($row->applied_status)) {
+			$row->applied_status = $status;
+			$row->save();
+		}
+		
+		if ($status === ModerationStatus::REJECTED && is_null($row->notified_at)) {
+			try {
+				$locale = $row->locale ?: ($post->user?->language_code ?: config('app.locale'));
+				$post->notify((new PostNotApproved($post, $row))->locale($locale));
+				$row->notified_at = now();
+				$row->save();
+			} catch (Throwable $e) {
+				report($e);
+			}
+		}
 	}
 	
 	private function limitReached(Post $post): ?string

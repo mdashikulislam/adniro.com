@@ -35,6 +35,7 @@ class AiSetting extends BaseSetting
 			'moderation_mode'              => 'off',
 			'moderation_user_daily_limit'  => '30',
 			'moderation_post_daily_limit'  => '10',
+			'moderation_when_unavailable'  => 'approve',
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -143,7 +144,7 @@ class AiSetting extends BaseSetting
 		$fields[] = [
 			'name'  => 'ai_moderation_info',
 			'type'  => 'custom_html',
-			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_moderation_info')) . '</div>',
+			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_moderation_info')) . '</div>' . self::moderationModeHtml(),
 			'tab'   => $tabName,
 		];
 		$fields[] = [
@@ -153,8 +154,21 @@ class AiSetting extends BaseSetting
 			'options' => [
 				'off'    => trans('ai.setting_moderation_mode_off'),
 				'shadow' => trans('ai.setting_moderation_mode_shadow'),
+				'enforce' => trans('ai.setting_moderation_mode_enforce'),
 			],
 			'hint'    => trans('ai.setting_moderation_mode_hint'),
+			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'moderation_when_unavailable',
+			'label'   => trans('ai.setting_moderation_unavailable_label'),
+			'type'    => 'select2_from_array',
+			'options' => [
+				'approve' => trans('ai.setting_moderation_unavailable_approve'),
+				'review'  => trans('ai.setting_moderation_unavailable_review'),
+			],
+			'hint'    => trans('ai.setting_moderation_unavailable_hint'),
 			'wrapper' => ['class' => 'col-md-6'],
 			'tab'     => $tabName,
 		];
@@ -231,6 +245,23 @@ class AiSetting extends BaseSetting
 				->toArray();
 		} catch (Throwable $e) {
 			return [];
+		}
+	}
+	
+	/**
+	 * Says which mode is really in effect: enforce needs models that passed the evaluation.
+	 */
+	private static function moderationModeHtml(): string
+	{
+		try {
+			$settings = app(\App\Services\Ai\AiSettings::class);
+			if ($settings->moderationModeSetting() !== 'enforce' || $settings->moderationModelsPassedEval()) {
+				return '';
+			}
+			
+			return '<div class="alert alert-warning">' . e(trans('ai.setting_moderation_enforce_blocked')) . '</div>';
+		} catch (Throwable $e) {
+			return '';
 		}
 	}
 	

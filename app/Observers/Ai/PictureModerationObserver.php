@@ -9,7 +9,7 @@ use Throwable;
 
 /*
  * A photo added, replaced or removed sends the listing for a new check (adniro:ai).
- * Reordering photos does not.
+ * Reordering photos does not. In enforce mode the listing is hidden until that check.
  */
 
 class PictureModerationObserver
@@ -34,7 +34,16 @@ class PictureModerationObserver
 	private function schedule(Picture $picture): void
 	{
 		try {
-			app(ModerationService::class)->schedule($picture->post_id, ModerationTrigger::PICTURES);
+			$service = app(ModerationService::class);
+			
+			if (isFromAdminPanel()) {
+				$service->acceptAdminContent($picture->post_id);
+				
+				return;
+			}
+			
+			$service->markPending($picture->post_id);
+			$service->schedule($picture->post_id, ModerationTrigger::PICTURES);
 		} catch (Throwable $e) {
 			report($e);
 		}

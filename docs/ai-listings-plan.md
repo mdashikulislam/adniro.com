@@ -69,6 +69,7 @@ Core files touched, each marked `adniro:ai`:
 Not done in this phase: owner banners and the "online" mail gate are phase 4. The admin queue is phase 5. The owner's view of a hidden listing was checked by tests, not in a signed-in browser.
 
 ### Phase 3, moderation in shadow mode: built on branch `ai` (2026-11-20)
+Committed as `232a5435`.
 Shadow mode only. Every check is recorded in `post_moderations`, and the listing itself is never changed. Moderation is off by default, so nothing runs until an admin picks shadow mode in Settings > AI > Moderation. Covered by 30 more tests in `tests/Unit/Ai/VerdictMapperTest.php` and `tests/Feature/Ai/ModerationShadowTest.php`, so 75 in all. No real provider was called, because no API key is set up.
 
 What exists:
@@ -95,6 +96,34 @@ Before phase 4:
 - Add a provider and model, then run `php artisan ai:moderation-eval` on the model. It makes 60 real calls.
 - Run shadow mode for about a week with a queue worker, and compare the `post_moderations` rows with your own judgement.
 - Phase 4 should only offer the enforce mode for a model whose evaluation passed.
+
+### Phase 4, enforce and notify: built on branch `ai` (2026-11-20)
+Covered by 13 more tests in `tests/Feature/Ai/ModerationEnforceTest.php`, so 88 in all. Moderation is still off locally, and no real provider was called.
+
+What exists:
+- **Enforce mode** in Settings > AI > Moderation. It only takes effect when every assigned moderation model has passed `ai:moderation-eval`. Until then, shadow mode stays in effect and the screen says so. Changing a model's settings clears its evaluation pass.
+- **Pending in the same save.** In enforce mode, a new listing and a text edit are saved as `pending`, so the listing is never public before its check. A photo or custom field change marks the listing `pending` before the check is queued.
+- **Decisions applied.** Approved and rejected listings get the content fingerprint and `moderated_at`. Errors, refusals and limits give `needs_review` without a fingerprint, so a later check can still run.
+- **Earlier decisions reused.** Returning to content that was decided before restores that decision with no AI call. An admin's edit counts as accepted content.
+- **"When the AI cannot be used"** is a new setting: publish (the default) or hold for an admin. It applies when the budget or call limit is reached, or no usable model is assigned.
+- **The "online" email waits.** `OnlineEmailGate` holds the app's "your listing is online" email until the listing is approved. It sends it when the listing goes live, and skips it when a listing that was already live is re-approved after an edit.
+- **Rejection email and SMS.** `PostNotApproved` gives the title, the category names, the cleaned reason, an Edit button, the fact that saving sends it for a new check, and a contact link. It is sent once per decision, in the language captured when the check was scheduled, to a verified email or by SMS for phone sign-ups. The AI's reason and the title are escaped.
+- **Owner messages.** A banner on the listing page for pending, in review and rejected (with categories, reason and Edit button), shown to the owner and staff only. A status badge in My Listings. A line on both finish pages while enforce is on.
+- **Sweep.** It now only looks at verified listings. When enforce is switched off, listings left waiting are published or held as the setting says.
+
+Differences from the plan above:
+- **Decision 4.** "AI down" is read as over budget or no usable model, which follows the new setting. A provider error after retries still goes to an admin, as decision 5 requires.
+- **Strings.** Email, SMS, banner and badge texts live in `lang/en/ai.php`, so core language files are untouched. Other languages fall back to English until phase 9.
+- **No admin alert yet.** Listings in review do not alert admins yet. That comes with the admin queue in phase 5.
+
+Core files touched, each marked `adniro:ai`:
+- `app/Observers/PostObserver.php`: the "online" email gate, about ten lines in `sendNotification()`
+- `app/Http/Controllers/Web/Admin/AiModelController.php`: clears evaluation passes
+- `resources/views/front/post/show/index.blade.php`: the owner banner
+- `resources/views/front/account/posts.blade.php`: the status badge
+- `resources/views/front/post/createOrEdit/multiSteps/create/finish.blade.php` and `.../singleStep/finish.blade.php`: the finish line
+
+Not checked in a signed-in browser: the banner, badge and finish line were checked by rendering the views in tests.
 
 ## 1. What we are building
 
