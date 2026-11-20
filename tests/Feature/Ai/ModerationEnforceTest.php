@@ -117,6 +117,35 @@ class ModerationEnforceTest extends TestCase
 		Notification::assertNotSentTo($fresh, PostReviewed::class);
 	}
 	
+	public function test_a_rejection_that_could_not_be_sent_is_not_marked_as_sent(): void
+	{
+		// Arrange: the owner's email is not verified, so there is no channel
+		$post = $this->insertPost(['moderation_status' => 'pending', 'email_verified_at' => now()]);
+		DB::table('posts')->where('id', $post->id)->update(['email' => null]);
+		$this->ai->answer(self::REJECT);
+		
+		// Act
+		$this->service()->moderate($post->id, ModerationTrigger::CREATED, 'en');
+		
+		// Assert
+		$this->assertSame('rejected', $post->fresh()->moderation_status);
+		$this->assertNull(PostModeration::query()->sole()->notified_at);
+	}
+	
+	public function test_a_failed_admin_alert_is_logged(): void
+	{
+		// Arrange: an urgent case with nobody to tell
+		\Illuminate\Support\Facades\Log::spy();
+		$post = $this->insertPost(['moderation_status' => 'pending']);
+		$this->ai->answer(['verdict' => 'reject', 'categories' => ['child_safety'], 'confidence' => 'high', 'user_reason' => '', 'internal_reason' => 'x']);
+		
+		// Act
+		$this->service()->moderate($post->id, ModerationTrigger::CREATED, 'en');
+		
+		// Assert
+		\Illuminate\Support\Facades\Log::shouldHaveReceived('log')->withArgs(fn ($level, $message) => $level === 'critical' && str_contains($message, 'Moderation alert'));
+	}
+	
 	public function test_the_rejection_email_explains_and_escapes(): void
 	{
 		$post = $this->insertPost(['title' => 'Party <script>x</script>']);
@@ -229,19 +258,111 @@ class ModerationEnforceTest extends TestCase
 		Notification::assertNothingSent();
 	}
 	
-	public function test_when_the_ai_is_unavailable_the_setting_decides(): void
+	public function test_when_no_model_can_be_used_the_setting_decides(): void
 	{
-		$this->ai->respond(fn () => AiResult::capped('daily_budget'));
-		
+		// Arrange
+		$this->ai->respond(fn () => AiResult::disabled('no_model'));
 		$approved = $this->insertPost(['moderation_status' => 'pending']);
-		$this->service()->moderate($approved->id, 'created');
-		$this->assertSame('approved', $approved->fresh()->moderation_status);
-		$this->assertSame('capped', PostModeration::query()->where('post_id', $approved->id)->sole()->rule);
 		
+		// Act
+		$this->service()->moderate($approved->id, 'created');
 		$this->setAi(['moderation_when_unavailable' => 'review']);
 		$held = $this->insertPost(['moderation_status' => 'pending', 'title' => 'Held one']);
 		$this->service()->moderate($held->id, 'created');
+		
+		// Assert
+		$this->assertSame('approved', $approved->fresh()->moderation_status);
+		$this->assertSame('unavailable', PostModeration::query()->where('post_id', $approved->id)->sole()->rule);
 		$this->assertSame('needs_review', $held->fresh()->moderation_status);
+	}
+	
+	public function test_when_the_budget_runs_out_listings_wait_for_an_admin(): void
+	{
+		// Arrange: "publish" is chosen for an unavailable AI, but spending must not publish everything
+		$this->setAi(['moderation_when_unavailable' => 'approve']);
+		$this->ai->respond(fn () => AiResult::capped('daily_budget'));
+		$post = $this->insertPost(['moderation_status' => 'pending']);
+		
+		// Act
+		$this->service()->moderate($post->id, 'created');
+		
+		// Assert
+		$this->assertSame('needs_review', $post->fresh()->moderation_status);
+		$this->assertSame('capped', PostModeration::query()->where('post_id', $post->id)->sole()->rule);
+	}
+	
+	public function test_a_listing_whose_photos_could_not_be_checked_goes_to_an_admin(): void
+	{
+		// Arrange: the photo file is missing, so the AI only sees the text
+		$post = $this->insertPost(['moderation_status' => 'pending']);
+		DB::table('pictures')->insert(['post_id' => $post->id, 'file_path' => 'files/missing.jpg', 'position' => 1, 'active' => 1]);
+		$this->ai->answer(self::ALLOW);
+		
+		// Act
+		$this->service()->moderate($post->id, 'created', 'en');
+		
+		// Assert
+		$this->assertSame('needs_review', $post->fresh()->moderation_status);
+		$row = PostModeration::query()->where('post_id', $post->id)->sole();
+		$this->assertSame('photos_not_checked', $row->rule);
+		$this->assertSame('allow', $row->verdict, 'the AI answer is kept for the admin');
+	}
+	
+	public function test_the_sweep_hands_listings_to_admins_when_enforce_lost_its_evaluation(): void
+	{
+		// Arrange: enforce is chosen but the model no longer counts as evaluated
+		$waiting = $this->insertPost(['moderation_status' => 'pending', 'updated_at' => now()->subMinutes(20)]);
+		$this->model->forceFill(['moderation_eval_passed_at' => null])->save();
+		
+		// Act
+		$this->artisan('ai:moderation-sweep')->assertSuccessful();
+		
+		// Assert
+		$this->assertSame('needs_review', $waiting->fresh()->moderation_status);
+		$this->assertSame('enforce_degraded', PostModeration::query()->where('post_id', $waiting->id)->sole()->rule);
+	}
+	
+	public function test_the_sweep_changes_nothing_when_the_settings_cannot_be_read(): void
+	{
+		// Arrange
+		$waiting = $this->insertPost(['moderation_status' => 'pending', 'updated_at' => now()->subMinutes(90)]);
+		$this->app->instance(AiSettings::class, new class extends AiSettings {
+			public function readFailed(): bool
+			{
+				return true;
+			}
+		});
+		$this->app->forgetInstance(ModerationService::class);
+		
+		// Act
+		$this->artisan('ai:moderation-sweep')->assertFailed();
+		
+		// Assert
+		$this->assertSame('pending', $waiting->fresh()->moderation_status);
+		$this->assertSame(0, PostModeration::query()->count());
+	}
+	
+	public function test_one_broken_listing_does_not_stop_the_sweep(): void
+	{
+		// Arrange
+		$this->setAi(['moderation_mode' => 'off']);
+		$first = $this->insertPost(['moderation_status' => 'pending']);
+		$second = $this->insertPost(['moderation_status' => 'pending', 'title' => 'Second']);
+		$released = [];
+		$service = \Mockery::mock($this->service());
+		$service->shouldReceive('release')->andReturnUsing(function (Post $post) use ($first, &$released) {
+			if ($post->id === $first->id) {
+				throw new \RuntimeException('broken listing');
+			}
+			$released[] = $post->id;
+		});
+		$this->app->instance(ModerationService::class, $service);
+		
+		// Act
+		$this->artisan('ai:moderation-sweep')->assertFailed();
+		
+		// Assert
+		$this->assertSame([$second->id], $released);
 	}
 	
 	public function test_the_sweep_requeues_and_hands_over_stuck_listings(): void

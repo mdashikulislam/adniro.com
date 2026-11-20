@@ -4,8 +4,8 @@ namespace App\Services\Ai\Moderation;
 
 use App\Jobs\Ai\ModeratePost;
 use App\Models\AiUsageLog;
-use App\Models\Post;
 use App\Models\Permission;
+use App\Models\Post;
 use App\Models\PostModeration;
 use App\Models\User;
 use App\Notifications\AdminModerationAlert;
@@ -14,8 +14,10 @@ use App\Services\Ai\AiRequest;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSettings;
 use App\Services\Ai\Contracts\AiClientContract;
+use App\Services\Ai\SecretRedactor;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Throwable;
 
@@ -295,23 +297,31 @@ class ModerationService
 			meta: ['trigger' => $trigger, 'policy' => Policy::VERSION],
 		));
 		
-		// The AI cannot be used: over budget, or no usable model
-		if (in_array($result->status, [AiResult::DISABLED, AiResult::CAPPED], true)) {
-			if (!$enforce) {
-				if ($result->status === AiResult::CAPPED) {
-					$this->record($base + ['source' => 'system', 'rule' => 'capped', 'error' => 'capped: ' . $result->errorType]);
-					
-					return self::CAPPED;
-				}
-				
-				return self::SKIPPED;
+		// Over the daily budget or call limit: the listing waits for an admin, whatever "When the AI
+		// cannot be used" says, so that spending the budget cannot publish everything
+		if ($result->status === AiResult::CAPPED) {
+			$row = $this->record($base + [
+					'source'         => 'system',
+					'decided_status' => $enforce ? ModerationStatus::NEEDS_REVIEW : null,
+					'rule'           => 'capped',
+					'error'          => 'capped: ' . $result->errorType,
+				]);
+			if ($enforce) {
+				$this->apply($post, ModerationStatus::NEEDS_REVIEW, null, $row);
 			}
 			
-			$this->release($post, $result->status === AiResult::CAPPED ? 'capped' : 'unavailable', $base + [
-					'error' => $result->status . ($result->errorType ? ': ' . $result->errorType : ''),
-				]);
+			return self::CAPPED;
+		}
+		
+		// No usable model: publish or hold, as chosen in Settings > AI > Moderation
+		if ($result->status === AiResult::DISABLED) {
+			if ($enforce) {
+				$this->release($post, 'unavailable', $base + [
+						'error' => $result->status . ($result->errorType ? ': ' . $result->errorType : ''),
+					]);
+			}
 			
-			return $result->status === AiResult::CAPPED ? self::CAPPED : self::SKIPPED;
+			return self::SKIPPED;
 		}
 		
 		if ($result->status === AiResult::ERROR) {
@@ -323,7 +333,7 @@ class ModerationService
 					'source'         => 'system',
 					'decided_status' => ModerationStatus::NEEDS_REVIEW,
 					'rule'           => 'error',
-					'error'          => mb_substr(trim($result->errorType . ': ' . $result->errorMessage), 0, 500),
+					'error'          => mb_substr(SecretRedactor::redact(trim($result->errorType . ': ' . $result->errorMessage)), 0, 500),
 				]);
 			if ($enforce) {
 				$this->apply($post, ModerationStatus::NEEDS_REVIEW, null, $row);
@@ -343,7 +353,7 @@ class ModerationService
 			return self::RESCHEDULED;
 		}
 		
-		$mapped = VerdictMapper::map($result);
+		$mapped = $this->holdIfPhotosUnchecked(VerdictMapper::map($result), $fresh, count($images));
 		
 		$row = $this->record($base + $this->modelColumns($result) + [
 				'source'          => 'ai',
@@ -364,6 +374,27 @@ class ModerationService
 		}
 		
 		return self::DECIDED;
+	}
+	
+	/**
+	 * An approval only covers the photos the AI saw. A photo that could not be read, or one past
+	 * the number sent, sends the listing to an admin. The AI's answer is kept for them.
+	 */
+	private function holdIfPhotosUnchecked(MappedVerdict $mapped, Post $post, int $checkedPhotos): MappedVerdict
+	{
+		if (!$mapped->isApproved() || ListingPayload::pictureCount($post) <= $checkedPhotos) {
+			return $mapped;
+		}
+		
+		return new MappedVerdict(
+			status: ModerationStatus::NEEDS_REVIEW,
+			verdict: $mapped->verdict,
+			categories: $mapped->categories,
+			confidence: $mapped->confidence,
+			userReason: $mapped->userReason,
+			internalReason: trim($mapped->internalReason . ' Some photos could not be checked.'),
+			rule: 'photos_not_checked',
+		);
 	}
 	
 	/**
@@ -408,7 +439,7 @@ class ModerationService
 				'policy_version' => Policy::VERSION,
 				'decided_status' => ModerationStatus::NEEDS_REVIEW,
 				'rule'           => 'job_failed',
-				'error'          => mb_substr(class_basename($e) . ': ' . $e->getMessage(), 0, 500),
+				'error'          => mb_substr(class_basename($e) . ': ' . SecretRedactor::redact($e->getMessage()), 0, 500),
 			]);
 			
 			$post = Post::query()->withoutGlobalScopes()->find($postId);
@@ -496,15 +527,35 @@ class ModerationService
 			$row->save();
 		}
 		
-		if ($status === ModerationStatus::REJECTED && is_null($row->notified_at)) {
-			try {
-				$locale = $row->locale ?: ($post->user?->language_code ?: config('app.locale'));
-				$post->notify((new PostNotApproved($post, $row))->locale($locale));
-				$row->notified_at = now();
-				$row->save();
-			} catch (Throwable $e) {
-				report($e);
+		if ($status === ModerationStatus::REJECTED && is_null($row->notified_at) && $this->notifyOwnerOfRejection($post, $row)) {
+			$row->notified_at = now();
+			$row->save();
+		}
+	}
+	
+	/**
+	 * Tell the owner why the listing was not approved. Sent at once (not queued), so true means
+	 * it really went out; false when the owner has no verified email or phone, or sending failed.
+	 */
+	private function notifyOwnerOfRejection(Post $post, PostModeration $row): bool
+	{
+		try {
+			$locale = $row->locale ?: ($post->user?->language_code ?: config('app.locale'));
+			$notification = (new PostNotApproved($post, $row))->locale($locale);
+			
+			if (empty($notification->via($post))) {
+				Log::warning('Rejected listing: the owner has no verified email or phone to be told.', ['post_id' => $post->getKey()]);
+				
+				return false;
 			}
+			
+			$post->notifyNow($notification);
+			
+			return true;
+		} catch (Throwable $e) {
+			Log::error('Rejected listing: the owner could not be told.', ['post_id' => $post->getKey(), 'error' => $e->getMessage()]);
+			
+			return false;
 		}
 	}
 	
@@ -529,6 +580,11 @@ class ModerationService
 			
 			$admins = User::query()->permission(Permission::getStaffPermissions())->get();
 			if ($admins->isEmpty()) {
+				Log::log($urgent ? 'critical' : 'warning', 'Moderation alert not sent: no staff account to send it to.', [
+					'post_id' => $post->getKey(),
+					'rule'    => $row->rule,
+				]);
+				
 				return;
 			}
 			
@@ -536,7 +592,11 @@ class ModerationService
 			Notification::send($admins, new AdminModerationAlert($post, $row, $skipped, $urgent));
 			Cache::put($hourKey, $sent + 1, now()->addHours(2));
 		} catch (Throwable $e) {
-			report($e);
+			Log::log($urgent ? 'critical' : 'error', 'Moderation alert could not be sent to the admins.', [
+				'post_id' => $post->getKey(),
+				'rule'    => $row->rule,
+				'error'   => $e->getMessage(),
+			]);
 		}
 	}
 	

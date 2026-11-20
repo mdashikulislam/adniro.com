@@ -179,7 +179,7 @@ class QuickPostPhotosTest extends TestCase
 		$expired = PostDraft::query()->create(['token' => str_repeat('a', 32), 'status' => 'drafted', 'expires_at' => now()->subHour()]);
 		$fresh = PostDraft::query()->create(['token' => str_repeat('b', 32), 'status' => 'drafted', 'expires_at' => now()->addHour()]);
 		
-		$this->artisan('ai:quickpost-purge', ['--dry-run' => true])->expectsOutputToContain('Would delete: 1 expired drafts, 1 temporary files')->assertSuccessful();
+		$this->artisan('ai:quickpost-purge', ['--dry-run' => true])->expectsOutputToContain('Would delete: 1 drafts (0 counted drafts kept for the AI post limit, emptied), 1 temporary files')->assertSuccessful();
 		$disk->assertExists('temporary/old1/a.jpg');
 		
 		$this->artisan('ai:quickpost-purge')->assertSuccessful();

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\PostModeration;
+use App\Notifications\Concerns\PlainMailText;
 use App\Services\Ai\Moderation\Policy;
 use Illuminate\Notifications\Messages\MailMessage;
 
@@ -13,6 +14,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class AdminModerationAlert extends BaseNotification
 {
+	use PlainMailText;
+	
 	protected ?object $post;
 	protected array $categories;
 	protected ?string $internalReason;
@@ -38,7 +41,7 @@ class AdminModerationAlert extends BaseNotification
 	
 	public function toMail($notifiable): MailMessage
 	{
-		$title = (string)str($this->post->title)->limit(60);
+		$title = self::plainMailText($this->post->title, 60);
 		
 		$message = (new MailMessage)
 			->subject(trans($this->urgent ? 'ai.alert_subject_urgent' : 'ai.alert_subject', ['title' => $title]))

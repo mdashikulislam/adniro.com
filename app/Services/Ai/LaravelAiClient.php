@@ -8,7 +8,6 @@ use App\Models\AiUsageLog;
 use App\Services\Ai\Agents\StructuredTaskAgent;
 use App\Services\Ai\Contracts\AiClientContract;
 use App\Services\Ai\Support\SchemaRules;
-use Illuminate\Support\Str;
 use Laravel\Ai\Ai;
 use Laravel\Ai\Transcription;
 use Laravel\Ai\Exceptions\FailoverableException;
@@ -55,7 +54,7 @@ class LaravelAiClient implements AiClientContract
 		}
 		
 		if (!$isAdminTest) {
-			$reason = $this->budget->check();
+			$reason = $this->budget->check($request->feature);
 			if (!is_null($reason)) {
 				$result = AiResult::capped($reason);
 				$this->log($request, null, $result);
@@ -107,7 +106,7 @@ class LaravelAiClient implements AiClientContract
 		}
 		
 		if (!$isAdminTest) {
-			$reason = $this->budget->check();
+			$reason = $this->budget->check('transcription');
 			if (!is_null($reason)) {
 				$result = AiResult::capped($reason);
 				$this->log($request, null, $result);
@@ -421,11 +420,7 @@ class LaravelAiClient implements AiClientContract
 	 */
 	private function safeMessage(Throwable $e): string
 	{
-		$message = $e->getMessage();
-		$message = preg_replace('/(sk|key|pk|xai|gsk)[-_][A-Za-z0-9_\-]{8,}/i', '[redacted]', $message) ?? $message;
-		$message = preg_replace('/Bearer\s+\S+/i', 'Bearer [redacted]', $message) ?? $message;
-		
-		return Str::limit(trim($message), 480);
+		return SecretRedactor::redact($e->getMessage());
 	}
 	
 	private function elapsedMs(int|float $started): int

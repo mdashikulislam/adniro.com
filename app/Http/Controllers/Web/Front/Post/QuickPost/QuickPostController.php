@@ -82,7 +82,7 @@ class QuickPostController extends BaseController
 				'ok'      => false,
 				'reason'  => 'rate',
 				'message' => trans('ai.qp_rate', ['seconds' => RateLimiter::availableIn($rateKey)]),
-			], 429, $headers);
+			], 429, $headers ?? []);
 		}
 		RateLimiter::hit($rateKey, 60);
 		
@@ -146,6 +146,11 @@ class QuickPostController extends BaseController
 			return response()->json(['ok' => false, 'message' => trans('ai.qp_unavailable')], 403, $headers);
 		}
 		
+		$throttled = $this->throttled('quickpost-photo', (int)config('ai_features.quickpost.photo_rate', 20), $request, $headers);
+		if ($throttled) {
+			return $throttled;
+		}
+		
 		$file = $request->file('photo');
 		$allowed = collect(getServerAllowedImageFormats())->join(',');
 		$validator = validator(['photo' => $file], [
@@ -201,11 +206,10 @@ class QuickPostController extends BaseController
 			return response()->json(['ok' => false, 'message' => trans('ai.qp_voice_unavailable')], 403, $headers);
 		}
 		
-		$rateKey = 'quickpost-voice:' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
-		if (RateLimiter::tooManyAttempts($rateKey, 10)) {
-			return response()->json(['ok' => false, 'message' => trans('ai.qp_rate', ['seconds' => RateLimiter::availableIn($rateKey)])], 429, $headers);
+		$throttled = $this->throttled('quickpost-voice', (int)config('ai_features.quickpost.voice_rate', 10), $request, $headers);
+		if ($throttled) {
+			return $throttled;
 		}
-		RateLimiter::hit($rateKey, 60);
 		
 		$validator = validator($request->all(), [
 			'audio'    => ['required', 'file', 'mimetypes:audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave', 'max:' . (int)config('ai_features.quickpost.max_audio_kb', 5120)],
@@ -398,5 +402,24 @@ class QuickPostController extends BaseController
 		return trans('ai.qp_limit_reached', [
 			'when' => $limit->resetsAt?->setTimezone((string)config('app.timezone', 'UTC'))->isoFormat('LLL') ?? '',
 		]);
+	}
+	
+	/**
+	 * A per-minute limit per account, or per IP address for guests. Null when the request may go on.
+	 */
+	private function throttled(string $prefix, int $perMinute, Request $request, ?array $headers): ?JsonResponse
+	{
+		$user = auth()->user();
+		$rateKey = $prefix . ':' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
+		
+		if (RateLimiter::tooManyAttempts($rateKey, max(1, $perMinute))) {
+			return response()->json([
+				'ok'      => false,
+				'message' => trans('ai.qp_rate', ['seconds' => RateLimiter::availableIn($rateKey)]),
+			], 429, $headers ?? []);
+		}
+		RateLimiter::hit($rateKey, 60);
+		
+		return null;
 	}
 }

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\PostModeration;
+use App\Notifications\Concerns\PlainMailText;
 use App\Services\Ai\Moderation\Policy;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\VonageMessage;
@@ -20,6 +21,8 @@ use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class PostNotApproved extends BaseNotification
 {
+	use PlainMailText;
+	
 	protected ?object $post;
 	protected array $categories;
 	protected ?string $reason;
@@ -65,11 +68,11 @@ class PostNotApproved extends BaseNotification
 	
 	public function toMail($notifiable): MailMessage
 	{
-		$title = (string)str($this->post->title)->limit(80);
+		$title = self::plainMailText($this->post->title, 80);
 		$appName = (string)config('app.name');
 		
 		$message = (new MailMessage)
-			->subject(trans('ai.mail_not_approved_subject', ['title' => (string)str($this->post->title)->limit(50)]))
+			->subject(trans('ai.mail_not_approved_subject', ['title' => self::plainMailText($this->post->title, 50)]))
 			->greeting(trans('ai.mail_not_approved_greeting'))
 			->line(e(trans('ai.mail_not_approved_intro', ['title' => $title, 'appName' => $appName])));
 		

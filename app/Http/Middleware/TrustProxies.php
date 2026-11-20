@@ -29,6 +29,27 @@ class TrustProxies extends Middleware
 	protected $proxies = '*';
 	
 	/**
+	 * From config('app.trusted_proxies') (TRUSTED_PROXIES): "*" trusts any proxy, a comma-separated
+	 * list trusts only those addresses or ranges, and an empty value trusts none. Behind a known
+	 * proxy, list it: trusting every proxy lets clients forge their IP address (adniro:ai).
+	 *
+	 * @return array<int, string>|string|null
+	 */
+	protected function proxies()
+	{
+		$value = trim((string)config('app.trusted_proxies', '*'));
+		
+		if ($value === '') {
+			return null;
+		}
+		if (in_array($value, ['*', '**'], true)) {
+			return $value;
+		}
+		
+		return array_values(array_filter(array_map('trim', explode(',', $value))));
+	}
+	
+	/**
 	 * The headers that should be used to detect proxies.
 	 *
 	 * @var int

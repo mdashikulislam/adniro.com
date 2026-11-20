@@ -16,10 +16,15 @@ use Illuminate\Support\Facades\Cache;
  * failed calls and the first two re-drafts of a draft are not counted. Periods follow the
  * calendar in the site's timezone: a day resets at midnight, a week on Monday, a month on the 1st.
  * The count is read from post_drafts, so a changed limit or period applies at once.
+ * created_at is stored in the app's timezone, so the period bounds are compared as they are,
+ * without converting them to UTC.
  */
 
 class AiPostLimit
 {
+	/** Period of a per-user limit when the site itself has no limit. */
+	public const OVERRIDE_PERIOD = 'day';
+	
 	public function __construct(private readonly AiSettings $settings)
 	{
 	}
@@ -30,6 +35,8 @@ class AiPostLimit
 		
 		if ($user && !is_null($user->ai_post_limit)) {
 			$limit = (int)$user->ai_post_limit;
+			// A per-user limit on a site without one counts per day
+			$period = ($period === 'none') ? self::OVERRIDE_PERIOD : $period;
 		}
 		
 		if ($period === 'none') {
@@ -38,13 +45,13 @@ class AiPostLimit
 		
 		[$start, $end] = $this->periodBounds($period);
 		
-		$query = PostDraft::query()->where('counted', true)->where('created_at', '>=', $start->utc());
+		$query = PostDraft::query()->where('counted', true)->where('created_at', '>=', $start);
 		
 		// An admin reset: only drafts made after it count
 		if ($user && !empty($user->ai_post_reset_at)) {
 			$resetAt = CarbonImmutable::parse($user->ai_post_reset_at);
 			if ($resetAt->greaterThanOrEqualTo($start)) {
-				$query->where('created_at', '>', $resetAt->utc());
+				$query->where('created_at', '>', $resetAt);
 			}
 		}
 		if ($user) {
@@ -54,6 +61,22 @@ class AiPostLimit
 		}
 		
 		return new LimitStatus($limit, $query->count(), $period, $end);
+	}
+	
+	/**
+	 * All guests together: a forged X-Forwarded-For header gives a new per-IP limit, so guest drafts
+	 * also stop at a site-wide number per day. 0 means no cap.
+	 */
+	public function guestCapReached(): bool
+	{
+		$cap = (int)config('ai_features.quickpost.guest_daily_cap', 200);
+		if ($cap <= 0) {
+			return false;
+		}
+		
+		[$start] = $this->periodBounds('day');
+		
+		return PostDraft::query()->where('counted', true)->whereNull('user_id')->where('created_at', '>=', $start)->count() >= $cap;
 	}
 	
 	/**

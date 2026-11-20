@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Picture;
 use App\Models\Post;
 use App\Models\PostValue;
+use App\Models\Setting;
 use App\Observers\Ai\PictureModerationObserver;
 use App\Observers\Ai\PostModerationObserver;
 use App\Observers\Ai\PostValueModerationObserver;
@@ -13,6 +14,7 @@ use App\Services\Ai\AiModelResolver;
 use App\Services\Ai\AiSettings;
 use App\Services\Ai\Contracts\AiClientContract;
 use App\Services\Ai\LaravelAiClient;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 
 /*
@@ -35,6 +37,10 @@ class AiServiceProvider extends ServiceProvider
 	
 	public function boot(): void
 	{
+		// AI settings are read once per request or job: read them again between jobs and after a save
+		Queue::looping(fn () => $this->flushAiSettings());
+		Setting::saved(fn (Setting $setting) => $setting->name === 'ai' ? $this->flushAiSettings() : null);
+		
 		// Listing moderation: added next to the app's own observers, so no core observer changes
 		Post::observe(PostModerationObserver::class);
 		Picture::observe(PictureModerationObserver::class);
@@ -45,6 +51,13 @@ class AiServiceProvider extends ServiceProvider
 			foreach (['saved', 'deleted'] as $event) {
 				$model::$event(fn () => \App\Services\QuickPost\CatalogBuilder::invalidate());
 			}
+		}
+	}
+	
+	private function flushAiSettings(): void
+	{
+		if ($this->app->resolved(AiSettings::class)) {
+			$this->app->make(AiSettings::class)->flush();
 		}
 	}
 }

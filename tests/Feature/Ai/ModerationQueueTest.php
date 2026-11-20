@@ -182,6 +182,35 @@ class ModerationQueueTest extends TestCase
 		Notification::assertNotSentTo(User::all(), AdminModerationAlert::class);
 	}
 	
+	public function test_rejecting_a_listing_whose_owner_cannot_be_told_warns_the_admin(): void
+	{
+		// Arrange: no verified email, no phone
+		$post = $this->insertPost(['moderation_status' => 'needs_review', 'email_verified_at' => null, 'title' => '<b>Sofa</b>']);
+		
+		// Act
+		$this->actingAs($this->admin)->post('/admin/moderation/' . $post->id . '/reject', ['categories' => ['scam_fraud']])->assertRedirect();
+		
+		// Assert
+		$this->assertNull(PostModeration::query()->where('source', 'human')->sole()->notified_at);
+		Notification::assertNotSentTo($post->fresh(), PostNotApproved::class);
+		$flash = json_encode(session()->all());
+		$this->assertStringContainsString('could not be told', $flash);
+		$this->assertStringNotContainsString('<b>Sofa', $flash, 'the title is escaped');
+	}
+	
+	public function test_a_rerun_is_not_swallowed_by_a_waiting_check(): void
+	{
+		// Arrange
+		$post = $this->insertPost(['moderation_status' => 'needs_review']);
+		
+		// Act
+		$normal = new \App\Jobs\Ai\ModeratePost($post->id, 'updated');
+		$forced = new \App\Jobs\Ai\ModeratePost($post->id, 'rerun', null, true);
+		
+		// Assert
+		$this->assertNotSame($normal->uniqueId(), $forced->uniqueId());
+	}
+	
 	public function test_rerun_queues_a_forced_check(): void
 	{
 		Queue::fake();

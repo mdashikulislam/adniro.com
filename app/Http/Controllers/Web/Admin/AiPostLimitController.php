@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Admin;
 
+use App\Models\Permission;
 use App\Models\User;
 use App\Services\QuickPost\AiPostLimit;
 use Illuminate\Http\Request;
@@ -55,6 +56,19 @@ class AiPostLimitController extends Controller
 		$user = User::query()->withoutGlobalScopes()->find((int)$id);
 		abort_if(empty($user), 404);
 		
+		// Only a super admin may change a super admin's AI limit
+		abort_if(self::isSuperAdmin($user) && !userHasSuperAdminPermissions(), 403, trans('admin.forbidden'));
+		
 		return $user;
+	}
+	
+	/** Same test as userHasSuperAdminPermissions(), for any user. */
+	private static function isSuperAdmin(User $user): bool
+	{
+		$permissions = collect(Permission::getSuperAdminPermissions())
+			->reject(fn ($item) => in_array($item, Permission::getStaffPermissions()))
+			->all();
+		
+		return !empty($permissions) && doesUserHavePermission($user, $permissions);
 	}
 }

@@ -102,7 +102,7 @@ class ModerationQueueController extends Controller
 		$post = $this->findPost($id);
 		$service->decideByAdmin($post, ModerationStatus::APPROVED, auth()->user());
 		
-		notification(trans('ai.queue_approved', ['title' => str($post->title)->limit(40)]), 'success');
+		notification(trans('ai.queue_approved', ['title' => e(str($post->title)->limit(40))]), 'success');
 		
 		return redirect()->back();
 	}
@@ -120,9 +120,12 @@ class ModerationQueueController extends Controller
 			'reason'     => trans('ai.queue_reason'),
 		]);
 		
-		$service->decideByAdmin($post, ModerationStatus::REJECTED, auth()->user(), $data['categories'], $data['reason'] ?? null);
+		$row = $service->decideByAdmin($post, ModerationStatus::REJECTED, auth()->user(), $data['categories'], $data['reason'] ?? null);
 		
-		notification(trans('ai.queue_rejected', ['title' => str($post->title)->limit(40)]), 'success');
+		$title = e(str($post->title)->limit(40)); // the toast renders HTML
+		empty($row->notified_at)
+			? notification(trans('ai.queue_rejected_not_notified', ['title' => $title]), 'warning')
+			: notification(trans('ai.queue_rejected', ['title' => $title]), 'success');
 		
 		return redirect()->to(urlGen()->adminUrl('moderation'));
 	}

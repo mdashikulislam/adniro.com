@@ -3,6 +3,7 @@
 namespace App\Services\Ai\Moderation;
 
 use App\Services\Ai\AiResult;
+use App\Services\Ai\ContactStripper;
 
 /*
  * Turns a model's labels into a moderation status with fixed rules (adniro:ai).
@@ -69,10 +70,7 @@ final class VerdictMapper
 	 */
 	public static function cleanUserReason(?string $text): ?string
 	{
-		$text = strip_tags((string)$text);
-		$text = preg_replace('~\b(?:https?://|www\.)\S+~iu', '', $text) ?? '';
-		$text = preg_replace('~[\w.+-]+@[\w-]+(?:\.[\w-]+)+~u', '', $text) ?? '';
-		$text = preg_replace('~\+?\d[\d\s().-]{6,}\d~u', '', $text) ?? '';
+		$text = ContactStripper::strip(strip_tags((string)$text));
 		$text = trim(preg_replace('~\s+~u', ' ', $text) ?? '');
 		$text = preg_replace('~\s+([.,;:!?])~u', '$1', $text) ?? '';
 		

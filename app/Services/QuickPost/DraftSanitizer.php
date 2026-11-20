@@ -5,6 +5,7 @@ namespace App\Services\QuickPost;
 use App\Enums\PostType;
 use App\Models\Category;
 use App\Models\Field;
+use App\Services\Ai\ContactStripper;
 use App\Services\Ai\Moderation\Policy;
 use Carbon\Carbon;
 use Throwable;
@@ -224,10 +225,7 @@ class DraftSanitizer
 	 */
 	public static function clean(string $text, int $max, bool $singleLine = false): string
 	{
-		$text = strip_tags(html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-		$text = preg_replace('~\b(?:https?://|www\.)\S+~iu', '', $text) ?? '';
-		$text = preg_replace('~[\w.+-]+@[\w-]+(?:\.[\w-]+)+~u', '', $text) ?? '';
-		$text = preg_replace('~\+?\d[\d\s().-]{7,}\d~u', '', $text) ?? '';
+		$text = ContactStripper::strip(strip_tags(html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
 		$text = $singleLine
 			? preg_replace('/\s+/u', ' ', $text)
 			: preg_replace("/[ \t]+/u", ' ', preg_replace("/\n{3,}/u", "\n\n", str_replace("\r", '', $text)) ?? '');

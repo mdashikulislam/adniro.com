@@ -71,6 +71,10 @@ return [
     | is set to "UTC" by default as it is suitable for most use cases.
     |
     */
+
+    // adniro:ai — proxies whose X-Forwarded-* headers are trusted (see App\Http\Middleware\TrustProxies)
+    'trusted_proxies' => env('TRUSTED_PROXIES', '*'),
+
 	
     'timezone' => function_exists('env') ? env('TIMEZONE', 'UTC') : 'UTC',
 	

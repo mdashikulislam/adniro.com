@@ -114,9 +114,8 @@ class QuickPostService
 			return ['ok' => false, 'reason' => 'too_short', 'limit' => $this->limit->status($user, $ip)];
 		}
 		
-		// Re-drafting the same draft is free a couple of times
-		$parent = $this->ownedDraft($context['redraft_of'] ?? null, $user, $context['session_id'] ?? null);
-		$free = $parent && $parent->redrafts < (int)config('ai_features.quickpost.free_redrafts', 2);
+		// Re-drafting is free a couple of times per counted draft, shared by its whole chain
+		$root = $this->redraftRoot($context['redraft_of'] ?? null, $user, $context['session_id'] ?? null);
 		
 		$lock = $this->limit->lock($user, $ip);
 		if (!$lock->get()) {
@@ -124,8 +123,11 @@ class QuickPostService
 		}
 		
 		try {
+			// Read inside the lock, so parallel re-drafts cannot share the last free one
+			$root = $root?->fresh();
+			$free = $root && $root->redrafts < (int)config('ai_features.quickpost.free_redrafts', 2);
 			$status = $this->limit->status($user, $ip);
-			if (!$free && $status->reached()) {
+			if (!$free && ($status->reached() || (!$user && $this->limit->guestCapReached()))) {
 				return ['ok' => false, 'reason' => 'limit', 'limit' => $status];
 			}
 			
@@ -143,7 +145,7 @@ class QuickPostService
 				'input_meta'   => array_filter(['lat' => $context['lat'] ?? null, 'lon' => $context['lon'] ?? null], fn ($v) => !is_null($v)),
 				'picture_paths' => $photos ?: null,
 				'status'       => PostDraft::NEW,
-				'redraft_of'   => $parent?->id,
+				'redraft_of'   => $root?->id,
 				'expires_at'   => now()->addHours((int)config('ai_features.quickpost.draft_ttl', 48)),
 			]);
 			
@@ -217,7 +219,7 @@ class QuickPostService
 			$draft->save();
 			
 			if ($free) {
-				$parent->increment('redrafts');
+				$root->increment('redrafts');
 			}
 			
 			return ['ok' => true, 'draft' => $draft, 'limit' => $this->limit->status($user, $ip)];
@@ -242,6 +244,34 @@ class QuickPostService
 		$draft->save();
 		
 		return true;
+	}
+	
+	/**
+	 * The counted draft whose free re-drafts a re-draft of $token uses. A free re-draft points to
+	 * its root through redraft_of, so a chain of re-drafts shares one allowance. Drafts that were
+	 * never counted (failed or unusable) give no free re-drafts.
+	 */
+	private function redraftRoot(?string $token, ?User $user, ?string $sessionId): ?PostDraft
+	{
+		$parent = $this->ownedDraft($token, $user, $sessionId);
+		if (!$parent) {
+			return null;
+		}
+		if ($parent->counted) {
+			return $parent;
+		}
+		
+		$root = empty($parent->redraft_of) ? null : PostDraft::query()->find($parent->redraft_of);
+		if (!$root || !$root->counted) {
+			return null;
+		}
+		
+		// Members are matched by account, guests by browser session
+		$sameOwner = is_null($parent->user_id)
+			? (is_null($root->user_id) && (string)$root->session_id === (string)$parent->session_id)
+			: (int)$root->user_id === (int)$parent->user_id;
+		
+		return $sameOwner ? $root : null;
 	}
 	
 	public function ownedDraft(?string $token, ?User $user, ?string $sessionId): ?PostDraft

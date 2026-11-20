@@ -162,8 +162,9 @@ Route::middleware(['admin', 'clearance', 'banned.user', 'no.http.cache'])
 			->where('table', '[^/]+')
 			->where('field', '[^/]+');
 		
-		// Backup
+		// Backup. Backups contain the AI provider keys, so only super admins (adniro:ai)
 		Route::controller(BackupController::class)
+			->middleware(\App\Http\Middleware\SuperAdminOnly::class)
 			->group(function ($router) {
 				Route::get('backups', 'index');
 				Route::put('backups/create', 'create');

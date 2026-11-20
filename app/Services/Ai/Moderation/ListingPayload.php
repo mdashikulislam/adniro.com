@@ -61,6 +61,12 @@ final class ListingPayload
 	 *
 	 * @return array<int, \Laravel\Ai\Files\Base64Image>
 	 */
+	/** Every photo of the listing, including those past MAX_PICTURES. */
+	public static function pictureCount(Post $post): int
+	{
+		return Picture::query()->withoutGlobalScopes()->where('post_id', $post->getKey())->count();
+	}
+	
 	public static function images(Post $post): array
 	{
 		$paths = Picture::query()
@@ -69,17 +75,24 @@ final class ListingPayload
 			->orderBy('position')
 			->orderBy('id')
 			->limit(self::MAX_PICTURES)
+			->toBase() // raw paths: the model's accessor puts a placeholder image in place of a missing file
 			->pluck('file_path');
 		
 		$images = [];
 		foreach ($paths as $path) {
-			$image = AiImage::fromStorage((string)$path);
+			$image = AiImage::fromStorage(self::currentPath((string)$path));
 			if ($image) {
 				$images[] = $image;
 			}
 		}
 		
 		return $images;
+	}
+	
+	/** Old uploads were stored under pictures/, now files/ (as Picture::filePath() does). */
+	private static function currentPath(string $path): string
+	{
+		return str_contains($path, 'pictures/') ? 'files/' . last(explode('pictures/', $path)) : $path;
 	}
 	
 	/**

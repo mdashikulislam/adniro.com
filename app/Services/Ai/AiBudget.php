@@ -11,6 +11,8 @@ use Throwable;
  *
  * Two counters per calendar day in the app's timezone: spend in micro-dollars and calls.
  * They live in the cache and are rebuilt from ai_usage_logs when missing.
+ * The last 20% is kept for moderation: running out of budget on drafts must not leave
+ * new listings unchecked.
  */
 
 class AiBudget
@@ -18,20 +20,29 @@ class AiBudget
 	public const DAILY_BUDGET = 'daily_budget';
 	public const DAILY_CALL_LIMIT = 'daily_call_limit';
 	
+	/** Feature that may use the whole budget. The others stop earlier, so listings can still be checked. */
+	public const RESERVED_FOR = 'moderation';
+	
+	/** Share of the daily budget and call limit open to features other than moderation. */
+	public const OTHER_FEATURES_SHARE = 0.8;
+	
 	public function __construct(private readonly AiSettings $settings) {}
 	
 	/**
+	 * @param string|null $feature The calling feature; null checks against the whole budget
 	 * @return string|null Null when a call is allowed, otherwise the reason it is not
 	 */
-	public function check(): ?string
+	public function check(?string $feature = null): ?string
 	{
+		$share = (is_null($feature) || $feature === self::RESERVED_FOR) ? 1.0 : self::OTHER_FEATURES_SHARE;
+		
 		$budget = $this->settings->dailyBudgetUsd();
-		if ($budget > 0 && $this->spentTodayMicro() >= (int)round($budget * 1_000_000)) {
+		if ($budget > 0 && $this->spentTodayMicro() >= (int)round($budget * $share * 1_000_000)) {
 			return self::DAILY_BUDGET;
 		}
 		
 		$limit = $this->settings->dailyCallLimit();
-		if ($limit > 0 && $this->callsToday() >= $limit) {
+		if ($limit > 0 && $this->callsToday() >= (int)floor($limit * $share)) {
 			return self::DAILY_CALL_LIMIT;
 		}
 		

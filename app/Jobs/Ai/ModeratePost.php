@@ -23,7 +23,14 @@ class ModeratePost implements ShouldQueue, ShouldBeUniqueUntilProcessing
 	use Dispatchable, InteractsWithQueue, Queueable;
 	
 	public int $tries = 3;
-	public int $timeout = 120;
+	
+	/**
+	 * One attempt can make several AI calls (primary model, then the fallback) of up to
+	 * ai_features.timeout (60s) each. The queue's retry_after must stay above this value,
+	 * or a second worker starts the same check while the first is still running.
+	 */
+	public int $timeout = 300;
+	
 	public int $uniqueFor = 900;
 	
 	public function __construct(
@@ -35,9 +42,13 @@ class ModeratePost implements ShouldQueue, ShouldBeUniqueUntilProcessing
 	{
 	}
 	
+	/**
+	 * An admin's re-run (force) has its own lock, so a normal check waiting in the queue cannot
+	 * swallow it.
+	 */
 	public function uniqueId(): string
 	{
-		return 'post-' . $this->postId;
+		return 'post-' . $this->postId . ($this->force ? '-force' : '');
 	}
 	
 	public function handle(ModerationService $service): void

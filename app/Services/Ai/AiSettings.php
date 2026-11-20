@@ -4,17 +4,33 @@ namespace App\Services\Ai;
 
 use App\Models\Setting;
 use App\Models\Setting\AiSetting;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /*
- * Reads Admin > Settings > AI fresh from the database (adniro:ai).
+ * Reads Admin > Settings > AI from the database (adniro:ai).
  *
- * config('settings.ai.*') is loaded once at boot, so a long-running queue worker
- * would keep old values. This class avoids that at the cost of one small query.
+ * config('settings.ai.*') is loaded once at boot, so a long-running queue worker would keep old
+ * values. This class reads the row once per request or queued job instead: AiServiceProvider calls
+ * flush() between jobs and when the settings are saved.
+ *
+ * When the row cannot be read, the last copy that could is used and readFailed() says so; callers
+ * that would publish or release listings stop instead. Without any copy, the AI is off and
+ * listings wait for an admin.
  */
 
 class AiSettings
 {
+	public const LAST_GOOD_CACHE_KEY = 'ai:settings:last_good';
+	
+	/** Used only when the database cannot be read and no earlier copy exists. */
+	private const SAFE_DEFAULTS = ['enabled' => '0', 'moderation_when_unavailable' => 'review'];
+	
+	private ?array $values = null;
+	
+	private bool $readFailed = false;
+	
 	private const FEATURE_KEYS = [
 		'moderation'      => ['moderation_model_id', 'moderation_fallback_model_id'],
 		'quickpost_draft' => ['quickpost_model_id', 'quickpost_fallback_model_id'],
@@ -23,13 +39,61 @@ class AiSettings
 	
 	public function all(): array
 	{
+		return $this->values ??= $this->load();
+	}
+	
+	/** Read the settings again on the next call. */
+	public function flush(): void
+	{
+		$this->values = null;
+		$this->readFailed = false;
+	}
+	
+	/** True when the settings row could not be read and an older copy (or safe defaults) is in use. */
+	public function readFailed(): bool
+	{
+		$this->all();
+		
+		return $this->readFailed;
+	}
+	
+	private function load(): array
+	{
 		try {
-			$setting = Setting::query()->where('name', 'ai')->first();
-			$values = $setting?->field_values;
-			
-			return is_array($values) ? $values : AiSetting::getFieldValues([], null);
+			$values = Setting::query()->where('name', 'ai')->first()?->field_values;
+			$values = is_array($values) ? $values : AiSetting::getFieldValues([], null);
 		} catch (Throwable $e) {
-			return AiSetting::getFieldValues([], null);
+			$this->readFailed = true;
+			Log::error('AI settings could not be read; using the last known copy.', ['error' => $e->getMessage()]);
+			
+			return $this->lastGood() ?? array_merge(AiSetting::getFieldValues([], null), self::SAFE_DEFAULTS);
+		}
+		
+		$this->readFailed = false;
+		$this->rememberLastGood($values);
+		
+		return $values;
+	}
+	
+	private function lastGood(): ?array
+	{
+		try {
+			$values = Cache::get(self::LAST_GOOD_CACHE_KEY);
+			
+			return is_array($values) ? $values : null;
+		} catch (Throwable $e) {
+			Log::error('The last known AI settings could not be read from the cache.', ['error' => $e->getMessage()]);
+			
+			return null;
+		}
+	}
+	
+	private function rememberLastGood(array $values): void
+	{
+		try {
+			Cache::forever(self::LAST_GOOD_CACHE_KEY, $values);
+		} catch (Throwable $e) {
+			Log::warning('The AI settings could not be kept as the last known copy.', ['error' => $e->getMessage()]);
 		}
 	}
 	

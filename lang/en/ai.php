@@ -210,6 +210,7 @@ return [
 	'queue_back'           => 'Back to the queue',
 	'queue_approved'       => '":title" was approved.',
 	'queue_rejected'       => '":title" was rejected and its owner was told why.',
+	'queue_rejected_not_notified' => '":title" was rejected, but its owner could not be told: no verified email or phone, or sending failed (see the log).',
 	'queue_rerun_queued'   => 'The AI check was queued. Its result appears here when it is done.',
 	'queue_rerun_unavailable' => 'The AI check could not be queued: moderation is off, or the listing is unverified or archived.',
 	'queue_reject_title'   => 'Reject listing',
