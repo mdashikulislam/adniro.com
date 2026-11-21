@@ -1,6 +1,7 @@
 /*
- * adniro: the listing strength card in the listing form's side panel (score, tier, next step and live
- * hints, scored by strength-score.js), its score in the phone bar, and the dismissible AI banner for guests.
+ * adniro: the listing quality card in the listing form's side panel (a ring with the score, a tier badge,
+ * and what each item is worth, scored by strength-score.js), the score in the phone bar, and the
+ * dismissible AI banner for guests.
  */
 (function (window, document) {
 	'use strict';
@@ -15,7 +16,6 @@
 	const cfg = LF.config;
 
 	const Strength = window.adniroListingStrength;
-	const TIERS = ['weak', 'fair', 'strong', 'excellent'];
 
 	const strength = document.querySelector('[data-lf-strength]');
 	const items = Array.from(document.querySelectorAll('[data-lf-check]'));
@@ -29,48 +29,34 @@
 		return hint.text !== undefined ? hint.text : LF.text(hint.key, hint.params);
 	}
 
-	function drawItem(element, entry) {
+	/** Row labels carry the good-length targets, e.g. "Clear title (15–80 characters)" */
+	function labelText(key, limits) {
+		return LF.text('check_' + key, {min: key === 'title' ? limits.titleMin : limits.descriptionMin, max: limits.titleMax});
+	}
+
+	function drawItem(element, entry, limits) {
 		element.hidden = !entry;
 		if (!entry) {
 			return;
 		}
+		const link = element.querySelector('.lf-check-link');
 		element.classList.toggle('is-done', entry.done);
-		element.classList.toggle('is-warn', !!entry.warn);
-		element.querySelector('[data-lf-hint]').textContent = hintText(entry.hint);
-		element.querySelector('[data-lf-points]').textContent = entry.done ? '' : '+' + entry.remaining;
-		const bar = element.querySelector('[data-lf-bar]');
-		if (bar) {
-			bar.style.width = Math.round((entry.bar || 0) * 100) + '%';
-		}
+		element.querySelector('[data-lf-label]').textContent = labelText(entry.key, limits);
+		element.querySelector('[data-lf-worth]').textContent = '+' + entry.worth + '%';
+		link.title = hintText(entry.hint);
 		element.querySelector('.lf-check-state').textContent = ' (' + LF.text(entry.done ? 'check_done' : 'check_todo') + ')';
 	}
 
-	function drawMeter(result) {
+	function drawScore(result) {
 		const tierLabel = LF.text('strength_' + result.tier);
-		const reached = TIERS.indexOf(result.tier);
 		strength.dataset.tier = result.tier;
 		strength.querySelector('[data-lf-score]').textContent = String(result.score);
+		strength.querySelector('[data-lf-ring]').style.strokeDasharray = result.score + ' 100';
 		strength.querySelector('[data-lf-tier]').textContent = tierLabel;
 		strength.querySelector('[data-lf-tier-text]').textContent = LF.text('strength_' + result.tier + '_text');
-		strength.querySelectorAll('[data-lf-step]').forEach((step) => {
-			step.classList.toggle('is-on', TIERS.indexOf(step.dataset.lfStep) <= reached);
-		});
 		const meter = strength.querySelector('[data-lf-meter]');
 		meter.setAttribute('aria-valuenow', String(result.score));
-		meter.setAttribute('aria-valuetext', result.score + '/100, ' + tierLabel);
-	}
-
-	/** The one step that adds the most points, with the field it leads to */
-	function drawNext(next, limits) {
-		const link = strength.querySelector('[data-lf-next]');
-		link.hidden = !next;
-		if (!next) {
-			return;
-		}
-		const item = items.find((element) => element.dataset.lfCheck === next.key);
-		link.dataset.lfTarget = item ? item.querySelector('[data-lf-target]').dataset.lfTarget : '';
-		strength.querySelector('[data-lf-next-text]').textContent = LF.text('next_' + next.key, {min: next.key === 'title' ? limits.titleMin : limits.descriptionMin});
-		strength.querySelector('[data-lf-next-points]').textContent = '+' + next.remaining;
+		meter.setAttribute('aria-valuetext', result.score + '%, ' + tierLabel);
 	}
 
 	function update(state) {
@@ -78,17 +64,16 @@
 			return;
 		}
 		const result = Strength.score(state, cfg);
-		items.forEach((element) => drawItem(element, result.items.find((entry) => entry.key === element.dataset.lfCheck)));
-		drawMeter(result);
-		drawNext(result.next, result.limits);
+		items.forEach((element) => drawItem(element, result.items.find((entry) => entry.key === element.dataset.lfCheck), result.limits));
+		drawScore(result);
 		chipCounts.forEach((chip) => {
-			chip.textContent = String(result.score);
+			chip.textContent = result.score + '%';
 		});
 	}
 
 	LF.onChange(update);
 
-	/* An item, or the next step, takes you to its field; on phones the sheet closes first */
+	/* An item takes you to its field; on phones the sheet closes first */
 	document.addEventListener('click', (event) => {
 		const link = event.target.closest('#lfPanel a[data-lf-target]');
 		if (!link) {

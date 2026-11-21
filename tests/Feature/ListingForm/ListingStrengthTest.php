@@ -16,11 +16,10 @@ class ListingStrengthTest extends TestCase
 	private const NEW_KEYS = [
 		'strength', 'strength_weak', 'strength_fair', 'strength_strong', 'strength_excellent',
 		'strength_weak_text', 'strength_fair_text', 'strength_strong_text', 'strength_excellent_text',
-		'strength_next', 'strength_photos_next',
+		'strength_score', 'strength_photos_next',
 		'hint_category_todo', 'hint_title_empty', 'hint_title_short', 'hint_title_long', 'hint_title_good',
 		'hint_description_empty', 'hint_description_short', 'hint_description_good',
 		'hint_price_todo', 'hint_price_negotiable', 'hint_city_todo', 'hint_contact_todo', 'hint_contact_done',
-		'next_category', 'next_title', 'next_description', 'next_price', 'next_city', 'next_contact',
 	];
 
 	public function test_the_scoring_rules_pass_their_node_tests(): void
@@ -39,17 +38,32 @@ class ListingStrengthTest extends TestCase
 		$this->assertTrue($process->isSuccessful(), $process->getOutput() . $process->getErrorOutput());
 	}
 
-	public function test_the_panel_has_a_meter_a_next_step_and_live_hints(): void
+	public function test_the_panel_shows_a_score_ring_a_tier_badge_and_what_each_item_is_worth(): void
 	{
 		// Act
 		$html = file_get_contents(resource_path('views/front/post/createOrEdit/form/panel.blade.php'));
 
 		// Assert
-		$this->assertStringContainsString('role="meter"', $html);
-		$this->assertStringContainsString('data-lf-next', $html);
-		$this->assertStringContainsString('data-lf-hint', $html);
-		$this->assertStringContainsString('data-lf-points', $html);
-		$this->assertStringNotContainsString("trans('listing_form.checklist')", $html);
+		$this->assertStringContainsString('class="lf-ring" role="meter"', $html);
+		$this->assertStringContainsString('data-lf-ring', $html);
+		$this->assertStringContainsString('class="lf-tier-badge" data-lf-tier', $html);
+		$this->assertStringContainsString('data-lf-worth', $html);
+		$this->assertStringNotContainsString('data-lf-next', $html);
+	}
+
+	public function test_row_labels_show_the_good_length_targets(): void
+	{
+		// Act
+		$html = view('front.post.createOrEdit.form.panel', [
+			'listingForm'   => (object)['isEdit' => false],
+			'isSingleStep'  => false,
+			'picturesLimit' => 5,
+		])->render();
+
+		// Assert
+		$this->assertStringContainsString('Clear title (15–80 characters)', $html);
+		$this->assertStringContainsString('Detailed description (200+ characters)', $html);
+		$this->assertStringNotContainsString('{min}', $html);
 	}
 
 	public function test_the_scoring_script_loads_before_the_panel_script(): void
@@ -80,7 +94,7 @@ class ListingStrengthTest extends TestCase
 					$this->assertNotSame($english[$key], $strings[$key], "{$file}: {$key} is translated");
 				}
 			}
-			foreach (['checklist', 'checklist_progress', 'checklist_ready'] as $old) {
+			foreach (['checklist', 'checklist_progress', 'checklist_ready', 'strength_next', 'next_title', 'next_description'] as $old) {
 				$this->assertArrayNotHasKey($old, $strings, "{$file}: {$old} is no longer used");
 			}
 		}

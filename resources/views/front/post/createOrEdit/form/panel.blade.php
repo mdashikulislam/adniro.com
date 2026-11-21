@@ -15,6 +15,13 @@
 		'city'        => '#cityBox',
 		'contact'     => '#lfSection-contact',
 	];
+	// Good-length targets in the row labels; panel.js keeps them current (same rule as strength-score.js)
+	$titleGoodMin = max(15, (int)config('settings.listing_form.title_min_length', 2));
+	$labelLimits = [
+		'{min}' => $titleGoodMin,
+		'{max}' => max($titleGoodMin, min(80, (int)config('settings.listing_form.title_max_length', 150))),
+	];
+	$descriptionLimits = ['{min}' => max(200, (int)config('settings.listing_form.description_min_length', 5))];
 	$tips = collect(range(1, 5))->map(fn ($i) => t('sell_quickly_advice_' . $i));
 @endphp
 <div class="offcanvas-lg offcanvas-bottom lf-panel" tabindex="-1" id="lfPanel" aria-labelledby="lfPanelTitle">
@@ -42,45 +49,36 @@
 			</div>
 		</section>
 
-		{{-- Listing strength: a weighted score with a tier, the one step that helps most, live hints (listing-form/panel.js) --}}
+		{{-- Listing quality: a ring with the score, a tier badge, and what each item is worth (listing-form/panel.js) --}}
 		<section class="lf-panel-card lf-strength" aria-labelledby="lfStrengthTitle" data-lf-strength data-tier="weak">
 			<div class="lf-strength-head">
-				<h2 class="lf-panel-heading" id="lfStrengthTitle">{{ trans('listing_form.strength') }}</h2>
-				<p class="lf-strength-score" aria-hidden="true"><span data-lf-score>0</span><span class="lf-strength-of">/100</span></p>
+				<div class="lf-ring" role="meter" aria-labelledby="lfStrengthTitle"
+				     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-lf-meter>
+					<svg class="lf-ring-svg" viewBox="0 0 64 64" aria-hidden="true">
+						<circle class="lf-ring-track" cx="32" cy="32" r="27" pathLength="100"></circle>
+						<circle class="lf-ring-value" cx="32" cy="32" r="27" pathLength="100" data-lf-ring></circle>
+					</svg>
+					<span class="lf-ring-label" aria-hidden="true">
+						<span class="lf-ring-number"><span data-lf-score>0</span>%</span>
+						<span class="lf-ring-caption">{{ trans('listing_form.strength_score') }}</span>
+					</span>
+				</div>
+				<div class="lf-strength-intro">
+					<div class="lf-strength-titlebar">
+						<h2 class="lf-panel-heading" id="lfStrengthTitle">{{ trans('listing_form.strength') }}</h2>
+						<span class="lf-tier-badge" data-lf-tier>{{ trans('listing_form.strength_weak') }}</span>
+					</div>
+					<p class="lf-strength-text" data-lf-tier-text aria-live="polite">{{ trans('listing_form.strength_weak_text') }}</p>
+				</div>
 			</div>
-			<div class="lf-strength-meter" role="meter" aria-labelledby="lfStrengthTitle"
-			     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-lf-meter>
-				@foreach (['weak', 'fair', 'strong', 'excellent'] as $tier)
-					<span class="lf-strength-step" data-lf-step="{{ $tier }}"></span>
-				@endforeach
-			</div>
-			<p class="lf-strength-tier" aria-live="polite">
-				<strong data-lf-tier>{{ trans('listing_form.strength_weak') }}</strong>
-				<span data-lf-tier-text>{{ trans('listing_form.strength_weak_text') }}</span>
-			</p>
-
-			<a href="#" class="lf-next" data-lf-next data-lf-target="" hidden>
-				<span class="lf-next-body">
-					<span class="lf-next-label">{{ trans('listing_form.strength_next') }}</span>
-					<span class="lf-next-text" data-lf-next-text></span>
-				</span>
-				<span class="lf-points lf-next-points" data-lf-next-points></span>
-				<i class="bi bi-arrow-right lf-next-arrow" aria-hidden="true"></i>
-			</a>
 
 			<ul class="lf-strength-list">
 				@foreach ($checks as $check => $target)
 					<li class="lf-check" data-lf-check="{{ $check }}">
 						<a href="#" class="lf-check-link" data-lf-target="{{ $target }}">
 							<span class="lf-check-icon" aria-hidden="true"></span>
-							<span class="lf-check-body">
-								<span class="lf-check-text">{{ trans('listing_form.check_' . $check) }}</span>
-								<span class="lf-check-hint" data-lf-hint></span>
-								@if (in_array($check, ['title', 'description']))
-									<span class="lf-check-bar" aria-hidden="true"><span data-lf-bar></span></span>
-								@endif
-							</span>
-							<span class="lf-points" data-lf-points aria-hidden="true"></span>
+							<span class="lf-check-text" data-lf-label>{{ strtr(trans('listing_form.check_' . $check), $check === 'description' ? $descriptionLimits : $labelLimits) }}</span>
+							<span class="lf-check-worth" data-lf-worth aria-hidden="true"></span>
 							<span class="visually-hidden lf-check-state"></span>
 						</a>
 					</li>
@@ -93,6 +91,7 @@
 				</p>
 			@endunless
 		</section>
+
 
 		@if ($isOwner)
 			<section class="lf-panel-card lf-panel-actions">
