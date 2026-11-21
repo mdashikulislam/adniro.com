@@ -407,6 +407,15 @@ body.page-listing-form .lf-v2 .input-group .lf-suffix-switch .form-check-input {
 	display: none;
 }
 
+/* Large screens: two equal buttons across the form, as on the Photos step (back on the left, next on the right) */
+@media (min-width: 992px) {
+	.lf-v2 .lf-actions {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.5rem;
+	}
+}
+
 @media (max-width: 991.98px) {
 	.lf-v2 .lf-actions {
 		position: sticky;
