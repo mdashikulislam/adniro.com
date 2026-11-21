@@ -235,6 +235,7 @@
 	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 72%, #000);
 	--adn-sell-size: 52px;
 	--adn-sell-ring: 4px;
+	--adn-pulse-rgb: 245, 158, 11; /* amber #f59e0b */
 	position: fixed;
 	inset-inline: 0;
 	bottom: var(--adn-appbar-safe);
@@ -379,15 +380,15 @@
 	transition: transform .2s ease, box-shadow .2s ease;
 }
 
-/* A soft radar pulse: two teal rings with a faint glow grow out of the button and fade, one after the other */
+/* A soft radar pulse: two warm amber rings (the site's Premium accent) grow out of the button and fade, one after the other */
 .adn-appbar-sell-tile::before,
 .adn-appbar-sell-tile::after {
 	content: "";
 	position: absolute;
 	inset: calc(var(--adn-sell-ring) * -1);
-	border: 2.5px solid rgba(var(--bs-primary-rgb), .6);
+	border: 2.5px solid rgba(var(--adn-pulse-rgb), .75);
 	border-radius: 50%;
-	background-color: rgba(var(--bs-primary-rgb), .08);
+	background-color: rgba(var(--adn-pulse-rgb), .1);
 	opacity: 0;
 	pointer-events: none;
 	will-change: transform, opacity;
