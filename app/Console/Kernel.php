@@ -54,8 +54,8 @@ class Kernel
 		// AI moderation: re-queue or hand over listings stuck waiting for a check (adniro:ai)
 		$schedule->command('ai:moderation-sweep')->timezone($tz)->everyFiveMinutes()->withoutOverlapping();
 		
-		// Quick post: expired drafts and temporary uploads older than 48 hours (adniro:ai)
-		$schedule->command('ai:quickpost-purge')->timezone($tz)->hourly()->withoutOverlapping();
+		// AI listing assistant: expired drafts and temporary uploads older than 48 hours (adniro:ai)
+		$schedule->command('ai:listing-assistant-purge')->timezone($tz)->hourly()->withoutOverlapping();
 		
 		// Backups
 		setBackupConfig();

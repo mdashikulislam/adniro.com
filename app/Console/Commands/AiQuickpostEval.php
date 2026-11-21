@@ -15,7 +15,7 @@ use Illuminate\Console\Command;
 use Throwable;
 
 /*
- * php artisan ai:quickpost-eval {model?} (adniro:ai)
+ * php artisan ai:listing-assistant-eval {model?} (adniro:ai). The old name ai:quickpost-eval still works.
  *
  * Runs the inputs in resources/ai/eval/quickpost.json through a model with the real drafting
  * prompt, catalog and sanitizer, and reports category accuracy, invented prices and whether
@@ -29,18 +29,21 @@ class AiQuickpostEval extends Command
 {
 	public const MIN_CATEGORY_ACCURACY = 0.8;
 	
-	protected $signature = 'ai:quickpost-eval
-		{model? : An AI model, by its database id or its model ID. Defaults to the assigned quick post model}
+	protected $signature = 'ai:listing-assistant-eval
+		{model? : An AI model, by its database id or its model ID. Defaults to the assigned AI listing assistant model}
 		{--only= : Run only the cases whose id starts with this text}
 		{--limit= : Run at most this many cases}';
 	
-	protected $description = 'Check a model against the quick post evaluation inputs (adniro:ai). Makes real AI calls.';
+	protected $description = 'Check a model against the AI listing assistant evaluation inputs (adniro:ai). Makes real AI calls.';
+	
+	/** The name used before the quick post page became the AI box in the listing form. */
+	protected $aliases = ['ai:quickpost-eval'];
 	
 	public function handle(AiClientContract $client, AiSettings $settings, DraftPrompt $prompt, DraftSanitizer $sanitizer): int
 	{
 		$model = $this->resolveModel($settings);
 		if (!$model) {
-			$this->warn('No model found. Pass a model, or assign a quick post model in Admin > Settings > AI.');
+			$this->warn('No model found. Pass a model, or assign an AI listing assistant model in Admin > Settings > AI > Models.');
 			
 			return self::FAILURE;
 		}

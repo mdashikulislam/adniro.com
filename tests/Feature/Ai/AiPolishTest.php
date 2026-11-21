@@ -144,9 +144,11 @@ class AiPolishTest extends TestCase
 		$html = view('admin.ai.spend-widget')->render();
 		$this->assertStringContainsString('$0.75', $html);
 		$this->assertStringContainsString('38% of today', $html);
+		$this->assertStringContainsString('AI listing assistant drafts', $html);
+		$this->assertStringNotContainsStringIgnoringCase('quick post', $html);
 	}
 	
-	// --- Quick post evaluation and model list ------------------------------
+	// --- AI listing assistant evaluation and model list --------------------
 	
 	public function test_the_quickpost_evaluation_grades_categories_prices_and_non_listings(): void
 	{
@@ -159,7 +161,7 @@ class AiPolishTest extends TestCase
 			return new AiResult(AiResult::OK, $base);
 		};
 		$this->ai->respond($answer);
-		$this->artisan('ai:quickpost-eval', ['model' => $this->model->id, '--only' => 'phone-'])
+		$this->artisan('ai:listing-assistant-eval', ['model' => $this->model->id, '--only' => 'phone-'])
 			->expectsOutputToContain('Partial run')
 			->assertSuccessful();
 		$this->assertSame(3, $this->ai->calls);
@@ -174,7 +176,7 @@ class AiPolishTest extends TestCase
 		$this->assertNull($this->model->fresh()->quickpost_eval_passed_at);
 		
 		$html = $this->model->fresh()->crudEvaluationsColumn();
-		$this->assertStringContainsString('Quick post –', $html);
+		$this->assertStringContainsString('Listing assistant –', $html);
 	}
 	
 	public function test_evaluations_stop_early_and_count_failed_calls_as_failures(): void

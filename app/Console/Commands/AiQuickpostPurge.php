@@ -8,11 +8,11 @@ use Illuminate\Console\Command;
 use Throwable;
 
 /*
- * php artisan ai:quickpost-purge (adniro:ai), scheduled hourly.
+ * php artisan ai:listing-assistant-purge (adniro:ai), scheduled hourly. The old name ai:quickpost-purge still works.
  *
- * Deletes expired quick post drafts (counted ones are emptied and kept 35 days for the AI post
+ * Deletes expired AI listing assistant drafts (counted ones are emptied and kept 35 days for the AI post
  * limit), and temporary uploads older than 48 hours. Temporary
- * uploads are the photos and files of listings that were never finished, from quick post and
+ * uploads are the photos and files of listings that were never finished, from the AI listing assistant and
  * from the normal form alike; nothing else ever cleaned them up.
  */
 
@@ -26,11 +26,14 @@ class AiQuickpostPurge extends Command
 	/** Columns emptied when a counted draft expires. */
 	private const HEAVY_COLUMNS = ['input_text', 'input_meta', 'picture_paths', 'raw_output', 'draft', 'error'];
 	
-	protected $signature = 'ai:quickpost-purge
+	protected $signature = 'ai:listing-assistant-purge
 		{--hours=48 : Delete temporary uploads older than this}
 		{--dry-run : Only count what would be deleted}';
 	
-	protected $description = 'Delete expired quick post drafts and old temporary uploads (adniro:ai).';
+	protected $description = 'Delete expired AI listing assistant drafts and old temporary uploads (adniro:ai).';
+	
+	/** The name used before the quick post page became the AI box in the listing form. */
+	protected $aliases = ['ai:quickpost-purge'];
 	
 	public function handle(): int
 	{

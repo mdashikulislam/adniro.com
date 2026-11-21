@@ -167,7 +167,7 @@ class AiModel extends BaseModel
 	}
 	
 	/**
-	 * Last passed evaluations: "php artisan ai:moderation-eval" and "php artisan ai:quickpost-eval".
+	 * Last passed evaluations: "php artisan ai:moderation-eval" and "php artisan ai:listing-assistant-eval".
 	 */
 	public function crudEvaluationsColumn(): string
 	{

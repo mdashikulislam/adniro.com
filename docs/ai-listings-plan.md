@@ -1,6 +1,8 @@
 # AI for listings: moderation and quick post
 
 > **Update 2026-11-21: the quick post composer was replaced.** At the owner's choice, the AI now lives in a box at the top of the normal listing form, ported from classifedz.com. It fills the open form in place, through `POST posts/create/quick/fill` and the same draft service, limits and budget. The composer, its photo upload, one-screen review, form banner and `quickpost_one_screen` setting are gone, and `posts/create/quick` redirects to the form. Sections below that describe the composer are kept as history. See section 8 of docs/professional-website-plan.md.
+>
+> **Name in admin: "AI listing assistant".** Admin screens no longer say "quick post": the settings tab is Settings > AI > AI listing assistant, the model is the "AI listing assistant model", and the commands are `ai:listing-assistant-eval` and `ai:listing-assistant-purge` (the old `ai:quickpost-*` names still work). Internal names keep "quickpost" (setting keys, the `quickpost_eval_passed_at` column, the `quickpost_draft` usage feature, `posts/create/quick/fill` and `/api/quickpost/*`), so stored data and the mobile apps are unaffected.
 
 Plan only. Nothing in this document has been implemented.
 Prepared 2026-11-20 from two planner passes over the codebase, then checked against the code.
@@ -169,7 +171,7 @@ What exists:
 - **Into the form.** `DraftToPostInput` writes `postInput` in the exact step 1 shape, including the city keys the request adds and `cf` in the form's own format. It keeps contact details already typed. The marks go in `quickPostMarks`.
 - **Step 1 banner** (`front.post.quick.form-banner`) with field highlights, a multiple-item note, soft policy warnings and "Not right? Describe it again". It also loads the draft's category, because the form only restores a chosen category after a validation error.
 - **Fallbacks.** When the AI fails, the text goes into the description of the normal form, and fields from an earlier draft are dropped. Input that is not a listing stays on the composer with a request for one sentence. Text that is too short is refused with no AI call.
-- **AI post limit.** It is set in Settings > AI > Quick post, separately for members (by account) and guests (by IP), per day, week, month or with no limit. It uses calendar periods in the site timezone. A per-person lock stops parallel drafts. A changed limit applies at once.
+- **AI post limit.** It is set in Settings > AI > AI listing assistant, separately for members (by account) and guests (by IP), per day, week, month or with no limit. It uses calendar periods in the site timezone. A per-person lock stops parallel drafts. A changed limit applies at once.
 - **Per-user override and reset.** An "AI limit" button on Admin > Users opens `/admin/users/{id}/ai-post-limit`, for super admins and staff who can edit users. This adds `users.ai_post_limit` and `users.ai_post_reset_at`.
 - **Burst limit.** At most 6 drafts a minute per IP and 10 per user.
 - **`post_drafts` table** with the input, the raw and sanitised output, status, counted flag, re-draft count, linked usage log and expiry.

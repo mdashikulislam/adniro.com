@@ -68,7 +68,7 @@ return [
 	'field_supports_vision' => 'Understands images',
 	'field_supports_vision_hint' => 'Required for listing moderation and for drafting a listing from photos.',
 	'field_supports_structured_output' => 'Returns structured JSON',
-	'field_supports_structured_output_hint' => 'Required for moderation and quick post. Most current text models support it.',
+	'field_supports_structured_output_hint' => 'Required for moderation and the AI listing assistant. Most current text models support it.',
 	'field_supports_transcription' => 'Speech to text',
 	'field_supports_transcription_hint' => 'Only for transcription models, used later for server-side voice input.',
 	'field_input_price'     => 'Input price (USD per 1M tokens)',
@@ -101,7 +101,7 @@ return [
 	// Admin > AI models: evaluations
 	'col_evaluations' => 'Evaluations',
 	'eval_moderation' => 'Moderation',
-	'eval_quickpost'  => 'Quick post',
+	'eval_quickpost'  => 'Listing assistant',
 	
 	// Admin dashboard: AI spend widget
 	'spend_title'          => 'AI usage',
@@ -113,13 +113,13 @@ return [
 	'spend_month'          => 'This month',
 	'spend_budget'         => ':used% of today\'s $:budget budget used',
 	'spend_feature_moderation'      => 'Listing moderation',
-	'spend_feature_quickpost_draft' => 'Quick post drafts',
+	'spend_feature_quickpost_draft' => 'AI listing assistant drafts',
 	'spend_feature_test'            => 'Model tests and evaluations',
 	'spend_calls_short'    => 'calls',
 	'spend_week'           => 'Spend over the last 7 days',
 	'spend_needs_review'   => ':count listings need review',
 	'spend_rejected_today' => ':count rejected today',
-	'spend_drafts_today'   => ':count quick post drafts today',
+	'spend_drafts_today'   => ':count AI listing drafts today',
 	
 	// Settings > AI
 	'setting_tab_general' => 'General',
@@ -132,12 +132,12 @@ return [
 	'setting_models_info'   => 'Only active models that passed "Test model" are listed. Image features only list models that understand images. If the main model fails, the fallback model is tried once.',
 	'setting_moderation_model_label' => 'Listing moderation model',
 	'setting_moderation_model_hint'  => 'Reads new and edited listings, text and photos. Leave empty to keep moderation off.',
-	'setting_quickpost_model_label'  => 'Quick post model',
-	'setting_quickpost_model_hint'   => 'Drafts a listing from the user\'s photos, voice or text. Leave empty to keep quick post off.',
+	'setting_quickpost_model_label'  => 'AI listing assistant model',
+	'setting_quickpost_model_hint'   => 'Fills in the listing form from what the seller types or says. Leave empty to keep the AI listing assistant off.',
 	'setting_fallback_model_label'   => 'Fallback model',
 	'setting_fallback_model_hint'    => 'Optional. Used once when the main model errors, times out or is rate limited.',
 	'setting_transcription_model_label' => 'Speech-to-text model',
-	'setting_transcription_model_hint'  => 'Optional, for a later phase. Browser speech input works without it.',
+	'setting_transcription_model_hint'  => 'Optional. Turns voice recordings from the AI listing assistant into text on the server, for browsers without their own speech input. Browsers that have it work without this model.',
 	'setting_daily_budget_label' => 'Daily budget (USD)',
 	'setting_daily_budget_hint'  => 'All AI features together. When today\'s spend reaches it, no more AI calls are made until midnight. 0 means no budget limit.',
 	'setting_daily_call_limit_label' => 'Daily call limit',
@@ -276,9 +276,9 @@ return [
 	'rule_admin_rejected'         => 'Rejected by an admin',
 	'rule_none'                   => '',
 	
-	// Settings: quick post
-	'setting_tab_quickpost' => 'Quick post',
-	'setting_quickpost_info' => 'Quick post lets people describe what they sell in a sentence; the AI fills in the listing form and they check it before publishing. It uses the quick post model from the Models tab, and only works with the multi-step listing form.',
+	// Settings: AI listing assistant (the AI box in the listing form; keys keep the old "quickpost" name)
+	'setting_tab_quickpost' => 'AI listing assistant',
+	'setting_quickpost_info' => 'The AI listing assistant is a box at the top of the listing form: people describe what they sell in a sentence or by voice, the AI fills in the form, and they check it before publishing. It uses the AI listing assistant model from the Models tab, and only works with the multi-step listing form.',
 	'setting_quickpost_enabled_label' => 'Show the AI box in the listing form',
 	'setting_quickpost_enabled_hint'  => 'When on, the listing form shows an AI box: the seller describes the item once and the form is filled in for them to check.',
 	'setting_quickpost_guests_label'  => 'Allow guests',
@@ -307,7 +307,7 @@ return [
 	'user_limit_reset_done'      => 'The user\'s AI post count was reset.',
 	'user_limit_back'            => 'Back to users',
 	
-	// Quick post: the form's AI box and the mobile API
+	// AI listing assistant: messages from the form's AI box and the mobile API
 	'qp_text_placeholder' => 'Example: iPhone 13, 128 GB, blue, small scratch on the back, battery 86%, 420 dollars, Dhaka',
 	'qp_too_short'        => 'Please add a photo, or write at least :min characters about what you\'re selling.',
 	'qp_busy'             => 'Your previous request is still being prepared. Please wait a moment.',
@@ -320,7 +320,7 @@ return [
 	'qp_left_week'        => '{0} No AI posts left this week|{1} 1 of :limit AI posts left this week|[2,*] :left of :limit AI posts left this week',
 	'qp_left_month'       => '{0} No AI posts left this month|{1} 1 of :limit AI posts left this month|[2,*] :left of :limit AI posts left this month',
 	
-	// Quick post: voice
+	// AI listing assistant: voice
 	'qp_voice_denied'      => 'Microphone access is blocked. Allow it in your browser settings, or type instead.',
 	'qp_voice_no_speech'   => 'We did not hear anything. Tap the microphone and try again.',
 	'qp_voice_unavailable' => 'Voice input is not available right now. Please type instead.',

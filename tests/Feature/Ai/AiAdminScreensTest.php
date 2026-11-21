@@ -199,6 +199,9 @@ class AiAdminScreensTest extends TestCase
 		$response->assertSee('ready-vision-model');
 		$response->assertDontSee('untested-model');
 		$response->assertDontSee('text-only-model');
+		$response->assertSee('AI listing assistant');
+		$response->assertDontSee('Quick post');
+		$response->assertDontSee('quick post');
 	}
 	
 	public function test_load_models_lists_the_provider_models_as_json(): void

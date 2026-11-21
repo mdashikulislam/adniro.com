@@ -10,13 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 
 /*
- * Quick post for the mobile apps (adniro:ai).
+ * AI listing assistant for the mobile apps (adniro:ai): the same drafting as the AI box in the
+ * website's listing form. The URLs keep the old "quickpost" name so existing apps keep working.
  *
  * The app sends text and up to four photos; the answer holds the draft in the same field names
  * as POST /api/posts, so the app shows it for review and then creates the listing as usual.
  * Photos are not stored here: the app uploads them with the listing.
  *
- * @group Quick post
+ * @group AI listing assistant
  */
 
 class QuickPostController extends BaseController

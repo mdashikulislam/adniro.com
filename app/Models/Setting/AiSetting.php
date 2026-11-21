@@ -206,7 +206,7 @@ class AiSetting extends BaseSetting
 			'tab'        => $tabName,
 		];
 		
-		// Quick post
+		// AI listing assistant (the AI box in the listing form; the keys keep the old "quickpost" name)
 		$tabName = trans('ai.setting_tab_quickpost');
 		if (self::getPanelTabsType() == 'vertical') {
 			$fields[] = [

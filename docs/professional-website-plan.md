@@ -285,7 +285,7 @@ Most important first:
 1. **AI posting.** Port the classifedz.com AI box into the normal posting form. adniro's moderation, limits, budget and evaluations stay behind it; the separate composer page goes away. **Done 21 Nov 2026:** the box sits at the top of step 1 (and of the single-step form), fills the form in place through `POST posts/create/quick/fill`, and has undo, a checklist, example chips, voice (recording when a speech-to-text model is assigned, otherwise the browser's dictation) and texts in all 9 languages. `posts/create/quick` now redirects to the form. Photos are no longer sent to the AI from the web (the box runs before the photos step); the mobile API still accepts them.
 2. **Verified badge.** Email only. No SMS provider needed; phone verification stays off.
 3. **Countries.** The live server has 6 countries; keep those. The 16 local ones don't matter.
-4. **Guest posting.** Left to the admin: Admin > Settings > Listing form > "Guests can submit listings", and for AI drafts, Settings > AI > Quick post > guests. Captcha covers guests once it is switched on.
+4. **Guest posting.** Left to the admin: Admin > Settings > Listing form > "Guests can submit listings", and for AI drafts, Settings > AI > AI listing assistant > "Allow guests". Captcha covers guests once it is switched on.
 5. **AI crawlers.** Keep GPTBot, ClaudeBot and Google-Extended blocked in `robots.txt`.
 6. **Notifications library.** Keep SweetAlert2 only (pop-ups and toast mode); remove PNotify, which is used in 18 files today.
 7. **Commits.** Conventional format (`feat:`, `fix:`) without the Co-Authored-By line.
