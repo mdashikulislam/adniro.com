@@ -229,28 +229,37 @@
 	background-color: rgba(var(--bs-danger-rgb), .1);
 }
 
-/* ---------- Bottom app bar (phones): a floating rounded bar with a notch for the round Sell button ---------- */
+/* ---------- Bottom app bar (phones): full width on the bottom edge, with a notch for the round Sell button ---------- */
 .adn-appbar {
-	--adn-bar-gap: 10px;
 	--adn-bar-radius: 22px;
 	--adn-bar-surface: var(--bs-body-bg);
 	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 72%, #000);
 	--adn-sell-size: 52px;
 	--adn-sell-ring: 4px;
 	position: fixed;
-	inset-inline: var(--adn-bar-gap);
-	bottom: calc(var(--adn-bar-gap) + var(--adn-appbar-safe));
+	inset-inline: 0;
+	bottom: var(--adn-appbar-safe);
 	z-index: 1030;
 	height: var(--adn-appbar-height);
 }
 
-/* The surface: two rounded sides and the curved notch between them, with one shadow around the whole shape */
+/* On phones with a home indicator, the bar's colour continues under it to the screen's edge */
+.adn-appbar::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	top: 100%;
+	height: var(--adn-appbar-safe);
+	background-color: var(--adn-bar-surface);
+}
+
+/* The surface: two sides (top corners rounded) and the curved notch between them, with one shadow around the shape */
 .adn-appbar-shape {
 	position: absolute;
 	inset: 0;
 	display: grid;
 	grid-template-columns: 1fr 114px 1fr;
-	filter: drop-shadow(0 8px 18px rgba(15, 23, 42, .16)) drop-shadow(0 1px 2px rgba(15, 23, 42, .08));
+	filter: drop-shadow(0 -4px 14px rgba(15, 23, 42, .12)) drop-shadow(0 -1px 1px rgba(15, 23, 42, .06));
 }
 
 .adn-appbar-shape-side {
@@ -259,12 +268,10 @@
 
 .adn-appbar-shape-side:first-child {
 	border-start-start-radius: var(--adn-bar-radius);
-	border-end-start-radius: var(--adn-bar-radius);
 }
 
 .adn-appbar-shape-side:last-child {
 	border-start-end-radius: var(--adn-bar-radius);
-	border-end-end-radius: var(--adn-bar-radius);
 }
 
 .adn-appbar-notch {
@@ -404,7 +411,7 @@
 }
 
 [data-bs-theme="dark"] .adn-appbar-shape {
-	filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .5));
+	filter: drop-shadow(0 -4px 14px rgba(0, 0, 0, .45));
 }
 
 [data-bs-theme="dark"] .adn-appbar-link.is-active .adn-appbar-icon {
@@ -414,11 +421,11 @@
 /* Room for the bar: page content, the cookie banner and other bottom bars stay above it */
 @media (max-width: 767.98px) {
 	body.has-appbar {
-		padding-bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 24px);
+		padding-bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 8px);
 	}
 
 	body.has-appbar .cookie-consent {
-		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 34px);
+		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 16px);
 	}
 }
 
