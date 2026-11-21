@@ -48,6 +48,8 @@ class ListingFormSetting extends BaseSetting
 			'cat_display_type'            => 'c_bigIcon_list',
 			'wysiwyg_editor'              => 'tinymce',
 			'auto_registration'           => '0',
+			'price_hint_enabled'          => '1', // adniro:ai
+			'price_hint_min_sample'       => '8', // adniro:ai
 		];
 		
 		$value = array_merge($defaultValue, $value);
@@ -466,6 +468,34 @@ class ListingFormSetting extends BaseSetting
 			'hint'    => trans('admin.auto_registration_hint'),
 			'wrapper' => ['class' => 'col-md-12'],
 			'tab'     => $tabName,
+		];
+		
+		// adniro:ai - helpers on the create/edit listing pages
+		$tabName = trans('listing_form.setting_tab_helpers');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'listing_helpers_title',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'    => 'price_hint_enabled',
+			'label'   => trans('listing_form.setting_price_hint_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('listing_form.setting_price_hint_hint'),
+			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'       => 'price_hint_min_sample',
+			'label'      => trans('listing_form.setting_price_hint_min_label'),
+			'type'       => 'number',
+			'attributes' => ['min' => 3, 'step' => 1],
+			'hint'       => trans('listing_form.setting_price_hint_min_hint'),
+			'wrapper'    => ['class' => 'col-md-6'],
+			'tab'        => $tabName,
 		];
 		
 		return addOptionsGroupJavaScript(__NAMESPACE__, __CLASS__, $fields, [

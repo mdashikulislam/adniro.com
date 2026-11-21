@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'पहले कुछ शब्द लिखें, फिर AI से मदद माँगें।',
 	'ai_error' => 'AI लेखन सहायता अभी उपलब्ध नहीं है। कृपया बाद में फिर कोशिश करें।',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => ':place में मिलते-जुलते विज्ञापनों की कीमत :low – :high है (:count विज्ञापन)।',
+	'price_hint_one' => ':place में मिलते-जुलते विज्ञापनों की कीमत करीब :low है (:count विज्ञापन)।',
+	'price_hint_parent' => ':place में :category के विज्ञापनों की कीमत :low – :high है (:count विज्ञापन)।',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'विज्ञापन सहायक',
+	'setting_price_hint_label' => 'कीमत संकेत',
+	'setting_price_hint_hint' => 'कीमत के नीचे दिखाएँ कि साइट पर मिलते-जुलते विज्ञापनों में कितनी कीमत माँगी गई है, आपके अपने लाइव विज्ञापनों से (AI के बिना)। यह कीमत अपने-आप कभी नहीं भरता।',
+	'setting_price_hint_min_label' => 'संकेत के लिए ज़रूरी विज्ञापन',
+	'setting_price_hint_min_hint' => 'मिलते-जुलते विज्ञापन इससे कम हों तो कोई संकेत नहीं दिखता। 8 या ज़्यादा होने पर संकेत भरोसेमंद रहता है।',
+
 	// Multi-step progress on phones
 	'step_of'            => 'चरण :current / :total',
 ];

@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'Schreiben Sie zuerst ein paar Wörter und bitten Sie dann die KI um Hilfe.',
 	'ai_error' => 'Die KI-Schreibhilfe ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => 'Ähnliche Anzeigen in :place kosten :low – :high (:count Anzeigen).',
+	'price_hint_one' => 'Ähnliche Anzeigen in :place kosten etwa :low (:count Anzeigen).',
+	'price_hint_parent' => 'Anzeigen in :category in :place kosten :low – :high (:count Anzeigen).',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'Anzeigenhelfer',
+	'setting_price_hint_label' => 'Preishinweis',
+	'setting_price_hint_hint' => 'Zeigt unter Preis, was ähnliche Anzeigen auf der Website verlangen, basierend auf Ihren eigenen aktiven Anzeigen (ohne KI). Der Preis wird nie automatisch ausgefüllt.',
+	'setting_price_hint_min_label' => 'Anzeigen für einen Hinweis',
+	'setting_price_hint_min_hint' => 'Bei weniger ähnlichen Anzeigen als diesem Wert wird kein Hinweis angezeigt. Ab 8 ist der Hinweis aussagekräftig.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Schritt :current von :total',
 ];

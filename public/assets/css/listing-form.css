@@ -213,6 +213,15 @@ body.page-listing-form .lf-v2 #catsContainer.is-invalid {
 	width: 2.4rem;
 }
 
+/* Room between the larger checkboxes and their labels */
+.lf-v2 .form-check:not(.form-switch) {
+	padding-inline-start: 1.9rem;
+}
+
+.lf-v2 .form-check:not(.form-switch) > .form-check-input {
+	margin-inline-start: -1.9rem;
+}
+
 /* Negotiable / hide phone: the whole label is the target, at least 44px tall */
 body.page-listing-form .lf-v2 .input-group .input-group-text:has(.lf-suffix-switch) {
 	flex: 0 0 auto;
@@ -303,6 +312,25 @@ body.page-listing-form .lf-v2 .input-group .lf-suffix-switch .form-check-input {
 .lf-v2 .lf-error-summary a {
 	color: inherit;
 	font-weight: 600;
+}
+
+/* ---------- Price hint (listing-form/price-hint.js) ---------- */
+.lf-v2 .lf-price-hint {
+	display: flex;
+	gap: .5rem;
+	align-items: flex-start;
+	margin-block: -.5rem 1rem;
+	font-size: .85rem;
+	color: var(--bs-secondary-color);
+}
+
+.lf-v2 .lf-price-hint .bi {
+	margin-block-start: .1rem;
+	color: var(--bs-primary);
+}
+
+.lf-v2 .lf-price-hint[hidden] {
+	display: none;
 }
 
 /* ---------- Guest AI banner ---------- */

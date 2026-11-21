@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'আগে কয়েকটি শব্দ লিখুন, তারপর AI-এর সাহায্য নিন।',
 	'ai_error' => 'AI লেখার সহায়তা এখন পাওয়া যাচ্ছে না। অনুগ্রহ করে পরে আবার চেষ্টা করুন।',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => ':place-এ অনুরূপ বিজ্ঞাপনের দাম :low – :high (:count টি বিজ্ঞাপন)।',
+	'price_hint_one' => ':place-এ অনুরূপ বিজ্ঞাপনের দাম প্রায় :low (:count টি বিজ্ঞাপন)।',
+	'price_hint_parent' => ':place-এ :category বিভাগের বিজ্ঞাপনের দাম :low – :high (:count টি বিজ্ঞাপন)।',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'বিজ্ঞাপন সহায়ক',
+	'setting_price_hint_label' => 'দামের ইঙ্গিত',
+	'setting_price_hint_hint' => 'দামের নিচে দেখান সাইটে অনুরূপ বিজ্ঞাপনে কত দাম চাওয়া হচ্ছে, আপনার নিজস্ব লাইভ বিজ্ঞাপন থেকে (AI ছাড়া)। এটি কখনো দাম নিজে থেকে পূরণ করে না।',
+	'setting_price_hint_min_label' => 'ইঙ্গিতের জন্য প্রয়োজনীয় বিজ্ঞাপন',
+	'setting_price_hint_min_hint' => 'অনুরূপ বিজ্ঞাপন এর চেয়ে কম হলে কোনো ইঙ্গিত দেখানো হয় না। ৮ বা তার বেশি হলে ইঙ্গিত অর্থবহ থাকে।',
+
 	// Multi-step progress on phones
 	'step_of'            => 'ধাপ :current / :total',
 ];

@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'Escribe primero unas palabras y luego pide ayuda a la IA.',
 	'ai_error' => 'La ayuda de escritura con IA no está disponible ahora mismo. Inténtalo de nuevo más tarde.',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => 'Los anuncios similares en :place tienen precios de :low – :high (:count anuncios).',
+	'price_hint_one' => 'Los anuncios similares en :place tienen un precio de unos :low (:count anuncios).',
+	'price_hint_parent' => 'Los anuncios de :category en :place tienen precios de :low – :high (:count anuncios).',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'Ayudas para anuncios',
+	'setting_price_hint_label' => 'Sugerencia de precio',
+	'setting_price_hint_hint' => 'Bajo Precio, muestra lo que piden los anuncios similares del sitio, a partir de tus propios anuncios activos (sin IA). Nunca rellena el precio.',
+	'setting_price_hint_min_label' => 'Anuncios necesarios para mostrar la sugerencia',
+	'setting_price_hint_min_hint' => 'No se muestra ninguna sugerencia si hay menos anuncios similares que este número. Con 8 o más, la sugerencia es fiable.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Paso :current de :total',
 ];

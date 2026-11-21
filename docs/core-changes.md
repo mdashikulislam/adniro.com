@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (237)
+## Changed (238)
 
 Stock files we edited.
 
@@ -82,6 +82,7 @@ Stock files we edited.
 - `app/Models/Post/SimilarByLocation.php` (no marker comment)
 - `app/Models/Scopes/ReviewedScope.php`
 - `app/Models/Setting/AppSetting.php` (no marker comment)
+- `app/Models/Setting/ListingFormSetting.php`
 - `app/Models/Setting/SecuritySetting.php` (no marker comment)
 - `app/Models/Setting/StyleSetting.php` (no marker comment)
 - `app/Models/Traits/MetaTagTrait.php` (no marker comment)
@@ -587,7 +588,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (244)
+## Added (249)
 
 Files that are not part of LaraClassifier.
 
@@ -624,6 +625,7 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/Concerns/AiJsonResponses.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/ListingAssistantController.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/WritingHelpController.php`
+- `app/Http/Controllers/Web/Front/Post/ListingForm/PriceHintController.php`
 - `app/Http/Controllers/Web/Front/RecentlyViewedController.php`
 - `app/Http/Controllers/Web/Front/SiteIconController.php`
 - `app/Http/Controllers/WebhookController.php`
@@ -719,6 +721,8 @@ Files that are not part of LaraClassifier.
 - `app/Services/ListingAssistant/ListingAssistantService.php`
 - `app/Services/ListingAssistant/LocationResolver.php`
 - `app/Services/ListingForm/ListingFormState.php`
+- `app/Services/ListingForm/PriceHint.php`
+- `app/Services/ListingForm/PriceStats.php`
 - `app/Services/ListingWriter/WritingHelpService.php`
 - `app/Services/ListingWriter/WritingLimit.php`
 - `app/Services/ListingWriter/WritingPrompt.php`
@@ -875,6 +879,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/js/app/listing-form/fields.js`
 - `public/assets/js/app/listing-form/panel.js`
 - `public/assets/js/app/listing-form/preview.js`
+- `public/assets/js/app/listing-form/price-hint.js`
 - `public/assets/js/app/listing-form/undo-stack.js`
 - `public/assets/js/app/listing-form/validate.js`
 - `public/assets/plugins/jquery/3.7.1/jquery.min.js`
@@ -947,5 +952,6 @@ Files that are not part of LaraClassifier.
 
 - `routes/web/ai-admin.php`
 - `routes/web/front/listing-assistant.php`
+- `routes/web/front/listing-form.php`
 - `routes/web/front/site-icons.php`
 

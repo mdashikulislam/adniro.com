@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'اكتب بضع كلمات أولًا، ثم اطلب المساعدة من الذكاء الاصطناعي.',
 	'ai_error' => 'مساعدة الكتابة بالذكاء الاصطناعي غير متاحة حاليًا. يُرجى المحاولة لاحقًا.',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => 'إعلانات مشابهة في :place مسعّرة بين :low – :high (عدد الإعلانات: :count).',
+	'price_hint_one' => 'إعلانات مشابهة في :place مسعّرة بنحو :low (عدد الإعلانات: :count).',
+	'price_hint_parent' => 'إعلانات :category في :place مسعّرة بين :low – :high (عدد الإعلانات: :count).',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'مساعدات الإعلان',
+	'setting_price_hint_label' => 'تلميح السعر',
+	'setting_price_hint_hint' => 'أسفل السعر، اعرض الأسعار المطلوبة في الإعلانات المشابهة على الموقع، اعتمادًا على إعلاناتك المنشورة (دون ذكاء اصطناعي). لا يملأ السعر أبدًا.',
+	'setting_price_hint_min_label' => 'الإعلانات المطلوبة لعرض التلميح',
+	'setting_price_hint_min_hint' => 'لا يظهر التلميح إذا كان عدد الإعلانات المشابهة أقل من هذا الرقم. يبقى التلميح ذا معنى عند 8 أو أكثر.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'الخطوة :current من :total',
 ];

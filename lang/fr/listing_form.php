@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'Écrivez d\'abord quelques mots, puis demandez de l\'aide à l\'IA.',
 	'ai_error' => 'L\'aide à la rédaction par IA n\'est pas disponible pour le moment. Veuillez réessayer plus tard.',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => 'Les annonces similaires (:place) affichent :low – :high (:count annonces).',
+	'price_hint_one' => 'Les annonces similaires (:place) affichent environ :low (:count annonces).',
+	'price_hint_parent' => 'Les annonces de la catégorie :category (:place) affichent :low – :high (:count annonces).',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'Aides pour les annonces',
+	'setting_price_hint_label' => 'Repère de prix',
+	'setting_price_hint_hint' => 'Sous Prix, affiche les prix demandés pour des annonces similaires sur le site, d\'après vos propres annonces en ligne (sans IA). Il ne remplit jamais le prix.',
+	'setting_price_hint_min_label' => 'Annonces nécessaires pour un repère',
+	'setting_price_hint_min_hint' => 'Aucun repère n\'est affiché s\'il y a moins d\'annonces similaires que ce nombre. À partir de 8, le repère est fiable.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Étape :current sur :total',
 ];

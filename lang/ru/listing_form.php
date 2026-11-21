@@ -94,6 +94,18 @@ return [
 	'ai_need_text' => 'Сначала напишите несколько слов, затем попросите помощи у ИИ.',
 	'ai_error' => 'Помощь ИИ в написании текста сейчас недоступна. Пожалуйста, попробуйте позже.',
 
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint' => 'Цены похожих объявлений (:place): :low – :high. Объявлений: :count.',
+	'price_hint_one' => 'Цены похожих объявлений (:place): около :low. Объявлений: :count.',
+	'price_hint_parent' => 'Цены объявлений в категории «:category» (:place): :low – :high. Объявлений: :count.',
+
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers' => 'Помощники для объявлений',
+	'setting_price_hint_label' => 'Подсказка по цене',
+	'setting_price_hint_hint' => 'Под полем «Цена» показывает, сколько просят за похожие объявления на сайте, по вашим собственным действующим объявлениям (без ИИ). Цену она никогда не заполняет.',
+	'setting_price_hint_min_label' => 'Объявлений для подсказки',
+	'setting_price_hint_min_hint' => 'Если похожих объявлений меньше этого числа, подсказка не показывается. При 8 и более подсказка надёжна.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Шаг :current из :total',
 ];

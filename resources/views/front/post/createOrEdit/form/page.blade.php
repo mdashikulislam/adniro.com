@@ -22,9 +22,10 @@
 		'currency'       => (string)config('currency.symbol', ''),
 		'strings'        => trans('listing_form'),
 		'writeUrl'       => url('posts/assistant/write'),
+		'priceHintUrl'   => app(\App\Services\ListingForm\PriceHint::class)->enabled() ? url('posts/price-hint') : null,
 		'postId'         => $listingForm->postId,
 	];
-	$lfScripts = ['fields', 'counters', 'validate', 'preview', 'panel', 'undo-stack', 'ai-field-tools'];
+	$lfScripts = ['fields', 'counters', 'validate', 'preview', 'panel', 'undo-stack', 'ai-field-tools', 'price-hint'];
 @endphp
 
 @if ($lfV2)

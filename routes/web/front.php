@@ -122,6 +122,9 @@ Route::namespace('Post')
 		// AI listing assistant: the AI box in the listing form (adniro:ai)
 		require __DIR__ . '/front/listing-assistant.php';
 		
+		// Listing form helpers, such as the price hint (adniro:ai)
+		require __DIR__ . '/front/listing-form.php';
+		
 		// SingleStep Listing creation
 		Route::namespace('CreateOrEdit\SingleStep')
 			->controller(SingleCreateController::class)

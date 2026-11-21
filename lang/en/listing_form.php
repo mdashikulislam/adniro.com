@@ -94,6 +94,18 @@ return [
 	'ai_need_text'       => 'Write a few words first, then ask the AI to help.',
 	'ai_error'           => 'AI writing help is not available right now. Please try again later.',
 	
+	// Price hint under Price (statistics from the site's own listings)
+	'price_hint'         => 'Similar listings in :place are priced :low – :high (:count listings).',
+	'price_hint_one'     => 'Similar listings in :place are priced about :low (:count listings).',
+	'price_hint_parent'  => 'Listings in :category in :place are priced :low – :high (:count listings).',
+	
+	// Admin > Settings > Listing form > Listing helpers
+	'setting_tab_helpers'          => 'Listing helpers',
+	'setting_price_hint_label'     => 'Price hint',
+	'setting_price_hint_hint'      => 'Under Price, show what similar listings on the site ask, from your own live listings (no AI). It never fills in the price.',
+	'setting_price_hint_min_label' => 'Listings needed for a hint',
+	'setting_price_hint_min_hint'  => 'No hint is shown with fewer similar listings than this. 8 or more keeps it meaningful.',
+	
 	// Multi-step progress on phones
 	'step_of'            => 'Step :current of :total',
 ];
