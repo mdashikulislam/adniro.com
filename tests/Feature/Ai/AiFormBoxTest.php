@@ -356,6 +356,58 @@ class AiFormBoxTest extends TestCase
 		}
 	}
 
+	private const MIC_HELP_KEYS = [
+		'assistant_mic_denied_title', 'assistant_mic_denied_step1', 'assistant_mic_denied_step2', 'assistant_mic_denied_step_mac',
+		'assistant_mic_missing_title', 'assistant_mic_missing_step1', 'assistant_mic_missing_step_mac', 'assistant_mic_missing_step2',
+		'assistant_mic_busy_title', 'assistant_mic_busy_step1', 'assistant_mic_busy_step2',
+		'assistant_mic_try_again', 'assistant_mic_type_instead',
+	];
+
+	public function test_the_box_carries_the_steps_to_fix_each_microphone_problem(): void
+	{
+		// Arrange
+		$this->actingAs($this->user(7));
+
+		// Act
+		$html = $this->renderBox();
+
+		// Assert
+		foreach (self::MIC_HELP_KEYS as $key) {
+			$this->assertStringContainsString(e(json_encode(trans('ai.' . $key), JSON_UNESCAPED_UNICODE)), $html, $key);
+		}
+	}
+
+	public function test_every_translation_has_the_microphone_help(): void
+	{
+		// Arrange
+		$english = require lang_path('en/ai.php');
+
+		foreach (glob(lang_path('*/ai.php')) as $file) {
+			// Act
+			$strings = require $file;
+
+			// Assert
+			foreach (self::MIC_HELP_KEYS as $key) {
+				$this->assertNotEmpty($strings[$key] ?? null, "{$file}: {$key}");
+				if ($file !== lang_path('en/ai.php')) {
+					$this->assertNotSame($english[$key], $strings[$key], "{$file}: {$key} is translated");
+				}
+			}
+		}
+	}
+
+	public function test_a_microphone_problem_opens_a_popup_with_a_retry(): void
+	{
+		// Arrange
+		$script = file_get_contents(public_path('assets/js/app/ai.formbox.js'));
+
+		// Assert: recording and dictation both open the help popup, which can try again or go back to typing
+		$this->assertSame(4, substr_count($script, 'showMicHelp('), 'the function, then recorder refused, recorder setup failed, dictation refused');
+		foreach (['function showMicHelp', "plain('mic_try_again')", "plain('mic_type_instead')", 'speakButton.click()', 'textEl.focus()'] as $hook) {
+			$this->assertStringContainsString($hook, $script, $hook);
+		}
+	}
+
 	public function test_only_a_refused_microphone_is_reported_as_blocked(): void
 	{
 		// Arrange

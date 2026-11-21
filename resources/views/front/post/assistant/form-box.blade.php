@@ -32,7 +32,12 @@
 			'mic_missing' => trans('ai.assistant_voice_no_mic'),
 			'mic_busy'    => trans('ai.assistant_voice_mic_busy'),
 			'no_speech'   => trans('ai.assistant_voice_no_speech'),
-		])->all();
+		])->merge(collect([
+			// The popup with the steps to fix a refused, missing or busy microphone
+			'denied_title', 'denied_step1', 'denied_step2', 'denied_step_mac',
+			'missing_title', 'missing_step1', 'missing_step_mac', 'missing_step2',
+			'busy_title', 'busy_step1', 'busy_step2', 'try_again', 'type_instead',
+		])->mapWithKeys(fn ($key) => ['mic_' . $key => trans('ai.assistant_mic_' . $key)]))->all();
 		$aiBoxExamples = ['phone', 'car', 'home', 'furniture'];
 	@endphp
 	<div class="col-12 mb-4 ai-assistant-wrap">
@@ -140,11 +145,11 @@
 	</div>
 
 	@pushOnce('after_styles_stack', 'ai_formbox_css')
-		<link href="{{ url('assets/css/ai-formbox.css') }}?v=3" rel="stylesheet">
+		<link href="{{ url('assets/css/ai-formbox.css') }}?v=4" rel="stylesheet">
 	@endPushOnce
 	@if ($aiBoxOn)
 		@pushOnce('after_scripts_stack', 'ai_formbox_js')
-			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=5"></script>
+			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=6"></script>
 		@endPushOnce
 	@endif
 @endif

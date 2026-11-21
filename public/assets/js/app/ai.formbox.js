@@ -114,6 +114,40 @@
 		'audio-capture': 'mic_missing'
 	};
 
+	// A site cannot switch a microphone on: only the person can, in the browser or the system. So when
+	// one is refused, missing or busy, a popup shows the steps for that case, then tries again on request.
+	var IS_MAC = /Mac/i.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '');
+	var MIC_HELP_STEPS = {
+		mic_denied: ['step1', 'step2', IS_MAC ? 'step_mac' : null],
+		mic_missing: ['step1', IS_MAC ? 'step_mac' : null, 'step2'],
+		mic_busy: ['step1', 'step2']
+	};
+
+	function showMicHelp(key) {
+		var steps = (MIC_HELP_STEPS[key] || []).filter(Boolean);
+		if (!steps.length || typeof window.Swal === 'undefined') {
+			return; // the message under the box already says what happened
+		}
+		var list = steps.map(function (step) {
+			return '<li>' + t(key + '_' + step) + '</li>';
+		}).join('');
+		window.Swal.fire({
+			title: plain(key + '_title'),
+			html: '<ol class="ai-mic-help">' + list + '</ol>',
+			icon: key === 'mic_busy' ? 'info' : 'warning',
+			showCancelButton: true,
+			confirmButtonText: '<i class="fa-solid fa-microphone"></i> ' + escapeHtml(plain('mic_try_again')),
+			cancelButtonText: escapeHtml(plain('mic_type_instead')),
+			theme: (typeof window.isDarkThemeEnabled === 'function' && window.isDarkThemeEnabled()) ? 'dark' : 'light'
+		}).then(function (result) {
+			if (result.isConfirmed) {
+				speakButton.click();
+			} else {
+				textEl.focus();
+			}
+		});
+	}
+
 	function setBusy(state, label) {
 		busy = state;
 		fillButton.disabled = state;
@@ -950,7 +984,9 @@
 				}, 250);
 			}, function (error) {
 				// NotReadableError, AbortError and the like: the microphone exists but would not start
-				setMessage(plain(MIC_ERRORS[error && error.name] || 'mic_busy'), 'danger');
+				var micKey = MIC_ERRORS[error && error.name] || 'mic_busy';
+				setMessage(plain(micKey), 'danger');
+				showMicHelp(micKey);
 			}).catch(function () {
 				// The microphone was allowed, but recording could not start
 				cancelled = true;
@@ -963,6 +999,7 @@
 					setBusy(false);
 				}
 				setMessage(plain('mic_busy'), 'danger');
+				showMicHelp('mic_busy');
 			});
 		}
 		var stopRecording = function () {
@@ -1034,7 +1071,11 @@
 				textEl.value = (before ? before + ' ' : '') + heard;
 			});
 			recognition.addEventListener('error', function (event) {
-				setMessage(plain(MIC_ERRORS[event.error] || 'no_speech'), 'warning');
+				var micKey = MIC_ERRORS[event.error];
+				setMessage(plain(micKey || 'no_speech'), 'warning');
+				if (micKey) {
+					showMicHelp(micKey);
+				}
 			});
 			recognition.addEventListener('end', function () {
 				recognition = null;
