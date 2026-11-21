@@ -28,7 +28,7 @@ class QuickPostLimitFixesTest extends TestCase
 		$this->setAi(['quickpost_member_limit' => '1']);
 		$user = $this->user(7);
 		$draft = fn (?string $parent) => $this->actingAs($user)->postJson(
-			'/posts/create/quick/draft',
+			'/posts/create/quick/fill',
 			array_filter(['text' => 'iPhone 13 blue with box ' . uniqid(), 'redraft_of' => $parent])
 		);
 		$root = $draft(null)->json('draft');
@@ -48,12 +48,12 @@ class QuickPostLimitFixesTest extends TestCase
 		// Arrange
 		$this->setAi(['quickpost_member_limit' => '1']);
 		$user = $this->user(7);
-		$root = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->json('draft');
-		$first = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue, box', 'redraft_of' => $root])->json('draft');
+		$root = $this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 blue with box'])->json('draft');
+		$first = $this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 blue, box', 'redraft_of' => $root])->json('draft');
 
 		// Act: re-draft the first re-draft, then the root again
-		$this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13, box', 'redraft_of' => $first])->assertJson(['ok' => true]);
-		$response = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 box', 'redraft_of' => $root]);
+		$this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13, box', 'redraft_of' => $first])->assertJson(['ok' => true]);
+		$response = $this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 box', 'redraft_of' => $root]);
 
 		// Assert
 		$response->assertStatus(429);
@@ -64,13 +64,13 @@ class QuickPostLimitFixesTest extends TestCase
 		// Arrange
 		$this->setAi(['quickpost_member_limit' => '1']);
 		$user = $this->user(7);
-		$this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
+		$this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
 		$failed = PostDraft::query()->create([
 			'token' => str_repeat('f', 32), 'user_id' => $user->id, 'status' => PostDraft::FAILED, 'counted' => false,
 		]);
 
 		// Act
-		$response = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 12 red', 'redraft_of' => $failed->token]);
+		$response = $this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 12 red', 'redraft_of' => $failed->token]);
 
 		// Assert
 		$response->assertStatus(429);
@@ -82,7 +82,7 @@ class QuickPostLimitFixesTest extends TestCase
 		$this->setAi(['quickpost_member_limit' => '1', 'quickpost_member_period' => 'month']);
 		$user = $this->user(7);
 		$this->travelTo(now()->startOfMonth()->addDay());
-		$this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
+		$this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
 
 		// Act: three days later the draft has expired and the hourly purge runs
 		$this->travel(3)->days();
@@ -93,7 +93,7 @@ class QuickPostLimitFixesTest extends TestCase
 		$this->assertNull($kept->input_text, 'the text is removed');
 		$this->assertNull($kept->raw_output);
 		$this->assertNull($kept->draft);
-		$this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 12 red with box'])->assertStatus(429);
+		$this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 12 red with box'])->assertStatus(429);
 	}
 
 	public function test_the_purge_deletes_counted_uses_once_no_period_can_need_them(): void
@@ -118,11 +118,11 @@ class QuickPostLimitFixesTest extends TestCase
 		$this->setAi(['quickpost_member_limit' => '1', 'quickpost_member_period' => 'day']);
 		$user = $this->user(7);
 		$this->travelTo(CarbonImmutable::parse('2026-11-19 21:00', 'Asia/Dhaka'));
-		$this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
+		$this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
 
 		// Act: half an hour after local midnight
 		$this->travelTo(CarbonImmutable::parse('2026-11-20 00:30', 'Asia/Dhaka'));
-		$response = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 12 red with box']);
+		$response = $this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 12 red with box']);
 
 		// Assert
 		date_default_timezone_set('UTC');
@@ -137,8 +137,8 @@ class QuickPostLimitFixesTest extends TestCase
 		$user->forceFill(['ai_post_limit' => 1])->save();
 
 		// Act
-		$this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
-		$response = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 12 red with box']);
+		$this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 13 blue with box'])->assertJson(['ok' => true]);
+		$response = $this->actingAs($user)->postJson('/posts/create/quick/fill', ['text' => 'iPhone 12 red with box']);
 
 		// Assert: the override counts per day
 		$response->assertStatus(429)->assertJson(['limit' => ['period' => 'day']]);

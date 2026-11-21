@@ -1626,14 +1626,6 @@ function getCreateListingLinkInfo(): array
 	$linkUrl = urlGen()->addPost();
 	$linkAttr = '';
 	
-	// adniro:ai - "Post an ad" opens the quick post composer when it is available
-	try {
-		if (app(\App\Services\QuickPost\QuickPostService::class)->available($authUser)) {
-			$linkUrl = url('posts/create/quick');
-		}
-	} catch (\Throwable $e) {
-	}
-	
 	if (config('settings.listing_form.mandatory_package_selection') == '1') {
 		if (!empty($authUser)) {
 			/*

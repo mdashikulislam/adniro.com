@@ -47,6 +47,8 @@
 									
 									<div class="row">
 										
+										@include('front.post.quick.form-box') {{-- adniro:ai --}}
+										
 										{{-- category_id --}}
 										@php
 											$categoryIdError = (isset($errors) && $errors->has('category_id')) ? ' is-invalid' : '';

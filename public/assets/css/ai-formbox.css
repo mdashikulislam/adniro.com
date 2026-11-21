@@ -1,0 +1,144 @@
+/*
+ * The AI box in the listing form (adniro:ai), ported from classifedz.com's listing-flow.css.
+ * Variables are scoped to the box and the flash on filled fields, so the rest of the form is unchanged.
+ */
+.ai-quick, .ai-filled {
+	--lf-brand: var(--bs-primary, #0a837f);
+	--lf-brand-rgb: var(--bs-primary-rgb, 10, 131, 127);
+	--lf-deep: #053f3d;
+	--lf-gold: #f6c343;
+	--lf-violet: #7c5cff;
+	--lf-ink: #142625;
+	--lf-muted: #5f7270;
+	--lf-line: #e4eaea;
+	--lf-field: #f7f9f9;
+	--lf-card: #ffffff;
+}
+[data-bs-theme="dark"] .ai-quick, [data-bs-theme="dark"] .ai-filled {
+	--lf-ink: #e8efee;
+	--lf-muted: #a3b3b1;
+	--lf-line: #2b3a39;
+	--lf-field: #1b2625;
+	--lf-card: #162120;
+}
+
+/* ---------- AI panel ---------- */
+.ai-quick-wrap { margin-bottom: .5rem; }
+.ai-quick {
+	border: 2px solid transparent !important;
+	border-radius: 20px !important;
+	background:
+		linear-gradient(var(--lf-card), var(--lf-card)) padding-box,
+		linear-gradient(120deg, var(--lf-brand), var(--lf-violet) 55%, var(--lf-gold)) border-box !important;
+	box-shadow: 0 18px 40px -22px rgba(124, 92, 255, .55) !important;
+}
+.ai-quick .card-body { padding: 1.6rem 1.75rem !important; }
+.ai-quick-badge { display: inline-flex; align-items: center; gap: .35rem; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #fff; padding: .3rem .65rem; border-radius: 999px; background: linear-gradient(120deg, var(--lf-brand), var(--lf-violet)); }
+.ai-quick-title { font-size: 1.3rem; font-weight: 700; letter-spacing: -.01em; margin: .6rem 0 .2rem; color: var(--lf-ink); }
+.ai-quick-hint { color: var(--lf-muted); font-size: .92rem; margin: 0 0 1rem; }
+.ai-quick-field { position: relative; }
+.ai-quick .ai-quick-text {
+	min-height: 110px;
+	resize: vertical;
+	border-radius: 16px !important;
+	border: 1px solid var(--lf-line) !important;
+	background: var(--lf-field) !important;
+	padding: 1rem 3.75rem 1rem 1.1rem !important;
+	font-size: 1rem;
+	line-height: 1.55;
+}
+.ai-quick .ai-quick-text:focus { background: var(--lf-card) !important; border-color: rgba(var(--lf-brand-rgb), .6) !important; box-shadow: 0 0 0 4px rgba(var(--lf-brand-rgb), .12) !important; }
+.ai-quick .ai-quick-text::placeholder { color: #9aaaa8; }
+.ai-quick-speak {
+	position: absolute;
+	right: .75rem;
+	bottom: .75rem;
+	width: 44px;
+	height: 44px;
+	padding: 0 !important;
+	border-radius: 50% !important;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	border: 0 !important;
+	color: var(--lf-brand) !important;
+	background: rgba(var(--lf-brand-rgb), .1) !important;
+	transition: background .15s, transform .15s;
+}
+.ai-quick-speak:hover { background: rgba(var(--lf-brand-rgb), .18) !important; transform: scale(1.05); }
+.ai-quick-speak.d-none { display: none !important; }
+.ai-quick-chips { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: .8rem 0 0; font-size: .82rem; color: var(--lf-muted); }
+.ai-quick-chip { border: 1px solid var(--lf-line); background: var(--lf-card); color: var(--lf-ink); border-radius: 999px; padding: .28rem .75rem; font-size: .8rem; cursor: pointer; transition: border-color .15s, background .15s; }
+.ai-quick-chip:hover { border-color: rgba(var(--lf-brand-rgb), .5); background: rgba(var(--lf-brand-rgb), .06); }
+.ai-quick-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 1.1rem; }
+.ai-quick-usage { color: var(--lf-muted); font-size: .82rem; }
+.ai-quick-fill {
+	border: 0 !important;
+	border-radius: 14px !important;
+	padding: .8rem 1.4rem !important;
+	font-weight: 700 !important;
+	color: #fff !important;
+	background: linear-gradient(120deg, var(--lf-brand), #0f9c8f 45%, var(--lf-violet)) !important;
+	box-shadow: 0 12px 26px -12px rgba(124, 92, 255, .7) !important;
+	transition: transform .15s, box-shadow .15s;
+}
+.ai-quick-fill:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 30px -12px rgba(124, 92, 255, .8) !important; }
+.ai-quick-fill:disabled { opacity: .6; }
+.ai-quick-undo { color: var(--lf-muted) !important; text-decoration: none !important; font-weight: 600; }
+/* live voice bar (WhatsApp-style) */
+.ai-quick.is-recording .ai-quick-field, .ai-quick.is-recording .ai-quick-chips, .ai-quick.is-recording .ai-quick-fill { display: none !important; }
+.ai-quick-recording { margin-top: .25rem; }
+.ai-voice-bar { display: flex; align-items: center; gap: .6rem; }
+.ai-voice-track { flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem; height: 60px; padding: 0 1.1rem; border-radius: 999px; background: var(--lf-field); border: 1px solid var(--lf-line); }
+.ai-voice-dot { width: 11px; height: 11px; flex-shrink: 0; border-radius: 50%; background: #e5484d; animation: lfVoicePulse 1.3s ease-out infinite; }
+@keyframes lfVoicePulse { 0% { box-shadow: 0 0 0 0 rgba(229, 72, 77, .55); } 70% { box-shadow: 0 0 0 9px rgba(229, 72, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0); } }
+.ai-quick-timer { flex-shrink: 0; min-width: 2.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--lf-ink); }
+.ai-voice-wave { flex: 1; min-width: 0; width: 100%; height: 38px; display: block; }
+.ai-voice-cancel, .ai-voice-send { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; transition: transform .15s, background .15s, box-shadow .15s; }
+.ai-voice-cancel { width: 48px; height: 48px; font-size: 1.15rem; color: #e5484d; background: transparent; }
+.ai-voice-cancel:hover { background: rgba(229, 72, 77, .1); }
+.ai-voice-send { width: 60px; height: 60px; font-size: 1.15rem; color: #fff; background: linear-gradient(120deg, var(--lf-deep), var(--lf-brand)); box-shadow: 0 12px 24px -10px rgba(var(--lf-brand-rgb), .9); }
+.ai-voice-send:hover:not(:disabled) { transform: scale(1.06); }
+.ai-voice-send .spinner-border { display: none; }
+.ai-voice-pause { flex-shrink: 0; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: transparent; color: #e5484d; font-size: 1.35rem; transition: background .15s; }
+.ai-voice-pause:hover { background: rgba(229, 72, 77, .1); }
+.ai-voice-hint-paused { display: none; }
+.ai-quick.is-paused .ai-voice-dot { animation: none; background: var(--lf-muted); }
+.ai-quick.is-paused .ai-voice-pause { color: var(--lf-brand); }
+.ai-quick.is-paused .ai-voice-hint-rec { display: none; }
+.ai-quick.is-paused .ai-voice-hint-paused { display: inline; }
+.ai-quick.is-sending .ai-voice-pause { visibility: hidden; }
+.ai-quick.is-sending .ai-voice-hint-paused { display: none; }
+.ai-voice-hint { margin: .6rem 0 0 3.6rem; font-size: .82rem; color: var(--lf-muted); }
+.ai-voice-hint-send { display: none; }
+.ai-quick.is-sending .ai-voice-dot { animation: none; background: var(--lf-muted); }
+.ai-quick.is-sending .ai-voice-wave { opacity: .45; }
+.ai-quick.is-sending .ai-voice-cancel { visibility: hidden; }
+.ai-quick.is-sending .ai-voice-send i { display: none; }
+.ai-quick.is-sending .ai-voice-send .spinner-border { display: inline-block; }
+.ai-quick.is-sending .ai-voice-hint-rec { display: none; }
+.ai-quick.is-sending .ai-voice-hint-send { display: inline; }
+.ai-quick-result { border-radius: 16px; background: rgba(var(--lf-brand-rgb), .06); padding: 1rem 1.15rem; }
+.ai-quick-result .list-group-item { background: transparent; color: var(--lf-ink); }
+
+
+/* filled-by-AI flash */
+.ai-filled { animation: lfFilled 2.4s ease-out 1; border-radius: 14px; }
+@keyframes lfFilled { 0% { box-shadow: 0 0 0 4px rgba(var(--lf-brand-rgb), .35); } 100% { box-shadow: 0 0 0 0 rgba(var(--lf-brand-rgb), 0); } }
+
+.ai-quick-speak.is-listening { color: #fff !important; background: #e5484d !important; }
+
+/* ---------- phones ---------- */
+@media (max-width: 767.98px) {
+	.ai-quick .card-body { padding: 1.1rem !important; }
+	.ai-quick-title { font-size: 1.12rem; }
+	.ai-quick-footer { flex-direction: column-reverse; align-items: stretch; }
+	.ai-quick-fill { width: 100%; }
+	/* Waveform on its own row, then delete / pause / send */
+	.ai-voice-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-areas: "track track track" "cancel pause send"; row-gap: .75rem; align-items: center; }
+	.ai-voice-track { grid-area: track; height: 52px; padding: 0 .9rem; }
+	.ai-voice-cancel { grid-area: cancel; justify-self: start; width: 44px; height: 44px; }
+	.ai-voice-pause { grid-area: pause; justify-self: center; width: 44px; height: 44px; }
+	.ai-voice-send { grid-area: send; justify-self: end; width: 54px; height: 54px; }
+	.ai-voice-hint { margin-left: 0; }
+}

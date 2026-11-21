@@ -3,16 +3,11 @@
 namespace Tests\Feature\Ai;
 
 use App\Models\AiUsageLog;
-use App\Models\Permission;
-use App\Models\Post;
-use App\Models\PostDraft;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSpend;
-use App\Services\QuickPost\DraftToPostInput;
 use App\Services\QuickPost\QuickPostService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /*
@@ -24,7 +19,7 @@ class AiPolishTest extends TestCase
 {
 	use RefreshDatabase, QuickPostFixtures;
 	
-	private const USER_KEYS = '/^(mail_not_approved|sms_not|owner_|badge_|finish_|moderation_category_|qp_|status_(approved|pending|needs_review|rejected|none))/';
+	private const USER_KEYS = '/^(mail_not_approved|sms_not|owner_|badge_|finish_|moderation_category_|qp_|box_|status_(approved|pending|needs_review|rejected|none))/';
 	
 	protected function setUp(): void
 	{
@@ -224,50 +219,4 @@ class AiPolishTest extends TestCase
 	
 	// --- One-screen review -------------------------------------------------
 	
-	public function test_a_draft_opens_the_one_screen_review_when_enabled(): void
-	{
-		$this->ai->answer($this->draftAnswer());
-		$user = $this->user(7);
-		$apply = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->json('redirect');
-		
-		$this->actingAs($user)->get($apply)->assertRedirect(url('posts/create/quick/review'));
-		
-		$this->setAi(['quickpost_one_screen' => '0']);
-		$this->actingAs($user)->get($apply)->assertRedirect(urlGen()->addPost());
-	}
-	
-	public function test_the_review_needs_a_draft_and_the_publish_checks_photos(): void
-	{
-		$user = $this->user(7);
-		$this->actingAs($user)->get('/posts/create/quick/review')->assertRedirect(urlGen()->addPost());
-		
-		config(['settings.listing_form.picture_mandatory' => '1', 'settings.listing_form.listings_limit' => 50]);
-		$this->ai->answer($this->draftAnswer());
-		$apply = $this->actingAs($user)->postJson('/posts/create/quick/draft', ['text' => 'iPhone 13 blue with box'])->json('redirect');
-		$this->actingAs($user)->get($apply);
-		
-		$response = $this->actingAs($user)->post('/posts/create/quick/publish', array_merge(session('postInput'), [
-			'contact_name' => 'Sam', 'auth_field' => 'email', 'email' => 'user7@example.test', 'accept_terms' => 1, 'city_id' => 600,
-			'description'  => 'Blue iPhone 13 with box, small scratch on the back.',
-		]));
-		
-		$response->assertRedirect(url('posts/create/quick/review'));
-		$this->assertSame(0, Post::query()->withoutGlobalScopes()->count());
-		$this->assertSame('Sam', session('postInput')['contact_name'], 'what was typed is kept');
-	}
-	
-	public function test_the_review_banner_shows_the_photos(): void
-	{
-		session()->put(DraftToPostInput::MARKS_KEY, ['draft' => str_repeat('a', 32), 'fields' => []]);
-		session()->put('postInput', ['title' => 'x']);
-		
-		$html = view('front.post.quick.form-banner', [
-			'quickPostOneScreen' => true,
-			'quickPostPhotos'    => [['key' => 0, 'url' => '/thumb/one.jpg']],
-		])->render();
-		
-		$this->assertStringContainsString('id="qpReviewPhotos"', $html);
-		$this->assertStringContainsString('/thumb/one.jpg', $html);
-		$this->assertStringContainsString('Add or remove photos', $html);
-	}
 }

@@ -12,7 +12,7 @@ use App\Services\Ai\Contracts\AiClientContract;
 use Illuminate\Support\Str;
 
 /*
- * Quick post: a person's text becomes a prefilled listing form (adniro:ai).
+ * Quick post: a person's description becomes the fields of a listing form (adniro:ai).
  * The draft call is synchronous; quick post never creates a listing itself.
  */
 
@@ -31,7 +31,6 @@ class QuickPostService
 		private readonly DraftPrompt $prompt,
 		private readonly DraftSanitizer $sanitizer,
 		private readonly LocationResolver $location,
-		private readonly DraftToPostInput $toPostInput,
 	)
 	{
 	}
@@ -94,9 +93,9 @@ class QuickPostService
 	}
 	
 	/**
-	 * Context: session_id, lat, lon, redraft_of, photos (stored paths, web), image_files (uploaded
-	 * files sent directly by the mobile app, not stored), web (false for the API: nothing is put
-	 * into the browser session).
+	 * Context: session_id, lat, lon, redraft_of, photos (stored paths), image_files (uploaded files
+	 * sent directly by the mobile app, not stored). Nothing is put into the browser session: the
+	 * form's AI box fills the form itself.
 	 *
 	 * @param array<string, mixed> $context
 	 * @return array{ok: bool, reason?: string, message?: string, draft?: PostDraft, limit: LimitStatus}
@@ -106,7 +105,6 @@ class QuickPostService
 		$text = trim($text);
 		$photos = array_slice(array_values(array_filter((array)($context['photos'] ?? []))), 0, self::MAX_PHOTOS);
 		$imageFiles = array_slice(array_values(array_filter((array)($context['image_files'] ?? []))), 0, self::MAX_PHOTOS);
-		$isWeb = (bool)($context['web'] ?? true);
 		
 		// With a photo, the text is optional
 		$min = (empty($photos) && empty($imageFiles)) ? (int)config('ai_features.quickpost.min_text', 10) : 0;
@@ -185,11 +183,6 @@ class QuickPostService
 				$draft->error = mb_substr($result->status . ($result->errorType ? ': ' . $result->errorType : ''), 0, 500);
 				$draft->save();
 				
-				// The form still works: the person's text goes into the description, the photos stay
-				if ($text !== '' && $isWeb) {
-					$this->toPostInput->applyText($text);
-				}
-				
 				return ['ok' => false, 'reason' => 'ai_unavailable', 'draft' => $draft, 'limit' => $status];
 			}
 			
@@ -226,24 +219,6 @@ class QuickPostService
 		} finally {
 			$lock->release();
 		}
-	}
-	
-	/**
-	 * Put a draft into the normal form. Only its owner (account or browser session) may use it.
-	 */
-	public function apply(string $token, ?User $user, ?string $sessionId): bool
-	{
-		$draft = $this->ownedDraft($token, $user, $sessionId);
-		if (!$draft || $draft->isExpired() || !in_array($draft->status, [PostDraft::DRAFTED, PostDraft::APPLIED], true)) {
-			return false;
-		}
-		
-		$this->toPostInput->apply($draft);
-		
-		$draft->status = PostDraft::APPLIED;
-		$draft->save();
-		
-		return true;
 	}
 	
 	/**

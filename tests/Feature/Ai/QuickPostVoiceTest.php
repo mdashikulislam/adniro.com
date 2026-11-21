@@ -3,14 +3,13 @@
 namespace Tests\Feature\Ai;
 
 use App\Http\Controllers\Web\Front\Post\QuickPost\QuickPostController;
-use App\Services\QuickPost\QuickPostService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /*
- * Phase 8: voice input in the quick post composer (adniro:ai).
+ * Dictation in the form's AI box when no speech-to-text model is assigned (adniro:ai).
  * The speech recognition itself runs in the browser; these tests cover what the server provides.
  */
 
@@ -51,37 +50,4 @@ class QuickPostVoiceTest extends TestCase
 		$this->assertSame(1, count(array_filter($voice['languages'], fn ($l) => $l['tag'] === 'bn-BD')), 'no duplicate');
 	}
 	
-	public function test_the_mic_is_hidden_until_the_browser_proves_it_can_listen(): void
-	{
-		$voice = ['default' => 'en-US', 'languages' => [['tag' => 'en-US', 'label' => 'English (US)'], ['tag' => 'bn-BD', 'label' => 'বাংলা']]];
-		$html = view('front.post.quick.partials.form', [
-			'limit' => app(QuickPostService::class)->limitStatus(null, '127.0.0.1'), 'limitText' => null,
-			'formUrl' => urlGen()->addPost(), 'draftUrl' => '/d', 'minText' => 10, 'maxText' => 2000, 'timeoutMs' => 30000,
-			'voice' => $voice,
-		])->render();
-		
-		$this->assertMatchesRegularExpression('/class="[^"]*d-none[^"]*"\s+id="qpVoice"/', $html);
-		$this->assertStringContainsString('<option value="en-US" selected>English (US)</option>', $html);
-		$this->assertStringContainsString('<option value="bn-BD" >বাংলা</option>', $html);
-		$this->assertStringContainsString('Speak instead of typing', $html);
-		$this->assertMatchesRegularExpression('/id="qpVoiceHint">Tip: on a phone, you can tap the microphone key/', $html);
-		$this->assertStringContainsString('processed by Google', $html);
-	}
-	
-	public function test_the_composer_script_listens_live_and_stops_after_a_minute(): void
-	{
-		$compiled = app('blade.compiler')->compileString(file_get_contents(resource_path('views/front/post/quick/composer.blade.php')));
-		token_get_all($compiled, TOKEN_PARSE); // throws a ParseError if the compiled template is not valid PHP
-		
-		foreach ([
-			'window.SpeechRecognition || window.webkitSpeechRecognition',
-			'isSecureContext',
-			'interimResults = true',
-			'VOICE_MAX_MS = 60000',
-			'qpVoiceLang',
-			'form.addEventListener(\'submit\', stopVoice, true)',
-		] as $hook) {
-			$this->assertStringContainsString($hook, $compiled, $hook);
-		}
-	}
 }

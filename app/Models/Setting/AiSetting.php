@@ -43,7 +43,6 @@ class AiSetting extends BaseSetting
 			'quickpost_member_period'      => 'day',
 			'quickpost_guest_limit'        => '5',
 			'quickpost_guest_period'       => 'day',
-			'quickpost_one_screen'         => '1',
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -228,14 +227,6 @@ class AiSetting extends BaseSetting
 			'label'   => trans('ai.setting_quickpost_enabled_label'),
 			'type'    => 'checkbox_switch',
 			'hint'    => trans('ai.setting_quickpost_enabled_hint'),
-			'wrapper' => ['class' => 'col-md-6'],
-			'tab'     => $tabName,
-		];
-		$fields[] = [
-			'name'    => 'quickpost_one_screen',
-			'label'   => trans('ai.setting_quickpost_one_screen_label'),
-			'type'    => 'checkbox_switch',
-			'hint'    => trans('ai.setting_quickpost_one_screen_hint'),
 			'wrapper' => ['class' => 'col-md-6'],
 			'tab'     => $tabName,
 		];

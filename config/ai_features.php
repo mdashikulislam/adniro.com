@@ -67,7 +67,6 @@ return [
 		'draft_ttl'      => 48, // hours
 		'rate_per_ip'    => 6,  // drafts a minute
 		'rate_per_user'  => 10, // drafts a minute
-		'photo_rate'     => 20, // photo uploads a minute
 		'voice_rate'     => 10, // voice recordings a minute
 		'guest_daily_cap' => (int)env('AI_QUICKPOST_GUEST_DAILY_CAP', 200), // AI drafts by all guests together, per day
 	],

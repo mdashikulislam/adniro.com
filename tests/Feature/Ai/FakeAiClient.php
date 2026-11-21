@@ -29,9 +29,12 @@ class FakeAiClient implements AiClientContract
 		$this->responder = $responder;
 	}
 	
+	/** Features to report as switched off (no model assigned). */
+	public array $disabled = [];
+	
 	public function enabled(string $feature): bool
 	{
-		return true;
+		return !in_array($feature, $this->disabled, true);
 	}
 	
 	public function structured(AiRequest $request): AiResult

@@ -1,5 +1,7 @@
 # AI for listings: moderation and quick post
 
+> **Update 2026-11-21: the quick post composer was replaced.** At the owner's choice, the AI now lives in a box at the top of the normal listing form, ported from classifedz.com. It fills the open form in place, through `POST posts/create/quick/fill` and the same draft service, limits and budget. The composer, its photo upload, one-screen review, form banner and `quickpost_one_screen` setting are gone, and `posts/create/quick` redirects to the form. Sections below that describe the composer are kept as history. See section 8 of docs/professional-website-plan.md.
+
 Plan only. Nothing in this document has been implemented.
 Prepared 2026-11-20 from two planner passes over the codebase, then checked against the code.
 Revised 2026-11-20: the AI provider and model are managed by the admin, not fixed in code.

@@ -225,14 +225,14 @@ Most important first:
   - Move new views into the theme override folder.
   - Add feature tests for the home, listing, search, 404, sitemap and structured-data pages.
 
-## 8. Decisions needed from you
-1. **AI posting.** Follow classifedz.com (the AI box inside the form) or keep adniro's composer?
-2. **Verified badge.** Email only, or email and phone? Phone needs an SMS provider.
-3. **Countries.** Keep 16 country sites with no listings, or launch the US (or your main country) only and hide the rest?
-4. **Guest posting.** Keep it with captcha, or require an account?
-5. **AI crawlers.** `robots.txt` blocks GPTBot, ClaudeBot and Google-Extended. Keep that, or allow them for visibility in AI search?
-6. **Notifications library.** Keep SweetAlert2 or PNotify?
-7. **From now on, follow your conventional commit format** (`feat:`, `fix:`) **without the Co-Authored-By line?**
+## 8. Decisions (answered 20 Nov 2026)
+1. **AI posting.** Port the classifedz.com AI box into the normal posting form. adniro's moderation, limits, budget and evaluations stay behind it; the separate composer page goes away. **Done 21 Nov 2026:** the box sits at the top of step 1 (and of the single-step form), fills the form in place through `POST posts/create/quick/fill`, and has undo, a checklist, example chips, voice (recording when a speech-to-text model is assigned, otherwise the browser's dictation) and texts in all 9 languages. `posts/create/quick` now redirects to the form. Photos are no longer sent to the AI from the web (the box runs before the photos step); the mobile API still accepts them.
+2. **Verified badge.** Email only. No SMS provider needed; phone verification stays off.
+3. **Countries.** The live server has 6 countries; keep those. The 16 local ones don't matter.
+4. **Guest posting.** Left to the admin: Admin > Settings > Listing form > "Guests can submit listings", and for AI drafts, Settings > AI > Quick post > guests. Captcha covers guests once it is switched on.
+5. **AI crawlers.** Keep GPTBot, ClaudeBot and Google-Extended blocked in `robots.txt`.
+6. **Notifications library.** Keep SweetAlert2 only (pop-ups and toast mode); remove PNotify, which is used in 18 files today.
+7. **Commits.** Conventional format (`feat:`, `fix:`) without the Co-Authored-By line.
 
 ## Total
 About 20 to 28 developer days. Phases 1 and 2 matter most: phase 1 is settings only, and phase 2 should be done before AI moderation or quick post is switched on for real users.

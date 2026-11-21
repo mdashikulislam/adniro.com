@@ -87,7 +87,6 @@ class QuickPostController extends BaseController
 			'lat'         => isset($data['lat']) ? (float)$data['lat'] : null,
 			'lon'         => isset($data['lon']) ? (float)$data['lon'] : null,
 			'redraft_of'  => $user ? ($data['redraft_of'] ?? null) : null,
-			'web'         => false,
 		]);
 		
 		/** @var LimitStatus $limit */
