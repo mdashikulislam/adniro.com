@@ -343,14 +343,10 @@
 	box-shadow: 0 0 0 2px var(--adn-bar-surface), 0 0 0 4px var(--bs-primary);
 }
 
-/* The current page: a mint pill behind the filled icon, in the site's teal */
-.adn-appbar-link.is-active {
-	color: var(--adn-teal-deep);
-}
-
+/* The current page: the filled icon and its label in the site's teal (no background) */
+.adn-appbar-link.is-active,
 .adn-appbar-link.is-active .adn-appbar-icon {
-	color: var(--adn-teal-deep);
-	background-color: rgba(var(--bs-primary-rgb), .2);
+	color: var(--bs-primary);
 }
 
 .adn-appbar-link.is-active .adn-appbar-label {
@@ -414,9 +410,6 @@
 	filter: drop-shadow(0 -4px 14px rgba(0, 0, 0, .45));
 }
 
-[data-bs-theme="dark"] .adn-appbar-link.is-active .adn-appbar-icon {
-	background-color: rgba(var(--bs-primary-rgb), .28);
-}
 
 /* Room for the bar: page content, the cookie banner and other bottom bars stay above it */
 @media (max-width: 767.98px) {
