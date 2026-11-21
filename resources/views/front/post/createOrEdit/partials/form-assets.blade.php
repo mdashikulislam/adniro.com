@@ -177,7 +177,8 @@
 		
 		/* Category */
 		var categoryWasSelected = false;
-		@if ($errors->isNotEmpty() || !empty($postId))
+		{{-- adniro: also when step 1 kept a category (back from the multi-step Photos step), so its name and fields load --}}
+		@if ($errors->isNotEmpty() || !empty($postId) || !empty(old('category_id', data_get($postInput, 'category_id'))))
 			categoryWasSelected = true;
 		@endif
 		/* Custom Fields */

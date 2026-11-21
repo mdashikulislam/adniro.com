@@ -42,8 +42,15 @@
 	$descriptionLimits = ['{min}' => max(200, (int)config('settings.listing_form.description_min_length', 5))];
 	$photoLimits = ['{min}' => 3]; // strength-score.js PHOTOS_GOOD
 	$tips = collect(range(1, 5))->map(fn ($i) => t('sell_quickly_advice_' . $i));
-	// Live buyer preview: a saved cover on edit pages; single-step pages also show the photos chosen in the form
-	$previewCover = (string)data_get($post, 'pictures.0.url.medium', '');
+	// The cover: the saved listing's first photo (edit), else the first photo already added in this create flow
+	// (back from the multi-step Photos step), as the Photos step shows it; never the site's default picture
+	$sessionCover = (string)collect((array)session('picturesInput', []))->first();
+	$previewCover = match (true) {
+		$listingForm->isEdit => (string)data_get($post, 'pictures.0.url.medium', ''),
+		$sessionCover !== '' && \App\Helpers\Common\Files\Storage\StorageDisk::getDisk()->exists($sessionCover)
+			=> thumbService($sessionCover)->resize('picture-md')->url(),
+		default => '',
+	};
 	$previewPhotoHint = match (true) {
 		$onPhotosStep => trans('listing_form.live_photo_here'),
 		($isSingleStep ?? false) => trans('listing_form.live_photo_below'),
