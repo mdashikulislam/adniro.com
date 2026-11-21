@@ -140,13 +140,13 @@
 		openSheet(preferredTab());
 	}
 
-	/* ---------- Menu and footer entries: always there in the browser ---------- */
+	/* ---------- Header menu, account menu and footer entries ([data-adn-install-entry]): always there in the browser ---------- */
 	function showEntries() {
 		var label = actionLabel();
 		document.querySelectorAll('[data-adn-install-label]').forEach(function (el) {
 			el.textContent = label;
 		});
-		document.querySelectorAll('.adn-install-foot, .adn-account-menu-item[data-adn-install]').forEach(function (el) {
+		document.querySelectorAll('[data-adn-install-entry]').forEach(function (el) {
 			el.hidden = false;
 		});
 	}
@@ -155,6 +155,11 @@
 		var trigger = event.target.closest && event.target.closest('[data-adn-install]');
 		if (trigger) {
 			event.preventDefault();
+			// From the header menu: close it first
+			var openMenu = trigger.closest('.navbar-collapse.show');
+			if (openMenu && window.bootstrap && window.bootstrap.Collapse) {
+				window.bootstrap.Collapse.getOrCreateInstance(openMenu).hide();
+			}
 			install();
 		}
 	});

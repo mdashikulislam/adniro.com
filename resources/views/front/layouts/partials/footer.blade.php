@@ -303,7 +303,7 @@
 				$footerAppName = (string)config('settings.app.name', config('app.name'));
 				$footerAppIcon = !empty(config('settings.app.favicon')) ? url('icon-192.png') : config('settings.app.logo_dark_url');
 			@endphp
-			<section class="adn-install-foot d-md-none" hidden aria-labelledby="adnInstallFootTitle">
+			<section class="adn-install-foot d-md-none" data-adn-install-entry hidden aria-labelledby="adnInstallFootTitle">
 				<img class="adn-install-icon" src="{{ $footerAppIcon }}" alt="" width="44" height="44" loading="lazy">
 				<div class="adn-install-foot-text">
 					<strong id="adnInstallFootTitle">{{ trans('app_install.title', ['name' => $footerAppName]) }}</strong>

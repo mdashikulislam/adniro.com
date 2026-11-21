@@ -258,6 +258,22 @@ html.adn-install-sheet-open {
 	font-weight: 700;
 }
 
+/* ---------- Header menu entry (phones): full width, like "Create Listing" above it ---------- */
+.adn-nav-install {
+	margin-top: .5rem;
+}
+
+.adn-nav-install .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .5rem;
+	width: 100%;
+	min-height: 44px;
+	border-radius: 999px;
+	font-weight: 700;
+}
+
 /* ---------- Footer card (the footer is dark) ---------- */
 .adn-install-foot {
 	display: grid;

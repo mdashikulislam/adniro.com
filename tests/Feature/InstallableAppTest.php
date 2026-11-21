@@ -80,6 +80,17 @@ class InstallableAppTest extends TestCase
 		$this->assertMatchesRegularExpression('/<button[^>]+class="dropdown-item adn-account-menu-item"[^>]+data-adn-install[^>]*hidden/', $html);
 	}
 
+	public function test_the_phone_header_menu_offers_the_app_hidden_until_the_script_shows_it(): void
+	{
+		// Act
+		$html = $this->get('/')->assertOk()->getContent();
+
+		// Assert: inside the header menu, phones only, with the same install action and label as the other entries
+		$menu = substr($html, strpos($html, 'id="navbarNav"'), strpos($html, '</nav>') - strpos($html, 'id="navbarNav"'));
+		$this->assertMatchesRegularExpression('/<li class="nav-item adn-nav-install d-md-none" data-adn-install-entry hidden>\s*<button type="button" class="btn btn-outline-primary" data-adn-install>/', $menu);
+		$this->assertStringContainsString('<span data-adn-install-label>' . e(trans('app_install.install')) . '</span>', $menu);
+	}
+
 	public function test_iphones_get_the_app_tags(): void
 	{
 		// Act
