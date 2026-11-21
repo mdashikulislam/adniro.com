@@ -40,7 +40,12 @@ trait MailConfig
 		
 		// Default Mail Sender
 		$mailSender = config('settings.app.email');
-		
+
+		// adniro: a sender for every driver. Drivers without their own sender setting ("log" in local
+		// development, "array" in tests) left it empty, and every email then failed with
+		// "An email must have a From or a Sender header". The drivers below still set their own.
+		config()->set('mail.from.address', env('MAIL_FROM_ADDRESS', $mailSender));
+
 		// SMTP
 		if ($driver == 'smtp') {
 			$host = $settings['smtp_host'] ?? null;

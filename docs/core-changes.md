@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (238)
+## Changed (239)
 
 Stock files we edited.
 
@@ -95,6 +95,7 @@ Stock files we edited.
 
 ### app/Providers
 
+- `app/Providers/AppService/ConfigTrait/MailConfig.php`
 - `app/Providers/AppService/ConfigTrait/SecurityConfig.php` (no marker comment)
 
 ### app/Rules
@@ -279,10 +280,10 @@ Stock files we edited.
 - `resources/views/front/pages/contact.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/multiSteps/create/finish.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/create/packages.blade.php` (no marker comment)
-- `resources/views/front/post/createOrEdit/multiSteps/create/photos.blade.php` (no marker comment)
+- `resources/views/front/post/createOrEdit/multiSteps/create/photos.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/create/post.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/edit/packages.blade.php` (no marker comment)
-- `resources/views/front/post/createOrEdit/multiSteps/edit/photos.blade.php` (no marker comment)
+- `resources/views/front/post/createOrEdit/multiSteps/edit/photos.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/edit/post.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/partials/wizard.blade.php`
 - `resources/views/front/post/createOrEdit/partials/category-modal.blade.php` (no marker comment)
@@ -588,7 +589,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (249)
+## Added (254)
 
 Files that are not part of LaraClassifier.
 
@@ -721,6 +722,7 @@ Files that are not part of LaraClassifier.
 - `app/Services/ListingAssistant/ListingAssistantService.php`
 - `app/Services/ListingAssistant/LocationResolver.php`
 - `app/Services/ListingForm/ListingFormState.php`
+- `app/Services/ListingForm/PanelState.php`
 - `app/Services/ListingForm/PriceHint.php`
 - `app/Services/ListingForm/PriceStats.php`
 - `app/Services/ListingWriter/WritingHelpService.php`
@@ -869,6 +871,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/ai-formbox.css`
 - `public/assets/css/listing-form-ai.css`
 - `public/assets/css/listing-form-panel.css`
+- `public/assets/css/listing-form-preview.css`
 - `public/assets/css/listing-form.css`
 - `public/assets/css/messenger.css`
 - `public/assets/js/app/ai.formbox.js`
@@ -880,6 +883,8 @@ Files that are not part of LaraClassifier.
 - `public/assets/js/app/listing-form/panel.js`
 - `public/assets/js/app/listing-form/preview.js`
 - `public/assets/js/app/listing-form/price-hint.js`
+- `public/assets/js/app/listing-form/strength-score.js`
+- `public/assets/js/app/listing-form/summary.js`
 - `public/assets/js/app/listing-form/undo-stack.js`
 - `public/assets/js/app/listing-form/validate.js`
 - `public/assets/plugins/jquery/3.7.1/jquery.min.js`
@@ -929,6 +934,7 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/post/createOrEdit/form/hidden-inputs.blade.php`
 - `resources/views/front/post/createOrEdit/form/page.blade.php`
 - `resources/views/front/post/createOrEdit/form/panel.blade.php`
+- `resources/views/front/post/createOrEdit/form/photos-panel.blade.php`
 - `resources/views/front/post/createOrEdit/form/section-card.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/contact.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/details.blade.php`
