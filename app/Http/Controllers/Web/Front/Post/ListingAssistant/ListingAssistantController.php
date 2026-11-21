@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web\Front\Post\ListingAssistant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\Front\Post\ListingAssistant\Concerns\AiJsonResponses;
 use App\Services\ListingAssistant\DraftForForm;
 use App\Services\ListingAssistant\FormPhotos;
 use App\Services\ListingAssistant\LimitStatus;
@@ -10,7 +11,6 @@ use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\RateLimiter;
 use Throwable;
 
 /*
@@ -23,6 +23,8 @@ use Throwable;
 
 class ListingAssistantController extends Controller
 {
+	use AiJsonResponses;
+
 	private const AUDIO_TYPES = 'audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave';
 
 	/** HTTP status for each reason a fill did not work. */
@@ -44,7 +46,7 @@ class ListingAssistantController extends Controller
 		}
 
 		$perMinute = (int)config($user ? 'ai_features.listing_assistant.rate_per_user' : 'ai_features.listing_assistant.rate_per_ip', 6);
-		if ($throttled = $this->throttled('listing-assistant', $perMinute, $request, $headers)) {
+		if ($throttled = $this->throttled('listing-assistant', $perMinute, $request)) {
 			return $throttled;
 		}
 
@@ -160,7 +162,7 @@ class ListingAssistantController extends Controller
 			return response()->json(['ok' => false, 'reason' => 'voice_off', 'message' => trans('ai.assistant_voice_unavailable')], 403, $headers);
 		}
 
-		if ($throttled = $this->throttled('listing-assistant-voice', (int)config('ai_features.listing_assistant.voice_rate', 10), $request, $headers)) {
+		if ($throttled = $this->throttled('listing-assistant-voice', (int)config('ai_features.listing_assistant.voice_rate', 10), $request)) {
 			return $throttled;
 		}
 
@@ -179,25 +181,5 @@ class ListingAssistantController extends Controller
 		return trans('ai.assistant_limit_reached', [
 			'when' => $limit->resetsAt?->setTimezone((string)config('app.timezone', 'UTC'))->isoFormat('LLL') ?? '',
 		]);
-	}
-
-	/**
-	 * A per-minute limit per account, or per IP address for guests. Null when the request may go on.
-	 */
-	private function throttled(string $prefix, int $perMinute, Request $request, array $headers): ?JsonResponse
-	{
-		$user = auth()->user();
-		$rateKey = $prefix . ':' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
-
-		if (RateLimiter::tooManyAttempts($rateKey, max(1, $perMinute))) {
-			return response()->json([
-				'ok'      => false,
-				'reason'  => 'rate',
-				'message' => trans('ai.assistant_rate', ['seconds' => RateLimiter::availableIn($rateKey)]),
-			], 429, $headers);
-		}
-		RateLimiter::hit($rateKey, 60);
-
-		return null;
 	}
 }

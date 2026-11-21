@@ -142,7 +142,7 @@
 	@endPushOnce
 	@if ($aiBoxOn)
 		@pushOnce('after_scripts_stack', 'ai_formbox_js')
-			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=3"></script>
+			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=4"></script>
 		@endPushOnce
 	@endif
 @endif

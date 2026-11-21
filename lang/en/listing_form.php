@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'Log in',
 	'ai_guest_hide'      => 'Hide this message',
 
+	// AI writing help next to Title and Description
+	'ai_help'            => 'AI help',
+	'ai_suggest_title'   => 'Suggest a title',
+	'ai_suggest_description' => 'Write a description',
+	'ai_shorten'         => 'Shorten',
+	'ai_clearer'         => 'Make clearer',
+	'ai_working'         => 'Writing…',
+	'ai_suggestion'      => 'AI suggestion',
+	'ai_check'           => 'Check it before you use it: the AI only knows what you wrote.',
+	'ai_use'             => 'Use this',
+	'ai_again'           => 'Try again',
+	'ai_dismiss'         => 'Dismiss',
+	'ai_undo'            => 'Undo',
+	'ai_used'            => 'Replaced with the AI suggestion.',
+	'ai_undone'          => 'Your own text is back.',
+	'ai_need_text'       => 'Write a few words first, then ask the AI to help.',
+	'ai_error'           => 'AI writing help is not available right now. Please try again later.',
+	
 	// Multi-step progress on phones
 	'step_of'            => 'Step :current of :total',
 ];

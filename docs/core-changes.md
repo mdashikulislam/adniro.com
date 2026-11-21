@@ -587,7 +587,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (232)
+## Added (244)
 
 Files that are not part of LaraClassifier.
 
@@ -621,7 +621,9 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Front/Account/FollowsController.php`
 - `app/Http/Controllers/Web/Front/Account/ProfileCoverController.php`
 - `app/Http/Controllers/Web/Front/Blog/BlogController.php`
+- `app/Http/Controllers/Web/Front/Post/ListingAssistant/Concerns/AiJsonResponses.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/ListingAssistantController.php`
+- `app/Http/Controllers/Web/Front/Post/ListingAssistant/WritingHelpController.php`
 - `app/Http/Controllers/Web/Front/RecentlyViewedController.php`
 - `app/Http/Controllers/Web/Front/SiteIconController.php`
 - `app/Http/Controllers/WebhookController.php`
@@ -717,6 +719,11 @@ Files that are not part of LaraClassifier.
 - `app/Services/ListingAssistant/ListingAssistantService.php`
 - `app/Services/ListingAssistant/LocationResolver.php`
 - `app/Services/ListingForm/ListingFormState.php`
+- `app/Services/ListingWriter/WritingHelpService.php`
+- `app/Services/ListingWriter/WritingLimit.php`
+- `app/Services/ListingWriter/WritingPrompt.php`
+- `app/Services/ListingWriter/WritingSanitizer.php`
+- `app/Services/ListingWriter/WritingTask.php`
 - `app/Services/SellerService.php`
 - `app/Services/StructuredDataService.php`
 
@@ -856,16 +863,19 @@ Files that are not part of LaraClassifier.
 ### public/assets
 
 - `public/assets/css/ai-formbox.css`
+- `public/assets/css/listing-form-ai.css`
 - `public/assets/css/listing-form-panel.css`
 - `public/assets/css/listing-form.css`
 - `public/assets/css/messenger.css`
 - `public/assets/js/app/ai.formbox.js`
 - `public/assets/js/app/consent.js`
 - `public/assets/js/app/guest-cache.js`
+- `public/assets/js/app/listing-form/ai-field-tools.js`
 - `public/assets/js/app/listing-form/counters.js`
 - `public/assets/js/app/listing-form/fields.js`
 - `public/assets/js/app/listing-form/panel.js`
 - `public/assets/js/app/listing-form/preview.js`
+- `public/assets/js/app/listing-form/undo-stack.js`
 - `public/assets/js/app/listing-form/validate.js`
 - `public/assets/plugins/jquery/3.7.1/jquery.min.js`
 
@@ -874,6 +884,7 @@ Files that are not part of LaraClassifier.
 - `resources/ai/eval/listing-assistant.json`
 - `resources/ai/eval/moderation.json`
 - `resources/ai/listing-assistant-instructions.md`
+- `resources/ai/listing-writer-instructions.md`
 - `resources/ai/moderation-policy.md`
 
 ### resources/css
@@ -908,6 +919,7 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/common/json-ld.blade.php`
 - `resources/views/front/post/assistant/form-box.blade.php`
 - `resources/views/front/post/createOrEdit/form/actions.blade.php`
+- `resources/views/front/post/createOrEdit/form/ai-tools.blade.php`
 - `resources/views/front/post/createOrEdit/form/body.blade.php`
 - `resources/views/front/post/createOrEdit/form/hidden-inputs.blade.php`
 - `resources/views/front/post/createOrEdit/form/page.blade.php`

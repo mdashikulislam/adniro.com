@@ -183,7 +183,7 @@ class AiAdminScreensTest extends TestCase
 		$this->assertNull($model->fresh()->last_test_ok);
 	}
 	
-	public function test_the_ai_settings_screen_lists_only_tested_vision_models(): void
+	public function test_the_ai_settings_screen_lists_only_tested_models_that_suit_each_feature(): void
 	{
 		$provider = AiProvider::query()->create(['name' => 'Main', 'driver' => 'anthropic', 'active' => true]);
 		$ready = AiModel::query()->create(['ai_provider_id' => $provider->id, 'model_id' => 'ready-vision-model', 'supports_vision' => true, 'active' => true]);
@@ -198,7 +198,9 @@ class AiAdminScreensTest extends TestCase
 		$response->assertOk();
 		$response->assertSee('ready-vision-model');
 		$response->assertDontSee('untested-model');
-		$response->assertDontSee('text-only-model');
+		// Text-only models suit writing help only, not the features that read photos
+		$this->assertSame(1, substr_count((string)$response->getContent(), 'text-only-model'));
+		$response->assertSee('AI writing help');
 		$response->assertSee('AI listing assistant');
 		$response->assertDontSee('Quick post');
 		$response->assertDontSee('quick post');

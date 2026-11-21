@@ -34,6 +34,7 @@ class AiSettings
 	private const FEATURE_KEYS = [
 		'moderation'      => ['moderation_model_id', 'moderation_fallback_model_id'],
 		'listing_assistant' => ['listing_assistant_model_id', 'listing_assistant_fallback_model_id'],
+		'listing_writer'  => ['writing_help_model_id', null],
 		'transcription'   => ['transcription_model_id', null],
 	];
 	
@@ -123,6 +124,12 @@ class AiSettings
 			}
 		}
 		
+		// Writing help works without setup: its own model first (if any), then the listing
+		// assistant's, so it keeps working when its own model is switched off or fails its test
+		if ($feature === 'listing_writer') {
+			return array_values(array_unique(array_merge($ids, $this->modelIdsFor('listing_assistant'))));
+		}
+		
 		return $ids;
 	}
 	
@@ -203,6 +210,28 @@ class AiSettings
 		
 		$limit = max(0, (int)($values['listing_assistant_' . $who . '_limit'] ?? $default));
 		$period = (string)($values['listing_assistant_' . $who . '_period'] ?? 'day');
+		
+		return [$limit, in_array($period, ['day', 'week', 'month', 'none'], true) ? $period : 'day'];
+	}
+	
+	/**
+	 * AI writing help next to the listing form's Title and Description (members only).
+	 */
+	public function writingHelpEnabled(): bool
+	{
+		return ($this->all()['writing_help_enabled'] ?? '0') == '1';
+	}
+	
+	/**
+	 * Writing help per member: [number per period, period]. Period: day, week, month, or none.
+	 *
+	 * @return array{0: int, 1: string}
+	 */
+	public function writingHelpLimit(): array
+	{
+		$values = $this->all();
+		$limit = max(0, (int)($values['writing_help_member_limit'] ?? 30));
+		$period = (string)($values['writing_help_period'] ?? 'day');
 		
 		return [$limit, in_array($period, ['day', 'week', 'month', 'none'], true) ? $period : 'day'];
 	}

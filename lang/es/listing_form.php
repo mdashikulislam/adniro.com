@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'Iniciar sesión',
 	'ai_guest_hide'      => 'Ocultar este mensaje',
 
+	// AI writing help next to Title and Description
+	'ai_help' => 'Ayuda de IA',
+	'ai_suggest_title' => 'Sugerir un título',
+	'ai_suggest_description' => 'Escribir una descripción',
+	'ai_shorten' => 'Acortar',
+	'ai_clearer' => 'Aclarar',
+	'ai_working' => 'Escribiendo…',
+	'ai_suggestion' => 'Sugerencia de la IA',
+	'ai_check' => 'Revísala antes de usarla: la IA solo sabe lo que tú has escrito.',
+	'ai_use' => 'Usar esto',
+	'ai_again' => 'Intentar de nuevo',
+	'ai_dismiss' => 'Descartar',
+	'ai_undo' => 'Deshacer',
+	'ai_used' => 'Sustituido por la sugerencia de la IA.',
+	'ai_undone' => 'Tu propio texto ha vuelto.',
+	'ai_need_text' => 'Escribe primero unas palabras y luego pide ayuda a la IA.',
+	'ai_error' => 'La ayuda de escritura con IA no está disponible ahora mismo. Inténtalo de nuevo más tarde.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Paso :current de :total',
 ];

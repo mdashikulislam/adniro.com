@@ -213,6 +213,71 @@ class ListingFormPagesTest extends TestCase
 		$this->assertNotNull($xpath->query("//label[@for='negotiable']//input[@id='negotiable']")->item(0), 'the whole Negotiable label toggles it');
 	}
 	
+	public static function writingHelpPages(): array
+	{
+		return [
+			'member, multi-step create' => [self::MULTI, true, '/posts/create', 6],
+			'member, single-step edit'  => [self::SINGLE, true, '/edit/{id}', 6],
+			'guest, multi-step create'  => [self::MULTI, false, '/posts/create', 0],
+		];
+	}
+	
+	#[DataProvider('writingHelpPages')]
+	public function test_members_get_ai_writing_help_beside_title_and_description(string $mode, bool $asOwner, string $url, int $buttons): void
+	{
+		// Arrange: AI on with writing help, and a client that reports a usable model
+		config(['settings.listing_form.publication_form_type' => $mode]);
+		$this->switchOnWritingHelp(true);
+		$request = $asOwner ? $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID)) : $this;
+		
+		// Act
+		$xpath = $this->formXPath($request->get(str_replace('{id}', (string)$this->postId, $url)));
+		
+		// Assert
+		$this->assertSame($buttons, $xpath->query("//form[@id='payableForm']//button[@data-lf-write]")->length);
+		if ($buttons > 0) {
+			$this->assertNotNull($xpath->query("//label[@for='title']/following-sibling::*//button[@id='lfAiTools-title']")->item(0), 'beside the Title label');
+		}
+	}
+	
+	public function test_no_writing_help_while_the_admin_has_it_off(): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => self::MULTI]);
+		$this->switchOnWritingHelp(false);
+		
+		// Act
+		$xpath = $this->formXPath($this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))->get('/posts/create'));
+		
+		// Assert
+		$this->assertSame(0, $xpath->query("//button[@data-lf-write]")->length);
+	}
+	
+	public function test_a_member_the_admin_blocked_from_ai_sees_no_writing_help(): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => self::MULTI]);
+		$this->switchOnWritingHelp(true);
+		$owner = \App\Models\User::query()->find(self::OWNER_ID);
+		$owner->forceFill(['ai_post_limit' => 0])->save();
+		
+		// Act
+		$xpath = $this->formXPath($this->actingAs($owner)->get('/posts/create'));
+		
+		// Assert
+		$this->assertSame(0, $xpath->query("//button[@data-lf-write]")->length);
+	}
+	
+	private function switchOnWritingHelp(bool $on): void
+	{
+		\App\Models\Setting::query()->updateOrCreate(['name' => 'ai'], ['label' => 'AI', 'active' => 1, 'field_values' => [
+			'enabled' => '1', 'writing_help_enabled' => $on ? '1' : '0',
+		]]);
+		$this->app->instance(\App\Services\Ai\Contracts\AiClientContract::class, new \Tests\Feature\Ai\FakeAiClient());
+		$this->app->forgetInstance(\App\Services\Ai\AiSettings::class);
+		$this->app->forgetInstance(\App\Services\ListingWriter\WritingHelpService::class);
+	}
+	
 	public static function editStatuses(): array
 	{
 		return [

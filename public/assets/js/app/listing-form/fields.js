@@ -67,13 +67,73 @@
 		return htmlToText(area.value);
 	}
 
+	function editorOf(area) {
+		if (!area) {
+			return null;
+		}
+		if (window.tinymce && area.id && window.tinymce.get(area.id)) {
+			const editor = window.tinymce.get(area.id);
+			return {get: () => editor.getContent(), set: (html) => editor.setContent(html)};
+		}
+		if (window.jQuery && window.jQuery(area).data('summernote')) {
+			const $area = window.jQuery(area);
+			return {get: () => $area.summernote('code'), set: (html) => $area.summernote('code', html)};
+		}
+		if (window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[area.id]) {
+			const editor = window.CKEDITOR.instances[area.id];
+			return {get: () => editor.getData(), set: (html) => editor.setData(html)};
+		}
+		return null;
+	}
+	
+	/** Plain text as editor HTML: escaped, blank lines become paragraphs, single new lines <br> */
+	function textToHtml(text) {
+		const escape = (value) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		return String(text).split(/\n{2,}/)
+			.map((paragraph) => paragraph.trim())
+			.filter(Boolean)
+			.map((paragraph) => '<p>' + escape(paragraph).replace(/\n/g, '<br>') + '</p>')
+			.join('');
+	}
+	
+	/** A field's value as its control holds it (HTML for rich editors), for undo */
+	function rawValue(name) {
+		const el = byName(name);
+		const editor = (name === 'description') ? editorOf(el) : null;
+		return editor ? editor.get() : (el ? el.value : '');
+	}
+	
+	function setRawValue(name, raw) {
+		const el = byName(name);
+		if (!el) {
+			return;
+		}
+		const editor = (name === 'description') ? editorOf(el) : null;
+		if (editor) {
+			editor.set(raw);
+		} else {
+			el.value = raw;
+		}
+		el.dispatchEvent(new Event('input', {bubbles: true}));
+		el.dispatchEvent(new Event('change', {bubbles: true}));
+	}
+	
+	/** Plain text into a field; a rich editor gets it as paragraphs */
+	function setText(name, text) {
+		const editor = (name === 'description') ? editorOf(byName(name)) : null;
+		setRawValue(name, editor ? textToHtml(text) : text);
+	}
+	
 	/** The picked category's name; the picker shows "Name [Edit]" */
 	function categoryName(categoryId) {
 		const box = form.querySelector('#catsContainer');
 		if (!box || categoryId <= 0) {
 			return '';
 		}
-		return (box.textContent || '').split('[')[0].replace(/\s+/g, ' ').trim();
+		// The picker shows "Name [Edit]"; before that it holds only its "Select a category" link
+		const copy = box.cloneNode(true);
+		copy.querySelectorAll('a').forEach((link) => link.remove());
+		return (copy.textContent || '').replace(/[\[\]]/g, '').replace(/\s+/g, ' ').trim();
 	}
 
 	function value(name) {
@@ -177,6 +237,9 @@
 		byName: byName,
 		isVisible: isVisible,
 		state: state,
+		rawValue: rawValue,
+		setRawValue: setRawValue,
+		setText: setText,
 		onChange: onChange,
 		focusTarget: focusTarget,
 	};

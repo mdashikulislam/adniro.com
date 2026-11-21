@@ -43,6 +43,10 @@ class AiSetting extends BaseSetting
 			'listing_assistant_member_period'      => 'day',
 			'listing_assistant_guest_limit'        => '5',
 			'listing_assistant_guest_period'       => 'day',
+			'writing_help_enabled'                 => '0',
+			'writing_help_member_limit'            => '30',
+			'writing_help_period'                  => 'day',
+			'writing_help_model_id'                => null,
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -264,6 +268,58 @@ class AiSetting extends BaseSetting
 				'tab'     => $tabName,
 			];
 		}
+		
+		// AI writing help (the buttons next to Title and Description)
+		$tabName = trans('ai.setting_tab_writing_help');
+		if (self::getPanelTabsType() == 'vertical') {
+			$fields[] = [
+				'name'  => 'ai_writing_help_sep',
+				'type'  => 'custom_html',
+				'value' => $tabName,
+				'tab'   => $tabName,
+			];
+		}
+		$fields[] = [
+			'name'  => 'ai_writing_help_info',
+			'type'  => 'custom_html',
+			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_writing_help_info')) . '</div>',
+			'tab'   => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'writing_help_enabled',
+			'label'   => trans('ai.setting_writing_help_enabled_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('ai.setting_writing_help_enabled_hint'),
+			'wrapper' => ['class' => 'col-md-6'],
+			'tab'     => $tabName,
+		];
+		$fields[] = [
+			'name'        => 'writing_help_model_id',
+			'label'       => trans('ai.setting_writing_help_model_label'),
+			'type'        => 'select2_from_array',
+			'options'     => self::modelOptions('listing_writer'),
+			'allows_null' => true,
+			'hint'        => trans('ai.setting_writing_help_model_hint'),
+			'wrapper'     => ['class' => 'col-md-6'],
+			'tab'         => $tabName,
+		];
+		$fields[] = [
+			'name'       => 'writing_help_member_limit',
+			'label'      => trans('ai.setting_writing_help_limit_label'),
+			'type'       => 'number',
+			'attributes' => ['min' => 0, 'step' => 1],
+			'hint'       => trans('ai.setting_writing_help_limit_hint'),
+			'wrapper'    => ['class' => 'col-md-3'],
+			'tab'        => $tabName,
+		];
+		$fields[] = [
+			'name'    => 'writing_help_period',
+			'label'   => trans('ai.setting_writing_help_period_label'),
+			'type'    => 'select2_from_array',
+			'options' => $periodOptions,
+			'wrapper' => ['class' => 'col-md-3'],
+			'tab'     => $tabName,
+		];
 		
 		// Budget
 		$tabName = trans('ai.setting_tab_budget');

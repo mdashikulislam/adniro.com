@@ -21,8 +21,10 @@
 		'priceMandatory' => (config('settings.listing_form.price_mandatory') == '1'),
 		'currency'       => (string)config('currency.symbol', ''),
 		'strings'        => trans('listing_form'),
+		'writeUrl'       => url('posts/assistant/write'),
+		'postId'         => $listingForm->postId,
 	];
-	$lfScripts = ['fields', 'counters', 'validate', 'preview', 'panel'];
+	$lfScripts = ['fields', 'counters', 'validate', 'preview', 'panel', 'undo-stack', 'ai-field-tools'];
 @endphp
 
 @if ($lfV2)
@@ -135,6 +137,9 @@
 	@endPushOnce
 	@pushOnce('after_styles_stack', 'listing_form_panel_css')
 		<link href="{{ url('assets/css/listing-form-panel.css') }}?v={{ @filemtime(public_path('assets/css/listing-form-panel.css')) }}" rel="stylesheet">
+	@endPushOnce
+	@pushOnce('after_styles_stack', 'listing_form_ai_css')
+		<link href="{{ url('assets/css/listing-form-ai.css') }}?v={{ @filemtime(public_path('assets/css/listing-form-ai.css')) }}" rel="stylesheet">
 	@endPushOnce
 	@pushOnce('after_scripts_stack', 'listing_form_js')
 		@foreach ($lfScripts as $lfScript)

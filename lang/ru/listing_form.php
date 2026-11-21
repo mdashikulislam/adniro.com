@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'Войти',
 	'ai_guest_hide'      => 'Скрыть это сообщение',
 
+	// AI writing help next to Title and Description
+	'ai_help' => 'Помощь ИИ',
+	'ai_suggest_title' => 'Предложить заголовок',
+	'ai_suggest_description' => 'Написать описание',
+	'ai_shorten' => 'Сократить',
+	'ai_clearer' => 'Сделать понятнее',
+	'ai_working' => 'Пишу…',
+	'ai_suggestion' => 'Предложение ИИ',
+	'ai_check' => 'Проверьте его перед использованием: ИИ знает только то, что вы написали.',
+	'ai_use' => 'Использовать',
+	'ai_again' => 'Попробовать снова',
+	'ai_dismiss' => 'Закрыть',
+	'ai_undo' => 'Отменить',
+	'ai_used' => 'Заменено предложением ИИ.',
+	'ai_undone' => 'Ваш текст возвращён.',
+	'ai_need_text' => 'Сначала напишите несколько слов, затем попросите помощи у ИИ.',
+	'ai_error' => 'Помощь ИИ в написании текста сейчас недоступна. Пожалуйста, попробуйте позже.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Шаг :current из :total',
 ];

@@ -542,8 +542,26 @@
 		return (title && title.value.trim() !== '') || plain !== '';
 	}
 
+	/* Asks before the AI overwrites what the seller typed (SweetAlert2); resolves true to go on */
 	function confirmReplace() {
-		return !hasContent() || window.confirm(plain('confirm_replace'));
+		if (!hasContent()) {
+			return Promise.resolve(true);
+		}
+		// SweetAlert2 is on every page; should it fail to load, still never overwrite silently
+		if (typeof window.Swal === 'undefined') {
+			return Promise.resolve(window.confirm(plain('confirm_replace')));
+		}
+		var buttons = (window.langLayout && window.langLayout.confirm && window.langLayout.confirm.button) || {};
+		return window.Swal.fire({
+			text: plain('confirm_replace'),
+			icon: 'question',
+			showCancelButton: true,
+			confirmButtonText: buttons.ok || 'OK',
+			cancelButtonText: buttons.cancel || 'Cancel',
+			theme: (typeof window.isDarkThemeEnabled === 'function' && window.isDarkThemeEnabled()) ? 'dark' : 'light'
+		}).then(function (result) {
+			return !!result.isConfirmed;
+		});
 	}
 
 	fillButton.addEventListener('click', function () {
@@ -556,16 +574,18 @@
 			textEl.focus();
 			return;
 		}
-		if (!confirmReplace()) {
-			return;
-		}
-		setMessage('');
-		setBusy(true, plain('filling'));
-		var body = new FormData();
-		if (text !== '') {
-			body.append('text', text);
-		}
-		send(body);
+		confirmReplace().then(function (go) {
+			if (!go) {
+				return;
+			}
+			setMessage('');
+			setBusy(true, plain('filling'));
+			var body = new FormData();
+			if (text !== '') {
+				body.append('text', text);
+			}
+			send(body);
+		});
 	});
 
 	textEl.addEventListener('keydown', function (event) {
@@ -850,9 +870,13 @@
 			if (busy || recorder) {
 				return;
 			}
-			if (!confirmReplace()) {
-				return;
-			}
+			confirmReplace().then(function (go) {
+				if (go && !busy && !recorder) {
+					startRecording();
+				}
+			});
+		});
+		function startRecording() {
 			setMessage('');
 			chunks = [];
 			cancelled = false;
@@ -913,7 +937,7 @@
 			}).catch(function () {
 				setMessage(plain('mic_denied'), 'danger');
 			});
-		});
+		}
 		var stopRecording = function () {
 			// Resume first so the last part is flushed and the length is right
 			if (paused && recorder && recorder.state === 'paused') {

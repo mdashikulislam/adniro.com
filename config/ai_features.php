@@ -26,6 +26,7 @@ return [
 	'features' => [
 		'moderation'      => ['vision' => true, 'transcription' => false],
 		'listing_assistant' => ['vision' => true, 'transcription' => false],
+		'listing_writer'  => ['vision' => false, 'transcription' => false],
 		'transcription'   => ['vision' => false, 'transcription' => true],
 	],
 	
@@ -69,5 +70,13 @@ return [
 		'rate_per_user'  => 10, // drafts a minute
 		'voice_rate'     => 10, // voice recordings a minute
 		'guest_daily_cap' => (int)env('AI_LISTING_ASSISTANT_GUEST_DAILY_CAP', 200), // AI drafts by all guests together, per day
+	],
+	
+	// AI writing help next to the listing form's Title and Description (members only)
+	'listing_writer' => [
+		'timeout'       => (int)env('AI_LISTING_WRITER_TIMEOUT', 20), // seconds
+		'min_text'      => 10,  // characters to work from
+		'max_tokens'    => 2000,
+		'rate_per_user' => 10,  // requests a minute
 	],
 ];

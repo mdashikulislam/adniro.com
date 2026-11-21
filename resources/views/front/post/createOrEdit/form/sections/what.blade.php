@@ -45,6 +45,20 @@
 	])
 @endif
 
+{{-- AI writing help beside Title and Description (redesigned layout, members, switched on) --}}
+@php
+	$writingHelp = app(\App\Services\ListingWriter\WritingHelpService::class);
+	$writingTools = [];
+	$writingStatus = (($lfV2 ?? false) && $writingHelp->available(auth()->user())) ? $writingHelp->limitStatus(auth()->user()) : null;
+	// No menu for a member the admin blocked from AI (limit 0)
+	if ($writingStatus && $writingStatus->limit !== 0) {
+		$writingLimitText = \App\Http\Controllers\Web\Front\Post\ListingAssistant\WritingHelpController::limitText($writingStatus);
+		foreach (['title', 'description'] as $writingField) {
+			$writingTools[$writingField] = view('front.post.createOrEdit.form.ai-tools', ['field' => $writingField, 'limitText' => $writingLimitText])->render();
+		}
+	}
+@endphp
+
 {{-- title --}}
 @php
 	$titleAttributes = ['id' => 'title', 'aria-required' => 'true'];
@@ -60,6 +74,7 @@
 	'value'       => $listingForm->title,
 	'hint'        => ($lfV2 ?? false) ? trans('listing_form.hint_title') : t('a_great_title_needs_at_least_60_characters'),
 	'attributes'  => $titleAttributes,
+	'labelRightContent' => $writingTools['title'] ?? null,
 ])
 
 {{-- description: rich editors render the real textarea as "{editor}_description" --}}
@@ -79,4 +94,5 @@
 	'attributes'  => ['rows' => 15, 'aria-required' => 'true'],
 	'hint'        => ($lfV2 ?? false) ? trans('listing_form.hint_description') : t('describe_what_makes_your_listing_unique'),
 	'wrapper'     => ($lfV2 ?? false) ? ['class' => 'lf-description'] : [],
+	'labelRightContent' => $writingTools['description'] ?? null,
 ])

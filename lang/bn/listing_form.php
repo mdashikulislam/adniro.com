@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'লগ ইন করুন',
 	'ai_guest_hide'      => 'এই বার্তা লুকান',
 
+	// AI writing help next to Title and Description
+	'ai_help' => 'AI সহায়তা',
+	'ai_suggest_title' => 'একটি শিরোনাম প্রস্তাব করুন',
+	'ai_suggest_description' => 'একটি বিবরণ লিখুন',
+	'ai_shorten' => 'ছোট করুন',
+	'ai_clearer' => 'আরও স্পষ্ট করুন',
+	'ai_working' => 'লেখা হচ্ছে…',
+	'ai_suggestion' => 'AI-এর প্রস্তাব',
+	'ai_check' => 'ব্যবহারের আগে দেখে নিন: AI শুধু আপনার লেখাটুকুই জানে।',
+	'ai_use' => 'এটি ব্যবহার করুন',
+	'ai_again' => 'আবার চেষ্টা করুন',
+	'ai_dismiss' => 'বাদ দিন',
+	'ai_undo' => 'পূর্বাবস্থায় ফিরুন',
+	'ai_used' => 'AI-এর প্রস্তাব দিয়ে বদলে দেওয়া হয়েছে।',
+	'ai_undone' => 'আপনার নিজের লেখা ফিরে এসেছে।',
+	'ai_need_text' => 'আগে কয়েকটি শব্দ লিখুন, তারপর AI-এর সাহায্য নিন।',
+	'ai_error' => 'AI লেখার সহায়তা এখন পাওয়া যাচ্ছে না। অনুগ্রহ করে পরে আবার চেষ্টা করুন।',
+
 	// Multi-step progress on phones
 	'step_of'            => 'ধাপ :current / :total',
 ];

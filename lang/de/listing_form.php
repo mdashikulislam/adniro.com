@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'Anmelden',
 	'ai_guest_hide'      => 'Diese Meldung ausblenden',
 
+	// AI writing help next to Title and Description
+	'ai_help' => 'KI-Hilfe',
+	'ai_suggest_title' => 'Titel vorschlagen',
+	'ai_suggest_description' => 'Beschreibung schreiben',
+	'ai_shorten' => 'Kürzen',
+	'ai_clearer' => 'Klarer formulieren',
+	'ai_working' => 'Wird geschrieben…',
+	'ai_suggestion' => 'KI-Vorschlag',
+	'ai_check' => 'Prüfen Sie ihn vor der Verwendung: Die KI kennt nur, was Sie geschrieben haben.',
+	'ai_use' => 'Übernehmen',
+	'ai_again' => 'Erneut versuchen',
+	'ai_dismiss' => 'Verwerfen',
+	'ai_undo' => 'Rückgängig',
+	'ai_used' => 'Durch den KI-Vorschlag ersetzt.',
+	'ai_undone' => 'Ihr eigener Text ist wieder da.',
+	'ai_need_text' => 'Schreiben Sie zuerst ein paar Wörter und bitten Sie dann die KI um Hilfe.',
+	'ai_error' => 'Die KI-Schreibhilfe ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'Schritt :current von :total',
 ];

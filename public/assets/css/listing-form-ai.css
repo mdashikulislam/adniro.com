@@ -1,0 +1,98 @@
+/*
+ * adniro: AI writing help in the redesigned listing form (form/ai-tools.blade.php and
+ * listing-form/ai-field-tools.js).
+ */
+
+/* "AI help" beside the label */
+.lf-v2 .lf-ai-tools-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: .35rem;
+	min-height: 32px;
+	padding: .2rem .7rem;
+	border: 1px solid rgba(var(--bs-primary-rgb), .3);
+	border-radius: 999px;
+	font-size: .8rem;
+	font-weight: 700;
+	color: var(--bs-primary);
+	background-color: rgba(var(--bs-primary-rgb), .06);
+}
+
+.lf-v2 .lf-ai-tools-toggle:hover,
+.lf-v2 .lf-ai-tools-toggle[aria-expanded="true"] {
+	color: var(--bs-primary);
+	background-color: rgba(var(--bs-primary-rgb), .12);
+	border-color: rgba(var(--bs-primary-rgb), .5);
+}
+
+.lf-v2 .lf-ai-tools-menu .dropdown-item {
+	min-height: 40px;
+	font-size: .9rem;
+}
+
+.lf-v2 .lf-ai-tools-limit {
+	font-size: .78rem;
+	color: var(--bs-secondary-color);
+}
+
+/* The suggestion panel under the field */
+.lf-v2 .lf-ai-panel {
+	/* Line up with the field: the card grid gives columns side padding */
+	width: calc(100% - var(--bs-gutter-x, 1.5rem));
+	margin-inline: calc(var(--bs-gutter-x, 1.5rem) * .5);
+	margin-block: -.5rem 1rem;
+	padding: .85rem 1rem;
+	border: 1px solid rgba(var(--bs-primary-rgb), .25);
+	border-inline-start-width: 4px;
+	border-radius: 12px;
+	background-color: rgba(var(--bs-primary-rgb), .04);
+}
+
+.lf-v2 .lf-ai-panel-heading {
+	margin: 0 0 .35rem;
+	font-size: .78rem;
+	font-weight: 700;
+	color: var(--bs-primary);
+}
+
+.lf-v2 .lf-ai-panel-text {
+	max-height: 16rem;
+	overflow-y: auto;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	color: var(--bs-emphasis-color);
+}
+
+.lf-v2 .lf-ai-panel-note {
+	margin: .5rem 0 0;
+	font-size: .78rem;
+	color: var(--bs-secondary-color);
+}
+
+.lf-v2 .lf-ai-panel-message {
+	margin: 0;
+	font-size: .9rem;
+}
+
+.lf-v2 .lf-ai-panel-message.is-error {
+	color: var(--bs-danger-text-emphasis);
+}
+
+.lf-v2 .lf-ai-panel-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	margin-block-start: .65rem;
+}
+
+.lf-v2 .lf-ai-panel-actions .btn {
+	min-height: 36px;
+	border-radius: 999px;
+	font-weight: 600;
+}
+
+.lf-v2 .lf-ai-undo {
+	padding: 0 .25rem;
+	vertical-align: baseline;
+	font-weight: 700;
+}

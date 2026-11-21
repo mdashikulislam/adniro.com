@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'लॉग इन करें',
 	'ai_guest_hide'      => 'यह संदेश छिपाएँ',
 
+	// AI writing help next to Title and Description
+	'ai_help' => 'AI सहायता',
+	'ai_suggest_title' => 'शीर्षक सुझाएँ',
+	'ai_suggest_description' => 'विवरण लिखें',
+	'ai_shorten' => 'छोटा करें',
+	'ai_clearer' => 'और साफ़ करें',
+	'ai_working' => 'लिखा जा रहा है…',
+	'ai_suggestion' => 'AI का सुझाव',
+	'ai_check' => 'इस्तेमाल से पहले जाँच लें: AI सिर्फ़ वही जानता है जो आपने लिखा है।',
+	'ai_use' => 'इसे इस्तेमाल करें',
+	'ai_again' => 'फिर कोशिश करें',
+	'ai_dismiss' => 'हटाएँ',
+	'ai_undo' => 'पूर्ववत करें',
+	'ai_used' => 'AI के सुझाव से बदल दिया गया।',
+	'ai_undone' => 'आपका अपना टेक्स्ट वापस आ गया है।',
+	'ai_need_text' => 'पहले कुछ शब्द लिखें, फिर AI से मदद माँगें।',
+	'ai_error' => 'AI लेखन सहायता अभी उपलब्ध नहीं है। कृपया बाद में फिर कोशिश करें।',
+
 	// Multi-step progress on phones
 	'step_of'            => 'चरण :current / :total',
 ];

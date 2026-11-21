@@ -76,6 +76,24 @@ return [
 	'ai_guest_login'     => 'تسجيل الدخول',
 	'ai_guest_hide'      => 'إخفاء هذه الرسالة',
 
+	// AI writing help next to Title and Description
+	'ai_help' => 'مساعدة الذكاء الاصطناعي',
+	'ai_suggest_title' => 'اقترح عنوانًا',
+	'ai_suggest_description' => 'اكتب وصفًا',
+	'ai_shorten' => 'اختصر',
+	'ai_clearer' => 'وضّح أكثر',
+	'ai_working' => 'جارٍ الكتابة…',
+	'ai_suggestion' => 'اقتراح الذكاء الاصطناعي',
+	'ai_check' => 'راجعه قبل استخدامه: الذكاء الاصطناعي لا يعرف إلا ما كتبته.',
+	'ai_use' => 'استخدم هذا',
+	'ai_again' => 'حاول مرة أخرى',
+	'ai_dismiss' => 'تجاهل',
+	'ai_undo' => 'تراجع',
+	'ai_used' => 'تم الاستبدال باقتراح الذكاء الاصطناعي.',
+	'ai_undone' => 'عاد نصك الأصلي.',
+	'ai_need_text' => 'اكتب بضع كلمات أولًا، ثم اطلب المساعدة من الذكاء الاصطناعي.',
+	'ai_error' => 'مساعدة الكتابة بالذكاء الاصطناعي غير متاحة حاليًا. يُرجى المحاولة لاحقًا.',
+
 	// Multi-step progress on phones
 	'step_of'            => 'الخطوة :current من :total',
 ];
