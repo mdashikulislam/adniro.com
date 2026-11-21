@@ -290,7 +290,8 @@
 									@elseif ($selectedDisplayMode == 'compact-view')
 										@include('front.search.partials.posts.template.compact')
 									@else
-										@include('front.search.partials.posts.template.grid',['customCols' => 3])
+										{{-- adniro: per row from Listings List > Grid View Columns --}}
+										@include('front.search.partials.posts.template.grid')
 									@endif
 								</div>
 							</div>

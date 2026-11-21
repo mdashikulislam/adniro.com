@@ -108,7 +108,7 @@ Stock files we edited.
 - `app/Services/MenuItemService.php` (no marker comment)
 - `app/Services/Post/List/Search/CategoryTrait.php` (no marker comment)
 - `app/Services/Post/List/Search/SidebarTrait.php` (no marker comment)
-- `app/Services/Post/List/SearchTrait.php` (no marker comment)
+- `app/Services/Post/List/SearchTrait.php`
 - `app/Services/Post/Show/DetailedTrait.php`
 - `app/Services/Post/ShowTrait.php`
 - `app/Services/Section/SectionDataTrait.php` (no marker comment)
@@ -183,7 +183,7 @@ Stock files we edited.
 
 ### lang/en
 
-- `lang/en/admin.php` (no marker comment)
+- `lang/en/admin.php`
 - `lang/en/global.php`
 - `lang/en/sections.php` (no marker comment)
 - `lang/en/validation.php` (no marker comment)
@@ -310,7 +310,7 @@ Stock files we edited.
 - `resources/views/front/search/partials/posts/template/grid.blade.php`
 - `resources/views/front/search/partials/posts/template/list.blade.php`
 - `resources/views/front/search/partials/posts/widget/carousel.blade.php`
-- `resources/views/front/search/partials/posts/widget/normal.blade.php` (no marker comment)
+- `resources/views/front/search/partials/posts/widget/normal.blade.php`
 - `resources/views/front/search/partials/sidebar.blade.php` (no marker comment)
 - `resources/views/front/search/partials/sidebar/categories.blade.php` (no marker comment)
 - `resources/views/front/search/partials/sidebar/categories/root.blade.php` (no marker comment)
@@ -318,7 +318,7 @@ Stock files we edited.
 - `resources/views/front/search/partials/sidebar/date.blade.php` (no marker comment)
 - `resources/views/front/search/partials/sidebar/fields.blade.php` (no marker comment)
 - `resources/views/front/search/partials/sidebar/price.blade.php` (no marker comment)
-- `resources/views/front/search/results.blade.php` (no marker comment)
+- `resources/views/front/search/results.blade.php`
 - `resources/views/front/sections/home/categories.blade.php` (no marker comment)
 - `resources/views/front/sections/home/categories/c-big-icon-list.blade.php` (no marker comment)
 - `resources/views/front/sections/home/categories/c-picture-list.blade.php` (no marker comment)

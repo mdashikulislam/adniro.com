@@ -2397,4 +2397,10 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
     'bottom_end' => 'Bottom-End',
     'bottom_center' => 'Bottom-Center',
     'bottom_between' => 'Bottom-Between',
+	// adniro: listings per row and rows per page
+	'grid_view_cols_hint' => 'Annonces par ligne sur la page de recherche, sur grand écran. Les tablettes en affichent jusqu\'à 3 et les téléphones 2.',
+	'rows_per_page_label' => 'Lignes par page',
+	'rows_per_page_hint' => 'Nombre de lignes d\'annonces par page de recherche ; en grille, c\'est lignes × colonnes, donc la dernière ligne est toujours complète. Laissez vide pour utiliser Pagination > Annonces par page.',
+	'items_per_row_label' => 'Éléments par ligne',
+	'items_per_row_hint' => 'Annonces par ligne dans cette section, sur grand écran. Les tablettes en affichent jusqu\'à 3 et les téléphones 2.',
 ];

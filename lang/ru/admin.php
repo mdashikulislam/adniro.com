@@ -2398,4 +2398,10 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
     'bottom_end' => 'Bottom-End',
     'bottom_center' => 'Bottom-Center',
     'bottom_between' => 'Bottom-Between',
+	// adniro: listings per row and rows per page
+	'grid_view_cols_hint' => 'Объявлений в ряду на странице поиска на широких экранах. Планшеты показывают до 3, телефоны — 2.',
+	'rows_per_page_label' => 'Рядов на странице',
+	'rows_per_page_hint' => 'Сколько рядов объявлений показывает каждая страница поиска; в сетке это ряды × колонки, поэтому последний ряд всегда полный. Оставьте пустым, чтобы использовать Пагинация > Объявлений на странице.',
+	'items_per_row_label' => 'Элементов в ряду',
+	'items_per_row_hint' => 'Объявлений в ряду в этом разделе на широких экранах. Планшеты показывают до 3, телефоны — 2.',
 ];

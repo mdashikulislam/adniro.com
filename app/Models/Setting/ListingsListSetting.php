@@ -112,15 +112,28 @@ class ListingsListSetting extends BaseSetting
 			'name'    => 'grid_view_cols',
 			'label'   => trans('admin.Grid View Columns'),
 			'type'    => 'select2_from_array',
-			'options' => [
-				4 => '4',
-				3 => '3',
-				2 => '2',
-			],
+			// adniro: up to 6 per row on the search page (wide screens; phones and tablets show fewer)
+			'options' => \App\Helpers\Common\ListingGrid::columnOptions(),
+			'hint'    => trans('admin.grid_view_cols_hint'),
 			'wrapper' => [
 				'class' => 'col-md-6 grid-view',
 			],
 			'tab'   => $tabName,
+		];
+		$fields[] = [
+			'name'       => 'rows_per_page',
+			'label'      => trans('admin.rows_per_page_label'),
+			'type'       => 'number',
+			'attributes' => [
+				'min'  => 1,
+				'max'  => 50,
+				'step' => 1,
+			],
+			'hint'       => trans('admin.rows_per_page_hint'),
+			'wrapper'    => [
+				'class' => 'col-md-6',
+			],
+			'tab'        => $tabName,
 		];
 		$fields[] = [
 			'name'    => 'fake_locations_results',

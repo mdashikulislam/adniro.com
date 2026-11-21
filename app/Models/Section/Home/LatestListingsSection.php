@@ -87,6 +87,9 @@ class LatestListingsSection extends BaseSection
 			'tab'         => $tabName,
 		];
 		
+		// adniro: listings per row in this section
+		$fields[] = \App\Helpers\Common\ListingGrid::sectionField($tabName);
+		
 		$fields[] = [
 			'name'    => 'items_in_carousel',
 			'label'   => trans('admin.items_in_carousel_label'),

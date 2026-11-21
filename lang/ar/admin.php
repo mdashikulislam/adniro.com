@@ -2392,4 +2392,10 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
     'bottom_end' => 'Bottom-End',
     'bottom_center' => 'Bottom-Center',
     'bottom_between' => 'Bottom-Between',
+	// adniro: listings per row and rows per page
+	'grid_view_cols_hint' => 'عدد الإعلانات في كل صف في صفحة البحث على الشاشات العريضة. تعرض الأجهزة اللوحية حتى 3 والهواتف 2.',
+	'rows_per_page_label' => 'الصفوف في كل صفحة',
+	'rows_per_page_hint' => 'عدد صفوف الإعلانات في كل صفحة بحث؛ في عرض الشبكة يساوي الصفوف × الأعمدة، لذا يكون الصف الأخير ممتلئًا دائمًا. اتركه فارغًا لاستخدام الترقيم > الإعلانات في كل صفحة.',
+	'items_per_row_label' => 'العناصر في كل صف',
+	'items_per_row_hint' => 'عدد الإعلانات في كل صف في هذا القسم على الشاشات العريضة. تعرض الأجهزة اللوحية حتى 3 والهواتف 2.',
 ];

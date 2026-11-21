@@ -2613,4 +2613,10 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'preset_applied_successfully' => 'The preset ":preset" has been applied successfully.',
 	'preset_application_failed' => 'The preset ":preset" application failed. Please try again.',
 	'no_changes_no_preset_applied' => 'No changes. The ":preset" is not applied.',
+	// adniro: listings per row and rows per page
+	'grid_view_cols_hint' => 'Listings per row on the search page, on wide screens. Tablets show up to 3 and phones 2.',
+	'rows_per_page_label' => 'Rows per page',
+	'rows_per_page_hint' => 'How many rows of listings each search page shows; in the grid view this is rows × columns, so the last row is always full. Leave empty to use Pagination > Listings per page.',
+	'items_per_row_label' => 'Items per row',
+	'items_per_row_hint' => 'Listings per row in this section, on wide screens. Tablets show up to 3 and phones 2.',
 ];

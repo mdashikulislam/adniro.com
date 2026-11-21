@@ -2389,4 +2389,10 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
     'bottom_end' => 'Bottom-End',
     'bottom_center' => 'Bottom-Center',
     'bottom_between' => 'Bottom-Between',
+	// adniro: listings per row and rows per page
+	'grid_view_cols_hint' => 'বড় স্ক্রিনে সার্চ পেজে প্রতি সারিতে কতটি বিজ্ঞাপন। ট্যাবলেটে সর্বোচ্চ ৩টি এবং ফোনে ২টি দেখায়।',
+	'rows_per_page_label' => 'প্রতি পেজে সারি',
+	'rows_per_page_hint' => 'প্রতিটি সার্চ পেজে কত সারি বিজ্ঞাপন দেখাবে; গ্রিড ভিউতে এটি সারি × কলাম, তাই শেষ সারি সবসময় পূর্ণ থাকে। Pagination > Listings per page ব্যবহার করতে খালি রাখুন।',
+	'items_per_row_label' => 'প্রতি সারিতে আইটেম',
+	'items_per_row_hint' => 'বড় স্ক্রিনে এই সেকশনে প্রতি সারিতে কতটি বিজ্ঞাপন। ট্যাবলেটে সর্বোচ্চ ৩টি এবং ফোনে ২টি দেখায়।',
 ];

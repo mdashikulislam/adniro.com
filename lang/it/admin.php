@@ -2385,4 +2385,10 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
     'bottom_end' => 'Bottom-End',
     'bottom_center' => 'Bottom-Center',
     'bottom_between' => 'Bottom-Between',
+	// adniro: listings per row and rows per page
+	'grid_view_cols_hint' => 'Annunci per riga nella pagina di ricerca, su schermi grandi. I tablet ne mostrano fino a 3 e i telefoni 2.',
+	'rows_per_page_label' => 'Righe per pagina',
+	'rows_per_page_hint' => 'Quante righe di annunci mostra ogni pagina di ricerca; nella griglia sono righe × colonne, quindi l\'ultima riga è sempre piena. Lascia vuoto per usare Paginazione > Annunci per pagina.',
+	'items_per_row_label' => 'Elementi per riga',
+	'items_per_row_hint' => 'Annunci per riga in questa sezione, su schermi grandi. I tablet ne mostrano fino a 3 e i telefoni 2.',
 ];

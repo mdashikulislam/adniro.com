@@ -45,7 +45,8 @@ trait SearchTrait
 		$preSearch = [];
 		$fields = collect();
 		
-		$perPage = getNumberOfItemsPerPage('posts', $params['perPage'] ?? null, $this->perPage);
+		// adniro: Listings List > "Rows per page" (full rows) when set, else the Pagination setting
+		$perPage = getNumberOfItemsPerPage('posts', $params['perPage'] ?? \App\Helpers\Common\ListingGrid::searchPerPage(), $this->perPage);
 		
 		$embed = ['user', 'savedByLoggedUser', 'picture', 'pictures', 'payment', 'package'];
 		if (!config('settings.listings_list.hide_post_type')) {

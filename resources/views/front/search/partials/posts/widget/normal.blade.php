@@ -16,6 +16,10 @@
 	$cssClasses = !empty($cssClasses) ? " {$cssClasses}" : '';
 	
 	$gridClass = config('settings.listings_list.display_mode', 'grid-view');
+
+	// adniro: the homepage section's own "Items per row" (4 when not set)
+	$customCols = $sectionOptions['items_per_row'] ?? null;
+	$customCols = !empty($customCols) ? $customCols : \App\Helpers\Common\ListingGrid::HOMEPAGE_DEFAULT_COLUMNS;
 @endphp
 @if ($totalPosts > 0)
 	<div class="container{{ $cssClasses }}" style="{!! $style !!}">

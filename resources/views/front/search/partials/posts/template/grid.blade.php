@@ -1,6 +1,5 @@
 @php
 	use App\Enums\BootstrapColor;
-	use Illuminate\Support\Number;
 
 	$posts ??= [];
 	$totalPosts ??= 0;
@@ -8,15 +7,10 @@
 	$city ??= null;
 	$cat ??= null;
 
-	$defaultCols = 4;
+	// adniro: listings per row from the admin panel (the section's own option, or Listings List > Grid View Columns)
 	$customCols ??= null;
-	$lgCols = !empty($customCols)
-		? (int)$customCols
-		: (int)config('settings.listings_list.grid_view_cols', $defaultCols);
-	$lgCols = Number::clamp($lgCols, min: 2, max: 4);
-	$mdCols = ($lgCols >= 3) ? 3 : $lgCols;
-	$smCols = ($lgCols >= 2) ? 2 : $lgCols;
-	
+	$rowColsClass = \App\Helpers\Common\ListingGrid::rowColsClass(\App\Helpers\Common\ListingGrid::columns($customCols));
+
 	$showPostInfo = (
 		(!config('settings.listings_list.hide_post_type') && config('settings.listing_form.show_listing_type'))
 		|| !config('settings.listings_list.hide_date')
@@ -25,7 +19,7 @@
 	);
 @endphp
 @if (!empty($posts) && $totalPosts > 0)
-	<div class="row row-cols-lg-{{ $lgCols }} row-cols-md-{{ $mdCols }} row-cols-{{ $smCols }} g-3 py-2 grid-view listing-grid">
+	<div class="row {{ $rowColsClass }} g-3 py-2 grid-view listing-grid">
 		@foreach($posts as $key => $post)
 			@php
 				$pictureAttr = \App\Helpers\Common\ListingCardImage::attributes('listing-card-picture'); // adniro
