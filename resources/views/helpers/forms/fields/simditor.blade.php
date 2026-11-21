@@ -71,7 +71,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link href="{{ asset('assets/plugins/simditor/styles/simditor.css') }}" media="all" rel="stylesheet" type="text/css"/>
 	@if (config('lang.direction') == 'rtl')
 		<link media="all" rel="stylesheet" type="text/css" href="{{ asset('assets/plugins/simditor/styles/simditor-rtl.css') }}" />
@@ -83,7 +83,7 @@
 	</style>
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ asset('assets/plugins/simditor/scripts/mobilecheck.js') }}"></script>
 	<script src="{{ asset('assets/plugins/simditor/scripts/module.js') }}"></script>
 	<script src="{{ asset('assets/plugins/simditor/scripts/hotkeys.js') }}"></script>

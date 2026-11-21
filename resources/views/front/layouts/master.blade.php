@@ -21,6 +21,12 @@
 	{{-- /* CUSTOM-SEO-END */ --}}
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href="{{ config('settings.app.favicon_url') }}">
+	{{-- adniro: app icons and manifest, made from the favicon (SiteIconController) --}}
+	@if (!empty(config('settings.app.favicon')))
+		<link rel="apple-touch-icon" href="{{ url('apple-touch-icon.png') }}">
+	@endif
+	<link rel="manifest" href="{{ url('manifest.json') }}">
+	<meta name="theme-color" content="{{ \App\Http\Controllers\Web\Front\SiteIconController::themeColor() }}">
 	<title>{!! MetaTag::get('title') !!}</title>
 	{!! MetaTag::tag('description') !!}{!! MetaTag::tag('keywords') !!}
 	@if (empty($hideCanonical))
@@ -121,13 +127,7 @@
 	
 	@include('front.common.js.document')
  
-	<script>
-		paceOptions = {
-			elements: true
-		};
-	</script>
-	<script src="{{ url()->asset('assets/plugins/pace-js/1.2.4/pace.min.js') }}"></script>
-	<link href="{{ url()->asset('assets/plugins/pace-js/1.2.4/pace-theme-default.min.css') }}" rel="stylesheet">
+	{{-- adniro: the "pace" page loader was removed; it blocked rendering in the <head> --}}
 	
 	@if (!empty($helpers))
 		@foreach($helpers as $helper)
@@ -136,11 +136,13 @@
 	@endif
 </head>
 <body class="bg-body text-body-emphasis skin @yield('body_class')">
+{{-- adniro: keyboard users can skip the header and menus --}}
+<a href="#main-content" class="visually-hidden-focusable position-absolute top-0 start-0 m-2 px-3 py-2 bg-body border rounded shadow" style="z-index: 2000">{{ t('skip_to_content') }}</a>
 @section('header')
 	@include('front.layouts.partials.header')
 @show
 
-<main>
+<main id="main-content" tabindex="-1">
 	@section('search')
 	@show
 	

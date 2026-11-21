@@ -89,7 +89,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link href="{{ asset('assets/plugins/simplemde/1.11.2/simplemde.min.css') }}" rel="stylesheet">
 	<style>
 		.CodeMirror-fullscreen, .editor-toolbar.fullscreen {
@@ -104,7 +104,7 @@
 	</style>
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ asset('assets/plugins/simplemde/1.11.2/simplemde.min.js') }}"></script>
 @endpushonce
 

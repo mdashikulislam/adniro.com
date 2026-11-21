@@ -52,9 +52,10 @@
 				</h1>
 			@endif
 			@if ($hideSubTitle != '1')
-				<h5 class="fs-4 lead text-white text-shadow mb-3 hero-subtitle"{!! $subtitleHtmlAttr !!}>
+				{{-- adniro: a paragraph, not a heading (it skipped from h1 to h5) --}}
+				<p class="fs-4 lead text-white text-shadow mb-3 hero-subtitle"{!! $subtitleHtmlAttr !!}>
 					{!! $headerSubTitle !!}
-				</h5>
+				</p>
 			@endif
 			
 			@if ($hideSearchBar != '1')

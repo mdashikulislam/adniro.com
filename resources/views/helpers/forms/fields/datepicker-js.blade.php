@@ -75,12 +75,12 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link rel="stylesheet" href="{{ asset($pluginBasePath . 'css/datepicker.min.css') }}">
 	<link rel="stylesheet" href="{{ asset($pluginBasePath . 'css/datepicker-bs5.min.css') }}">
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ asset($pluginBasePath . 'js/datepicker.min.js') }}"></script>
 	@php
 		$foundLocale = '';

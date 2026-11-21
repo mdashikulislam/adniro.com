@@ -72,7 +72,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ asset('assets/plugins/tinymce/tinymce.min.js') }}"></script>
 	@php
 		$editorI18n = trans('tinymce', [], $language);

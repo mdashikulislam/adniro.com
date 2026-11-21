@@ -63,9 +63,9 @@
 	<div class="container{{ $cssClasses }}" style="{!! $style !!}">
 		<div class="card listing-section listing-carousel-section"{!! $htmlAttr !!}>
 			<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-				<h4 class="mb-0 fw-lighter section-title">
+				<h2 class="h4 mb-0 fw-lighter section-title">
 					{!! data_get($widget, 'title') !!}
-				</h4>
+				</h2>
 				<a href="{{ data_get($widget, 'link') }}" class="{{ linkClass() }} section-more-link">
 					{{ t('View more') }} <i class="fa-solid fa-arrow-right"></i>
 				</a>
@@ -104,16 +104,16 @@
 											$src = data_get($post, 'picture.url.medium');
 											$webpSrc = data_get($post, 'picture.url.webp.medium');
 											$alt = trim(strip_tags((string)data_get($post, 'title')));
-											$attr = ['class' => 'lazyload listing-card-picture'];
+											$attr = \App\Helpers\Common\ListingCardImage::attributes('listing-card-picture'); // adniro
 											echo generateImageHtml($src, $alt, $webpSrc, $attr);
 										@endphp
 									</a>
 									@if ($savedByLoggedUser)
-										<a class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
+										<a href="#" role="button" class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
 											<i class="bi bi-heart-fill small"></i> <span>{{ t('Saved') }}</span>
 										</a>
 									@else
-										<a class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
+										<a href="#" role="button" class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
 											<i class="bi bi-heart small"></i> <span>{{ t('Save') }}</span>
 										</a>
 									@endif
@@ -136,11 +136,11 @@
 											<a href="{!! $catUrl !!}" class="listing-card-cat" title="{{ $catName }}">{{ $catName }}</a>
 										</div>
 									@endif
-									<h5 class="listing-card-title">
+									<h3 class="h5 listing-card-title">
 										<a href="{{ $postUrl }}" class="{{ linkClass('body-emphasis') }}">
 											{{ str(data_get($post, 'title'))->limit(60) }}
 										</a>
-									</h5>
+									</h3>
 									@php
 										$cardExcerpt = singleLineStringCleaner(strip_tags((string)data_get($post, 'description')));
 										$cardExcerpt = str($cardExcerpt)->limit(160)->toString();

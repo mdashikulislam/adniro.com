@@ -187,7 +187,24 @@ class StructuredDataService
 			'name'     => $name,
 			'url'      => url('/'),
 			'logo'     => config('settings.app.logo_url'),
+			'sameAs'   => $this->socialProfiles(), // adniro
 		]);
+	}
+	
+	/**
+	 * The site's social profiles from Settings > Social links: real web addresses only
+	 * ("#" is the default for a profile that was never set).
+	 *
+	 * @return string[]
+	 */
+	private function socialProfiles(): array
+	{
+		$links = (array)config('settings.social_link', []);
+		
+		return array_values(array_filter(
+			array_map(fn ($url) => trim((string)$url), $links),
+			fn ($url) => preg_match('#^https?://#i', $url) === 1 && filter_var($url, FILTER_VALIDATE_URL) !== false
+		));
 	}
 
 	/**

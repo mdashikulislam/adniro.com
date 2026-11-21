@@ -21,9 +21,9 @@
 	<div class="container{{ $cssClasses }}" style="{!! $style !!}">
 		<div class="card listing-section"{!! $htmlAttr !!}>
 			<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-				<h4 class="mb-0 fw-lighter section-title">
+				<h2 class="h4 mb-0 fw-lighter section-title">
 					{!! data_get($widget, 'title') !!}
-				</h4>
+				</h2>
 				<a href="{{ data_get($widget, 'link') }}" class="{{ linkClass() }} section-more-link">
 					{{ t('View more') }} <i class="fa-solid fa-arrow-right"></i>
 				</a>

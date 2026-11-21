@@ -120,7 +120,7 @@
 					<div>
 						@if (!empty(data_get($post, 'payment.package')))
 							@if (data_get($post, 'payment.package.has_badge') == 1)
-								<a class="btn btn-danger btn-xs small make-favorite">
+								<a href="#" role="button" class="btn btn-danger btn-xs small make-favorite">
 									<i class="fa-solid fa-certificate"></i> <span>{{ data_get($post, 'payment.package.short_name') }}</span>
 								</a>&nbsp;
 							@endif
@@ -130,11 +130,11 @@
 							$savedByLoggedUser = (bool)data_get($post, 'p_saved_by_logged_user');
 						@endphp
 						@if ($savedByLoggedUser)
-							<a class="btn btn-success btn-xs small make-favorite" id="{{ $postId }}">
+							<a href="#" role="button" class="btn btn-success btn-xs small make-favorite" id="{{ $postId }}">
 								<i class="bi bi-heart-fill"></i> <span>{{ t('Saved') }}</span>
 							</a>
 						@else
-							<a class="btn btn-outline-secondary btn-xs small make-favorite" id="{{ $postId }}">
+							<a href="#" role="button" class="btn btn-outline-secondary btn-xs small make-favorite" id="{{ $postId }}">
 								<i class="bi bi-heart"></i> <span>{{ t('Save') }}</span>
 							</a>
 						@endif

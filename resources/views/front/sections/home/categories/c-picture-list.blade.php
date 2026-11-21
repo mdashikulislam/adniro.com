@@ -20,7 +20,7 @@
 						<span class="cat-card-icon cat-card-picture">
 							<img src="{{ $catImgUrl }}" class="lazyload img-fluid" alt="{{ $catName }}">
 						</span>
-						<h6 class="cat-card-title mb-0 fw-bold">{{ $catName }}</h6>
+						<h3 class="h6 cat-card-title mb-0 fw-bold">{{ $catName }}</h3>
 						@if (!is_null($catCountPosts))
 							<span class="cat-card-count">{{ number_format((int)$catCountPosts) }} {{ trans_choice('global.count_listings', $catCountPosts) }}</span>
 						@endif

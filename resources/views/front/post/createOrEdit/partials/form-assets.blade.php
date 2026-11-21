@@ -58,7 +58,7 @@
 @endsection
 
 {{-- For Custom Fields --}}
-@pushonce("select2_assets_styles")
+@pushonce("select2_assets_styles", "select2_assets_styles")
 	<link href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css"/>
 	@if ($s2Theme == 'bootstrap5')
 		<link href="{{ asset('assets/plugins/select2-bootstrap5-theme/1.3.0/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet" type="text/css"/>
@@ -73,7 +73,7 @@
 		<link href="{{ asset('assets/plugins/select2/css/custom.css') }}" rel="stylesheet" type="text/css"/>
 	@endif
 @endpushonce
-@pushonce("select2_assets_scripts")
+@pushonce("select2_assets_scripts", "select2_assets_scripts")
 	<script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
 	@php
 		$localeFilesBasePath = 'assets/plugins/select2/js/i18n/';
@@ -96,7 +96,7 @@
 		<script src="{{ asset($localeFilesBasePath . $foundLocale . '.js') }}"></script>
 	@endif
 @endpushonce
-@pushonce("fileinput_assets_styles")
+@pushonce("fileinput_assets_styles", "fileinput_assets_styles")
 	<link href="{{ url('assets/plugins/bootstrap-fileinput/css/fileinput.min.css') }}" rel="stylesheet">
 	@if ($isRtl == 'true')
 		<link href="{{ url('assets/plugins/bootstrap-fileinput/css/fileinput-rtl.min.css') }}" rel="stylesheet">
@@ -113,7 +113,7 @@
 		}
 	</style>
 @endpushonce
-@pushonce("fileinput_assets_scripts")
+@pushonce("fileinput_assets_scripts", "fileinput_assets_scripts")
 	<script src="{{ url('assets/plugins/bootstrap-fileinput/js/plugins/sortable.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url('assets/plugins/bootstrap-fileinput/js/fileinput.min.js') }}" type="text/javascript"></script>
 	@if (file_exists(public_path('assets/plugins/bootstrap-fileinput/themes/' . $fiTheme . '/theme.js')))
@@ -121,7 +121,7 @@
 	@endif
 	<script src="{{ url('common/js/fileinput/locales/' . $langCode . '.js') }}" type="text/javascript"></script>
 @endpushonce
-@pushonce("momentjs_assets_scripts")
+@pushonce("momentjs_assets_scripts", "momentjs_assets_scripts")
 	<script src="{{ url('assets/plugins/momentjs/2.30.1/moment.min.js') }}" type="text/javascript"></script>
 	@php
 		$localeFilesBasePath = 'assets/plugins/momentjs/2.30.1/locale/';
@@ -144,15 +144,18 @@
 		<script charset="UTF-8" src="{{ asset($localeFilesBasePath . $foundLocale . '.min.js') }}"></script>
 	@endif
 @endpushonce
-@pushonce("daterangepicker_date_assets_styles")
+@pushonce("daterangepicker_date_assets_styles", "daterangepicker_date_assets_styles")
 	<link href="{{ url('assets/plugins/daterangepicker/3.1/daterangepicker.css') }}" rel="stylesheet">
 @endpushonce
-@pushonce("daterangepicker_date_assets_scripts")
+@pushonce("daterangepicker_date_assets_scripts", "daterangepicker_date_assets_scripts")
 	<script src="{{ url('assets/plugins/daterangepicker/3.1/daterangepicker.js') }}" type="text/javascript"></script>
 @endpushonce
 
 @push('before_helpers_scripts_stack')
-	@include('front.common.js.payment-scripts')
+	{{-- Payment scripts only when packages are for sale on this page (adniro) --}}
+	@if (isset($packages, $paymentMethods) && $packages->count() > 0 && $paymentMethods->count() > 0)
+		@include('front.common.js.payment-scripts')
+	@endif
 	
 	<script>
 		/* Translation */
@@ -211,7 +214,7 @@
 	@if (config('settings.listing_form.city_selection') == 'select')
 		<script src="{{ url('assets/js/app/d.select.location.js') . vTime() }}"></script>
 	@else
-		<script src="{{ url('assets/js/app/browse.locations.js') . vTime() }}"></script>
+		{{-- browse.locations.js comes with the location modal included above (adniro: was loaded twice) --}}
 		<script src="{{ url('assets/js/app/d.modal.location.js') . vTime() }}"></script>
 	@endif
 @endpush

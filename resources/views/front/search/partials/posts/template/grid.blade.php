@@ -28,9 +28,7 @@
 	<div class="row row-cols-lg-{{ $lgCols }} row-cols-md-{{ $mdCols }} row-cols-{{ $smCols }} g-3 py-2 grid-view listing-grid">
 		@foreach($posts as $key => $post)
 			@php
-				$pictureAttr = [
-					'class' => 'lazyload listing-card-picture',
-				];
+				$pictureAttr = \App\Helpers\Common\ListingCardImage::attributes('listing-card-picture'); // adniro
 
 				$postUrl = urlGen()->post($post);
 				$parentCatUrl = null;
@@ -77,11 +75,11 @@
 						@endif
 						
 						@if ($savedByLoggedUser)
-							<a class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
+							<a href="#" role="button" class="btn btn-success btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Remove favorite') }}">
 								<i class="bi bi-heart-fill small"></i> <span>{{ t('Saved') }}</span>
 							</a>
 						@else
-							<a class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
+							<a href="#" role="button" class="btn btn-outline-secondary btn-xs small make-favorite listing-fav" id="{{ $postId }}" title="{{ t('Save listing') }}">
 								<i class="bi bi-heart small"></i> <span>{{ t('Save') }}</span>
 							</a>
 						@endif
@@ -129,11 +127,11 @@
 							</div>
 						@endif
 						
-						<h5 class="listing-card-title">
+						<h3 class="h5 listing-card-title">
 							<a href="{{ $postUrl }}" class="{{ linkClass('body-emphasis') }}">
 								{{ str(data_get($post, 'title'))->limit(70) }}
 							</a>
-						</h5>
+						</h3>
 
 						@php
 							$cardExcerpt = singleLineStringCleaner(strip_tags((string)data_get($post, 'description')));

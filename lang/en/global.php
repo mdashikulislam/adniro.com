@@ -1224,4 +1224,7 @@ return [
 	'blog_share_this_post' => 'Share this post',
 	'blog_back_to_blog' => 'Back to the blog',
 	'blog_in_category' => 'In :category',
+	
+	// adniro: accessibility
+	'skip_to_content' => 'Skip to main content',
 ];

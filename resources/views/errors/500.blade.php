@@ -1,34 +1,17 @@
 @extends('errors.master')
 
 @php
+	// adniro: error details only while debugging, never for visitors
 	$title = t('Internal Server Error');
-	
-	$isDebugEnabled = config('app.debug');
-	$defaultErrorMessage = t('An internal server error has occurred');
-	$extractedMessage = null;
-	
-	if (isset($exception) && $exception instanceof \Throwable) {
-		$extractedMessage = $exception->getMessage();
-		$extractedMessage = str_replace(base_path(), '', $extractedMessage);
-		
-		if (!empty($extractedMessage) && $isDebugEnabled) {
-			if (method_exists($exception, 'getFile')) {
-				$filePath = $exception->getFile();
-				$filePath = str_replace(base_path(), '', $filePath);
-				$extractedMessage .= "\n" . 'In the: <code>' . $filePath . '</code> file';
-				if (method_exists($exception, 'getLine')) {
-					$extractedMessage .= ' at line: <code>' . $exception->getLine() . '</code>';
-				}
-			}
-			$extractedMessage = nl2br($extractedMessage);
-		}
-	}
-	
-	$message = !empty($extractedMessage) ? $extractedMessage : $defaultErrorMessage;
+	$message = \App\Helpers\Common\ErrorPageMessage::forServerError(
+		(isset($exception) && $exception instanceof \Throwable) ? $exception : null,
+		e(t('An internal server error has occurred')),
+		(bool)config('app.debug')
+	);
 @endphp
 
 @section('title', $title)
-@section('status', 401)
+@section('status', 500)
 @section('message')
 	{!! $message !!}
 @endsection

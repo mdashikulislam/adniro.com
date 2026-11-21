@@ -7,7 +7,7 @@
 	<div class="col-md-5 col-sm-12 px-0 mb-md-0 mb-2 search-col">
 		<div class="hstack gap-0 border px-3 bg-body border-end-md-0 rounded-5 rounded-end-md-0 py-1 search-field">
 			<i class="bi bi-search fs-5 search-field-icon"></i>
-			<input class="form-control shadow-none rounded-0 border-0" name="q" placeholder="{{ t('what') }}" type="text" value="">
+			<input class="form-control shadow-none rounded-0 border-0" name="q" placeholder="{{ t('what') }}" aria-label="{{ t('search_for') }}" type="text" value="">
 		</div>
 	</div>
 	
@@ -19,6 +19,7 @@
 			       id="locSearch"
 			       name="location"
 			       placeholder="{{ t('where') }}"
+			       aria-label="{{ t('location') }}"
 			       type="text"
 			       value=""
 			       data-old-value=""

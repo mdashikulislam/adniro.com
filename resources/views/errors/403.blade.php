@@ -1,21 +1,16 @@
 @extends('errors.master')
 
 @php
-    $title = t('Forbidden');
-	
-    $defaultErrorMessage = t('Meanwhile, you may return to homepage', ['url' => url('/')]);
-	$extractedMessage = null;
-	
-	if (isset($exception) && $exception instanceof \Throwable) {
-		$extractedMessage = $exception->getMessage();
-		$extractedMessage = str_replace(base_path(), '', $extractedMessage);
-	}
-	
-	$message = !empty($extractedMessage) ? $extractedMessage : $defaultErrorMessage;
+	// adniro: visitors see a message given on purpose (escaped), never framework text
+	$title = t('Forbidden');
+	$message = \App\Helpers\Common\ErrorPageMessage::forVisitor(
+		(isset($exception) && $exception instanceof \Throwable) ? $exception : null,
+		t('Meanwhile, you may return to homepage', ['url' => url('/')])
+	);
 @endphp
 
 @section('title', $title)
-@section('status', 401)
+@section('status', 403)
 @section('message')
-    {!! $message !!}
+	{!! $message !!}
 @endsection

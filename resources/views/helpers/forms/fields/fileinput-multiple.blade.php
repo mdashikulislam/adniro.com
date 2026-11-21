@@ -147,7 +147,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("fileinput_assets_styles")
+@pushonce("fileinput_assets_styles", "fileinput_assets_styles")
 	<link href="{{ url($pluginBasePath . 'css/fileinput.min.css') }}" rel="stylesheet">
 	@if ($rtl == 'true')
 		<link href="{{ url($pluginBasePath . 'css/fileinput-rtl.min.css') }}" rel="stylesheet">
@@ -165,7 +165,7 @@
 	</style>
 @endpushonce
 
-@pushonce("fileinput_assets_scripts")
+@pushonce("fileinput_assets_scripts", "fileinput_assets_scripts")
 	<script src="{{ url($pluginBasePath . 'js/plugins/sortable.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url($pluginBasePath . 'js/fileinput.min.js') }}" type="text/javascript"></script>
 	@if (file_exists($pluginFullPath . 'themes/' . $theme . '/theme.js'))
@@ -174,7 +174,7 @@
 	<script src="{{ url('common/js/fileinput/locales/' . $language . '.js') }}" type="text/javascript"></script>
 @endpushonce
 
-@pushonce("fileinput_preview_frame_assets_styles")
+@pushonce("fileinput_preview_frame_assets_styles", "fileinput_preview_frame_assets_styles")
 	<style>
 		{{-- Preview Frame Size --}}
 		.krajee-default.file-preview-frame .kv-file-content {

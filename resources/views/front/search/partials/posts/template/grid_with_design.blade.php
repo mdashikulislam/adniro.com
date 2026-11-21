@@ -26,10 +26,7 @@
                 <div class="h-100 w-100 border rounded p-2 pt-1 mx-1 hover-bg-tertiary hover-shadow">
                     @php
                         $picturePath = data_get($post, 'picture.file_path');
-                        $pictureAttr = [
-                            'class' => 'lazyload img-fluid w-100 h-auto rounded',
-                            //'style' => 'max-width: 300px; max-height: 200px; width: auto; height: 200px;',
-                        ];
+                        $pictureAttr = \App\Helpers\Common\ListingCardImage::attributes('img-fluid w-100 h-auto rounded'); // adniro
 
                         $postUrl = urlGen()->post($post);
                         $parentCatUrl = null;
@@ -169,7 +166,7 @@
                                 <div class="col-12 text-end">
                                     @if (!empty(data_get($post, 'payment.package')))
                                         @if (data_get($post, 'payment.package.has_badge') == 1)
-                                            <a class="btn btn-danger btn-xs small me-1 make-favorite">
+                                            <a href="#" role="button" class="btn btn-danger btn-xs small me-1 make-favorite">
                                                 <i class="fa-solid fa-certificate"></i> <span>{{ data_get($post, 'payment.package.short_name') }}</span>
                                             </a>
                                         @endif
@@ -179,11 +176,11 @@
                                         $savedByLoggedUser = (bool)data_get($post, 'p_saved_by_logged_user');
                                     @endphp
                                     @if ($savedByLoggedUser)
-                                        <a class="btn btn-success btn-xs small make-favorite" id="{{ $postId }}">
+                                        <a href="#" role="button" class="btn btn-success btn-xs small make-favorite" id="{{ $postId }}">
                                             <i class="bi bi-heart-fill small"></i> <span>{{ t('Saved') }}</span>
                                         </a>
                                     @else
-                                        <a class="btn btn-outline-secondary btn-xs small make-favorite" id="{{ $postId }}">
+                                        <a href="#" role="button" class="btn btn-outline-secondary btn-xs small make-favorite" id="{{ $postId }}">
                                             <i class="bi bi-heart small"></i> <span>{{ t('Save') }}</span>
                                         </a>
                                     @endif

@@ -1,33 +1,16 @@
 @extends('errors.master')
 
 @php
-	// Get page error title
-	$defaultTitle = 'Page not found';
-	$titleKey = 'error_http_404_title';
-	$titleNamespace = "global.{$titleKey}";
-	$title = trans()->has($titleNamespace) ? trans($titleNamespace) : $defaultTitle;
+	// adniro: visitors see a message given on purpose (escaped), never framework text
+	$titleKey = 'global.error_http_404_title';
+	$title = trans()->has($titleKey) ? trans($titleKey) : 'Page not found';
 	
-	// Get page error message
-	$defaultMessageKey = 'error_http_404_message';
-	$message = (isset($exception) && $exception instanceof \Throwable)
-		? $exception->getMessage()
-		: $defaultMessageKey;
-	
-	$defaultMessageKey = 'error_http_404_message';
-	$defaultMessageNamespace = "global.{$defaultMessageKey}";
-	$defaultMessage = trans()->has($defaultMessageNamespace)
-		? trans($defaultMessageNamespace, ['url' => url('/')])
-		: $title;
-	
-	if (isset($exception) && $exception instanceof \Throwable) {
-		$badCharacters = ['[', ']', '\\', '/'];
-		
-		$message = $exception->getMessage();
-		$message = str_replace(base_path(), '', $message);
-		$message = !str($message)->contains($badCharacters) ? $message : $defaultMessage;
-	} else {
-		$message = $defaultMessage;
-	}
+	$defaultKey = 'global.error_http_404_message';
+	$message = \App\Helpers\Common\ErrorPageMessage::forVisitor(
+		(isset($exception) && $exception instanceof \Throwable) ? $exception : null,
+		trans()->has($defaultKey) ? trans($defaultKey, ['url' => url('/')]) : e($title)
+	);
+	$showSearch = true;
 @endphp
 
 @section('title', $title)

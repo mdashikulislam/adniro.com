@@ -43,13 +43,13 @@
                 <div class="col-md-12">
                     <div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3">
 						
-                        <h3 class="fw-bold border-bottom pb-3 mb-4">
+                        <h1 class="h3 fw-bold border-bottom pb-3 mb-4">
 							@if (!empty($selectedPackage))
 		                        <i class="bi bi-wallet"></i> {{ t('Payment') }}
 							@else
 								<i class="fa-solid fa-tags"></i> {{ t('Pricing') }}
 							@endif
-						</h3>
+						</h1>
 						
                         <div class="row">
                             <div class="col-12">

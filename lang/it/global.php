@@ -1058,4 +1058,7 @@ Usa immagini reali del tuo prodotto, non cataloghi.',
     'distance' => 'Distance',
     'start' => 'Start',
     'stop' => 'Stop',
+	
+	// adniro: accessibility
+	'skip_to_content' => 'Vai al contenuto principale',
 ];

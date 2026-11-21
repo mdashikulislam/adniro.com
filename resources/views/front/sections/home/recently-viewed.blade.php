@@ -9,7 +9,7 @@
 >
 	<div class="card listing-section">
 		<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-			<h4 class="mb-0 fw-lighter section-title">{!! t('home_recently_viewed') !!}</h4>
+			<h2 class="h4 mb-0 fw-lighter section-title">{!! t('home_recently_viewed') !!}</h2>
 			<div class="recently-viewed-tools">
 				<button type="button" class="btn recently-viewed-nav" id="recentlyViewedPrev" aria-label="{{ t('previous') }}" hidden>
 					<i class="bi bi-chevron-left"></i>

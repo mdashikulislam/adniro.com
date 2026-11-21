@@ -44,9 +44,9 @@
 				
 				<div class="col-md-9">
 					<div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3">
-						<h3 class="fw-bold border-bottom pb-3 mb-4">
+						<h1 class="h3 fw-bold border-bottom pb-3 mb-4">
 							<i class="fa-regular fa-pen-to-square"></i> {{ t('create_new_listing') }}
-						</h3>
+						</h1>
 						
 						<div class="row d-flex justify-content-center">
 							<div class="col-md-10 col-sm-12 col-xs-12">

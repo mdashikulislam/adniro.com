@@ -1053,4 +1053,7 @@ return [
     'distance' => 'Distance',
     'start' => 'Start',
     'stop' => 'Stop',
+	
+	// adniro: accessibility
+	'skip_to_content' => 'Saltar al contenido principal',
 ];

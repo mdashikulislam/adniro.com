@@ -112,12 +112,12 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link href="{{ asset('assets/plugins/intl-tel-input/25.3.1/css/intlTelInput.css') }}" rel="stylesheet" type="text/css"/>
 	<link href="{{ asset('assets/plugins/intl-tel-input/25.3.1/css/custom.css') }}" rel="stylesheet" type="text/css"/>
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ asset('assets/plugins/intl-tel-input/25.3.1/js/intlTelInput.js') }}"></script>
 	<script src="{{ asset('assets/plugins/intl-tel-input/25.3.1/js/custom.js') }}" defer></script>
 @endpushonce
@@ -154,7 +154,7 @@
 		</script>
 	@endpush
 @else
-	@pushonce("shared_iti_assets_scripts")
+	@pushonce("shared_iti_assets_scripts", "shared_iti_assets_scripts")
 		<script>
 			onDocumentReady((event) => {
 				const itiElsSelector = 'input.iti-phone-number:not([type=hidden])';

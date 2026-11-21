@@ -60,6 +60,9 @@ if (!$isDomainmappingAvailable) {
 	Route::get('sitemaps.xml', [SitemapsController::class, 'getAllCountriesSitemapIndex']);
 }
 
+// favicon.ico, app icons and manifest (adniro)
+require __DIR__ . '/front/site-icons.php';
+
 // Impersonate (As admin user, login as another user)
 Route::middleware(['auth'])
 	->group(function ($router) {

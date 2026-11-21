@@ -1050,4 +1050,7 @@ return [
     'distance' => 'Distance',
     'start' => 'Start',
     'stop' => 'Stop',
+	
+	// adniro: accessibility
+	'skip_to_content' => 'मुख्य सामग्री पर जाएं',
 ];

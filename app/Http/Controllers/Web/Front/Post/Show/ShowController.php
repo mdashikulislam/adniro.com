@@ -170,13 +170,12 @@ class ShowController extends FrontController
 					$this->og->forget('image')->forget('image:width')->forget('image:height');
 				}
 				
+				// adniro: listing photos keep their own proportions (resized to fit the "large"
+				// size), so no width/height is claimed; the default 1200x630 was wrong for them
 				foreach ($pictures as $picture) {
 					$pictureUrl = data_get($picture, 'url.large');
 					if (!empty($pictureUrl)) {
-						$this->og->image($pictureUrl, [
-							'width'  => (int)config('settings.social_share.og_image_width', 1200),
-							'height' => (int)config('settings.social_share.og_image_height', 630),
-						]);
+						$this->og->image($pictureUrl);
 					}
 				}
 			}

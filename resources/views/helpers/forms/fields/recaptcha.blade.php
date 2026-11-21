@@ -75,7 +75,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	@if ($isReCaptchaEnabled)
 		<style>
 			.is-invalid .g-recaptcha iframe {

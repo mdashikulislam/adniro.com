@@ -96,11 +96,11 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("jquery_assets_scripts")
+@pushonce("jquery_assets_scripts", "jquery_assets_scripts")
 	{{--<script src="{{ url('assets/plugins/jquery/3.3.1/jquery.min.js') }}" type="text/javascript"></script>--}}
 @endpushonce
 
-@pushonce("momentjs_assets_scripts")
+@pushonce("momentjs_assets_scripts", "momentjs_assets_scripts")
 	<script src="{{ url($momentJsBasePath . 'moment.min.js') }}" type="text/javascript"></script>
 	@php
 		$localeFilesBasePath = $momentJsBasePath . 'locale/';
@@ -124,12 +124,12 @@
 	@endif
 @endpushonce
 
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link href="{{ url('assets/plugins/daterangepicker/3.1/daterangepicker.css') }}" rel="stylesheet">
 	<link href="{{ url('assets/plugins/daterangepicker/3.1/daterangepicker-dark.css') }}" rel="stylesheet">
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ url('assets/plugins/daterangepicker/3.1/daterangepicker.js') }}" type="text/javascript"></script>
 @endpushonce
 

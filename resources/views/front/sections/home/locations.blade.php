@@ -34,10 +34,10 @@
 					@if (!$mapCanBeShown)
 						<div class="row">
 							<div class="col-xl-12 col-sm-12">
-								<h4 class="mb-0 pb-3 px-0 fw-lighter section-title location-title">
+								<h2 class="h4 mb-0 pb-3 px-0 fw-lighter section-title location-title">
 									<span class="location-title-icon"><i class="bi bi-geo-alt-fill"></i></span>
 									<span class="fw-bold">{{ t('Choose a city') }}</span>
-								</h4>
+								</h2>
 							</div>
 						</div>
 					@endif
@@ -78,10 +78,10 @@
 						<div class="{{ $leftClassCol }} m-0 p-0">
 							@if (!empty($cities))
 								@if ($mapCanBeShown)
-									<h4 class="mb-0 pt-1 pb-3 px-3 fw-lighter section-title location-title">
+									<h2 class="h4 mb-0 pt-1 pb-3 px-3 fw-lighter section-title location-title">
 										<span class="location-title-icon"><i class="bi bi-geo-alt-fill"></i></span>
 										<span class="fw-bold">{{ t('Choose a city or region') }}</span>
-									</h4>
+									</h2>
 								@endif
 								<div class="row px-4">
 									<div class="col-xl-12">

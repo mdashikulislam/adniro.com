@@ -73,7 +73,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	@if (!empty($theme))
 		<link href="{{ asset($pluginBasePath . "summernote-{$theme}.min.css") }}" rel="stylesheet">
 	@else
@@ -81,7 +81,7 @@
 	@endif
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	@if (!empty($theme))
 		<script src="{{ asset($pluginBasePath . "summernote-{$theme}.min.js") }}"></script>
 	@else

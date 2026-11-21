@@ -45,9 +45,9 @@
                 <div class="col-md-12">
                     <div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3">
 						
-                        <h3 class="fw-bold border-bottom pb-3 mb-4">
+                        <h1 class="h3 fw-bold border-bottom pb-3 mb-4">
 							<i class="fa-solid fa-camera"></i> {{ t('Photos') }}
-						</h3>
+						</h1>
 						
                         <div class="row">
                             <div class="col-md-12">

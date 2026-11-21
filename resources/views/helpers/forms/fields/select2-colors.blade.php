@@ -100,7 +100,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("select2_assets_styles")
+@pushonce("select2_assets_styles", "select2_assets_styles")
 	<link href="{{ asset($pluginBasePath . 'css/select2.min.css') }}" rel="stylesheet" type="text/css"/>
 	@if ($theme == 'bootstrap5')
 		<link href="{{ asset('assets/plugins/select2-bootstrap5-theme/1.3.0/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet" type="text/css"/>
@@ -134,14 +134,14 @@
 	}
 @endphp
 
-@pushonce("select2_assets_scripts")
+@pushonce("select2_assets_scripts", "select2_assets_scripts")
 	<script src="{{ asset($pluginBasePath . 'js/select2.full.min.js') }}"></script>
 	@if ($foundLocale != 'en')
 		<script src="{{ asset($localeFilesBasePath . $foundLocale . '.js') }}"></script>
 	@endif
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script>
 		function formatColor(color) {
 			if (!color.id) {

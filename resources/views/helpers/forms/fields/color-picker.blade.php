@@ -54,7 +54,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link rel="stylesheet" href="{{ asset('assets/plugins/coloris/0.24.0/coloris.min.css') }}"/>
 	<style>
 		.coloris {
@@ -105,7 +105,7 @@
 	</style>
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script type="text/javascript" src="{{ asset('assets/plugins/coloris/0.24.0/coloris.min.js') }}"></script>
 @endpushonce
 

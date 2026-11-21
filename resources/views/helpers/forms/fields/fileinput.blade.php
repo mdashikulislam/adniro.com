@@ -181,7 +181,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_styles")
+@pushonce("{$viewName}_assets_styles", "{$viewName}_assets_styles")
 	<link href="{{ url($pluginBasePath . 'css/fileinput.min.css') }}" rel="stylesheet">
 	@if ($rtl == 'true')
 		<link href="{{ url($pluginBasePath . 'css/fileinput-rtl.min.css') }}" rel="stylesheet">
@@ -199,7 +199,7 @@
 	</style>
 @endpushonce
 
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	<script src="{{ url($pluginBasePath . 'js/plugins/sortable.min.js') }}" type="text/javascript"></script>
 	<script src="{{ url($pluginBasePath . 'js/fileinput.min.js') }}" type="text/javascript"></script>
 	@if (file_exists($pluginFullPath . 'themes/' . $theme . '/theme.js'))
@@ -208,7 +208,7 @@
 	<script src="{{ url('common/js/fileinput/locales/' . $language . '.js') }}" type="text/javascript"></script>
 @endpushonce
 
-@pushonce("fileinput_multiple_selections_assets_scripts")
+@pushonce("fileinput_multiple_selections_assets_scripts", "fileinput_multiple_selections_assets_scripts")
 	<script src="{{ url('assets/js/helpers/extensionMimetype.js') }}" type="text/javascript"></script>
 	<script>
 		/**

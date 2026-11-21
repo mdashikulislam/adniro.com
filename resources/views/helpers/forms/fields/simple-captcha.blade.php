@@ -96,7 +96,7 @@
 
 {{-- Extra CSS and JS for this particular field --}}
 {{-- If a field type is shown multiple times on a form, the CSS and JS will only be loaded once --}}
-@pushonce("{$viewName}_assets_scripts")
+@pushonce("{$viewName}_assets_scripts", "{$viewName}_assets_scripts")
 	@if ($isSimpleCaptchaEnabled)
 		<script>
 			/* Load the captcha image when the page is loaded */

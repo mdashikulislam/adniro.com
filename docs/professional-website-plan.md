@@ -190,6 +190,20 @@ Most important first:
 8. **Test gaps.** Close the gaps from my mistakes list: real HTTP tests for the composer and review pages, and a coverage report.
 
 ### Phase 3: quick front-end wins (3 to 4 days)
+
+> **Status, 21 Nov 2026: done, with tests (210 passing) and checked in the browser.**
+> - **Images:** card pictures use the browser's own lazy loading, with width and height set. The old swap only covered `<img>`, so with WebP on (phase 1) every WebP thumbnail loaded at once. The `pace` loader is gone.
+> - **Error pages:** branded 404, 403, 401, 410 and 500 pages with logo, search (on not-found pages), home and back links, and footer. They never show framework text, and server error details only appear while debugging. The 403 and 500 pages wrongly said 401.
+> - **Scripts on the posting form:** down from 26 to 18. Shared libraries (select2, moment, fileinput, daterangepicker) were pushed once per file because `@pushonce` had no shared ID; `browse.locations.js` loaded twice; payment scripts load only when packages are for sale.
+> - **SEO and accessibility:**
+>   - Heading order on the home page; an `h1` on every posting form page.
+>   - Listing share images no longer claim a wrong 1200x630 size.
+>   - The Organization data lists the site's social profiles.
+>   - Save on cards works by keyboard; the search boxes have labels; there is a skip link.
+> - **Icons:** `/favicon.ico`, `/apple-touch-icon.png`, `/icon-192.png`, `/icon-512.png` and `/manifest.json` are made from the favicon in Admin > Settings, with the brand colour as theme colour.
+> - **Login nudge:** shown once per browser session instead of on every page.
+>
+> Left for the owner: a default share image (Admin > Settings > Social share; the home page has none), and the slogan, which is why the contact page title reads "Adniro - adniro".
 - **Images.** Real lazy loading and fixed image sizes on listing cards, and remove the `pace` loader.
 - **Error pages.** Branded 404 and 500 pages with header, footer and search, never showing the framework's message.
 - **Duplicate scripts.** Stop them loading twice on the posting form, and load payment scripts only when packages are for sale.

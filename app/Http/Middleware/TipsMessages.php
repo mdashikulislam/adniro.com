@@ -27,6 +27,9 @@ use Illuminate\Http\Request;
 
 class TipsMessages
 {
+	/** Session key: the login nudge was shown in this browser session (adniro). */
+	public const LOGIN_NUDGE_SHOWN = 'tips.login_nudge_shown';
+	
 	/**
 	 * Handle an incoming request.
 	 *
@@ -46,8 +49,10 @@ class TipsMessages
 		}
 		
 		// SHOW MESSAGE... (About Login) If user not logged
+		// adniro: once per browser session, not on every page (it covered the breadcrumb and buttons)
 		if (
 			!auth()->check()
+			&& !session()->has(self::LOGIN_NUDGE_SHOWN)
 			&& request()->segment(1) !== null
 			&& !routeActionHas(getClassNamespaceName(RegisterController::class))
 			&& !routeActionHas(getClassNamespaceName(BaseController::class, depth: 1))
@@ -84,6 +89,9 @@ class TipsMessages
 		}
 		
 		$message = $siteCountryInfo ?? $loginInfo ?? null;
+		if (!empty($loginInfo) && $message === $loginInfo) {
+			session()->put(self::LOGIN_NUDGE_SHOWN, true);
+		}
 		
 		if (!empty($message)) {
 			flash($message)->now()->info();
