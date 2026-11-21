@@ -258,18 +258,27 @@
 	inset: 0;
 	display: grid;
 	grid-template-columns: 1fr 114px 1fr;
-	filter: drop-shadow(0 -4px 14px rgba(15, 23, 42, .12)) drop-shadow(0 -1px 1px rgba(15, 23, 42, .06));
+	filter: drop-shadow(0 -1px 0 rgba(15, 23, 42, .07)) drop-shadow(0 -3px 6px rgba(15, 23, 42, .05)); /* light: the notch stays clean */
 }
 
 .adn-appbar-shape-side {
 	background-color: var(--adn-bar-surface);
 }
 
+/* The sides tuck 1px under the notch, so no hairline shows between the pieces */
+.adn-appbar-shape-side:first-child {
+	margin-inline-end: -1px;
+}
+
+.adn-appbar-shape-side:last-child {
+	margin-inline-start: -1px;
+}
+
 .adn-appbar-notch {
+	position: relative;
 	display: block;
-	width: 116px;
-	height: 100%;
-	margin-inline: -1px; /* no hairline between the pieces */
+	width: 114px;
+	height: var(--adn-appbar-height); /* 66px: drawn at its real size, the curve is not stretched */
 	fill: var(--adn-bar-surface);
 }
 
@@ -352,7 +361,7 @@
 
 .adn-appbar-sell-tile {
 	position: absolute;
-	top: calc((var(--adn-sell-size) / -2) - 1px); /* a small gap between its ring and the notch's curve */
+	top: calc(3px - var(--adn-sell-size) / 2 - var(--adn-sell-ring)); /* centred 3px below the top edge, as the notch is */
 	left: 50%;
 	display: inline-flex;
 	align-items: center;
@@ -365,7 +374,7 @@
 	color: #fff;
 	font-size: 1.55rem;
 	background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--bs-primary) 82%, #fff), var(--bs-primary) 55%, var(--adn-teal-deep));
-	box-shadow: 0 10px 20px -6px rgba(var(--bs-primary-rgb), .55), 0 2px 4px rgba(15, 23, 42, .12);
+	box-shadow: 0 3px 8px -2px rgba(var(--bs-primary-rgb), .45); /* small: the gap in the notch stays clean */
 	transform: translateX(-50%);
 	transition: transform .2s ease, box-shadow .2s ease;
 }
@@ -375,7 +384,7 @@
 }
 
 .adn-appbar-sell:hover .adn-appbar-sell-tile {
-	box-shadow: 0 12px 24px -6px rgba(var(--bs-primary-rgb), .65), 0 2px 4px rgba(15, 23, 42, .12);
+	box-shadow: 0 4px 10px -2px rgba(var(--bs-primary-rgb), .55);
 }
 
 .adn-appbar-sell:active .adn-appbar-sell-tile {
