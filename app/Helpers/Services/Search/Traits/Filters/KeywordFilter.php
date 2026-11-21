@@ -23,14 +23,16 @@ use Illuminate\Support\Facades\DB;
 
 trait KeywordFilter
 {
+	// adniro: the title and the category say what a listing is; the description often only
+	// mentions a word in passing ("call my phone"), so it weighs less than the title
 	protected array $searchableColumns = [
 		// Post
-		'title'                    => 10,
-		'{postsTable}.description' => 10,
+		'title'                    => 20,
+		'{postsTable}.description' => 4,
 		'tags'                     => 8,
 		// Category
-		'tCategory.name'           => 5,
-		'tParentCat.name'          => 2,
+		'tCategory.name'           => 12,
+		'tParentCat.name'          => 6,
 	];
 	
 	protected bool $forceAverage = true; // Force relevance's average

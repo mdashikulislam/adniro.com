@@ -1,0 +1,5 @@
+# adniro: built files carry a content hash in their URL (?id=..., see public/mix-manifest.json),
+# so browsers may keep them for a year.
+<IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>

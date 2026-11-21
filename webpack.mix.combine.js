@@ -25,19 +25,16 @@ mix.combine([
 	'public/assets/js/helpers/domObserver/domObserverBatch.js',
 	'public/assets/js/helpers/vanilla.js',
 	'public/assets/js/helpers/urlBuilder.js',
-	'public/assets/plugins/jquery/3.3.1/jquery.min.js',
+	'public/assets/plugins/jquery/3.7.1/jquery.min.js',
 	'public/assets/bootstrap/5.3.7/dist/js/bootstrap.bundle.min.js',
 	'public/assets/js/helpers/bootstrap.js',
 	'public/assets/js/helpers/cookieManager.js',
+	'public/assets/plugins/sweetalert2/11.21.0/sweetalert2.all.min.js',
 	'public/assets/plugins/dompurify/3.2.5/purify.min.js',
 	'public/assets/js/helpers/themeDetector.js',
 	'public/assets/js/app/theme-switcher.js',
 	'public/assets/js/helpers/unsavedFormGuard/locale.js',
 	'public/assets/js/helpers/unsavedFormGuard/unsavedFormGuard.js',
-	'public/assets/plugins/pnotify/5.2.0/dist/PNotify.js',
-	'public/assets/plugins/pnotify/5.2.0/modules/font-awesome5/PNotifyFontAwesome5.js',
-	'public/assets/plugins/pnotify/5.2.0/modules/font-awesome5-fix/PNotifyFontAwesome5Fix.js',
-	'public/assets/plugins/pnotify/5.2.0/modules/confirm/PNotifyConfirm.js',
 	'public/assets/auth/js/script.js',
 	'public/assets/auth/js/two-factor-otp-form.js',
 	'public/assets/js/app/auth-fields.js'
@@ -68,7 +65,7 @@ mix.combine([
 	'public/assets/js/helpers/global.js',
 	'public/assets/js/helpers/httpRequest.js',
 	
-	'public/assets/plugins/jquery/3.3.1/jquery.min.js',
+	'public/assets/plugins/jquery/3.7.1/jquery.min.js',
 	'public/assets/plugins/jqueryui/1.13.2/jquery-ui.min.js',
 	'public/assets/bootstrap/5.3.7/dist/js/bootstrap.bundle.min.js',
 	'public/assets/js/helpers/bootstrap.js',
@@ -78,10 +75,6 @@ mix.combine([
 	'public/assets/plugins/jquery-nice-select/js/jquery.nice-select.min.js',
 	'public/assets/plugins/jquery.nicescroll/dist/jquery.nicescroll.min.js',
 	'public/assets/plugins/tiny-slider/2.9.4/min/tiny-slider.js',
-	'public/assets/plugins/pnotify/5.2.0/dist/PNotify.js',
-	'public/assets/plugins/pnotify/5.2.0/modules/font-awesome5/PNotifyFontAwesome5.js',
-	'public/assets/plugins/pnotify/5.2.0/modules/font-awesome5-fix/PNotifyFontAwesome5Fix.js',
-	'public/assets/plugins/pnotify/5.2.0/modules/confirm/PNotifyConfirm.js',
 	'public/assets/plugins/sweetalert2/11.21.0/sweetalert2.all.min.js',
 	'public/assets/plugins/autoComplete.js/10.2.7/autoComplete.min.js',
 	'public/assets/plugins/counter-up/2.0.2/dist/index.js',
@@ -124,7 +117,7 @@ mix.combine([
 	'public/assets/js/helpers/global.js',
 	'public/assets/js/helpers/httpRequest.js',
 	
-	'public/assets/plugins/jquery/3.3.1/jquery.min.js',
+	'public/assets/plugins/jquery/3.7.1/jquery.min.js',
 	'public/assets/bootstrap/5.3.7/dist/js/bootstrap.bundle.min.js',
 	'public/assets/js/helpers/bootstrap.js',
 	'public/assets/admin/js/app.js',
@@ -161,3 +154,6 @@ mix.version();
 
 /* Disable Compilation Notification */
 /* mix.disableNotifications(); */
+
+// adniro: the hand-written front stylesheet, minified and versioned (edit resources/css/front/custom.css)
+mix.postCss('resources/css/front/custom.css', 'public/dist/front/custom.css');

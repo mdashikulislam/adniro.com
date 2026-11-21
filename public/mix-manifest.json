@@ -1,11 +1,12 @@
 {
+    "/dist/front/custom.css": "/dist/front/custom.css?id=cba1007fd042e400c1c5514909ebeb7f",
     "/dist/auth/styles.css": "/dist/auth/styles.css?id=3063350b268624050d028fd655a6884e",
     "/dist/auth/styles.rtl.css": "/dist/auth/styles.rtl.css?id=31a6d2ccc11b8798d37d6f86c1a31f95",
-    "/dist/auth/scripts.js": "/dist/auth/scripts.js?id=b7969dea37e4e7ec93ad375c3e5304ff",
+    "/dist/auth/scripts.js": "/dist/auth/scripts.js?id=96c3093f314c35e10dc47832e4868822",
     "/dist/front/styles.css": "/dist/front/styles.css?id=9ff7ebfbefa9c9dda3304d6715dac7e5",
     "/dist/front/styles.rtl.css": "/dist/front/styles.rtl.css?id=264a034565caa30a9c5ea24801e67740",
-    "/dist/front/scripts.js": "/dist/front/scripts.js?id=1842d21e8de45f481820984f410337ef",
+    "/dist/front/scripts.js": "/dist/front/scripts.js?id=92fb5518002e2ada8d3e1a481702edd8",
     "/dist/admin/styles.css": "/dist/admin/styles.css?id=8597b5b472d9750cf0261d98e75550ae",
     "/dist/admin/styles.rtl.css": "/dist/admin/styles.rtl.css?id=47c7fc50923387959650b740dbc24dd9",
-    "/dist/admin/scripts.js": "/dist/admin/scripts.js?id=6b3890f7c6802ff688c806bf4e8b4ff9"
+    "/dist/admin/scripts.js": "/dist/admin/scripts.js?id=a7b3d4e32589c388a768a4c3247dcfef"
 }

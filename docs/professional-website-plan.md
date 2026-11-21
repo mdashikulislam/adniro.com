@@ -243,6 +243,18 @@ Most important first:
 - **Cookie consent.** Load Analytics only after consent. The banner must be decided in JavaScript, because the guest page cache serves one copy of each page to everyone.
 
 ### Phase 6: performance (3 to 5 days)
+
+> **Status, 21 Nov 2026: done, with tests (228 passing) and a click-through** (home, search, listing page, posting form with category, custom fields, city popup, editor and tags; signed in: account profile, admin dashboard, admin listings table, admin settings form). No console errors.
+> - **jQuery 3.3.1 → 3.7.1** in the front, auth and admin bundles. The bundles were rebuilt with `npx mix --production --mix-config=webpack.mix.combine.js`; CSS output is byte-identical, JS differs only by the newer minifier (no source had changed).
+> - **One notification library:** flash messages use SweetAlert2 toasts (same corner, same 10 s); PNotify is gone from the front and auth bundles (front scripts 826 KB → 745 KB). The admin panel still uses PNotify directly in about 13 places, so its bundle keeps it.
+> - **custom.css** now lives in `resources/css/front/custom.css` and is built minified and versioned (243 KB → 200 KB). **Edit the source, then run the combine build above**; `public/dist/front/custom.css` is generated.
+> - **Search:** keyword results are ranked by relevance before date (relevance only broke ties before), and a title or category match weighs more than a mention in the description, so "phone" finds phones first. Sorting by date or price still works.
+> - **Editor:** already loaded only for the description field; nothing to change.
+> - **Static file caching:** Apache rules in `public/.htaccess` (images 30 days, fonts a year, other CSS/JS 7 days) and `public/dist/.htaccess` (a year, immutable; these URLs carry a content hash). On nginx, the equivalent is:
+>   `location ^~ /dist/ { add_header Cache-Control "public, max-age=31536000, immutable"; }` and
+>   `location ~* \.(jpe?g|png|webp|gif|svg)$ { expires 30d; }`, `location ~* \.(woff2?|ttf)$ { expires 1y; }`, `location ~* \.(css|js)$ { expires 7d; }`.
+>
+> Noticed, not changed: listing titles are capitalised by the site ("iPhone" shows as "IPhone").
 - **Custom CSS.** Move `custom.css`, currently 243 KB and built by hand, into the build, so it is minified and versioned.
 - **jQuery.** Upgrade to 3.7, and drop unused libraries. Use one notification library: PNotify or SweetAlert2. This needs a full click-through.
 - **Editor and caching.** Load the rich text editor only for the description field, and set long cache headers for static files.

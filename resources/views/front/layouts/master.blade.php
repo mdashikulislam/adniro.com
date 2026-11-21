@@ -91,12 +91,8 @@
 	@endphp
 	{!! $homeStyle !!}
 	
-	{{-- Custom CSS --}}
-	@php
-		$customCssPath = public_path('dist/front/custom.css');
-		$customCssVersion = file_exists($customCssPath) ? '?v=' . filemtime($customCssPath) : getPictureVersion();
-	@endphp
-	<link href="{{ url()->asset('dist/front/custom.css') . $customCssVersion }}" rel="stylesheet">
+	{{-- Custom CSS (adniro: built from resources/css/front/custom.css, minified and versioned) --}}
+	<link href="{{ url(mix('dist/front/custom.css')) }}" rel="stylesheet">
 	
     @yield('after_styles')
 	@stack('after_styles_stack')

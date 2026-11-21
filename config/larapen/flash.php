@@ -21,7 +21,7 @@ return [
 	|--------------------------------------------------------------------------
 	| Supported: 'bsmodal', 'bstoast', 'pnotify' or 'sweetalert2'
 	*/
-	'default'    => env('FLASH_MESSAGE_PRESENTER', 'pnotify'),
+	'default'    => env('FLASH_MESSAGE_PRESENTER', 'sweetalert2'), // adniro: one notification library (PNotify stays only in the admin panel)
 	
 	/*
     |--------------------------------------------------------------------------

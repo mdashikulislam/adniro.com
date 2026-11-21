@@ -133,6 +133,7 @@ trait OrderBy
 	{
 		// Default Priorities
 		$orderByPriorities = [
+			'relevance'               => 92, // adniro: the best keyword matches first (it came after the date)
 			'lft'                     => 90,
 			config('distance.rename') => 89,
 			'created_at'              => 88,

@@ -49,7 +49,7 @@
 		{{-- Brand colours (separate requests: the page still renders if they fail) --}}
 		<link href="{{ url('common/css/style.css') . getPictureVersion() }}" rel="stylesheet">
 		@if (file_exists(public_path('dist/front/custom.css')))
-			<link href="{{ url()->asset('dist/front/custom.css') }}" rel="stylesheet">
+			<link href="{{ url(mix('dist/front/custom.css')) }}" rel="stylesheet">
 		@endif
 	@endunless
 	<style>
