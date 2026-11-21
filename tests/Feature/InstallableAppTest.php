@@ -91,6 +91,19 @@ class InstallableAppTest extends TestCase
 		$this->assertStringContainsString('<span data-adn-install-label>' . e(trans('app_install.install')) . '</span>', $menu);
 	}
 
+	public function test_the_installed_app_starts_on_the_site_logo_with_a_loading_ring(): void
+	{
+		// Act
+		$html = $this->get('/')->assertOk()->getContent();
+
+		// Assert: the logo (not the small icon) on the start screen, a loading ring, and only in the installed app
+		$logo = config('settings.app.logo_dark_url') ?: config('larapen.media.logo-factory');
+		$this->assertNotEmpty($logo);
+		$this->assertMatchesRegularExpression('/html\.adn-splash::before \{[^}]*url\(' . preg_quote($logo, '/') . '\)/', $html);
+		$this->assertMatchesRegularExpression('/html\.adn-splash::after \{[^}]*animation: adnSplashSpin/', $html);
+		$this->assertStringContainsString("matchMedia('(display-mode: standalone)')", $html);
+	}
+
 	public function test_iphones_get_the_app_tags(): void
 	{
 		// Act
