@@ -235,7 +235,7 @@
 	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 72%, #000);
 	--adn-sell-size: 52px;
 	--adn-sell-ring: 4px;
-	--adn-pulse-rgb: 245, 158, 11; /* amber #f59e0b */
+	--adn-pulse-rgb: 139, 92, 246; /* soft violet #8b5cf6 */
 	position: fixed;
 	inset-inline: 0;
 	bottom: var(--adn-appbar-safe);
@@ -380,15 +380,15 @@
 	transition: transform .2s ease, box-shadow .2s ease;
 }
 
-/* A soft radar pulse: two warm amber rings (the site's Premium accent) grow out of the button and fade, one after the other */
+/* A soft radar pulse: two light violet rings grow a little way out of the button and fade, one after the other */
 .adn-appbar-sell-tile::before,
 .adn-appbar-sell-tile::after {
 	content: "";
 	position: absolute;
 	inset: calc(var(--adn-sell-ring) * -1);
-	border: 2.5px solid rgba(var(--adn-pulse-rgb), .75);
+	border: 2px solid rgba(var(--adn-pulse-rgb), .5);
 	border-radius: 50%;
-	background-color: rgba(var(--adn-pulse-rgb), .1);
+	background-color: rgba(var(--adn-pulse-rgb), .05);
 	opacity: 0;
 	pointer-events: none;
 	will-change: transform, opacity;
@@ -401,17 +401,17 @@
 
 @keyframes adnRadarPulse {
 	0% {
-		opacity: .85;
+		opacity: .7;
 		transform: scale(1);
 	}
 
 	55% {
-		opacity: .35;
+		opacity: .25;
 	}
 
 	100% {
 		opacity: 0;
-		transform: scale(1.75);
+		transform: scale(1.45);
 	}
 }
 
