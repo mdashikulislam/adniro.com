@@ -23,15 +23,9 @@
 	];
 	$descriptionLimits = ['{min}' => max(200, (int)config('settings.listing_form.description_min_length', 5))];
 	$tips = collect(range(1, 5))->map(fn ($i) => t('sell_quickly_advice_' . $i));
-	// Live buyer preview: a saved cover on edit pages (single-step pages also show photos chosen in the form),
-	// and the seller as buyers will see them: the form's name (the account's until changed), the verified-email tick
+	// Live buyer preview: a saved cover on edit pages; single-step pages also show the photos chosen in the form
 	$previewCover = (string)data_get($post, 'pictures.0.url.medium', '');
 	$previewPhotoHint = ($isSingleStep ?? false) ? trans('listing_form.live_photo_below') : trans('listing_form.live_photo_next');
-	$sellerUser = auth()->user();
-	$sellerVerified = $sellerUser instanceof \App\Models\User && \App\Services\SellerService::isVerifiedSeller($sellerUser);
-	$sellerName = trim((string)(data_get($post, 'contact_name') ?: data_get($sellerUser, 'name', '')));
-	$sellerInitials = collect(preg_split('/\s+/u', $sellerName, -1, PREG_SPLIT_NO_EMPTY))->take(2)
-		->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))->implode('') ?: '?';
 @endphp
 <div class="offcanvas-lg offcanvas-bottom lf-panel" tabindex="-1" id="lfPanel" aria-labelledby="lfPanelTitle">
 	<div class="offcanvas-header d-lg-none">
@@ -84,10 +78,10 @@
 			@endunless
 		</section>
 
-		{{-- Live buyer preview: the listing as buyers will see it, as a feed card or a detail view (listing-form/preview.js; text only) --}}
+		{{-- Live buyer preview: the site's own listing card (search results) and listing page, filled from the form
+		     as the seller types (listing-form/preview.js; text only) --}}
 		<section class="lf-panel-card lf-live" aria-labelledby="lfLiveTitle" data-lf-live data-view="feed"
-		         data-lf-cover="{{ $previewCover }}" data-lf-seller-verified="{{ $sellerVerified ? '1' : '0' }}"
-		         data-lf-seller-default="{{ $sellerName }}">
+		         data-lf-cover="{{ $previewCover }}">
 			<div class="lf-live-head">
 				<h2 class="lf-panel-heading lf-live-heading" id="lfLiveTitle">
 					<span class="lf-live-dot" aria-hidden="true"></span>{{ trans('listing_form.live_title') }}
@@ -98,45 +92,106 @@
 				</div>
 			</div>
 
-			<article class="lf-live-card" aria-hidden="true">
-				<div class="lf-live-media">
-					<img class="lf-live-photo" alt="" data-lf-live-photo hidden>
-					<div class="lf-live-empty" data-lf-live-empty>
-						<span class="lf-live-empty-icon"><i class="bi bi-image"></i></span>
-						<span>{{ $previewPhotoHint }}</span>
-					</div>
-					<span class="lf-live-cat" data-lf-live="category">{{ trans('listing_form.preview_category') }}</span>
-					<span class="lf-live-fav"><i class="bi bi-heart"></i></span>
-				</div>
-				<div class="lf-live-body">
-					<div class="lf-live-priceline">
-						<p class="lf-live-price is-empty" data-lf-live="price">{{ trans('listing_form.preview_price') }}</p>
-						<span class="lf-live-condition" data-lf-live="condition" hidden></span>
-					</div>
-					<h3 class="lf-live-name is-empty" data-lf-live="title">{{ trans('listing_form.live_title_empty') }}</h3>
-					<ul class="lf-live-specs" data-lf-live-specs hidden></ul>
-					<p class="lf-live-specs-empty" data-lf-live-specs-empty>{{ trans('listing_form.live_specs_empty') }}</p>
-					{{-- Detail view only: every chosen detail, and the description --}}
-					<dl class="lf-live-details" data-lf-live-details hidden></dl>
-					<p class="lf-live-desc is-empty" data-lf-live="description">{{ trans('listing_form.live_description_empty') }}</p>
-					<div class="lf-live-meta">
-						<span class="lf-live-city"><i class="bi bi-geo-alt"></i> <span data-lf-live="city">{{ trans('listing_form.preview_city') }}</span></span>
-						<span>{{ trans('listing_form.live_just_now') }}</span>
-					</div>
-					<div class="lf-live-seller">
-						<span class="lf-live-avatar" data-lf-live="initials">{{ $sellerInitials }}</span>
-						<span class="lf-live-seller-text">
-							<span class="lf-live-seller-name">
-								<span data-lf-live="seller">{{ $sellerName !== '' ? $sellerName : trans('listing_form.live_seller_empty') }}</span>
-								<i class="bi bi-patch-check lf-live-verified" title="{{ trans('listing_form.live_verified') }}" @unless ($sellerVerified) hidden @endunless></i>
-							</span>
-							<span class="lf-live-negotiable" data-lf-live="negotiable" hidden>{{ trans('listing_form.preview_negotiable') }}</span>
+			<div class="lf-live-stage" aria-hidden="true">
+				{{-- Feed: the listing card from search results (front/search/partials/posts/template/grid.blade.php) --}}
+				<article class="listing-card lf-live-card lf-live-feed">
+					<div class="listing-card-media">
+						<div class="listing-card-img lf-live-media">
+							<img class="listing-card-picture" alt="" data-lf-live-photo hidden>
+							<div class="lf-live-empty" data-lf-live-empty>
+								<span class="lf-live-empty-icon"><i class="bi bi-image"></i></span>
+								<span>{{ $previewPhotoHint }}</span>
+							</div>
+						</div>
+						<span class="btn listing-fav"><i class="bi bi-heart small"></i></span>
+						<span class="listing-card-location" data-lf-live-city-pill hidden>
+							<i class="bi bi-geo-alt-fill"></i> <span data-lf-live="city"></span>
 						</span>
-						<span class="lf-live-cta lf-live-cta-feed">{{ trans('listing_form.live_cta') }} <i class="bi bi-arrow-right"></i></span>
-						<span class="lf-live-cta lf-live-cta-detail"><i class="bi bi-chat-dots"></i> {{ trans('listing_form.live_contact') }}</span>
+					</div>
+					<div class="listing-card-body">
+						<div class="listing-card-topline">
+							<span class="listing-card-cat" data-lf-live="category">{{ trans('listing_form.preview_category') }}</span>
+						</div>
+						<h3 class="h5 listing-card-title" data-lf-live="title">{{ trans('listing_form.live_title_empty') }}</h3>
+						<p class="listing-card-desc" data-lf-live="excerpt" hidden></p>
+						<div class="listing-card-footer">
+							<div class="listing-card-price" data-lf-live="price">{{ trans('listing_form.preview_price') }}</div>
+							<div class="listing-card-footer-right">
+								<span class="listing-card-date"><i class="fa-regular fa-clock"></i> {{ trans('listing_form.live_just_now') }}</span>
+							</div>
+						</div>
+					</div>
+				</article>
+
+				{{-- Detail: the listing page's main column (front/post/show/index.blade.php and partials/details), scaled down --}}
+				<div class="lf-live-page">
+					<div class="listing-main">
+						<header class="listing-header">
+							<div class="listing-header-top">
+								<div class="listing-chips">
+									<span class="listing-chip listing-chip-cat">
+										<i class="bi bi-folder-fill"></i> <span data-lf-live="page-category">{{ trans('listing_form.preview_category') }}</span>
+									</span>
+								</div>
+								<div class="listing-price-card" data-lf-live-price-card>
+									<span class="listing-price-icon"><i class="bi bi-tag-fill"></i></span>
+									<span class="listing-price-body">
+										<span class="listing-price-value">
+											<span data-lf-live="page-price">{{ trans('listing_form.preview_price') }}</span>
+											<span class="listing-price-negotiable" data-lf-live="negotiable" hidden>{{ t('negotiable') }}</span>
+										</span>
+									</span>
+								</div>
+							</div>
+							<h3 class="listing-title" data-lf-live="page-title">{{ trans('listing_form.live_title_empty') }}</h3>
+							<div class="listing-header-bottom">
+								<ul class="listing-meta list-unstyled">
+									<li class="listing-meta-city"><i class="bi bi-geo-alt-fill"></i> <span data-lf-live="page-city">{{ trans('listing_form.preview_city') }}</span></li>
+									<li><i class="bi bi-clock"></i> {{ trans('listing_form.live_just_now') }}</li>
+								</ul>
+							</div>
+						</header>
+
+						<div class="listing-gallery">
+							<div class="gallery-container lf-live-gallery">
+								<img alt="" data-lf-live-page-photo hidden>
+								<div class="lf-live-empty" data-lf-live-page-empty>
+									<span class="lf-live-empty-icon"><i class="bi bi-image"></i></span>
+									<span>{{ $previewPhotoHint }}</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="items-details listing-details">
+							<div class="tab-content listing-panel">
+								<div class="items-details-info">
+									<section class="listing-section">
+										<h4 class="listing-section-title">
+											<span class="listing-section-icon"><i class="bi bi-card-text"></i></span>
+											{{ t('Description') }}
+										</h4>
+										<div class="listing-description" data-lf-live="description">{{ trans('listing_form.live_description_empty') }}</div>
+									</section>
+									<section class="listing-section" data-lf-live-tags-section hidden>
+										<h4 class="listing-section-title">
+											<span class="listing-section-icon"><i class="bi bi-tags"></i></span>
+											{{ t('Tags') }}
+										</h4>
+										<div class="listing-tags" data-lf-live-tags></div>
+									</section>
+									<section class="listing-section" data-lf-live-specs-section hidden>
+										<h4 class="listing-section-title">
+											<span class="listing-section-icon"><i class="bi bi-list-check"></i></span>
+											{{ t('Additional Details') }}
+										</h4>
+										<div class="listing-specs" data-lf-live-specs></div>
+									</section>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-			</article>
+			</div>
 		</section>
 
 		@if ($isOwner)

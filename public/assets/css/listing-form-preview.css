@@ -1,17 +1,17 @@
 /*
  * adniro: the live buyer preview in the listing form's side panel (form/panel.blade.php, listing-form/preview.js).
- * A feed card by default; [data-view="detail"] shows every detail and the description instead of badges.
+ * The card and the page are the site's own (.listing-card and .listing-* from resources/css/front/custom.css);
+ * this file only adapts them to the panel: the header and view switch, no hover, a photo placeholder,
+ * and the listing page shrunk to the panel's width.
  */
 
 .lf-live {
-	--lf-live-accent: color-mix(in srgb, var(--bs-primary) 78%, #000);
 	padding: 1rem 1rem 1.05rem;
 	border-radius: 20px;
 	box-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 8px 24px -12px rgba(15, 23, 42, .12);
 }
 
 [data-bs-theme="dark"] .lf-live {
-	--lf-live-accent: color-mix(in srgb, var(--bs-primary) 55%, #fff);
 	box-shadow: none;
 }
 
@@ -72,36 +72,38 @@
 	outline-offset: 1px;
 }
 
-/* The card */
-.lf-live-card {
-	border: 1px solid var(--bs-border-color);
-	border-radius: 16px;
-	overflow: hidden;
-	background-color: var(--bs-body-bg);
+/* Only one of the two is shown */
+.lf-live:not([data-view="detail"]) .lf-live-page,
+.lf-live[data-view="detail"] .lf-live-feed {
+	display: none;
+}
+
+.lf-live-stage {
 	pointer-events: none;
 	user-select: none;
 }
 
-.lf-live-media {
-	position: relative;
-	aspect-ratio: 4 / 3;
-	background-color: var(--bs-tertiary-bg);
+/* ---------- Feed: the listing card, as in search results ---------- */
+.lf-live-feed.listing-card {
+	height: auto;
 }
 
-.lf-live-photo {
-	display: block;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	outline: 1px solid rgba(0, 0, 0, .08);
-	outline-offset: -1px;
+.lf-live-feed.listing-card:hover {
+	transform: none;
+	border-color: var(--bs-border-color);
+	box-shadow: none;
 }
 
-.lf-live-photo[hidden],
-.lf-live-empty[hidden] {
-	display: none;
+.lf-live [data-lf-live].is-empty {
+	color: var(--bs-secondary-color);
 }
 
+.lf-live .listing-card-price.is-empty {
+	font-size: .85rem;
+	font-weight: 600;
+}
+
+/* No photo yet: say where photos are added */
 .lf-live-empty {
 	display: flex;
 	flex-direction: column;
@@ -113,7 +115,14 @@
 	text-align: center;
 	font-size: .8rem;
 	color: var(--bs-secondary-color);
+	background-color: var(--bs-tertiary-bg);
 	text-wrap: balance;
+}
+
+.lf-live-empty[hidden],
+.lf-live [data-lf-live-photo][hidden],
+.lf-live [data-lf-live-page-photo][hidden] {
+	display: none;
 }
 
 .lf-live-empty-icon {
@@ -128,287 +137,49 @@
 	background-color: var(--bs-body-bg);
 }
 
-.lf-live-cat {
-	position: absolute;
-	inset-block-start: .65rem;
-	inset-inline-start: .65rem;
-	max-width: calc(100% - 4rem);
-	padding: .2rem .6rem;
-	border-radius: 8px;
-	font-size: .72rem;
-	font-weight: 700;
-	color: #fff;
-	background-color: rgba(15, 23, 42, .78);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.lf-live-fav {
-	position: absolute;
-	inset-block-start: .6rem;
-	inset-inline-end: .6rem;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 2rem;
-	height: 2rem;
-	border-radius: 50%;
-	color: #334155;
-	background-color: rgba(255, 255, 255, .95);
-	box-shadow: 0 2px 8px rgba(15, 23, 42, .15);
-}
-
-.lf-live-body {
-	padding: .85rem .95rem .95rem;
-}
-
-.lf-live-priceline {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: .5rem;
-}
-
-.lf-live-price {
-	margin: 0;
-	font-size: 1.3rem;
-	font-weight: 800;
-	letter-spacing: -.01em;
-	color: var(--lf-live-accent);
-	font-variant-numeric: tabular-nums;
-}
-
-.lf-live-price[hidden] {
+/* The placeholder needs no darkening gradient; keep it for real photos */
+.lf-live-feed .listing-card-media:has(.lf-live-empty:not([hidden]))::after {
 	display: none;
 }
 
-.lf-live-condition {
-	flex: 0 0 auto;
-	padding: .15rem .6rem;
-	border: 1px solid var(--bs-border-color);
-	border-radius: 999px;
-	font-size: .72rem;
-	font-weight: 700;
-	color: var(--bs-emphasis-color);
-	background-color: var(--bs-tertiary-bg);
+/* ---------- Detail: the listing page's main column, shrunk to the panel ---------- */
+.lf-live-page {
+	/* lays the page out at about a phone's width, then scales it to the panel */
+	zoom: .6;
 }
 
-.lf-live-condition[hidden] {
-	display: none;
-}
-
-.lf-live-name {
-	margin: .35rem 0 0;
-	font-size: 1rem;
-	font-weight: 700;
-	line-height: 1.35;
-	color: var(--bs-emphasis-color);
-	overflow-wrap: anywhere;
-	text-wrap: balance;
-}
-
-.lf-live [data-lf-live].is-empty {
-	color: var(--bs-secondary-color);
-}
-
-.lf-live .lf-live-cat.is-empty {
-	color: rgba(255, 255, 255, .88);
-}
-
-.lf-live-price.is-empty {
-	color: var(--lf-live-accent);
-	opacity: 1;
-}
-
-/* Badges (feed) */
-.lf-live-specs {
-	display: flex;
-	flex-wrap: wrap;
-	gap: .3rem;
-	margin: .55rem 0 0;
-	padding: 0;
-	list-style: none;
-}
-
-.lf-live-specs[hidden],
-.lf-live-specs-empty[hidden],
-.lf-live-details[hidden] {
-	display: none;
-}
-
-.lf-live-specs li {
-	max-width: 100%;
-	padding: .15rem .55rem;
-	border-radius: 999px;
-	font-size: .72rem;
-	font-weight: 600;
-	color: var(--lf-live-accent);
-	background-color: rgba(var(--bs-primary-rgb), .1);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.lf-live-specs-empty {
-	margin: .45rem 0 0;
-	font-size: .78rem;
-	font-style: italic;
-	color: var(--bs-secondary-color);
-}
-
-/* Every detail and the description (detail view) */
-.lf-live-details {
-	display: grid;
-	grid-template-columns: auto minmax(0, 1fr);
-	gap: .3rem .75rem;
-	margin: .7rem 0 0;
-	padding: .65rem .75rem;
-	border-radius: 12px;
-	font-size: .8rem;
-	background-color: var(--bs-tertiary-bg);
-}
-
-.lf-live-details dt {
-	font-weight: 500;
-	color: var(--bs-secondary-color);
-}
-
-.lf-live-details dd {
-	margin: 0;
-	font-weight: 600;
-	color: var(--bs-emphasis-color);
+.lf-live-page .listing-title {
 	overflow-wrap: anywhere;
 }
 
-.lf-live-desc {
-	margin: .65rem 0 0;
-	font-size: .82rem;
-	line-height: 1.5;
-	color: var(--bs-body-color);
-	text-wrap: pretty;
+.lf-live-gallery {
+	aspect-ratio: 4 / 3;
+	overflow: hidden;
+}
+
+.lf-live-gallery img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: 14px;
+	object-fit: cover;
+}
+
+.lf-live-gallery .lf-live-empty {
+	border-radius: 14px;
+	font-size: 1.1rem;
+}
+
+.lf-live-page .listing-description {
+	white-space: pre-line;
 	overflow-wrap: anywhere;
 }
 
-.lf-live:not([data-view="detail"]) .lf-live-details,
-.lf-live:not([data-view="detail"]) .lf-live-desc,
-.lf-live[data-view="detail"] .lf-live-specs,
-.lf-live[data-view="detail"] .lf-live-specs-empty {
+.lf-live-page [data-lf-live-price-card][hidden],
+.lf-live-page [data-lf-live-tags-section][hidden],
+.lf-live-page [data-lf-live-specs-section][hidden],
+.lf-live-page .listing-price-negotiable[hidden] {
 	display: none;
-}
-
-/* Place, time and seller */
-.lf-live-meta {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: .5rem;
-	margin-block-start: .75rem;
-	padding-block: .6rem;
-	border-block: 1px solid var(--bs-border-color-translucent);
-	font-size: .8rem;
-	color: var(--bs-secondary-color);
-}
-
-.lf-live-city {
-	min-width: 0;
-	color: var(--bs-body-color);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.lf-live-city .bi {
-	color: var(--lf-live-accent);
-}
-
-.lf-live-seller {
-	display: flex;
-	align-items: center;
-	gap: .6rem;
-	margin-block-start: .7rem;
-}
-
-.lf-live-avatar {
-	display: inline-flex;
-	flex: 0 0 auto;
-	align-items: center;
-	justify-content: center;
-	width: 2.1rem;
-	height: 2.1rem;
-	border-radius: 50%;
-	font-size: .78rem;
-	font-weight: 700;
-	color: #fff;
-	background-color: var(--bs-primary);
-}
-
-.lf-live-avatar.is-empty {
-	color: #fff;
-}
-
-.lf-live-seller-text {
-	display: flex;
-	flex: 1 1 auto;
-	flex-direction: column;
-	min-width: 0;
-	line-height: 1.3;
-}
-
-.lf-live-seller-name {
-	display: inline-flex;
-	align-items: center;
-	gap: .3rem;
-	min-width: 0;
-	font-size: .85rem;
-	font-weight: 700;
-	color: var(--bs-emphasis-color);
-}
-
-.lf-live-seller-name > span {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.lf-live-verified {
-	flex: 0 0 auto;
-	color: var(--lf-live-accent);
-}
-
-.lf-live-verified[hidden],
-.lf-live-negotiable[hidden] {
-	display: none;
-}
-
-.lf-live-negotiable {
-	font-size: .75rem;
-	font-weight: 600;
-	color: var(--lf-live-accent);
-}
-
-.lf-live-cta {
-	flex: 0 0 auto;
-	display: inline-flex;
-	align-items: center;
-	gap: .3rem;
-	padding: .3rem .7rem;
-	border-radius: 9px;
-	font-size: .75rem;
-	font-weight: 700;
-	color: var(--lf-live-accent);
-	background-color: rgba(var(--bs-primary-rgb), .1);
-	white-space: nowrap;
-}
-
-.lf-live:not([data-view="detail"]) .lf-live-cta-detail,
-.lf-live[data-view="detail"] .lf-live-cta-feed {
-	display: none;
-}
-
-.lf-live[data-view="detail"] .lf-live-cta-detail {
-	color: #fff;
-	background-color: var(--bs-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
