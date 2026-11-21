@@ -58,6 +58,41 @@ class TranscriptionTest extends TestCase
 		$this->assertSame(7, (int)$log->user_id);
 	}
 	
+	/**
+	 * @return array<string, array{0: string, 1: string, 2: string}>
+	 */
+	public static function recordedTypes(): array
+	{
+		return [
+			'iPhone (seen as video)' => ['video/mp4', 'voice.m4a', 'audio/mp4'],
+			'iPhone'                 => ['audio/mp4', 'voice.m4a', 'audio/mp4'],
+			'Chrome'                 => ['video/webm', 'voice.webm', 'audio/webm'],
+			'Firefox'                => ['audio/ogg', 'voice.ogg', 'audio/ogg'],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('recordedTypes')]
+	public function test_an_upload_without_an_extension_reaches_openai_named_by_its_audio_type(string $detected, string $name, string $sent): void
+	{
+		// Arrange: PHP keeps uploads in temporary files without an extension, and OpenAI reads the format from the name
+		\Illuminate\Support\Facades\Http::fake([
+			'api.openai.com/*' => \Illuminate\Support\Facades\Http::response(['text' => 'iPhone 13, 128 GB', 'usage' => ['input_tokens' => 20, 'output_tokens' => 6]]),
+		]);
+		$upload = tempnam(sys_get_temp_dir(), 'php');
+		file_put_contents($upload, 'recorded audio');
+
+		// Act
+		$result = app(LaravelAiClient::class)->transcribe($upload, $detected, 'en', 7, '10.0.0.1');
+
+		// Assert
+		$this->assertTrue($result->ok(), (string)$result->errorMessage);
+		\Illuminate\Support\Facades\Http::assertSent(function (\Illuminate\Http\Client\Request $request) use ($name, $sent) {
+			$body = (string)$request->toPsrRequest()->getBody();
+
+			return str_contains($body, 'filename="' . $name . '"') && str_contains($body, 'Content-Type: ' . $sent);
+		});
+	}
+
 	public function test_without_an_assigned_model_or_with_ai_off_nothing_is_sent(): void
 	{
 		Transcription::fake(['x']);

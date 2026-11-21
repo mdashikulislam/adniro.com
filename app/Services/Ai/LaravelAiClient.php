@@ -12,6 +12,7 @@ use Laravel\Ai\Ai;
 use Laravel\Ai\Transcription;
 use Laravel\Ai\Exceptions\FailoverableException;
 use Laravel\Ai\Files\Image;
+use Laravel\Ai\Files\LocalAudio;
 use Laravel\Ai\Responses\AgentResponse;
 use Laravel\Ai\Responses\Data\FinishReason;
 use Throwable;
@@ -131,7 +132,7 @@ class LaravelAiClient implements AiClientContract
 		try {
 			Ai::build($provider->sdkConfig());
 			
-			$pending = Transcription::fromPath($audioPath, $mimeType)->timeout((int)config('ai_features.timeout', 60));
+			$pending = Transcription::of(self::namedAudio($audioPath, $mimeType))->timeout((int)config('ai_features.timeout', 60));
 			if (!empty($language)) {
 				$pending->language($language);
 			}
@@ -426,6 +427,35 @@ class LaravelAiClient implements AiClientContract
 	private function elapsedMs(int|float $started): int
 	{
 		return (int)round((hrtime(true) - $started) / 1_000_000);
+	}
+
+	/** File extension for each recorded audio type the speech-to-text providers accept. */
+	private const AUDIO_EXTENSIONS = [
+		'audio/mp4'  => 'm4a',
+		'audio/x-m4a' => 'm4a',
+		'audio/m4a'  => 'm4a',
+		'audio/aac'  => 'm4a',
+		'audio/webm' => 'webm',
+		'audio/ogg'  => 'ogg',
+		'audio/mpeg' => 'mp3',
+		'audio/wav'  => 'wav',
+		'audio/x-wav' => 'wav',
+		'audio/vnd.wave' => 'wav',
+	];
+
+	/**
+	 * The recording, named by its audio type. PHP keeps uploads in temporary files without an extension, and
+	 * OpenAI reads the format from the file name ("Unsupported file format" otherwise). Browsers' audio-only
+	 * recordings are often detected as video/mp4 or video/webm, so those are sent as audio.
+	 */
+	private static function namedAudio(string $path, ?string $mimeType): LocalAudio
+	{
+		$type = strtolower(trim(explode(';', (string)$mimeType)[0]));
+		$type = preg_replace('#^video/(mp4|webm|ogg)$#', 'audio/$1', $type) ?? $type;
+		$extension = self::AUDIO_EXTENSIONS[$type] ?? null;
+		$audio = new LocalAudio($path, $type !== '' ? $type : null);
+
+		return $extension ? $audio->as('voice.' . $extension) : $audio;
 	}
 	
 	/**
