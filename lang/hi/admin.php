@@ -2392,4 +2392,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'प्रति पंक्ति आइटम',
 	'items_per_row_hint' => 'बड़ी स्क्रीन पर इस सेक्शन में प्रति पंक्ति विज्ञापन। टैबलेट पर अधिकतम 3 और फ़ोन पर 2 दिखते हैं।',
 	'recently_viewed_max_items_hint' => 'विज़िटर के हाल में देखे गए कितने विज्ञापन दिखाएँ, अधिकतम :max।',
+	'recently_viewed_carousel_hint' => 'एक पंक्ति जो बगल में स्क्रॉल होती है, तीरों के साथ। बंद: कार्ड अगली पंक्तियों में चले जाते हैं।',
+	'recently_viewed_clear_btn_label' => '\'Clear\' बटन दिखाएँ',
+	'recently_viewed_clear_btn_hint' => 'विज़िटर अपनी हाल में देखी गई सूची साफ़ कर सकते हैं।',
 ];

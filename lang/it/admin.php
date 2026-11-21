@@ -2392,4 +2392,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'Elementi per riga',
 	'items_per_row_hint' => 'Annunci per riga in questa sezione, su schermi grandi. I tablet ne mostrano fino a 3 e i telefoni 2.',
 	'recently_viewed_max_items_hint' => 'Quanti annunci visti di recente dal visitatore mostrare, fino a :max.',
+	'recently_viewed_carousel_hint' => 'Una riga che scorre di lato, con frecce. Disattivato: le schede vanno a capo su più righe.',
+	'recently_viewed_clear_btn_label' => 'Mostra il pulsante «Cancella»',
+	'recently_viewed_clear_btn_hint' => 'Permette ai visitatori di cancellare l\'elenco degli annunci visti di recente.',
 ];

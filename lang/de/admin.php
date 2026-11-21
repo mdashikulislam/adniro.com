@@ -2395,4 +2395,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'Elemente pro Zeile',
 	'items_per_row_hint' => 'Anzeigen pro Zeile in diesem Bereich, auf großen Bildschirmen. Tablets zeigen bis zu 3, Telefone 2.',
 	'recently_viewed_max_items_hint' => 'Wie viele zuletzt angesehene Anzeigen des Besuchers angezeigt werden, bis zu :max.',
+	'recently_viewed_carousel_hint' => 'Eine Zeile, die seitlich scrollt, mit Pfeilen. Aus: Die Karten brechen in weitere Zeilen um.',
+	'recently_viewed_clear_btn_label' => '„Löschen“-Schaltfläche anzeigen',
+	'recently_viewed_clear_btn_hint' => 'Besucher können ihre Liste zuletzt angesehener Anzeigen löschen.',
 ];

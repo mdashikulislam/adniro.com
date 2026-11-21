@@ -33,7 +33,7 @@ return new class extends Migration
 				'belongs_to'   => 'home',
 				'name'         => self::NAME,
 				'label'        => 'Recently Viewed',
-				'field_values' => json_encode(['max_items' => '12', 'items_per_row' => '4']),
+				'field_values' => null, // the defaults: App\Models\HasSettings\Presets\Section\RecentlyViewedPreset
 				'description'  => 'Recently Viewed Listings Section',
 				'parent_id'    => null,
 				'lft'          => $lft,

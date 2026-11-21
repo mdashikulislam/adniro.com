@@ -2620,4 +2620,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'Items per row',
 	'items_per_row_hint' => 'Listings per row in this section, on wide screens. Tablets show up to 3 and phones 2.',
 	'recently_viewed_max_items_hint' => 'How many of the visitor\'s recently viewed listings to show, up to :max.',
+	'recently_viewed_carousel_hint' => 'One row that scrolls sideways, with arrows. Off: the cards wrap onto more rows.',
+	'recently_viewed_clear_btn_label' => 'Show \'Clear\' button',
+	'recently_viewed_clear_btn_hint' => 'Lets visitors clear their recently viewed list.',
 ];

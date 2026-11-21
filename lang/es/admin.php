@@ -2401,4 +2401,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'Elementos por fila',
 	'items_per_row_hint' => 'Anuncios por fila en esta sección, en pantallas grandes. Las tabletas muestran hasta 3 y los teléfonos 2.',
 	'recently_viewed_max_items_hint' => 'Cuántos anuncios vistos recientemente por el visitante mostrar, hasta :max.',
+	'recently_viewed_carousel_hint' => 'Una fila que se desplaza de lado, con flechas. Desactivado: las tarjetas pasan a más filas.',
+	'recently_viewed_clear_btn_label' => 'Mostrar el botón «Borrar»',
+	'recently_viewed_clear_btn_hint' => 'Permite a los visitantes borrar su lista de vistos recientemente.',
 ];

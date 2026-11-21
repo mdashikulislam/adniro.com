@@ -2405,4 +2405,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'Элементов в ряду',
 	'items_per_row_hint' => 'Объявлений в ряду в этом разделе на широких экранах. Планшеты показывают до 3, телефоны — 2.',
 	'recently_viewed_max_items_hint' => 'Сколько недавно просмотренных посетителем объявлений показывать, до :max.',
+	'recently_viewed_carousel_hint' => 'Один ряд с прокруткой вбок и стрелками. Выключено: карточки переносятся на новые ряды.',
+	'recently_viewed_clear_btn_label' => 'Показывать кнопку «Очистить»',
+	'recently_viewed_clear_btn_hint' => 'Позволяет посетителям очистить список недавно просмотренных.',
 ];

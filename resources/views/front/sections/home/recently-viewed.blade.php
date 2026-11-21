@@ -2,7 +2,8 @@
 	Homepage: "Recently viewed" listings, in one row.
 	The listings opened by the visitor are remembered in the browser (localStorage, see the listing page).
 	The section stays hidden for the visitors without history (& for the search engines).
-	Its options (Admin > Homepage > Sections > Recently Viewed): max items, items per row, spacing, animation.
+	Its options (Admin > Homepage > Sections > Recently Viewed): max items, items per row, one sideways row
+	(carousel) or a grid, the "Clear" button, spacing, animation.
 --}}
 @php
 	$sectionOptions = $recentlyViewedOptions ?? [];
@@ -12,6 +13,8 @@
 	$cssClasses = !empty($cssClasses) ? " {$cssClasses}" : '';
 	$htmlAttr = $sectionOptions['html_attributes'] ?? '';
 	$htmlAttr = !empty($htmlAttr) ? " {$htmlAttr}" : '';
+	$isCarousel = (($sectionOptions['items_in_carousel'] ?? '1') == '1');
+	$showClearBtn = (($sectionOptions['show_clear_btn'] ?? '1') == '1');
 @endphp
 <div class="container recently-viewed-section{{ $cssClasses }}" id="recentlyViewed" hidden
      data-url="{{ url('listings/recently-viewed') }}"
@@ -23,19 +26,24 @@
 		<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
 			<h2 class="h4 mb-0 fw-lighter section-title">{!! t('home_recently_viewed') !!}</h2>
 			<div class="recently-viewed-tools">
-				<button type="button" class="btn recently-viewed-nav" id="recentlyViewedPrev" aria-label="{{ t('previous') }}" hidden>
-					<i class="bi bi-chevron-left"></i>
-				</button>
-				<button type="button" class="btn recently-viewed-nav" id="recentlyViewedNext" aria-label="{{ t('next') }}" hidden>
-					<i class="bi bi-chevron-right"></i>
-				</button>
-				<button type="button" class="btn section-more-link recently-viewed-clear" id="recentlyViewedClear">
-					<i class="bi bi-x-lg"></i> {{ t('clear_history') }}
-				</button>
+				@if ($isCarousel)
+					<button type="button" class="btn recently-viewed-nav" id="recentlyViewedPrev" aria-label="{{ t('previous') }}" hidden>
+						<i class="bi bi-chevron-left"></i>
+					</button>
+					<button type="button" class="btn recently-viewed-nav" id="recentlyViewedNext" aria-label="{{ t('next') }}" hidden>
+						<i class="bi bi-chevron-right"></i>
+					</button>
+				@endif
+				@if ($showClearBtn)
+					<button type="button" class="btn section-more-link recently-viewed-clear" id="recentlyViewedClear">
+						<i class="bi bi-x-lg"></i> {{ t('clear_history') }}
+					</button>
+				@endif
 			</div>
 		</div>
 		<div class="card-body rounded py-0">
-			<div class="recently-viewed-row" id="recentlyViewedRow">
+			{{-- recently-viewed-row: one row that scrolls sideways (custom.css); recently-viewed-grid: the cards wrap --}}
+			<div class="{{ $isCarousel ? 'recently-viewed-row' : 'recently-viewed-grid' }}" id="recentlyViewedRow">
 				{{-- Placeholder cards: the row's height is reserved before the cards arrive (no layout shift) --}}
 				<div class="recently-viewed-skeleton" aria-hidden="true">
 					@for ($i = 0; $i < 4; $i++)
@@ -87,9 +95,10 @@
 		var scrollerEl = function () {
 			return rowEl.querySelector('.row');
 		};
+		{{-- The arrows are there only in the carousel (sideways row), the "Clear" button only when it is switched on --}}
 		var refreshNav = function () {
 			var el = scrollerEl();
-			if (!el) {
+			if (!el || !prevBtn || !nextBtn) {
 				return;
 			}
 			var isScrollable = (el.scrollWidth - el.clientWidth) > 4;
@@ -107,12 +116,16 @@
 			var isRtl = (getComputedStyle(el).direction === 'rtl');
 			el.scrollBy({left: direction * (isRtl ? -1 : 1) * el.clientWidth * 0.9, behavior: 'smooth'});
 		};
-		prevBtn.addEventListener('click', function () { scrollByPage(-1); });
-		nextBtn.addEventListener('click', function () { scrollByPage(1); });
-		clearBtn.addEventListener('click', function () {
-			writeIds([]);
-			sectionEl.hidden = true;
-		});
+		if (prevBtn && nextBtn) {
+			prevBtn.addEventListener('click', function () { scrollByPage(-1); });
+			nextBtn.addEventListener('click', function () { scrollByPage(1); });
+		}
+		if (clearBtn) {
+			clearBtn.addEventListener('click', function () {
+				writeIds([]);
+				sectionEl.hidden = true;
+			});
+		}
 		window.addEventListener('resize', refreshNav);
 		
 		var query = '?ids=' + encodeURIComponent(ids.join(','))

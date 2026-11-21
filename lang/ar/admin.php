@@ -2399,4 +2399,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'العناصر في كل صف',
 	'items_per_row_hint' => 'عدد الإعلانات في كل صف في هذا القسم على الشاشات العريضة. تعرض الأجهزة اللوحية حتى 3 والهواتف 2.',
 	'recently_viewed_max_items_hint' => 'عدد الإعلانات التي شاهدها الزائر مؤخرًا لعرضها، حتى :max.',
+	'recently_viewed_carousel_hint' => 'صف واحد يمرر جانبيًا مع أسهم. عند الإيقاف: تنتقل البطاقات إلى صفوف إضافية.',
+	'recently_viewed_clear_btn_label' => 'إظهار زر «مسح»',
+	'recently_viewed_clear_btn_hint' => 'يتيح للزوار مسح قائمة ما شاهدوه مؤخرًا.',
 ];

@@ -2404,4 +2404,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'Éléments par ligne',
 	'items_per_row_hint' => 'Annonces par ligne dans cette section, sur grand écran. Les tablettes en affichent jusqu\'à 3 et les téléphones 2.',
 	'recently_viewed_max_items_hint' => 'Combien d\'annonces récemment consultées par le visiteur afficher, jusqu\'à :max.',
+	'recently_viewed_carousel_hint' => 'Une seule ligne qui défile horizontalement, avec des flèches. Désactivé : les cartes passent à la ligne.',
+	'recently_viewed_clear_btn_label' => 'Afficher le bouton « Effacer »',
+	'recently_viewed_clear_btn_hint' => 'Permet aux visiteurs d\'effacer leur liste d\'annonces récemment consultées.',
 ];

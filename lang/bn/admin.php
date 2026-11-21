@@ -2396,4 +2396,7 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'items_per_row_label' => 'প্রতি সারিতে আইটেম',
 	'items_per_row_hint' => 'বড় স্ক্রিনে এই সেকশনে প্রতি সারিতে কতটি বিজ্ঞাপন। ট্যাবলেটে সর্বোচ্চ ৩টি এবং ফোনে ২টি দেখায়।',
 	'recently_viewed_max_items_hint' => 'ভিজিটরের সম্প্রতি দেখা কতটি বিজ্ঞাপন দেখাবে, সর্বোচ্চ :max টি।',
+	'recently_viewed_carousel_hint' => 'একটি সারি যা পাশে স্ক্রল হয়, তীর চিহ্নসহ। বন্ধ থাকলে কার্ডগুলো একাধিক সারিতে যায়।',
+	'recently_viewed_clear_btn_label' => '\'Clear\' বাটন দেখান',
+	'recently_viewed_clear_btn_hint' => 'ভিজিটররা তাদের সম্প্রতি দেখা তালিকা মুছে ফেলতে পারবেন।',
 ];

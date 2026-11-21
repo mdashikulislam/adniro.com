@@ -218,11 +218,12 @@ class SectionController extends PanelController
 				'locations'        => ['lft' => 2, 'rgt' => 3, 'active' => 1],
 				'premium_listings' => ['lft' => 4, 'rgt' => 5, 'active' => 1],
 				'categories'       => ['lft' => 6, 'rgt' => 7, 'active' => 1],
-				'latest_listings'  => ['lft' => 8, 'rgt' => 9, 'active' => 1],
-				'stats'            => ['lft' => 10, 'rgt' => 11, 'active' => 1],
-				'text_area'        => ['lft' => 12, 'rgt' => 13, 'active' => 0],
-				'top_ad'           => ['lft' => 14, 'rgt' => 15, 'active' => 0],
-				'bottom_ad'        => ['lft' => 16, 'rgt' => 17, 'active' => 0],
+				'recently_viewed'  => ['lft' => 8, 'rgt' => 9, 'active' => 1], // adniro: just before the latest listings
+				'latest_listings'  => ['lft' => 10, 'rgt' => 11, 'active' => 1],
+				'stats'            => ['lft' => 12, 'rgt' => 13, 'active' => 1],
+				'text_area'        => ['lft' => 14, 'rgt' => 15, 'active' => 0],
+				'top_ad'           => ['lft' => 16, 'rgt' => 17, 'active' => 0],
+				'bottom_ad'        => ['lft' => 18, 'rgt' => 19, 'active' => 0],
 			];
 			
 			foreach ($data as $name => $value) {
@@ -243,6 +244,7 @@ class SectionController extends PanelController
 				'locations'        => $activated,
 				'premium_listings' => $activated,
 				'categories'       => $activated,
+				'recently_viewed'  => $activated, // adniro
 				'latest_listings'  => $activated,
 				'stats'            => $activated,
 				'text_area'        => $unactivated,

@@ -601,7 +601,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (256)
+## Added (258)
 
 Files that are not part of LaraClassifier.
 
@@ -668,6 +668,7 @@ Files that are not part of LaraClassifier.
 - `app/Models/PostDraft.php`
 - `app/Models/PostModeration.php`
 - `app/Models/Section/Home/BlogSection.php`
+- `app/Models/Section/Home/RecentlyViewedSection.php`
 - `app/Models/Setting/AiSetting.php`
 - `app/Models/Traits/BlogCategoryTrait.php`
 - `app/Models/Traits/BlogPostTrait.php`
@@ -798,6 +799,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_21_000300_add_new_pages_to_footer_menu.php`
 - `database/migrations/2026_11_21_000400_rename_quickpost_to_listing_assistant.php`
 - `database/migrations/2026_11_22_000100_keep_search_page_at_three_listings_per_row.php`
+- `database/migrations/2026_11_22_000200_add_recently_viewed_homepage_section.php`
 
 ### database/seeders
 

@@ -39,7 +39,49 @@ class RecentlyViewedSectionTest extends TestCase
 
 		$section = DB::table('sections')->where('name', 'recently_viewed')->first();
 		$this->assertSame(1, (int)$section->active);
-		$this->assertSame(['max_items' => '12', 'items_per_row' => '4'], json_decode($section->field_values, true));
+	}
+
+	public function test_without_saved_options_it_uses_the_defaults_and_the_usual_spacing(): void
+	{
+		// Act
+		$values = RecentlyViewedSection::getFieldValues(null, null);
+
+		// Assert: as it looked before, with the same bottom margin as the other sections (a margin row the form can save)
+		$this->assertSame('12', $values['max_items']);
+		$this->assertSame('4', $values['items_per_row']);
+		$this->assertSame('1', $values['items_in_carousel']);
+		$this->assertSame('1', $values['show_clear_btn']);
+		$this->assertSame([['side' => 'mb', 'breakpoint' => null, 'size' => '4']], $values['margins']);
+		$this->assertStringContainsString('mb-4', $values['css_classes']);
+	}
+
+	public function test_the_default_section_is_a_sideways_row_with_arrows_and_a_clear_button(): void
+	{
+		// Act
+		$html = $this->get('/')->assertOk()->getContent();
+
+		// Assert
+		$this->assertStringContainsString('class="recently-viewed-row"', $html);
+		$this->assertStringContainsString('id="recentlyViewedNext"', $html);
+		$this->assertStringContainsString('id="recentlyViewedClear"', $html);
+		$this->assertMatchesRegularExpression('/id="recentlyViewed"[^>]*data-max="12"/s', $html);
+	}
+
+	public function test_without_the_carousel_and_the_clear_button_it_is_a_plain_grid(): void
+	{
+		// Arrange
+		DB::table('sections')->where('name', 'recently_viewed')->update([
+			'field_values' => json_encode(['items_in_carousel' => '0', 'show_clear_btn' => '0']),
+		]);
+
+		// Act
+		$html = $this->get('/')->assertOk()->getContent();
+
+		// Assert: the cards wrap onto more rows, no arrows, no clear button
+		$this->assertStringContainsString('class="recently-viewed-grid"', $html);
+		$this->assertStringNotContainsString('class="recently-viewed-row"', $html);
+		$this->assertStringNotContainsString('id="recentlyViewedNext"', $html);
+		$this->assertStringNotContainsString('id="recentlyViewedClear"', $html);
 	}
 
 	public function test_rolling_back_removes_the_section_and_keeps_the_order(): void
@@ -119,6 +161,8 @@ class RecentlyViewedSectionTest extends TestCase
 		$this->assertSame('number', $fields['max_items']['type']);
 		$this->assertSame(12, $fields['max_items']['attributes']['max']);
 		$this->assertArrayHasKey('items_per_row', $fields->all());
+		$this->assertSame('checkbox_switch', $fields['items_in_carousel']['type']);
+		$this->assertSame('checkbox_switch', $fields['show_clear_btn']['type']);
 		$this->assertArrayHasKey('active', $fields->all());
 		$this->assertArrayHasKey('hide_on_mobile', $fields->all());
 	}

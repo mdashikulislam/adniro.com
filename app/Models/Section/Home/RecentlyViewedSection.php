@@ -9,15 +9,20 @@ use App\Models\Section\BaseSection;
 
 /*
  * adniro: the homepage's "Recently viewed" section (the listings the visitor opened, remembered in the
- * browser). Its options, like the latest listings: how many, how many per row, spacing and animation.
+ * browser). Its options, like the latest listings: how many, how many per row, carousel or grid, the
+ * "Clear" button, spacing and animation. Defaults: App\Models\HasSettings\Presets\Section\RecentlyViewedPreset.
+ * No cache option: each visitor's list comes from their browser and is never cached on the server.
  */
 
 class RecentlyViewedSection extends BaseSection
 {
 	public static function getFieldValues($value, $disk): array
 	{
+		$defaultValue = self::getDefaultPreset(__CLASS__);
+
 		$value = is_array($value) ? $value : [];
-		$value = array_merge(['max_items' => (string)RecentlyViewedController::MAX_ITEMS, 'items_per_row' => (string)ListingGrid::HOMEPAGE_DEFAULT_COLUMNS], $value);
+		$value = array_merge($defaultValue, $value);
+		$value = self::applyPreset(__CLASS__, $value);
 
 		$value['css_classes'] = self::buildCssClassesAsString($value);
 		$value['html_attributes'] = Arr::toAttributes(self::buildAnimationHtmlAttributes($value));
@@ -61,6 +66,28 @@ class RecentlyViewedSection extends BaseSection
 		];
 
 		$fields[] = ListingGrid::sectionField($tabName);
+
+		$fields[] = [
+			'name'    => 'items_in_carousel',
+			'label'   => trans('admin.items_in_carousel_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('admin.recently_viewed_carousel_hint'),
+			'wrapper' => [
+				'class' => 'col-md-6',
+			],
+			'tab'     => $tabName,
+		];
+
+		$fields[] = [
+			'name'    => 'show_clear_btn',
+			'label'   => trans('admin.recently_viewed_clear_btn_label'),
+			'type'    => 'checkbox_switch',
+			'hint'    => trans('admin.recently_viewed_clear_btn_hint'),
+			'wrapper' => [
+				'class' => 'col-md-6',
+			],
+			'tab'     => $tabName,
+		];
 
 		$fields[] = [
 			'name'     => 'active',
