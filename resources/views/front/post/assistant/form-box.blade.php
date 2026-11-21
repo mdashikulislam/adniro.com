@@ -29,6 +29,8 @@
 		])->mapWithKeys(fn ($key) => [$key => trans('ai.box_' . $key)])->merge([
 			'timeout'     => trans('ai.assistant_timeout'),
 			'mic_denied'  => trans('ai.assistant_voice_denied'),
+			'mic_missing' => trans('ai.assistant_voice_no_mic'),
+			'mic_busy'    => trans('ai.assistant_voice_mic_busy'),
 			'no_speech'   => trans('ai.assistant_voice_no_speech'),
 		])->all();
 		$aiBoxExamples = ['phone', 'car', 'home', 'furniture'];
@@ -142,7 +144,7 @@
 	@endPushOnce
 	@if ($aiBoxOn)
 		@pushOnce('after_scripts_stack', 'ai_formbox_js')
-			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=4"></script>
+			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=5"></script>
 		@endPushOnce
 	@endif
 @endif

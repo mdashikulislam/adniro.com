@@ -322,6 +322,8 @@ return [
 	
 	// AI listing assistant: voice
 	'assistant_voice_denied'      => 'Microphone access is blocked. Allow it in your browser settings, or type instead.',
+	'assistant_voice_no_mic'      => 'No microphone was found. Connect one and try again, or type instead.',
+	'assistant_voice_mic_busy'    => 'The microphone could not start. Another app may be using it. Try again, or type instead.',
 	'assistant_voice_no_speech'   => 'We did not hear anything. Tap the microphone and try again.',
 	'assistant_voice_unavailable' => 'Voice input is not available right now. Please type instead.',
 	'assistant_voice_failed' => 'We could not turn the recording into text. Please try again, or type instead.',

@@ -41,6 +41,8 @@ return [
 	'assistant_left_week' => '{0} No te quedan anuncios con IA esta semana|{1} Te queda 1 de :limit anuncios con IA esta semana|[2,*] Te quedan :left de :limit anuncios con IA esta semana',
 	'assistant_left_month' => '{0} No te quedan anuncios con IA este mes|{1} Te queda 1 de :limit anuncios con IA este mes|[2,*] Te quedan :left de :limit anuncios con IA este mes',
 	'assistant_voice_denied' => 'El acceso al micrófono está bloqueado. Permítelo en la configuración del navegador o escribe.',
+	'assistant_voice_no_mic' => 'No se encontró ningún micrófono. Conecta uno e inténtalo de nuevo, o escribe.',
+	'assistant_voice_mic_busy' => 'No se pudo iniciar el micrófono. Puede que otra aplicación lo esté usando. Inténtalo de nuevo o escribe.',
 	'assistant_voice_no_speech' => 'No hemos oído nada. Toca el micrófono e inténtalo de nuevo.',
 	'assistant_voice_unavailable' => 'La entrada de voz no está disponible ahora. Escribe, por favor.',
 	'assistant_voice_failed' => 'No hemos podido convertir la grabación en texto. Inténtalo de nuevo o escribe.',

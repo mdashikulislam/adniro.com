@@ -291,6 +291,51 @@ class AiFormBoxTest extends TestCase
 		}
 	}
 
+	public function test_the_box_has_a_message_for_each_kind_of_microphone_problem(): void
+	{
+		// Arrange
+		$this->actingAs($this->user(7));
+
+		// Act
+		$html = $this->renderBox();
+
+		// Assert: blocked, missing and busy microphones each get their own advice
+		foreach (['assistant_voice_denied', 'assistant_voice_no_mic', 'assistant_voice_mic_busy'] as $key) {
+			$this->assertStringContainsString(e(json_encode(trans('ai.' . $key), JSON_UNESCAPED_UNICODE)), $html, $key);
+		}
+	}
+
+	public function test_every_translation_explains_a_missing_or_busy_microphone(): void
+	{
+		// Arrange
+		$english = require lang_path('en/ai.php');
+
+		foreach (glob(lang_path('*/ai.php')) as $file) {
+			// Act
+			$strings = require $file;
+
+			// Assert
+			foreach (['assistant_voice_no_mic', 'assistant_voice_mic_busy'] as $key) {
+				$this->assertNotEmpty($strings[$key] ?? null, "{$file}: {$key}");
+				if ($file !== lang_path('en/ai.php')) {
+					$this->assertNotSame($english[$key], $strings[$key], "{$file}: {$key} is translated");
+				}
+			}
+		}
+	}
+
+	public function test_only_a_refused_microphone_is_reported_as_blocked(): void
+	{
+		// Arrange
+		$script = file_get_contents(public_path('assets/js/app/ai.formbox.js'));
+
+		// Assert: the browser's error names decide the message, for recording and for dictation
+		foreach (['NotAllowedError', 'NotFoundError', 'mic_missing', 'mic_busy', "'audio-capture'"] as $hook) {
+			$this->assertStringContainsString($hook, $script, $hook);
+		}
+		$this->assertStringNotContainsString("}).catch(function () {\n\t\t\t\tsetMessage(plain('mic_denied')", $script, 'not every failure means blocked');
+	}
+
 	public function test_the_post_a_listing_link_opens_the_normal_form(): void
 	{
 		// Act & Assert

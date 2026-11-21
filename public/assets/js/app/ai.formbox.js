@@ -100,6 +100,20 @@
 		messageEl.className = 'ai-assistant-message small mt-2 text-' + (type || 'secondary') + (text ? '' : ' d-none');
 	}
 
+	// Browser error names (getUserMedia and SpeechRecognition) mapped to a message. Only a refused
+	// permission is "blocked"; a missing microphone or one another app holds needs different advice.
+	var MIC_ERRORS = {
+		NotAllowedError: 'mic_denied',
+		PermissionDeniedError: 'mic_denied',
+		SecurityError: 'mic_denied',
+		'not-allowed': 'mic_denied',
+		'service-not-allowed': 'mic_denied',
+		NotFoundError: 'mic_missing',
+		DevicesNotFoundError: 'mic_missing',
+		OverconstrainedError: 'mic_missing',
+		'audio-capture': 'mic_missing'
+	};
+
 	function setBusy(state, label) {
 		busy = state;
 		fillButton.disabled = state;
@@ -934,8 +948,21 @@
 						stop();
 					}
 				}, 250);
+			}, function (error) {
+				// NotReadableError, AbortError and the like: the microphone exists but would not start
+				setMessage(plain(MIC_ERRORS[error && error.name] || 'mic_busy'), 'danger');
 			}).catch(function () {
-				setMessage(plain('mic_denied'), 'danger');
+				// The microphone was allowed, but recording could not start
+				cancelled = true;
+				if (recorder && recorder.state !== 'inactive') {
+					recorder.stop();
+				} else {
+					recorder = null;
+					stopAll();
+					hideBar();
+					setBusy(false);
+				}
+				setMessage(plain('mic_busy'), 'danger');
 			});
 		}
 		var stopRecording = function () {
@@ -1007,7 +1034,7 @@
 				textEl.value = (before ? before + ' ' : '') + heard;
 			});
 			recognition.addEventListener('error', function (event) {
-				setMessage(plain(event.error === 'not-allowed' || event.error === 'service-not-allowed' ? 'mic_denied' : 'no_speech'), 'warning');
+				setMessage(plain(MIC_ERRORS[event.error] || 'no_speech'), 'warning');
 			});
 			recognition.addEventListener('end', function () {
 				recognition = null;

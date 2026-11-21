@@ -41,6 +41,8 @@ return [
 	'assistant_left_week' => '{0} Diese Woche keine KI-Anzeigen mehr übrig|{1} Diese Woche noch 1 von :limit KI-Anzeigen übrig|[2,*] Diese Woche noch :left von :limit KI-Anzeigen übrig',
 	'assistant_left_month' => '{0} Diesen Monat keine KI-Anzeigen mehr übrig|{1} Diesen Monat noch 1 von :limit KI-Anzeigen übrig|[2,*] Diesen Monat noch :left von :limit KI-Anzeigen übrig',
 	'assistant_voice_denied' => 'Der Mikrofonzugriff ist blockiert. Erlauben Sie ihn in den Browsereinstellungen oder tippen Sie stattdessen.',
+	'assistant_voice_no_mic' => 'Es wurde kein Mikrofon gefunden. Schließen Sie eines an und versuchen Sie es erneut, oder tippen Sie stattdessen.',
+	'assistant_voice_mic_busy' => 'Das Mikrofon konnte nicht starten. Möglicherweise wird es von einer anderen App verwendet. Versuchen Sie es erneut oder tippen Sie stattdessen.',
 	'assistant_voice_no_speech' => 'Wir haben nichts gehört. Tippen Sie auf das Mikrofon und versuchen Sie es erneut.',
 	'assistant_voice_unavailable' => 'Die Spracheingabe ist gerade nicht verfügbar. Bitte tippen Sie stattdessen.',
 	'assistant_voice_failed' => 'Die Aufnahme konnte nicht in Text umgewandelt werden. Bitte versuchen Sie es erneut oder tippen Sie stattdessen.',

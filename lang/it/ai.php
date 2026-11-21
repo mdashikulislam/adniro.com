@@ -41,6 +41,8 @@ return [
 	'assistant_left_week' => '{0} Nessun annuncio con IA rimasto questa settimana|{1} 1 annuncio con IA su :limit rimasto questa settimana|[2,*] :left annunci con IA su :limit rimasti questa settimana',
 	'assistant_left_month' => '{0} Nessun annuncio con IA rimasto questo mese|{1} 1 annuncio con IA su :limit rimasto questo mese|[2,*] :left annunci con IA su :limit rimasti questo mese',
 	'assistant_voice_denied' => 'L\'accesso al microfono è bloccato. Consentilo nelle impostazioni del browser oppure scrivi.',
+	'assistant_voice_no_mic' => 'Nessun microfono trovato. Collegane uno e riprova, oppure scrivi.',
+	'assistant_voice_mic_busy' => 'Non è stato possibile avviare il microfono. Forse lo sta usando un\'altra app. Riprova oppure scrivi.',
 	'assistant_voice_no_speech' => 'Non abbiamo sentito nulla. Tocca il microfono e riprova.',
 	'assistant_voice_unavailable' => 'L\'inserimento vocale non è disponibile al momento. Scrivi, per favore.',
 	'assistant_voice_failed' => 'Non è stato possibile trasformare la registrazione in testo. Riprova oppure scrivi.',
