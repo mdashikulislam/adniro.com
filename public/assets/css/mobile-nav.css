@@ -386,9 +386,9 @@
 	content: "";
 	position: absolute;
 	inset: calc(var(--adn-sell-ring) * -1);
-	border: 2px solid rgba(var(--adn-pulse-rgb), .5);
+	border: 2.5px solid rgba(var(--adn-pulse-rgb), .65);
 	border-radius: 50%;
-	background-color: rgba(var(--adn-pulse-rgb), .05);
+	background-color: rgba(var(--adn-pulse-rgb), .08);
 	opacity: 0;
 	pointer-events: none;
 	will-change: transform, opacity;
@@ -401,12 +401,12 @@
 
 @keyframes adnRadarPulse {
 	0% {
-		opacity: .7;
+		opacity: .85;
 		transform: scale(1);
 	}
 
 	55% {
-		opacity: .25;
+		opacity: .35;
 	}
 
 	100% {
