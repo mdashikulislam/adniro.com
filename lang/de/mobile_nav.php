@@ -5,7 +5,7 @@ return [
 	'label' => 'Hauptmenü',
 	'home' => 'Start',
 	'search' => 'Suchen',
-	'sell' => 'Verkaufen',
+	'post_ad' => 'Inserieren',
 	'saved' => 'Gemerkt',
 	'account' => 'Konto',
 	'sign_in' => 'Anmelden',

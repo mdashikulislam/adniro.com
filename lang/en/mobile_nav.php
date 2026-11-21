@@ -5,7 +5,7 @@ return [
 	'label' => 'Main',
 	'home' => 'Home',
 	'search' => 'Search',
-	'sell' => 'Sell',
+	'post_ad' => 'Post ad',
 	'saved' => 'Saved',
 	'account' => 'Account',
 	'sign_in' => 'Sign in',

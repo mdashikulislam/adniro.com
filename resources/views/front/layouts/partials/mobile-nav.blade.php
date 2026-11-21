@@ -59,7 +59,7 @@
 				<li class="adn-appbar-item adn-appbar-item-sell">
 					<a href="{{ $mobileNavSellUrl }}" class="adn-appbar-link adn-appbar-sell"{!! $mobileNavSellAttr !!}>
 						<span class="adn-appbar-sell-tile" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
-						<span class="adn-appbar-label">{{ trans('mobile_nav.sell') }}</span>
+						<span class="adn-appbar-label">{{ trans('mobile_nav.post_ad') }}</span>
 					</a>
 				</li>
 				@continue

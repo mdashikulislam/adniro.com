@@ -38,6 +38,7 @@ class MobileNavTest extends TestCase
 		$this->assertMatchesRegularExpression('/<body[^>]*class="[^"]*has-appbar/', $html);
 		$this->assertMatchesRegularExpression('/class="adn-appbar-link is-active"\s+aria-current="page"[^>]*>\s*<span class="adn-appbar-icon"[^>]*>\s*<i class="bi bi-house-door-fill"/', $appbar);
 		$this->assertStringContainsString('href="' . url('posts/create') . '" class="adn-appbar-link adn-appbar-sell"', $appbar);
+		$this->assertStringContainsString('<span class="adn-appbar-label">Post ad</span>', $appbar);
 		$this->assertSame(2, substr_count($appbar, 'href="' . route('auth.login.showForm') . '"'));
 		$this->assertStringContainsString('class="dropdown adn-mhead-account', $html);
 	}

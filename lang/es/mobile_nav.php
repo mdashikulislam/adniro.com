@@ -5,7 +5,7 @@ return [
 	'label' => 'Principal',
 	'home' => 'Inicio',
 	'search' => 'Buscar',
-	'sell' => 'Vender',
+	'post_ad' => 'Publicar',
 	'saved' => 'Guardados',
 	'account' => 'Cuenta',
 	'sign_in' => 'Iniciar sesión',
