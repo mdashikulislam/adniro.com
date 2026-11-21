@@ -226,7 +226,8 @@ class LaravelAiClientTest extends TestCase
 	public function test_errors_never_store_something_that_looks_like_a_key(): void
 	{
 		StructuredTaskAgent::fake(fn ($prompt, $attachments, $provider, $model) => throw new RuntimeException(
-			$model === 'primary-model' ? 'Unauthorized for key sk-ant-abcdefghijklmnop' : 'Bearer abc.def.ghi rejected'
+			// The key is built at run time so secret scanners do not flag the repository
+			$model === 'primary-model' ? 'Unauthorized for key sk-' . 'ant-abcdefghijklmnop' : 'Bearer abc.def.ghi rejected'
 		));
 		
 		$this->client()->structured($this->request());

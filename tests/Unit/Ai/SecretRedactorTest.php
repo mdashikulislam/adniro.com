@@ -21,9 +21,13 @@ class SecretRedactorTest extends TestCase
 	
 	public static function secrets(): array
 	{
+		// Built at run time so the repository holds nothing shaped like a real key (secret scanners flag those)
+		$anthropicKey = 'sk-' . 'ant-' . str_repeat('x', 24);
+		$googleKey = 'AI' . 'za' . str_repeat('x', 35);
+
 		return [
-			'anthropic key'   => ['Invalid key sk-ant-api03-AbCdEf123456789xyz', 'AbCdEf123456789xyz'],
-			'google key'      => ['403 for AIzaSyA1b2C3d4E5f6G7h8I9j0KlMnOpQrStUvW', 'SyA1b2C3d4E5f6G7h8I9j0KlMnOpQrStUvW'],
+			'anthropic key'   => ['Invalid key ' . $anthropicKey, substr($anthropicKey, 7)],
+			'google key'      => ['403 for ' . $googleKey, substr($googleKey, 4)],
 			'key in a url'    => ['GET https://api.example.com/v1/models?key=abc123secretvalue&x=1', 'abc123secretvalue'],
 			'api_key in body' => ['{"api_key":"plainsecret999"}', 'plainsecret999'],
 			'bearer header'   => ['Authorization: Bearer eyJhbGciOi.payload.sig', 'eyJhbGciOi.payload.sig'],
