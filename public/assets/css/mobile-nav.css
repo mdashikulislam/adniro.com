@@ -454,7 +454,7 @@
 	}
 
 	body.has-appbar .cookie-consent {
-		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 16px);
+		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 40px); /* clear of the Post ad button, which rises above the bar */
 	}
 }
 
