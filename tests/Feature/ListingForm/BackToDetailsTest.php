@@ -73,6 +73,28 @@ class BackToDetailsTest extends TestCase
 		$this->assertStringContainsString('data-lf-photo-count="2"', $response->getContent());
 	}
 
+	public function test_the_edit_details_step_counts_the_listings_photos_and_shows_its_cover(): void
+	{
+		// Arrange: a saved listing with two photos
+		Storage::fake(StorageDisk::getDiskName());
+		$post = $this->stockListing('Apple iPhone 17 Pro', ['user_id' => self::OWNER_ID]);
+		foreach (['files/us/' . $post->id . '/front.jpg', 'files/us/' . $post->id . '/back.jpg'] as $position => $path) {
+			Storage::disk(StorageDisk::getDiskName())->put($path, UploadedFile::fake()->image(basename($path))->getContent());
+			\Illuminate\Support\Facades\DB::table('pictures')->insert([
+				'post_id' => $post->id, 'file_path' => $path, 'mime_type' => 'image/jpeg', 'position' => $position, 'active' => 1,
+				'created_at' => now(), 'updated_at' => now(),
+			]);
+		}
+
+		// Act
+		$response = $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))->get('/posts/' . $post->id . '/details');
+
+		// Assert
+		$response->assertOk();
+		$this->assertStringContainsString('data-lf-photo-count="2"', $response->getContent());
+		$this->assertMatchesRegularExpression('/data-lf-cover="[^"]*front\.jpg"/', $response->getContent());
+	}
+
 	public function test_a_photo_that_is_gone_shows_the_add_photos_hint_not_a_default_picture(): void
 	{
 		// Arrange: the session still names a photo whose temporary file was cleaned up

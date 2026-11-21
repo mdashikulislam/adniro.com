@@ -69,7 +69,8 @@ class PostController extends BaseController
 		if (auth()->check()) {
 			// Get the post
 			$queryParams = [
-				'embed'               => 'category,city,subAdmin1,subAdmin2',
+				// adniro: with pictures, for the side panel's photo count and the live preview's cover
+				'embed'               => 'category,city,subAdmin1,subAdmin2,pictures',
 				'countryCode'         => config('country.code'),
 				'unactivatedIncluded' => true,
 				'belongLoggedUser'    => true, // Logged user required

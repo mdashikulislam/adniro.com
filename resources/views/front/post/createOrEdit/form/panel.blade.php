@@ -45,8 +45,11 @@
 	// The cover: the saved listing's first photo (edit), else the first photo already added in this create flow
 	// (back from the multi-step Photos step), as the Photos step shows it; never the site's default picture
 	$sessionCover = (string)collect((array)session('picturesInput', []))->first();
+	$editCoverPath = (string)data_get($post, 'pictures.0.file_path', '');
 	$previewCover = match (true) {
-		$listingForm->isEdit => (string)data_get($post, 'pictures.0.url.medium', ''),
+		$listingForm->isEdit && $editCoverPath !== '' && \App\Helpers\Common\Files\Storage\StorageDisk::getDisk()->exists($editCoverPath)
+			=> (string)data_get($post, 'pictures.0.url.medium', ''),
+		$listingForm->isEdit => '',
 		$sessionCover !== '' && \App\Helpers\Common\Files\Storage\StorageDisk::getDisk()->exists($sessionCover)
 			=> thumbService($sessionCover)->resize('picture-md')->url(),
 		default => '',
