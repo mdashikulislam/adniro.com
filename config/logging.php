@@ -68,7 +68,7 @@ return [
 			'driver' => 'daily',
 			'path'   => storage_path('logs/laravel.log'),
 			'level'  => env('LOG_LEVEL', 'debug'),
-			'days'   => env('LOG_DAILY_DAYS', 2),
+			'days'   => env('LOG_DAILY_DAYS', 14), // adniro: two weeks of logs (was 2 days)
 			'replace_placeholders' => true,
 		],
 		

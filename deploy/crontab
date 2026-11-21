@@ -1,0 +1,3 @@
+# adniro scheduler: add with `crontab -e` as the web user (set the path).
+# GET /health reports "scheduler: fail" when this has not run for 10 minutes.
+* * * * * cd /var/www/adniro.com && php artisan schedule:run >> /dev/null 2>&1

@@ -261,6 +261,17 @@ Most important first:
 - **Search relevance.** "phone" should find phones.
 
 ### Phase 7: operations and upgrade safety (3 to 4 days)
+
+> **Status, 21 Nov 2026: done in the code; the server steps are in `docs/operations.md`. Tests: 236 passing, no warnings.**
+> - **Health check:** `GET /health` answers 200 or 503 with database, cache, storage and scheduler checks (the scheduler writes a heartbeat every minute). Locally it reports "scheduler: fail" because no cron runs here.
+> - **Logs** kept 14 days (was 2).
+> - **Deploy:** `deploy/deploy.sh` (maintenance mode, composer, migrations, route/view/event caches, worker restart). Config is not cached on purpose: LaraClassifier reads `.env` with `env()` at runtime.
+> - **Queue:** `deploy/supervisor/adniro-workers.conf` with two workers: `mail,sms,default,thumbs` and `ai` (a `default`-only worker would never have sent emails). `deploy/crontab` for the scheduler. Switch the queue driver to Redis in the admin once the workers run.
+> - **Backups off the server:** no code needed; set the cloud disk in `.env` and choose "Local and Cloud" in Admin > Settings > Backup. Restore steps are in the guide.
+> - **Packages:** phpseclib, zbateson/mail-mime-parser, symfony/http-client, phpunit and psysh updated (patch and minor versions). One low advisory remains on firebase/php-jwt, which has no fixed 6.x release and is required by Socialite.
+> - **Upgrade safety:** `php deploy/core-changes.php` writes `docs/core-changes.md` (stock files changed, deleted and added). Smoke tests for home with structured data, a listing page, search, a CMS page, the listing form, the 404 page and the sitemap, on the stock seed data.
+>
+> Not done: moving new views into a theme override folder (low value for the risk; the core-changes list covers upgrades), and an error tracker (needs an account; how to add Sentry is in the guide).
 - **Queue.** Use Redis, with a Supervisor worker for `default` and `ai`, plus the scheduler cron.
 - **Monitoring.** Turn on the health check, add uptime monitoring and an error tracker such as Sentry, and keep logs for 14 days or more.
 - **Deploys and backups.** A deploy script with caches, `queue:restart` and `APP_ENV=production`. Daily off-server backups, with one test restore.

@@ -46,6 +46,11 @@ class Kernel
 		// Rebuild the listings counts & last changes (sitemaps, sidebar, noindex rules)
 		$schedule->command('listings:warm-counts')->timezone($tz)->everyThirtyMinutes()->withoutOverlapping();
 		
+		// Health check: proves the cron runs the scheduler (GET /health, adniro)
+		$schedule->call([\App\Http\Controllers\HealthController::class, 'recordSchedulerHeartbeat'])
+			->everyMinute()
+			->name('health heartbeat');
+		
 		// AI moderation: re-queue or hand over listings stuck waiting for a check (adniro:ai)
 		$schedule->command('ai:moderation-sweep')->timezone($tz)->everyFiveMinutes()->withoutOverlapping();
 		

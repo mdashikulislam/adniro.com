@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 return Application::configure(basePath: dirname(__DIR__))
 	->withRouting(
 		using: function () {
+			// adniro: health check for uptime monitors, outside the web stack (no session, no localization)
+			Route::get('health', \App\Http\Controllers\HealthController::class)->name('health');
+			
 			// api
 			Route::middleware('api')
 				->namespace('App\Http\Controllers\Api')

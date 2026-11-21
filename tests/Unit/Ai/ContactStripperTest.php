@@ -2,14 +2,13 @@
 
 namespace Tests\Unit\Ai;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Services\Ai\ContactStripper;
 use PHPUnit\Framework\TestCase;
 
 class ContactStripperTest extends TestCase
 {
-	/**
-	 * @dataProvider kept
-	 */
+	#[DataProvider('kept')]
 	public function test_dates_years_and_sizes_are_kept(string $text): void
 	{
 		$this->assertSame($text, ContactStripper::strip($text));
@@ -26,9 +25,7 @@ class ContactStripperTest extends TestCase
 		];
 	}
 	
-	/**
-	 * @dataProvider removed
-	 */
+	#[DataProvider('removed')]
 	public function test_contact_details_are_removed(string $text, string $contact): void
 	{
 		$this->assertStringNotContainsString($contact, ContactStripper::strip($text));

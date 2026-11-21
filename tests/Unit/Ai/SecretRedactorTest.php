@@ -2,14 +2,13 @@
 
 namespace Tests\Unit\Ai;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Services\Ai\SecretRedactor;
 use PHPUnit\Framework\TestCase;
 
 class SecretRedactorTest extends TestCase
 {
-	/**
-	 * @dataProvider secrets
-	 */
+	#[DataProvider('secrets')]
 	public function test_secrets_are_removed_from_error_messages(string $message, string $secret): void
 	{
 		// Act
