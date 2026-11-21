@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (231)
+## Changed (233)
 
 Stock files we edited.
 
@@ -110,6 +110,10 @@ Stock files we edited.
 - `app/Services/Post/ShowTrait.php`
 - `app/Services/Section/SectionDataTrait.php` (no marker comment)
 
+### bootstrap/app.php
+
+- `bootstrap/app.php`
+
 ### bootstrap/providers.php
 
 - `bootstrap/providers.php`
@@ -129,6 +133,10 @@ Stock files we edited.
 ### config/larapen
 
 - `config/larapen/flash.php`
+
+### config/logging.php
+
+- `config/logging.php`
 
 ### config/mail.php
 
@@ -575,7 +583,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (188)
+## Added (195)
 
 Files that are not part of LaraClassifier.
 
@@ -599,6 +607,7 @@ Files that are not part of LaraClassifier.
 ### app/Http
 
 - `app/Http/Controllers/Api/QuickPostController.php`
+- `app/Http/Controllers/HealthController.php`
 - `app/Http/Controllers/Web/Admin/AiModelController.php`
 - `app/Http/Controllers/Web/Admin/AiPostLimitController.php`
 - `app/Http/Controllers/Web/Admin/AiProviderController.php`
@@ -753,9 +762,33 @@ Files that are not part of LaraClassifier.
 
 - `database/seeders/CategoryIconsSeeder.php`
 
+### deploy/core-changes.php
+
+- `deploy/core-changes.php`
+
+### deploy/crontab
+
+- `deploy/crontab`
+
+### deploy/deploy.sh
+
+- `deploy/deploy.sh`
+
+### deploy/supervisor
+
+- `deploy/supervisor/adniro-workers.conf`
+
 ### docs/ai-listings-plan.md
 
 - `docs/ai-listings-plan.md`
+
+### docs/core-changes.md
+
+- `docs/core-changes.md`
+
+### docs/operations.md
+
+- `docs/operations.md`
 
 ### docs/professional-website-plan.md
 
