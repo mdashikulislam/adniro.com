@@ -20,7 +20,9 @@ Route::middleware([SuperAdminOnly::class])
 	->group(function () {
 		Route::post('ai_providers/{id}/test', [AiProviderController::class, 'test'])->whereNumber('id');
 		Route::post('ai_models/{id}/test', [AiModelController::class, 'test'])->whereNumber('id');
-		
+		// "Load models": calls the provider's API, so it is rate limited (before the resource routes)
+		Route::get('ai_models/available', [AiModelController::class, 'available'])->middleware('throttle:20,1');
+
 		PanelRoutes::resource('ai_providers', AiProviderController::class);
 		PanelRoutes::resource('ai_models', AiModelController::class);
 	});

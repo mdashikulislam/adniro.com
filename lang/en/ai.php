@@ -78,6 +78,23 @@ return [
 	'field_options_hint'    => 'Optional. Sent with every request to this model. Example for Claude: {"output_config": {"effort": "low"}}. Example for OpenAI: {"reasoning": {"effort": "low"}}.',
 	'field_options_invalid' => 'The provider options must be a valid JSON object.',
 	'field_model_active_hint' => 'When off, this model is not used, even if it is assigned to a feature.',
+
+	// "Load models" on the model form
+	'catalog_load'          => 'Load models',
+	'catalog_loading'       => 'Loading models…',
+	'catalog_pick'          => 'Choose a model',
+	'catalog_hint'          => 'Lists the models this provider offers with its saved API key. Choosing one fills in the model ID, label, capabilities and, for Claude and OpenRouter models, the prices. Check them before saving.',
+	'catalog_loaded'        => ':count models found.',
+	'catalog_empty'         => 'The provider returned no models.',
+	'catalog_choose_provider' => 'Choose a provider first.',
+	'catalog_no_key'        => 'This provider has no API key. Save one on the provider first.',
+	'catalog_no_url'        => 'This provider needs a base URL. Save one on the provider first.',
+	'catalog_unreachable'   => 'Could not reach :host. Check the base URL and the server\'s internet connection.',
+	'catalog_bad_answer'    => ':host did not answer with a model list.',
+	'catalog_key_refused'   => ':host refused the API key. Check the key on the provider.',
+	'catalog_http_error'    => ':host answered with error :status.',
+	'catalog_failed'        => 'Could not load the models.',
+	'catalog_unknown_price' => 'Price unknown: copy it from the provider\'s pricing page.',
 	'model_unique'          => 'This provider already has a model with this ID.',
 	'model_retest_needed'   => 'The model settings changed. Run "Test model" again before using it.',
 	

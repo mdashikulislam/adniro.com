@@ -201,6 +201,65 @@ class AiAdminScreensTest extends TestCase
 		$response->assertDontSee('text-only-model');
 	}
 	
+	public function test_load_models_lists_the_provider_models_as_json(): void
+	{
+		// Arrange
+		$provider = AiProvider::query()->create(['name' => 'Main', 'driver' => 'anthropic', 'api_key' => 'k-load-123456', 'active' => true]);
+		\Illuminate\Support\Facades\Http::fake(['api.anthropic.com/*' => \Illuminate\Support\Facades\Http::response([
+			'data'     => [['id' => 'claude-sonnet-5-5', 'display_name' => 'Claude Sonnet 5.5', 'capabilities' => ['image_input' => ['supported' => true]]]],
+			'has_more' => false,
+		])]);
+		
+		// Act
+		$response = $this->actingAs($this->admin)->getJson('/admin/ai_models/available?provider=' . $provider->id);
+		
+		// Assert
+		$response->assertOk()
+			->assertJsonPath('success', true)
+			->assertJsonPath('data.0.id', 'claude-sonnet-5-5')
+			->assertJsonPath('data.0.vision', true)
+			->assertJsonPath('data.0.input_price', 2);
+		$this->assertStringNotContainsString('k-load-123456', $response->getContent());
+	}
+	
+	public function test_load_models_reports_a_provider_error(): void
+	{
+		// Arrange
+		$provider = AiProvider::query()->create(['name' => 'Main', 'driver' => 'openai', 'api_key' => 'sk-bad-123456789', 'active' => true]);
+		\Illuminate\Support\Facades\Http::fake(['api.openai.com/*' => \Illuminate\Support\Facades\Http::response(['error' => ['message' => 'bad key sk-bad-123456789']], 401)]);
+		
+		// Act
+		$response = $this->actingAs($this->admin)->getJson('/admin/ai_models/available?provider=' . $provider->id);
+		
+		// Assert
+		$response->assertStatus(422)->assertJsonPath('success', false)->assertJsonPath('data', null);
+		$this->assertStringContainsString('refused the API key', (string)$response->json('error'));
+		$this->assertStringNotContainsString('sk-bad-123456789', $response->getContent());
+	}
+	
+	public function test_load_models_needs_a_known_provider_and_a_super_admin(): void
+	{
+		// Arrange
+		$staff = User::query()->forceCreate([
+			'name' => 'Staff', 'email' => 'staff@example.test', 'auth_field' => 'email', 'password' => bcrypt(str()->random(32)),
+			'email_verified_at' => now(), 'phone_verified_at' => now(),
+		]);
+		$staff->givePermissionTo(Permission::getStaffPermissions());
+		
+		// Act & Assert
+		$this->actingAs($this->admin)->getJson('/admin/ai_models/available?provider=999')->assertStatus(404);
+		$this->assertNotSame(200, $this->actingAs($staff)->getJson('/admin/ai_models/available?provider=1')->status());
+	}
+	
+	public function test_the_model_form_has_the_load_models_button(): void
+	{
+		// Act & Assert
+		$this->actingAs($this->admin)->get('/admin/ai_models/create')
+			->assertOk()
+			->assertSee('Load models')
+			->assertSee('data-catalog-url', false);
+	}
+	
 	private function rowsHtml($response): string
 	{
 		return collect($response->json('data'))->flatten()->implode(' ');

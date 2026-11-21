@@ -8,7 +8,11 @@ use App\Http\Requests\Admin\AiModelRequest as UpdateRequest;
 use App\Models\AiModel;
 use App\Models\AiProvider;
 use App\Services\Ai\Contracts\AiClientContract;
+use App\Services\Ai\ModelCatalogException;
+use App\Services\Ai\ProviderModelCatalog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 /*
  * Admin > AI Models (adniro:ai). Super admins only (see routes/web/ai-admin.php).
@@ -100,6 +104,12 @@ class AiModelController extends PanelController
 				'wrapper' => ['class' => 'col-md-6'],
 			]);
 			$this->xPanel->addField([
+				'name'    => 'model_catalog',
+				'type'    => 'custom_html',
+				'value'   => view('admin.ai.model-catalog')->render(),
+				'wrapper' => ['class' => 'col-md-12 mb-3'],
+			]);
+			$this->xPanel->addField([
 				'name'    => 'label',
 				'label'   => trans('ai.field_label'),
 				'type'    => 'text',
@@ -174,6 +184,27 @@ class AiModelController extends PanelController
 		}
 		
 		return $response;
+	}
+	
+	/**
+	 * "Load models": the models the chosen provider offers, read from its API with the saved key.
+	 */
+	public function available(Request $request, ProviderModelCatalog $catalog): JsonResponse
+	{
+		$provider = AiProvider::query()->findOrFail($request->integer('provider'));
+		
+		try {
+			$models = $catalog->list($provider);
+		} catch (ModelCatalogException $e) {
+			return response()->json(['success' => false, 'data' => null, 'error' => $e->getMessage()], 422);
+		}
+		
+		return response()->json([
+			'success' => true,
+			'data'    => $models,
+			'error'   => null,
+			'meta'    => ['total' => count($models)],
+		]);
 	}
 	
 	public function test(int $id, AiClientContract $client): RedirectResponse
