@@ -46,14 +46,20 @@
 @endif
 
 {{-- title --}}
+@php
+	$titleAttributes = ['id' => 'title', 'aria-required' => 'true'];
+	if ($lfV2 ?? false) {
+		$titleAttributes['maxlength'] = (int)config('settings.listing_form.title_max_length', 150);
+	}
+@endphp
 @include('helpers.forms.fields.text', [
 	'label'       => t('title'),
 	'name'        => 'title',
 	'placeholder' => t('enter_your_title'),
 	'required'    => true,
 	'value'       => $listingForm->title,
-	'hint'        => t('a_great_title_needs_at_least_60_characters'),
-	'attributes'  => ['id' => 'title', 'aria-required' => 'true'],
+	'hint'        => ($lfV2 ?? false) ? trans('listing_form.hint_title') : t('a_great_title_needs_at_least_60_characters'),
+	'attributes'  => $titleAttributes,
 ])
 
 {{-- description: rich editors render the real textarea as "{editor}_description" --}}
@@ -71,5 +77,6 @@
 	'value'       => $listingForm->description,
 	'height'      => 350,
 	'attributes'  => ['rows' => 15, 'aria-required' => 'true'],
-	'hint'        => t('describe_what_makes_your_listing_unique'),
+	'hint'        => ($lfV2 ?? false) ? trans('listing_form.hint_description') : t('describe_what_makes_your_listing_unique'),
+	'wrapper'     => ($lfV2 ?? false) ? ['class' => 'lf-description'] : [],
 ])

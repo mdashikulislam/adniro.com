@@ -1,10 +1,12 @@
 {{-- adniro: the seller's contact details --}}
-<div class="my-4 col-md-12">
-	<h5 class="listing-form-section">
-		<span class="listing-form-section-icon"><i class="bi bi-person-fill"></i></span>
-		<span>{{ t('seller_information') }}</span>
-	</h5>
-</div>
+@unless ($lfV2 ?? false)
+	<div class="my-4 col-md-12">
+		<h5 class="listing-form-section">
+			<span class="listing-form-section-icon"><i class="bi bi-person-fill"></i></span>
+			<span>{{ t('seller_information') }}</span>
+		</h5>
+	</div>
+@endunless
 
 {{-- contact_name: a signed-in member posts under their own name --}}
 @if ($listingForm->contactNameIsHidden)
@@ -78,8 +80,14 @@
 @php
 	$phoneHiddenValue = old('phone_hidden', $listingForm->phoneHidden);
 	$phoneHiddenChecked = ($phoneHiddenValue == '1') ? ' checked' : '';
-	$itiSuffix = '<input id="phoneHidden" name="phone_hidden" type="checkbox" value="1"' . $phoneHiddenChecked . '>';
-	$itiSuffix .= '&nbsp;<small>' . t('Hide') . '</small>';
+	if ($lfV2 ?? false) {
+		$itiSuffix = '<label class="form-check form-switch lf-suffix-switch" for="phoneHidden">';
+		$itiSuffix .= '<input class="form-check-input" id="phoneHidden" name="phone_hidden" type="checkbox" role="switch" value="1"' . $phoneHiddenChecked . '>';
+		$itiSuffix .= '<span class="form-check-label">' . e(t('Hide')) . '</span></label>';
+	} else {
+		$itiSuffix = '<input id="phoneHidden" name="phone_hidden" type="checkbox" value="1"' . $phoneHiddenChecked . '>';
+		$itiSuffix .= '&nbsp;<small>' . t('Hide') . '</small>';
+	}
 @endphp
 @include('helpers.forms.fields.intl-tel-input', [
 	'label'       => trans('auth.phone_number'),

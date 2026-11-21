@@ -81,6 +81,20 @@ class ListingFormPagesTest extends TestCase
 	#[DataProvider('formPages')]
 	public function test_each_form_page_keeps_its_fields_and_script_hooks(string $mode, bool $asOwner, string $url, array $fields, array $hooks): void
 	{
+		$this->assertFormContract($mode, $asOwner, $url, $fields, $hooks);
+	}
+	
+	#[DataProvider('formPages')]
+	public function test_the_stock_layout_keeps_the_same_fields_and_script_hooks(string $mode, bool $asOwner, string $url, array $fields, array $hooks): void
+	{
+		// Arrange: the redesign switched off (LISTING_FORM_V2=false)
+		config(['listing_form.v2' => false]);
+		
+		$this->assertFormContract($mode, $asOwner, $url, $fields, $hooks);
+	}
+	
+	private function assertFormContract(string $mode, bool $asOwner, string $url, array $fields, array $hooks): void
+	{
 		// Arrange: the photos step opens once the details step is in the session
 		config(['settings.listing_form.publication_form_type' => $mode]);
 		$request = $asOwner ? $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID)) : $this;
@@ -169,6 +183,76 @@ class ListingFormPagesTest extends TestCase
 		$this->assertSame('Ana', $xpath->query("//input[@name='contact_name']")->item(0)?->getAttribute('value'));
 	}
 
+	public static function bothModesCreate(): array
+	{
+		return [
+			'multi-step'  => [self::MULTI, '/posts/create'],
+			'single-step' => [self::SINGLE, '/create'],
+		];
+	}
+	
+	#[DataProvider('bothModesCreate')]
+	public function test_the_redesigned_create_page_has_numbered_sections_and_a_checklist(string $mode, string $url): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => $mode]);
+		
+		// Act
+		$xpath = $this->formXPath($this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))->get($url));
+		
+		// Assert
+		$form = $xpath->query("//div[contains(@class, 'lf-v2')]//form[@id='payableForm']")->item(0);
+		$this->assertNotNull($form, 'the redesigned layout');
+		$this->assertFalse($form->hasAttribute('novalidate'), 'the browser still checks fields our scripts do not');
+		$this->assertNotEmpty(json_decode($form->getAttribute('data-lf-config'), true)['strings'] ?? null);
+		$sections = array_map(fn ($node) => $node->getAttribute('id'), iterator_to_array($xpath->query("//form[@id='payableForm']//*[contains(concat(' ', @class, ' '), ' lf-card ')]")));
+		$this->assertSame(['lfSection-what', 'lfSection-details', 'lfSection-price-location', 'lfSection-more', 'lfSection-contact', 'lfSection-finish'], array_values(array_diff($sections, ['lfSection-photos'])));
+		$this->assertSame($mode === self::SINGLE, in_array('lfSection-photos', $sections), 'photos are a section in single-step mode only');
+		$this->assertSame(6, $xpath->query("//*[@id='lfPanel']//*[@data-lf-check]")->length);
+		$this->assertSame('150', $xpath->query("//input[@name='title']")->item(0)?->getAttribute('maxlength'));
+		$this->assertNotNull($xpath->query("//label[@for='negotiable']//input[@id='negotiable']")->item(0), 'the whole Negotiable label toggles it');
+	}
+	
+	public static function editStatuses(): array
+	{
+		return [
+			'live'           => [['moderation_status' => 'approved'], 'lf-status--live'],
+			'being checked'  => [['moderation_status' => 'needs_review'], 'lf-status--review'],
+			'not approved'   => [['moderation_status' => 'rejected'], 'lf-status--rejected'],
+		];
+	}
+	
+	#[DataProvider('editStatuses')]
+	public function test_the_redesigned_edit_page_says_whether_the_listing_is_live(array $columns, string $class): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => self::SINGLE]);
+		\Illuminate\Support\Facades\DB::table('posts')->where('id', $this->postId)->update($columns);
+		
+		// Act
+		$xpath = $this->formXPath($this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))->get('/edit/' . $this->postId));
+		
+		// Assert
+		$this->assertSame('Grey corner sofa', trim($xpath->query("//h1[contains(@class, 'lf-head-title')]")->item(0)?->textContent ?? ''));
+		$this->assertNotNull($xpath->query("//span[contains(@class, '{$class}')]")->item(0));
+		$this->assertNull($xpath->query("//form[@id='payableForm']//*[@id='lfSection-finish']//input[@name='accept_terms']")->item(0));
+	}
+	
+	public function test_the_stock_layout_comes_back_when_the_redesign_is_off(): void
+	{
+		// Arrange
+		config(['listing_form.v2' => false, 'settings.listing_form.publication_form_type' => self::MULTI]);
+		
+		// Act
+		$response = $this->get('/posts/create');
+		
+		// Assert
+		$response->assertOk();
+		$response->assertDontSee('lf-v2', false);
+		$response->assertDontSee('listing-form.css', false);
+		$response->assertSee('reg-sidebar', false);
+	}
+	
 	public static function inactiveModeUrls(): array
 	{
 		return [

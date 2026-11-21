@@ -174,4 +174,36 @@ class ListingFormStateTest extends TestCase
 		$this->assertSame(0, $form->adminCode);
 		$this->assertSame(0, $form->cityId);
 	}
+
+	public static function statuses(): array
+	{
+		return [
+			'approved and reviewed'   => [['moderation_status' => 'approved', 'reviewed_at' => '2026-11-01'], 'live'],
+			'old listing, no status'  => [['reviewed_at' => '2026-11-01'], 'live'],
+			'not reviewed yet'        => [['moderation_status' => 'approved', 'reviewed_at' => null], 'pending'],
+			'held by moderation'      => [['moderation_status' => 'needs_review', 'reviewed_at' => '2026-11-01'], 'review'],
+			'waiting for moderation'  => [['moderation_status' => 'pending', 'reviewed_at' => '2026-11-01'], 'review'],
+			'rejected'                => [['moderation_status' => 'rejected', 'reviewed_at' => '2026-11-01'], 'rejected'],
+			'archived'                => [['moderation_status' => 'approved', 'reviewed_at' => '2026-11-01', 'archived_at' => '2026-11-02'], 'archived'],
+		];
+	}
+	
+	#[\PHPUnit\Framework\Attributes\DataProvider('statuses')]
+	public function test_an_edit_knows_whether_the_listing_is_live(array $post, string $status): void
+	{
+		// Act
+		$form = ListingFormState::fromPost(['id' => 9] + $post, self::DEFAULTS);
+		
+		// Assert
+		$this->assertSame($status, $form->status);
+	}
+	
+	public function test_a_new_listing_has_no_status(): void
+	{
+		// Act
+		$form = ListingFormState::forCreate([], null, self::DEFAULTS);
+		
+		// Assert
+		$this->assertNull($form->status);
+	}
 }

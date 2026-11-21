@@ -2,7 +2,9 @@
 
 {{-- tags --}}
 @php
-	$tagHint = t('tags_hint', ['limit' => '{limit}', 'min' => '{min}', 'max' => '{max}']);
+	$tagHint = ($lfV2 ?? false)
+		? trans('listing_form.hint_tags')
+		: t('tags_hint', ['limit' => '{limit}', 'min' => '{min}', 'max' => '{max}']);
 @endphp
 @include('helpers.forms.fields.select2-tagging', [
 	'label'       => t('Tags'),

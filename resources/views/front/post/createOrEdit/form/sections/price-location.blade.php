@@ -12,8 +12,14 @@
 	$negotiable = old('negotiable', $listingForm->negotiable);
 	$negotiableChecked = ($negotiable == '1') ? ' checked' : '';
 
-	$priceSuffix = '<input id="negotiable" name="negotiable" type="checkbox" value="1"' . $negotiableChecked . '>';
-	$priceSuffix .= '&nbsp;<small>' . t('negotiable') . '</small>';
+	if ($lfV2 ?? false) {
+		$priceSuffix = '<label class="form-check form-switch lf-suffix-switch" for="negotiable">';
+		$priceSuffix .= '<input class="form-check-input" id="negotiable" name="negotiable" type="checkbox" role="switch" value="1"' . $negotiableChecked . '>';
+		$priceSuffix .= '<span class="form-check-label">' . e(t('negotiable')) . '</span></label>';
+	} else {
+		$priceSuffix = '<input id="negotiable" name="negotiable" type="checkbox" value="1"' . $negotiableChecked . '>';
+		$priceSuffix .= '&nbsp;<small>' . t('negotiable') . '</small>';
+	}
 @endphp
 @include('helpers.forms.fields.number', [
 	'label'       => t('price'),

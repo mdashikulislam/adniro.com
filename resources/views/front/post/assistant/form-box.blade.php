@@ -5,7 +5,16 @@
 	$aiBoxOn = $aiBoxService->available($aiBoxUser);
 	$aiBoxLogin = !$aiBoxOn && is_null($aiBoxUser) && app(\App\Services\Ai\AiSettings::class)->listingAssistantEnabled();
 @endphp
-@if ($aiBoxOn || $aiBoxLogin)
+@if ($aiBoxLogin && ($lfV2 ?? false))
+	{{-- Redesigned listing form: guests get one dismissible line instead of the whole box --}}
+	<div class="lf-ai-banner" data-lf-ai-banner>
+		<i class="fa-solid fa-wand-magic-sparkles lf-ai-banner-icon" aria-hidden="true"></i>
+		<span class="lf-ai-banner-text">{{ trans('listing_form.ai_guest_text') }}</span>
+		<a href="#quickLogin" data-bs-toggle="modal" class="lf-ai-banner-login">{{ trans('listing_form.ai_guest_login') }}</a>
+		<button type="button" class="btn-close lf-ai-banner-hide" data-lf-ai-banner-hide
+		        aria-label="{{ trans('listing_form.ai_guest_hide') }}"></button>
+	</div>
+@elseif ($aiBoxOn || $aiBoxLogin)
 	@php
 		$aiBoxLimit = $aiBoxService->limitStatus($aiBoxUser, request()->ip());
 		$aiBoxLimitText = \App\Http\Controllers\Web\Front\Post\ListingAssistant\ListingAssistantController::limitText($aiBoxLimit);

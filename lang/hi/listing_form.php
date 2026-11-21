@@ -1,0 +1,81 @@
+<?php
+
+/*
+ * adniro: the create/edit listing pages (config/listing_form.php).
+ * Placeholders in {braces} are filled by the page scripts; :name ones by Laravel.
+ */
+
+return [
+	// Page header
+	'create_sub'         => 'इसमें लगभग 2 मिनट लगेंगे। * वाले खाने भरना ज़रूरी है।',
+	'edit_kicker'        => 'विज्ञापन संपादित करें',
+	'view_listing'       => 'विज्ञापन देखें',
+	'status_live'        => 'प्रकाशित',
+	'status_pending'     => 'मंज़ूरी का इंतज़ार',
+	'status_review'      => 'जाँच जारी',
+	'status_rejected'    => 'मंज़ूर नहीं हुआ',
+	'status_archived'    => 'संग्रहीत',
+
+	// Section cards
+	'section_photos'          => 'फ़ोटो',
+	'section_photos_sub'      => 'साफ़ फ़ोटो वाले विज्ञापनों को कहीं ज़्यादा जवाब मिलते हैं।',
+	'section_what'            => 'आप क्या बेच रहे हैं?',
+	'section_what_sub'        => 'एक श्रेणी चुनें, फिर साफ़ शीर्षक और विवरण लिखें।',
+	'section_details'         => 'विवरण',
+	'section_details_sub'     => 'इस श्रेणी में खरीदार जो जानकारी ढूँढते हैं।',
+	'section_price_location'  => 'कीमत और जगह',
+	'section_price_location_sub' => 'सही कीमत और सही शहर से खरीदारों को आप आसानी से मिलते हैं।',
+	'section_more'            => 'और विकल्प',
+	'section_more_sub'        => 'वैकल्पिक: टैग और विज्ञापन कितने समय तक लगा रहेगा।',
+	'section_contact'         => 'खरीदार आपसे कैसे संपर्क करें',
+	'section_contact_sub'     => 'खरीदार इन जानकारियों से आपसे संपर्क करेंगे।',
+	'section_finish'          => 'लगभग पूरा',
+	'section_finish_sub'      => 'जाँचें और पुष्टि करें, फिर प्रकाशित करें।',
+
+	// Field hints
+	'hint_title'         => 'बताएँ कि यह क्या है, ब्रांड और मॉडल के साथ, जैसे "Samsung Galaxy S21, 128 GB"।',
+	'hint_description'   => 'हालत, उम्र, आकार, साथ में क्या मिलेगा और आप क्यों बेच रहे हैं।',
+	'hint_tags'          => 'ज़्यादा से ज़्यादा {limit} शब्द, जो खरीदार खोज सकते हैं।',
+	'counter'            => '{count} / {max}',
+	'counter_min'        => 'कम से कम {min} अक्षर',
+
+	// Side panel and phone sheet
+	'panel_title'        => 'आपका विज्ञापन',
+	'panel_open'         => 'चेकलिस्ट',
+	'panel_close'        => 'बंद करें',
+	'preview'            => 'पूर्वावलोकन',
+	'preview_title'      => 'आपका शीर्षक यहाँ दिखेगा',
+	'preview_price'      => 'अभी कीमत नहीं',
+	'preview_city'       => 'अभी शहर नहीं',
+	'preview_category'   => 'अभी श्रेणी नहीं',
+	'preview_negotiable' => 'बातचीत योग्य',
+	'checklist'          => 'प्रकाशित करने से पहले',
+	'checklist_progress' => '{total} में से {done} पूरे',
+	'checklist_ready'    => 'प्रकाशित करने के लिए तैयार',
+	'check_category'     => 'श्रेणी चुनें',
+	'check_title'        => 'शीर्षक जोड़ें',
+	'check_description'  => 'सामान का विवरण दें',
+	'check_price'        => 'कीमत तय करें',
+	'check_city'         => 'शहर चुनें',
+	'check_contact'      => 'संपर्क का तरीका जोड़ें',
+	'check_done'         => 'पूरा',
+	'check_todo'         => 'बाकी',
+	'tips'               => 'जल्दी बेचने के सुझाव',
+
+	// Checks while filling in
+	'error_summary'      => 'आगे बढ़ने से पहले इन्हें ठीक करें:',
+	'error_required'     => 'कृपया इसे भरें।',
+	'error_category'     => 'कृपया एक श्रेणी चुनें।',
+	'error_city'         => 'कृपया एक शहर चुनें।',
+	'error_email'        => 'सही ईमेल पता लिखें, जैसे name@example.com।',
+	'error_terms'        => 'आगे बढ़ने के लिए शर्तें स्वीकार करें।',
+	'error_too_short'    => 'कृपया कम से कम {min} अक्षर लिखें।',
+
+	// AI box for guests
+	'ai_guest_text'      => 'लॉग इन करें, फिर AI छोटे विवरण या कुछ फ़ोटो से यह फ़ॉर्म भर सकता है।',
+	'ai_guest_login'     => 'लॉग इन करें',
+	'ai_guest_hide'      => 'यह संदेश छिपाएँ',
+
+	// Multi-step progress on phones
+	'step_of'            => 'चरण :current / :total',
+];

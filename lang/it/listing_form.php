@@ -1,0 +1,81 @@
+<?php
+
+/*
+ * adniro: the create/edit listing pages (config/listing_form.php).
+ * Placeholders in {braces} are filled by the page scripts; :name ones by Laravel.
+ */
+
+return [
+	// Page header
+	'create_sub'         => 'Ci vogliono circa 2 minuti. I campi contrassegnati con * sono obbligatori.',
+	'edit_kicker'        => 'Modifica annuncio',
+	'view_listing'       => 'Vedi annuncio',
+	'status_live'        => 'Online',
+	'status_pending'     => 'In attesa di approvazione',
+	'status_review'      => 'In controllo',
+	'status_rejected'    => 'Non approvato',
+	'status_archived'    => 'Archiviato',
+
+	// Section cards
+	'section_photos'          => 'Foto',
+	'section_photos_sub'      => 'Gli annunci con foto chiare ricevono molte più risposte.',
+	'section_what'            => 'Cosa vendi?',
+	'section_what_sub'        => 'Scegli una categoria, poi scrivi un titolo e una descrizione chiari.',
+	'section_details'         => 'Dettagli',
+	'section_details_sub'     => 'Le informazioni che gli acquirenti cercano in questa categoria.',
+	'section_price_location'  => 'Prezzo e luogo',
+	'section_price_location_sub' => 'Un prezzo giusto e la città giusta aiutano gli acquirenti a trovarti.',
+	'section_more'            => 'Altre opzioni',
+	'section_more_sub'        => 'Facoltativo: tag e per quanto tempo l\'annuncio resta online.',
+	'section_contact'         => 'Come ti contattano gli acquirenti',
+	'section_contact_sub'     => 'Gli acquirenti usano questi dati per contattarti.',
+	'section_finish'          => 'Quasi fatto',
+	'section_finish_sub'      => 'Controlla e conferma, poi pubblica.',
+
+	// Field hints
+	'hint_title'         => 'Dì cos\'è, con marca e modello, ad es. «Samsung Galaxy S21, 128 GB».',
+	'hint_description'   => 'Condizioni, età, dimensioni, cosa è incluso e perché vendi.',
+	'hint_tags'          => 'Fino a {limit} parole che gli acquirenti potrebbero cercare.',
+	'counter'            => '{count} / {max}',
+	'counter_min'        => 'Almeno {min} caratteri',
+
+	// Side panel and phone sheet
+	'panel_title'        => 'Il tuo annuncio',
+	'panel_open'         => 'Checklist',
+	'panel_close'        => 'Chiudi',
+	'preview'            => 'Anteprima',
+	'preview_title'      => 'Qui apparirà il tuo titolo',
+	'preview_price'      => 'Ancora nessun prezzo',
+	'preview_city'       => 'Ancora nessuna città',
+	'preview_category'   => 'Ancora nessuna categoria',
+	'preview_negotiable' => 'Negoziabile',
+	'checklist'          => 'Prima di pubblicare',
+	'checklist_progress' => '{done} di {total} completati',
+	'checklist_ready'    => 'Pronto per la pubblicazione',
+	'check_category'     => 'Scegli una categoria',
+	'check_title'        => 'Aggiungi un titolo',
+	'check_description'  => 'Descrivi l\'oggetto',
+	'check_price'        => 'Imposta un prezzo',
+	'check_city'         => 'Scegli una città',
+	'check_contact'      => 'Aggiungi un modo per contattarti',
+	'check_done'         => 'Fatto',
+	'check_todo'         => 'Da fare',
+	'tips'               => 'Consigli per vendere più in fretta',
+
+	// Checks while filling in
+	'error_summary'      => 'Correggi questi punti prima di continuare:',
+	'error_required'     => 'Compila questo campo.',
+	'error_category'     => 'Scegli una categoria.',
+	'error_city'         => 'Scegli una città.',
+	'error_email'        => 'Inserisci un indirizzo email valido, come nome@example.com.',
+	'error_terms'        => 'Accetta i termini per continuare.',
+	'error_too_short'    => 'Scrivi almeno {min} caratteri.',
+
+	// AI box for guests
+	'ai_guest_text'      => 'Accedi e l\'IA può compilare questo modulo da una breve descrizione o da qualche foto.',
+	'ai_guest_login'     => 'Accedi',
+	'ai_guest_hide'      => 'Nascondi questo messaggio',
+
+	// Multi-step progress on phones
+	'step_of'            => 'Passo :current di :total',
+];

@@ -238,11 +238,11 @@ class AiFormBoxTest extends TestCase
 		$this->assertStringContainsString('data-url="' . url('posts/create/assistant/fill') . '"', $html);
 		$this->assertStringContainsString('20 of 20 AI posts left today', $html);
 		$this->assertStringContainsString('ai.formbox.js', $html);
-		// Both create pages use the shared form, which shows the box on new listings
+		// Both create pages use the shared form page, whose body shows the box on new listings
 		$body = file_get_contents(resource_path('views/front/post/createOrEdit/form/body.blade.php'));
 		$this->assertStringContainsString("@includeWhen(!\$listingForm->isEdit, 'front.post.assistant.form-box')", $body);
 		foreach (['multiSteps/create/post.blade.php', 'singleStep/create.blade.php'] as $form) {
-			$this->assertStringContainsString("@include('front.post.createOrEdit.form.body'", file_get_contents(resource_path('views/front/post/createOrEdit/' . $form)), $form);
+			$this->assertStringContainsString("@include('front.post.createOrEdit.form.page'", file_get_contents(resource_path('views/front/post/createOrEdit/' . $form)), $form);
 		}
 	}
 	
@@ -254,6 +254,17 @@ class AiFormBoxTest extends TestCase
 		// Assert
 		$this->assertStringContainsString('#quickLogin', $html);
 		$this->assertStringNotContainsString('ai.formbox.js', $html);
+	}
+	
+	public function test_the_redesigned_form_gives_guests_one_line_instead_of_the_box(): void
+	{
+		// Act: guests are off by default
+		$html = view('front.post.assistant.form-box', ['lfV2' => true])->render();
+		
+		// Assert
+		$this->assertStringContainsString('data-lf-ai-banner', $html);
+		$this->assertStringContainsString('#quickLogin', $html);
+		$this->assertStringNotContainsString('id="aiAssistant"', $html);
 	}
 	
 	public function test_the_box_is_hidden_when_ai_posting_is_off(): void

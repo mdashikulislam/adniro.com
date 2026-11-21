@@ -12,6 +12,12 @@ namespace App\Services\ListingForm;
  */
 final readonly class ListingFormState
 {
+	public const STATUS_LIVE = 'live';
+	public const STATUS_PENDING = 'pending';    // waiting for the admin's approval
+	public const STATUS_REVIEW = 'review';      // held by moderation
+	public const STATUS_REJECTED = 'rejected';
+	public const STATUS_ARCHIVED = 'archived';
+	
 	private const DEFAULT_CITY_NAME = '--';
 	private const ADMIN_TYPES = ['0', '1', '2'];
 
@@ -41,6 +47,7 @@ final readonly class ListingFormState
 		public mixed $phoneHidden,
 		public mixed $acceptTerms,
 		public mixed $acceptMarketingOffers,
+		public ?string $status = null,
 	) {
 	}
 
@@ -135,6 +142,7 @@ final readonly class ListingFormState
 			phoneHidden: $get('phone_hidden'),
 			acceptTerms: null,
 			acceptMarketingOffers: null,
+			status: self::status($post),
 		);
 	}
 
@@ -175,6 +183,26 @@ final readonly class ListingFormState
 		];
 	}
 
+	/**
+	 * Whether buyers can see the listing, for the edit page header.
+	 */
+	private static function status(array|object $post): string
+	{
+		if (!empty(data_get($post, 'archived_at'))) {
+			return self::STATUS_ARCHIVED;
+		}
+		
+		$moderation = data_get($post, 'moderation_status') ?? 'approved';
+		if ($moderation === 'rejected') {
+			return self::STATUS_REJECTED;
+		}
+		if ($moderation !== 'approved') {
+			return self::STATUS_REVIEW;
+		}
+		
+		return empty(data_get($post, 'reviewed_at')) ? self::STATUS_PENDING : self::STATUS_LIVE;
+	}
+	
 	private static function text(mixed $value): ?string
 	{
 		return ($value === null) ? null : (string)$value;

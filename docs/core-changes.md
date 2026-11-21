@@ -283,7 +283,7 @@ Stock files we edited.
 - `resources/views/front/post/createOrEdit/multiSteps/edit/packages.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/multiSteps/edit/photos.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/multiSteps/edit/post.blade.php`
-- `resources/views/front/post/createOrEdit/multiSteps/partials/wizard.blade.php` (no marker comment)
+- `resources/views/front/post/createOrEdit/multiSteps/partials/wizard.blade.php`
 - `resources/views/front/post/createOrEdit/partials/category-modal.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/partials/category/select.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/partials/form-assets.blade.php`
@@ -587,7 +587,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (211)
+## Added (232)
 
 Files that are not part of LaraClassifier.
 
@@ -724,6 +724,10 @@ Files that are not part of LaraClassifier.
 
 - `config/ai_features.php`
 
+### config/listing_form.php
+
+- `config/listing_form.php`
+
 ### config/seo.php
 
 - `config/seo.php`
@@ -807,46 +811,62 @@ Files that are not part of LaraClassifier.
 ### lang/ar
 
 - `lang/ar/ai.php`
+- `lang/ar/listing_form.php`
 
 ### lang/bn
 
 - `lang/bn/ai.php`
+- `lang/bn/listing_form.php`
 
 ### lang/de
 
 - `lang/de/ai.php`
+- `lang/de/listing_form.php`
 
 ### lang/en
 
 - `lang/en/ai.php`
+- `lang/en/listing_form.php`
 
 ### lang/es
 
 - `lang/es/ai.php`
+- `lang/es/listing_form.php`
 
 ### lang/fr
 
 - `lang/fr/ai.php`
+- `lang/fr/listing_form.php`
 
 ### lang/hi
 
 - `lang/hi/ai.php`
+- `lang/hi/listing_form.php`
 
 ### lang/it
 
 - `lang/it/ai.php`
+- `lang/it/listing_form.php`
 
 ### lang/ru
 
 - `lang/ru/ai.php`
+- `lang/ru/listing_form.php`
 
 ### public/assets
 
 - `public/assets/css/ai-formbox.css`
+- `public/assets/css/listing-form-panel.css`
+- `public/assets/css/listing-form.css`
 - `public/assets/css/messenger.css`
 - `public/assets/js/app/ai.formbox.js`
 - `public/assets/js/app/consent.js`
 - `public/assets/js/app/guest-cache.js`
+- `public/assets/js/app/listing-form/counters.js`
+- `public/assets/js/app/listing-form/fields.js`
+- `public/assets/js/app/listing-form/panel.js`
+- `public/assets/js/app/listing-form/preview.js`
+- `public/assets/js/app/listing-form/validate.js`
 - `public/assets/plugins/jquery/3.7.1/jquery.min.js`
 
 ### resources/ai
@@ -889,6 +909,10 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/post/assistant/form-box.blade.php`
 - `resources/views/front/post/createOrEdit/form/actions.blade.php`
 - `resources/views/front/post/createOrEdit/form/body.blade.php`
+- `resources/views/front/post/createOrEdit/form/hidden-inputs.blade.php`
+- `resources/views/front/post/createOrEdit/form/page.blade.php`
+- `resources/views/front/post/createOrEdit/form/panel.blade.php`
+- `resources/views/front/post/createOrEdit/form/section-card.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/contact.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/details.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/finish.blade.php`

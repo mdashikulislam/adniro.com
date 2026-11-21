@@ -66,6 +66,23 @@
 						</li>
 					@endforeach
 				</ol>
+				@if (config('listing_form.v2') && $activeIndex >= 0)
+					{{-- adniro:ai - phones: "Step 1 of 3 · Details" and a progress bar (the list above stays for screen readers) --}}
+					@php
+						$stepTotal = $wizardSteps->count();
+						$stepPercent = (int)round(($activeIndex + 1) / max($stepTotal, 1) * 100);
+					@endphp
+					<div class="listing-steps-compact" aria-hidden="true">
+						<p class="listing-steps-compact-text">
+							<span>{{ trans('listing_form.step_of', ['current' => $activeIndex + 1, 'total' => $stepTotal]) }}</span>
+							· <strong>{{ $wizardSteps[$activeIndex]['label'] ?? '' }}</strong>
+						</p>
+						<div class="listing-steps-compact-bar"><span style="width: {{ $stepPercent }}%"></span></div>
+					</div>
+					@pushOnce('after_styles_stack', 'listing_form_css')
+						<link href="{{ url('assets/css/listing-form.css') }}?v={{ @filemtime(public_path('assets/css/listing-form.css')) }}" rel="stylesheet">
+					@endPushOnce
+				@endif
 			</div>
 		</div>
 	</div>

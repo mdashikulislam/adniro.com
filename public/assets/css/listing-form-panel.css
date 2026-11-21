@@ -1,0 +1,231 @@
+/*
+ * adniro: the side panel of the redesigned listing form (form/panel.blade.php).
+ * Large screens: a sticky column. Phones: a Bootstrap bottom sheet (offcanvas-lg).
+ */
+
+.lf-panel-card {
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 16px;
+	background-color: var(--bs-body-bg);
+}
+
+.lf-panel-heading {
+	margin: 0 0 .75rem;
+	font-size: .95rem;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+}
+
+@media (min-width: 992px) {
+	.lf-panel {
+		position: sticky;
+		/* below the site's fixed header */
+		inset-block-start: 5.75rem;
+	}
+
+	.lf-panel .lf-panel-body {
+		flex-direction: column;
+		gap: 1rem;
+	}
+}
+
+@media (max-width: 991.98px) {
+	.lf-panel.offcanvas-lg {
+		--bs-offcanvas-height: min(85vh, 640px);
+		border-start-start-radius: 20px;
+		border-start-end-radius: 20px;
+	}
+
+	.lf-panel .lf-panel-body {
+		display: flex;
+		flex-direction: column;
+		gap: .85rem;
+		padding-block-start: 0;
+	}
+}
+
+/* ---------- Preview ---------- */
+.lf-preview-card {
+	display: flex;
+	gap: .85rem;
+	align-items: flex-start;
+}
+
+.lf-preview-photo {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 4.5rem;
+	height: 4.5rem;
+	border-radius: 12px;
+	font-size: 1.4rem;
+	color: var(--bs-secondary-color);
+	background-color: var(--bs-tertiary-bg);
+}
+
+.lf-preview-text {
+	min-width: 0;
+}
+
+.lf-preview-text p {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.lf-preview-category {
+	font-size: .75rem;
+	font-weight: 600;
+	color: var(--bs-secondary-color);
+}
+
+.lf-preview-title {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	font-weight: 700;
+	line-height: 1.35;
+	color: var(--bs-emphasis-color);
+}
+
+.lf-preview-price {
+	margin-block-start: .15rem !important;
+	font-weight: 800;
+	color: var(--bs-primary);
+}
+
+.lf-preview-city {
+	font-size: .8rem;
+	color: var(--bs-secondary-color);
+}
+
+.lf-preview [data-lf-preview].is-empty {
+	font-weight: 500;
+	color: var(--bs-secondary-color);
+}
+
+/* ---------- Checklist ---------- */
+.lf-checklist-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: .5rem;
+}
+
+.lf-checklist-count {
+	font-size: .8rem;
+	font-weight: 600;
+	color: var(--bs-secondary-color);
+	font-variant-numeric: tabular-nums;
+}
+
+.lf-progress {
+	height: 6px;
+	margin-block-end: .75rem;
+	border-radius: 999px;
+}
+
+.lf-progress .progress-bar {
+	border-radius: inherit;
+	transition: width .3s ease;
+}
+
+.lf-checklist.is-ready .progress-bar {
+	background-color: var(--bs-success);
+}
+
+.lf-checklist-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.lf-check-link {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	min-height: 40px;
+	padding: .3rem .4rem;
+	border-radius: 10px;
+	font-size: .9rem;
+	color: var(--bs-body-color);
+	text-decoration: none;
+}
+
+.lf-check-link:hover {
+	background-color: var(--bs-tertiary-bg);
+	color: var(--bs-emphasis-color);
+}
+
+.lf-check-link:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 1px;
+}
+
+.lf-check-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 1.25rem;
+	height: 1.25rem;
+	border: 2px solid var(--bs-border-color);
+	border-radius: 50%;
+	font-size: .75rem;
+	line-height: 1;
+}
+
+.lf-check.is-done .lf-check-icon {
+	border-color: var(--bs-success);
+	color: #fff;
+	background-color: var(--bs-success);
+}
+
+.lf-check.is-done .lf-check-icon::before {
+	content: "\f633";
+	font-family: "bootstrap-icons";
+}
+
+.lf-check.is-done .lf-check-text {
+	color: var(--bs-secondary-color);
+}
+
+/* ---------- Tips ---------- */
+.lf-tips-summary {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	min-height: 32px;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+	cursor: pointer;
+}
+
+.lf-tips-summary:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 2px;
+	border-radius: 6px;
+}
+
+.lf-tips-summary .bi {
+	color: var(--bs-warning);
+}
+
+.lf-tips-list {
+	margin: .6rem 0 0;
+	padding-inline-start: 1.15rem;
+	font-size: .88rem;
+	color: var(--bs-body-color);
+}
+
+.lf-tips-list li + li {
+	margin-block-start: .35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.lf-progress .progress-bar {
+		transition: none;
+	}
+}

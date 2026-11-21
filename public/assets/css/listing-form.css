@@ -1,0 +1,476 @@
+/*
+ * adniro: the redesigned create/edit listing pages (config/listing_form.php "v2").
+ * Scoped to .lf-v2 so the stock layout is untouched. Overrides of custom.css use
+ * "body.page-listing-form .lf-v2" to win over its !important rules.
+ * Panel and checklist styles live in listing-form-panel.css.
+ */
+
+/* ---------- Page header ---------- */
+.lf-v2 .lf-head {
+	margin-block-end: 1.25rem;
+}
+
+.lf-v2 .lf-head-kicker {
+	margin: 0 0 .25rem;
+	font-size: .8rem;
+	font-weight: 700;
+	letter-spacing: .02em;
+	color: var(--bs-secondary-color);
+}
+
+.lf-v2 .lf-head-title {
+	margin: 0;
+	font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+	font-weight: 800;
+	line-height: 1.25;
+	color: var(--bs-emphasis-color);
+	overflow-wrap: anywhere;
+}
+
+.lf-v2 .lf-head-sub {
+	margin: .35rem 0 0;
+	color: var(--bs-secondary-color);
+}
+
+.lf-v2 .lf-head-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .5rem 1rem;
+	margin-block-start: .6rem;
+}
+
+.lf-v2 .lf-head-link {
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.lf-v2 .lf-status {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	padding: .2rem .7rem;
+	border-radius: 999px;
+	font-size: .8rem;
+	font-weight: 700;
+	color: var(--bs-success-text-emphasis);
+	background-color: var(--bs-success-bg-subtle);
+}
+
+.lf-v2 .lf-status-dot {
+	width: .5rem;
+	height: .5rem;
+	border-radius: 50%;
+	background-color: currentColor;
+}
+
+.lf-v2 .lf-status--pending,
+.lf-v2 .lf-status--review {
+	color: var(--bs-warning-text-emphasis);
+	background-color: var(--bs-warning-bg-subtle);
+}
+
+.lf-v2 .lf-status--rejected {
+	color: var(--bs-danger-text-emphasis);
+	background-color: var(--bs-danger-bg-subtle);
+}
+
+.lf-v2 .lf-status--archived {
+	color: var(--bs-secondary-text-emphasis);
+	background-color: var(--bs-secondary-bg-subtle);
+}
+
+/* ---------- Section cards (numbered with a counter; hidden cards leave no gap) ---------- */
+.lf-v2 .lf-form {
+	counter-reset: lf-section;
+}
+
+.lf-v2 .lf-card {
+	counter-increment: lf-section;
+	margin-block-end: 1rem;
+	padding: 1.25rem 1.5rem .5rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 16px;
+	background-color: var(--bs-body-bg);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+}
+
+/* The category's own fields: no card until d.modal.category.js fills #cfContainer */
+.lf-v2 .lf-card--details:not(:has(#cfContainer > *)) {
+	display: none;
+}
+
+.lf-v2 .lf-card-head {
+	display: flex;
+	align-items: flex-start;
+	gap: .85rem;
+	margin-block-end: 1rem;
+}
+
+.lf-v2 .lf-card-num {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	font-size: .9rem;
+	font-weight: 800;
+	color: var(--bs-primary);
+	background-color: rgba(var(--bs-primary-rgb), .1);
+}
+
+.lf-v2 .lf-card-num::before {
+	content: counter(lf-section);
+}
+
+.lf-v2 .lf-card-heading {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.lf-v2 .lf-card-title {
+	margin: 0;
+	font-size: 1.1rem;
+	font-weight: 700;
+	line-height: 1.35;
+	color: var(--bs-emphasis-color);
+}
+
+.lf-v2 .lf-card-sub {
+	margin: .15rem 0 0;
+	font-size: .85rem;
+	color: var(--bs-secondary-color);
+}
+
+.lf-v2 .lf-card-body > [class*="col-md-8"] {
+	/* Fields read better full width inside a card */
+	width: 100%;
+}
+
+/* "More options" folds away */
+.lf-v2 details.lf-card > summary {
+	cursor: pointer;
+	list-style: none;
+}
+
+.lf-v2 details.lf-card > summary::-webkit-details-marker {
+	display: none;
+}
+
+.lf-v2 details.lf-card:not([open]) {
+	padding-block-end: .25rem;
+}
+
+.lf-v2 details.lf-card:not([open]) > summary {
+	margin-block-end: 1rem;
+}
+
+.lf-v2 .lf-card-chevron {
+	margin-block-start: .4rem;
+	color: var(--bs-secondary-color);
+	transition: transform .2s ease;
+}
+
+.lf-v2 details.lf-card[open] .lf-card-chevron {
+	transform: rotate(180deg);
+}
+
+/* ---------- Fields ---------- */
+body.page-listing-form .lf-v2 .form-control:focus,
+body.page-listing-form .lf-v2 .form-select:focus,
+body.page-listing-form .lf-v2 .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+body.page-listing-form .lf-v2 .select2-container--bootstrap-5.select2-container--open .select2-selection {
+	border-color: var(--bs-primary) !important;
+	box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), .35) !important;
+}
+
+body.page-listing-form .lf-v2 .form-control.is-invalid,
+body.page-listing-form .lf-v2 .is-invalid .select2-selection,
+body.page-listing-form .lf-v2 #catsContainer.is-invalid {
+	border-color: var(--bs-danger) !important;
+}
+
+.lf-v2 a:focus-visible,
+.lf-v2 button:focus-visible,
+.lf-v2 summary:focus-visible,
+.lf-v2 .btn:focus-visible,
+.lf-v2 .form-check-input:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+.lf-v2 .form-check-input {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.lf-v2 .form-switch .form-check-input {
+	width: 2.4rem;
+}
+
+/* Negotiable / hide phone: the whole label is the target, at least 44px tall */
+body.page-listing-form .lf-v2 .input-group .input-group-text:has(.lf-suffix-switch) {
+	flex: 0 0 auto;
+	width: auto; /* style.css gives the phone suffix 25% */
+	padding: 0;
+	overflow: visible;
+}
+
+.lf-v2 .lf-suffix-switch {
+	display: inline-flex;
+	align-items: center;
+	gap: .5rem;
+	min-height: 44px;
+	margin: 0;
+	padding-block: 0;
+	padding-inline: 2.9rem .9rem;
+	cursor: pointer;
+	font-size: .85rem;
+	font-weight: 600;
+	color: var(--bs-body-color);
+	white-space: nowrap;
+}
+
+body.page-listing-form .lf-v2 .input-group .lf-suffix-switch .form-check-input {
+	width: 2.4rem;
+	height: 1.25rem;
+	margin-block-start: 0;
+	cursor: pointer;
+	accent-color: auto;
+}
+
+.lf-v2 .lf-suffix-switch .form-check-label {
+	cursor: pointer;
+}
+
+/* Character counters (listing-form/counters.js) */
+.lf-v2 .lf-counter {
+	display: block;
+	margin-block-start: .25rem;
+	font-size: .78rem;
+	color: var(--bs-secondary-color);
+	text-align: end;
+	font-variant-numeric: tabular-nums;
+}
+
+.lf-v2 .lf-counter.is-near {
+	color: var(--bs-warning-text-emphasis);
+}
+
+.lf-v2 .lf-counter.is-over {
+	color: var(--bs-danger-text-emphasis);
+	font-weight: 700;
+}
+
+/* Inline errors and the summary (listing-form/validate.js) */
+.lf-v2 .lf-error {
+	display: block;
+	margin-block-start: .3rem;
+	font-size: .82rem;
+	font-weight: 600;
+	color: var(--bs-danger-text-emphasis);
+}
+
+.lf-v2 .lf-error-summary {
+	margin-block-end: 1rem;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--bs-danger-border-subtle);
+	border-radius: 12px;
+	color: var(--bs-danger-text-emphasis);
+	background-color: var(--bs-danger-bg-subtle);
+}
+
+.lf-v2 .lf-error-summary:focus {
+	outline: 2px solid var(--bs-danger);
+	outline-offset: 2px;
+}
+
+.lf-v2 .lf-error-summary p {
+	margin: 0 0 .4rem;
+	font-weight: 700;
+}
+
+.lf-v2 .lf-error-summary ul {
+	margin: 0;
+	padding-inline-start: 1.1rem;
+}
+
+.lf-v2 .lf-error-summary a {
+	color: inherit;
+	font-weight: 600;
+}
+
+/* ---------- Guest AI banner ---------- */
+.lf-v2 .lf-ai-banner {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: .5rem .75rem;
+	margin-block-end: 1rem;
+	padding: .75rem 1rem;
+	border: 1px solid rgba(var(--bs-primary-rgb), .25);
+	border-radius: 12px;
+	background-color: rgba(var(--bs-primary-rgb), .06);
+}
+
+.lf-v2 .lf-ai-banner-icon {
+	color: var(--bs-primary);
+}
+
+.lf-v2 .lf-ai-banner-text {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: .9rem;
+}
+
+.lf-v2 .lf-ai-banner-login {
+	flex: 0 0 auto;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.lf-v2 .lf-ai-banner-hide {
+	flex: 0 0 auto;
+	width: .75rem;
+	height: .75rem;
+	padding: .75rem;
+}
+
+/* ---------- Buttons: a sticky bar on phones ---------- */
+.lf-v2 .lf-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: .75rem;
+	margin-block: 1.5rem 1rem;
+}
+
+.lf-v2 .lf-actions-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	min-height: 44px;
+	margin-inline-end: auto;
+	padding: .4rem .9rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 999px;
+	font-size: .85rem;
+	font-weight: 600;
+	color: var(--bs-emphasis-color);
+	background-color: var(--bs-body-bg);
+}
+
+.lf-v2 .lf-actions-chip-count {
+	padding: .05rem .45rem;
+	border-radius: 999px;
+	font-size: .75rem;
+	font-weight: 700;
+	color: var(--bs-primary);
+	background-color: rgba(var(--bs-primary-rgb), .12);
+	font-variant-numeric: tabular-nums;
+}
+
+.lf-v2 .lf-actions-chip-count:empty {
+	display: none;
+}
+
+@media (max-width: 991.98px) {
+	.lf-v2 .lf-actions {
+		position: sticky;
+		inset-block-end: 0;
+		z-index: 1020;
+		margin-inline: calc(var(--bs-gutter-x, 1.5rem) * -.5);
+		padding: .65rem calc(var(--bs-gutter-x, 1.5rem) * .5);
+		border-top: 1px solid var(--bs-border-color);
+		background-color: var(--bs-body-bg);
+		box-shadow: 0 -8px 24px -16px rgba(0, 0, 0, .35);
+	}
+
+	body.page-listing-form .lf-v2 .lf-actions .btn-lg {
+		padding: .6rem 1.1rem;
+		font-size: .95rem;
+	}
+
+	.lf-v2 .lf-actions-submit {
+		flex: 1 1 auto;
+	}
+}
+
+@media (max-width: 575.98px) {
+	.lf-v2 .lf-card {
+		padding-inline: 1rem;
+	}
+	
+	/* Room for the phone number next to its "Hide" switch */
+	.lf-v2 .lf-suffix-switch {
+		gap: .35rem;
+		padding-inline: 2.85rem .6rem;
+	}
+
+	/* Icon and count only; screen readers still hear "Checklist" */
+	.lf-v2 .lf-actions-chip > span:not(.lf-actions-chip-count) {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+	}
+}
+
+/* ---------- Multi-step progress on phones (wizard partial) ---------- */
+.listing-steps-compact {
+	display: none;
+}
+
+@media (max-width: 767.98px) {
+	.listing-steps-compact {
+		display: block;
+		margin-block-start: .5rem;
+	}
+
+	.listing-steps-compact-text {
+		margin: 0 0 .35rem;
+		font-size: .85rem;
+		color: var(--bs-secondary-color);
+	}
+
+	.listing-steps-compact-text strong {
+		color: var(--bs-emphasis-color);
+	}
+
+	.listing-steps-compact-bar {
+		height: 6px;
+		border-radius: 999px;
+		background-color: var(--bs-tertiary-bg);
+		overflow: hidden;
+	}
+
+	.listing-steps-compact-bar > span {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background-color: var(--bs-primary);
+	}
+
+	/* The step names move to the line above; screen readers still read them in the list */
+	.listing-steps:has(~ .listing-steps-compact) .listing-step-text {
+		position: absolute !important;
+		width: 1px !important;
+		height: 1px !important;
+		overflow: hidden !important;
+		clip: rect(0, 0, 0, 0) !important;
+		white-space: nowrap !important;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.lf-v2 .lf-card-chevron {
+		transition: none;
+	}
+}
