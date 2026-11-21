@@ -1058,4 +1058,18 @@ return [
 	
 	// adniro: accessibility
 	'skip_to_content' => 'Перейти к основному содержимому',
+	
+	// adniro: trust and safety
+	'verified_seller' => 'Проверенный продавец',
+	'verified_seller_hint' => 'Этот продавец подтвердил свой адрес электронной почты.',
+	'seller_active_listings' => 'Активные объявления',
+	'tip_no_advance_payment' => 'Никогда не вносите предоплату и не платите заранее',
+	'tip_no_codes' => 'Никогда не сообщайте коды, пришедшие на телефон или почту',
+	'chat_safety_title' => 'Будьте осторожны:',
+	'chat_safety_text' => 'встречайтесь в людном месте, проверяйте товар до оплаты и никогда не вносите предоплату и не сообщайте коды из SMS.',
+	'chat_safety_link' => 'Советы по безопасности',
+	'mail_footer_help' => 'Помощь',
+	'mail_footer_safety' => 'Советы по безопасности',
+	'mail_footer_preferences' => 'Настройки писем',
+	'mail_footer_reason' => 'Вы получили это письмо, потому что у вас есть аккаунт или объявление на :appName.',
 ];

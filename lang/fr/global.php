@@ -1061,4 +1061,18 @@ return [
 	
 	// adniro: accessibility
 	'skip_to_content' => 'Aller au contenu principal',
+	
+	// adniro: trust and safety
+	'verified_seller' => 'Vendeur vérifié',
+	'verified_seller_hint' => 'Ce vendeur a confirmé son adresse e-mail.',
+	'seller_active_listings' => 'Annonces actives',
+	'tip_no_advance_payment' => 'N\'envoyez jamais d\'acompte et ne payez jamais à l\'avance',
+	'tip_no_codes' => 'Ne partagez jamais les codes reçus par téléphone ou par e-mail',
+	'chat_safety_title' => 'Restez prudent :',
+	'chat_safety_text' => 'rencontrez-vous dans un lieu public, vérifiez l\'article avant de payer, et n\'envoyez jamais d\'acompte ni les codes reçus sur votre téléphone.',
+	'chat_safety_link' => 'Conseils de sécurité',
+	'mail_footer_help' => 'Aide',
+	'mail_footer_safety' => 'Conseils de sécurité',
+	'mail_footer_preferences' => 'Préférences e-mail',
+	'mail_footer_reason' => 'Vous recevez cet e-mail parce que vous avez un compte ou une annonce sur :appName.',
 ];

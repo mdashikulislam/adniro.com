@@ -41,6 +41,13 @@
 				</div>
 			@else
 				{{-- Author Info (for Guests & Non-Owner Users) --}}
+				@php
+					// adniro: verified badge (email) and the seller's public listings
+					$trustSeller = !empty(data_get($post, 'user_id'))
+						? \App\Services\SellerService::findByUserId((int)data_get($post, 'user_id'))
+						: \App\Services\SellerService::find(data_get($post, 'guest_username'));
+					$trustListings = \App\Services\SellerService::liveListingsCount($trustSeller);
+				@endphp
 				<div class="seller-profile">
 					<div class="seller-avatar">
 						<img src="{{ data_get($post, 'user_photo_url') }}" alt="{{ data_get($post, 'contact_name') }}">
@@ -61,6 +68,11 @@
 								{{ data_get($post, 'contact_name') }}
 							@endif
 						</span>
+						@if (data_get($trustSeller, 'is_verified'))
+							<span class="seller-verified badge rounded-pill text-bg-success-subtle text-success-emphasis mt-1" title="{{ t('verified_seller_hint') }}">
+								<i class="bi bi-patch-check-fill"></i> {{ t('verified_seller') }}
+							</span>
+						@endif
 						@if (config('plugins.reviews.installed'))
 							@if (view()->exists('reviews::ratings-user'))
 								@include('reviews::ratings-user')
@@ -77,6 +89,16 @@
 							{{ data_get($post, 'city.name') }}
 						</a>
 					</li>
+					@if ($trustListings > 0)
+						<li>
+							<span class="seller-fact-label"><i class="bi bi-collection"></i> {{ t('seller_active_listings') }}</span>
+							@if (!empty($sellerUrl))
+								<a href="{{ $sellerUrl }}" class="seller-fact-value">{{ $trustListings }}</a>
+							@else
+								<span class="seller-fact-value">{{ $trustListings }}</span>
+							@endif
+						</li>
+					@endif
 					@if (!config('settings.listing_page.hide_date'))
 						@if (!empty($user) && !empty(data_get($user, 'created_at_formatted')))
 							<li>
@@ -253,6 +275,8 @@
 			t('Meet seller at a public place'),
 			t('Check the item before you buy'),
 			t('Pay only after collecting the item'),
+			t('tip_no_advance_payment'), // adniro
+			t('tip_no_codes'),           // adniro
 		];
 	@endphp
 	<div class="card sidebar-panel tips-panel">

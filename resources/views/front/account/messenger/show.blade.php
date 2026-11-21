@@ -139,6 +139,7 @@
                                 @include('front.account.messenger.partials.sidebar')
                                 
                                 <div class="col-md-9 col-lg-10">
+                                    @include('front.account.messenger.partials.safety-banner') {{-- adniro --}}
                                     <div class="p-0 m-0 message-chat">
                                         <div class="container mx-0 border rounded bg-body pb-3 mb-3">
                                             <div id="messageChatHistory" class="container mt-3 overflow-y-auto" id="listMessages" style="max-height: 550px;">

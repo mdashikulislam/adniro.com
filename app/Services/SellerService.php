@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Country;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\Ai\Moderation\ModerationStatus;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -102,9 +103,26 @@ class SellerService
 			'cover_url'    => !empty($user->cover_path) ? fileUrl($user->cover_path) : null,
 			'about'        => trim(strip_tags((string)$user->about)),
 			'since'        => !empty($since) ? Carbon::parse($since) : null,
-			'is_verified'  => (!empty($user->email_verified_at) && !empty($user->phone_verified_at)),
+			'is_verified'  => self::isVerifiedSeller($user),
 			'country_code' => $user->country_code,
 		];
+	}
+	
+	/**
+	 * The "Verified seller" badge: a confirmed email address (adniro: the owner chose email-only
+	 * verification; phone verification needs an SMS provider). Login rules use isVerifiedUser().
+	 */
+	public static function isVerifiedSeller(User $user): bool
+	{
+		return !empty($user->email_verified_at);
+	}
+	
+	/**
+	 * Listings of the seller that the public can see.
+	 */
+	public static function liveListingsCount(?array $seller): int
+	{
+		return empty($seller) ? 0 : (int)self::liveListings($seller)->count();
 	}
 	
 	/**
@@ -236,7 +254,13 @@ class SellerService
 			->whereNull('archived_at')
 			->whereNull('deleted_at')
 			->whereNotNull('email_verified_at')
-			->whereNotNull('phone_verified_at');
+			->whereNotNull('phone_verified_at')
+			// adniro: listings held by moderation or waiting for review are not public
+			->where(fn ($q) => $q->whereNull('moderation_status')->orWhereIn('moderation_status', ['', ModerationStatus::APPROVED]));
+		
+		if (config('settings.listing_form.listings_review_activation') == '1') {
+			$query->whereNotNull('reviewed_at');
+		}
 		
 		if (!empty($seller['user_id'])) {
 			return $query->where('user_id', $seller['user_id']);

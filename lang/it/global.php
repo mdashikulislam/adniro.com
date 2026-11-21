@@ -1061,4 +1061,18 @@ Usa immagini reali del tuo prodotto, non cataloghi.',
 	
 	// adniro: accessibility
 	'skip_to_content' => 'Vai al contenuto principale',
+	
+	// adniro: trust and safety
+	'verified_seller' => 'Venditore verificato',
+	'verified_seller_hint' => 'Questo venditore ha confermato il suo indirizzo email.',
+	'seller_active_listings' => 'Annunci attivi',
+	'tip_no_advance_payment' => 'Non inviare mai un acconto e non pagare mai in anticipo',
+	'tip_no_codes' => 'Non condividere mai i codici ricevuti via telefono o email',
+	'chat_safety_title' => 'Resta al sicuro:',
+	'chat_safety_text' => 'incontratevi in un luogo pubblico, controlla l\'articolo prima di pagare e non inviare mai acconti né condividere i codici ricevuti sul telefono.',
+	'chat_safety_link' => 'Consigli di sicurezza',
+	'mail_footer_help' => 'Aiuto',
+	'mail_footer_safety' => 'Consigli di sicurezza',
+	'mail_footer_preferences' => 'Preferenze email',
+	'mail_footer_reason' => 'Ricevi questa email perché hai un account o un annuncio su :appName.',
 ];

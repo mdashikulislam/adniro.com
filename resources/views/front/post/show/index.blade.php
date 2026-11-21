@@ -183,6 +183,12 @@
 								</ul>
 								<div class="listing-ref">
 									<i class="bi bi-upc-scan"></i> {{ t('reference') }}: <span>{{ data_get($post, 'reference') }}</span>
+									{{-- adniro: report link next to the price and reference, for everyone but the owner --}}
+									@if (!auth()->check() || (string)auth()->id() !== (string)data_get($post, 'user_id'))
+										<a href="{{ urlGen()->reportPost($post) }}" class="listing-report-link ms-2 link-secondary small" rel="nofollow">
+											<i class="bi bi-flag"></i> {{ t('Report abuse') }}
+										</a>
+									@endif
 								</div>
 								
 							</div>

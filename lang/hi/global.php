@@ -1053,4 +1053,18 @@ return [
 	
 	// adniro: accessibility
 	'skip_to_content' => 'मुख्य सामग्री पर जाएं',
+	
+	// adniro: trust and safety
+	'verified_seller' => 'सत्यापित विक्रेता',
+	'verified_seller_hint' => 'इस विक्रेता ने अपना ईमेल पता सत्यापित किया है।',
+	'seller_active_listings' => 'सक्रिय विज्ञापन',
+	'tip_no_advance_payment' => 'कभी भी अग्रिम राशि या एडवांस भुगतान न भेजें',
+	'tip_no_codes' => 'फ़ोन या ईमेल पर आए कोड कभी साझा न करें',
+	'chat_safety_title' => 'सुरक्षित रहें:',
+	'chat_safety_text' => 'किसी सार्वजनिक जगह पर मिलें, भुगतान से पहले सामान जाँचें, और कभी अग्रिम राशि न भेजें या फ़ोन पर आए कोड साझा न करें।',
+	'chat_safety_link' => 'सुरक्षा सुझाव',
+	'mail_footer_help' => 'सहायता',
+	'mail_footer_safety' => 'सुरक्षा सुझाव',
+	'mail_footer_preferences' => 'ईमेल प्राथमिकताएँ',
+	'mail_footer_reason' => 'आपको यह ईमेल इसलिए मिला है क्योंकि :appName पर आपका खाता या विज्ञापन है।',
 ];

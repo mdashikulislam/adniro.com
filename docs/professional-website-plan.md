@@ -214,6 +214,16 @@ Most important first:
 - **Small items.** Favicon, app icon and `manifest.json`. Make the login nudge smaller, and keep it from covering content.
 
 ### Phase 4: trust and safety (4 to 6 days)
+
+> **Status, 21 Nov 2026: done except the messenger restyle, with tests (215 passing).**
+> - **Seller card:** "Verified seller" badge for a confirmed email (decision 2; login rules unchanged), and "Active listings" counting only listings the public can see. Moderation-held and unreviewed listings no longer count on seller pages either.
+> - **Safety:** two more tips on listings (no deposits, never share codes); "Know more" now works. A "Report abuse" link sits next to the reference under the price.
+> - **Safety page:** the anti-scam page is the site's "tips" page with a current guide (migration; owner-edited text would be kept; English only, other languages show it until translated).
+> - **Messages:** a short safety reminder at the top of every conversation and in the "Send a message" popup.
+> - **Emails:** brand colour (theme `adniro`), logo with alt text, and Help, Safety tips and Email preferences links plus a "why you got this" line.
+> - New texts in all 9 languages; "Verified seller" was English only before.
+>
+> Not done: the messenger restyle. It needs a signed-in look at the inbox and conversations; sign in on the local site in the browser pane and it can be done next.
 - **Seller card.** A verified badge, "member since" and an active listing count on the listing page.
 - **Safety and reporting.** A safety tips card that links to a rewritten anti-scam page, and a "Report" link next to the price.
 - **Messages.** Restyle the messenger, with a safety banner in each conversation.

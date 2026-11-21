@@ -1055,4 +1055,18 @@ return [
 	
 	// adniro: accessibility
 	'skip_to_content' => 'انتقل إلى المحتوى الرئيسي',
+	
+	// adniro: trust and safety
+	'verified_seller' => 'بائع موثّق',
+	'verified_seller_hint' => 'أكّد هذا البائع عنوان بريده الإلكتروني.',
+	'seller_active_listings' => 'الإعلانات النشطة',
+	'tip_no_advance_payment' => 'لا ترسل عربونًا ولا تدفع مقدمًا أبدًا',
+	'tip_no_codes' => 'لا تشارك أبدًا الرموز المرسلة إلى هاتفك أو بريدك',
+	'chat_safety_title' => 'ابقَ آمنًا:',
+	'chat_safety_text' => 'التقِ في مكان عام، وافحص السلعة قبل الدفع، ولا ترسل عربونًا أو تشارك الرموز المرسلة إلى هاتفك أبدًا.',
+	'chat_safety_link' => 'نصائح الأمان',
+	'mail_footer_help' => 'مساعدة',
+	'mail_footer_safety' => 'نصائح الأمان',
+	'mail_footer_preferences' => 'تفضيلات البريد',
+	'mail_footer_reason' => 'تتلقى هذه الرسالة لأن لديك حسابًا أو إعلانًا على :appName.',
 ];

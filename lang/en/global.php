@@ -1227,4 +1227,17 @@ return [
 	
 	// adniro: accessibility
 	'skip_to_content' => 'Skip to main content',
+	
+	// adniro: trust and safety
+	'verified_seller_hint' => 'This seller confirmed their email address.',
+	'seller_active_listings' => 'Active listings',
+	'tip_no_advance_payment' => 'Never send a deposit or pay in advance',
+	'tip_no_codes' => 'Never share codes sent to your phone or email',
+	'chat_safety_title' => 'Stay safe:',
+	'chat_safety_text' => 'meet in a public place, check the item before you pay, and never send a deposit or share codes sent to your phone.',
+	'chat_safety_link' => 'Safety tips',
+	'mail_footer_help' => 'Help',
+	'mail_footer_safety' => 'Safety tips',
+	'mail_footer_preferences' => 'Email preferences',
+	'mail_footer_reason' => 'You are receiving this email because you have an account or a listing on :appName.',
 ];

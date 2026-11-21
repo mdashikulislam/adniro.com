@@ -144,7 +144,7 @@ return [
 	*/
 	
 	'markdown' => [
-		'theme' => 'default',
+		'theme' => env('MAIL_MARKDOWN_THEME', 'adniro'), // adniro: brand colours (resources/views/vendor/mail/html/themes/adniro.css)
 		
 		'paths' => [
 			resource_path('views/vendor/mail'),

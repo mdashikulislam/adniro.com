@@ -1053,4 +1053,18 @@ return [
 	
 	// adniro: accessibility
 	'skip_to_content' => 'মূল বিষয়বস্তুতে যান',
+	
+	// adniro: trust and safety
+	'verified_seller' => 'যাচাইকৃত বিক্রেতা',
+	'verified_seller_hint' => 'এই বিক্রেতা তার ইমেইল ঠিকানা নিশ্চিত করেছেন।',
+	'seller_active_listings' => 'সক্রিয় বিজ্ঞাপন',
+	'tip_no_advance_payment' => 'কখনো অগ্রিম টাকা বা ডিপোজিট পাঠাবেন না',
+	'tip_no_codes' => 'ফোন বা ইমেইলে পাঠানো কোড কখনো কাউকে দেবেন না',
+	'chat_safety_title' => 'নিরাপদ থাকুন:',
+	'chat_safety_text' => 'জনবহুল জায়গায় দেখা করুন, টাকা দেওয়ার আগে পণ্য দেখে নিন, আর কখনো অগ্রিম টাকা পাঠাবেন না বা ফোনে আসা কোড শেয়ার করবেন না।',
+	'chat_safety_link' => 'নিরাপত্তা পরামর্শ',
+	'mail_footer_help' => 'সাহায্য',
+	'mail_footer_safety' => 'নিরাপত্তা পরামর্শ',
+	'mail_footer_preferences' => 'ইমেইল পছন্দসমূহ',
+	'mail_footer_reason' => 'আপনি এই ইমেইলটি পাচ্ছেন কারণ :appName-এ আপনার একটি অ্যাকাউন্ট বা বিজ্ঞাপন আছে।',
 ];

@@ -21,6 +21,7 @@
 				</div>
 				
 				<div class="modal-body">
+					@include('front.account.messenger.partials.safety-banner') {{-- adniro --}}
 					@if (isset($errors) && $errors->any() && old('messageForm')=='1')
 						<div class="alert alert-danger alert-dismissible">
 							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('Close') }}"></button>
