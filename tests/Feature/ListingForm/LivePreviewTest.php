@@ -12,8 +12,7 @@ use Tests\TestCase;
 class LivePreviewTest extends TestCase
 {
 	private const NEW_KEYS = [
-		'live_title', 'live_view', 'live_feed', 'live_detail', 'live_title_empty',
-		'live_just_now', 'live_photo_next', 'live_photo_below', 'live_description_empty',
+		'live_title', 'live_title_empty', 'live_just_now', 'live_photo_next', 'live_photo_below', 'live_photo_here',
 	];
 
 	public function test_the_preview_comes_after_the_listing_quality_card(): void
@@ -23,14 +22,14 @@ class LivePreviewTest extends TestCase
 
 		// Assert
 		$quality = strpos($html, 'data-lf-strength');
-		$live = strpos($html, 'data-lf-live ');
+		$live = strpos($html, 'aria-labelledby="lfLiveTitle"');
 		$this->assertNotFalse($live, 'the live preview');
 		$this->assertGreaterThan($quality, $live, 'after listing quality');
 		$this->assertStringNotContainsString('lf-preview-card', $html, 'the old small preview is gone');
 		$this->assertStringContainsString('lf-tips', $html, 'the details step keeps the selling tips');
 	}
 
-	public function test_the_feed_view_is_the_sites_own_listing_card(): void
+	public function test_the_preview_is_the_sites_own_listing_card(): void
 	{
 		// Act
 		$html = $this->renderPanel(false);
@@ -41,29 +40,15 @@ class LivePreviewTest extends TestCase
 		}
 	}
 
-	public function test_the_detail_view_is_the_sites_own_listing_page(): void
+	public function test_only_the_listing_card_is_shown(): void
 	{
 		// Act
 		$html = $this->renderPanel(false);
 
-		// Assert: the classes of front/post/show/index.blade.php and its details partials, in the page's order
-		$order = ['listing-header', 'listing-chip-cat', 'listing-price-card', 'listing-title', 'listing-meta', 'listing-gallery', 'listing-description', 'listing-tags', 'listing-specs'];
-		$positions = array_map(fn ($class) => strpos($html, $class), $order);
-		$this->assertNotContains(false, $positions, implode(', ', $order));
-		$sorted = $positions;
-		sort($sorted);
-		$this->assertSame($sorted, $positions, 'same order as the listing page');
-		$this->assertStringContainsString(e(t('Additional Details')), $html);
-	}
-
-	public function test_the_preview_switches_between_the_card_and_the_page(): void
-	{
-		// Act
-		$html = $this->renderPanel(false);
-
-		// Assert
-		$this->assertMatchesRegularExpression('/<button[^>]*data-lf-view="feed"[^>]*aria-pressed="true"/', $html);
-		$this->assertMatchesRegularExpression('/<button[^>]*data-lf-view="detail"[^>]*aria-pressed="false"/', $html);
+		// Assert: no detail view, and no switch between views
+		$this->assertStringNotContainsString('data-lf-view', $html);
+		$this->assertStringNotContainsString('listing-header', $html);
+		$this->assertStringNotContainsString('listing-specs', $html);
 	}
 
 	public function test_the_photo_area_says_where_photos_are_added_in_each_form_mode(): void
@@ -101,8 +86,8 @@ class LivePreviewTest extends TestCase
 		// Arrange
 		$script = file_get_contents(public_path('assets/js/app/listing-form/preview.js'));
 
-		// Assert: custom fields (also through select2), tags, photos, and the view switch
-		foreach (['#cfContainer', "select[name=\"tags[]\"]", '#lfSection-photos', 'listing-spec-label', 'data-lf-view', 'aria-pressed'] as $hook) {
+		// Assert: the form state, and the photos on the page
+		foreach (['LF.onChange(draw)', '#lfSection-photos', 'data-lf-live'] as $hook) {
 			$this->assertStringContainsString($hook, $script, $hook);
 		}
 		$this->assertStringNotContainsString('innerHTML', $script, 'typed text is never read as HTML');

@@ -114,18 +114,14 @@
 			@endunless
 		</section>
 
-		{{-- Live buyer preview: the site's own listing card (search results) and listing page, filled from the form
-		     as the seller types (listing-form/preview.js; text only) --}}
-		<section class="lf-panel-card lf-live" aria-labelledby="lfLiveTitle" data-lf-live data-view="feed"
+		{{-- Live buyer preview: the site's own listing card, as in search results, filled from the form as the
+		     seller types (listing-form/preview.js; text only) --}}
+		<section class="lf-panel-card lf-live" aria-labelledby="lfLiveTitle" data-lf-live
 		         data-lf-cover="{{ $previewCover }}">
 			<div class="lf-live-head">
 				<h2 class="lf-panel-heading lf-live-heading" id="lfLiveTitle">
 					<span class="lf-live-dot" aria-hidden="true"></span>{{ trans('listing_form.live_title') }}
 				</h2>
-				<div class="lf-live-switch" role="group" aria-label="{{ trans('listing_form.live_view') }}">
-					<button type="button" class="is-active" data-lf-view="feed" aria-pressed="true">{{ trans('listing_form.live_feed') }}</button>
-					<button type="button" data-lf-view="detail" aria-pressed="false">{{ trans('listing_form.live_detail') }}</button>
-				</div>
 			</div>
 
 			<div class="lf-live-stage" aria-hidden="true">
@@ -158,75 +154,6 @@
 						</div>
 					</div>
 				</article>
-
-				{{-- Detail: the listing page's main column (front/post/show/index.blade.php and partials/details), scaled down --}}
-				<div class="lf-live-page">
-					<div class="listing-main">
-						<header class="listing-header">
-							<div class="listing-header-top">
-								<div class="listing-chips">
-									<span class="listing-chip listing-chip-cat">
-										<i class="bi bi-folder-fill"></i> <span data-lf-live="page-category">{{ trans('listing_form.preview_category') }}</span>
-									</span>
-								</div>
-								<div class="listing-price-card" data-lf-live-price-card>
-									<span class="listing-price-icon"><i class="bi bi-tag-fill"></i></span>
-									<span class="listing-price-body">
-										<span class="listing-price-value">
-											<span data-lf-live="page-price">{{ trans('listing_form.preview_price') }}</span>
-											<span class="listing-price-negotiable" data-lf-live="negotiable" hidden>{{ t('negotiable') }}</span>
-										</span>
-									</span>
-								</div>
-							</div>
-							<h3 class="listing-title" data-lf-live="page-title">{{ trans('listing_form.live_title_empty') }}</h3>
-							<div class="listing-header-bottom">
-								<ul class="listing-meta list-unstyled">
-									<li class="listing-meta-city"><i class="bi bi-geo-alt-fill"></i> <span data-lf-live="page-city">{{ trans('listing_form.preview_city') }}</span></li>
-									<li><i class="bi bi-clock"></i> {{ trans('listing_form.live_just_now') }}</li>
-								</ul>
-							</div>
-						</header>
-
-						<div class="listing-gallery">
-							<div class="gallery-container lf-live-gallery">
-								<img alt="" data-lf-live-page-photo hidden>
-								<div class="lf-live-empty" data-lf-live-page-empty>
-									<span class="lf-live-empty-icon"><i class="bi bi-image"></i></span>
-									<span>{{ $previewPhotoHint }}</span>
-								</div>
-							</div>
-						</div>
-
-						<div class="items-details listing-details">
-							<div class="tab-content listing-panel">
-								<div class="items-details-info">
-									<section class="listing-section">
-										<h4 class="listing-section-title">
-											<span class="listing-section-icon"><i class="bi bi-card-text"></i></span>
-											{{ t('Description') }}
-										</h4>
-										<div class="listing-description" data-lf-live="description">{{ trans('listing_form.live_description_empty') }}</div>
-									</section>
-									<section class="listing-section" data-lf-live-tags-section hidden>
-										<h4 class="listing-section-title">
-											<span class="listing-section-icon"><i class="bi bi-tags"></i></span>
-											{{ t('Tags') }}
-										</h4>
-										<div class="listing-tags" data-lf-live-tags></div>
-									</section>
-									<section class="listing-section" data-lf-live-specs-section hidden>
-										<h4 class="listing-section-title">
-											<span class="listing-section-icon"><i class="bi bi-list-check"></i></span>
-											{{ t('Additional Details') }}
-										</h4>
-										<div class="listing-specs" data-lf-live-specs></div>
-									</section>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
 		</section>
 

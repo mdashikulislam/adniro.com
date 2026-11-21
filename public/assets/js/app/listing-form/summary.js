@@ -59,8 +59,6 @@
 		onChange: (listener) => listener(state()),
 		rawValue: () => '',
 		byName: () => null,
-		details: () => (saved.details || []).slice(),
-		tags: () => (saved.tags || []).slice(),
 		focusTarget: focusTarget,
 	};
 })(window, document);

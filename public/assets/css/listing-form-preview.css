@@ -1,8 +1,7 @@
 /*
  * adniro: the live buyer preview in the listing form's side panel (form/panel.blade.php, listing-form/preview.js).
- * The card and the page are the site's own (.listing-card and .listing-* from resources/css/front/custom.css);
- * this file only adapts them to the panel: the header and view switch, no hover, a photo placeholder,
- * and the listing page shrunk to the panel's width.
+ * The card is the site's own (.listing-card from resources/css/front/custom.css); this file only adapts it
+ * to the panel: the header, no hover, and a photo placeholder.
  */
 
 .lf-live {
@@ -15,7 +14,7 @@
 	box-shadow: none;
 }
 
-/* Header: title with a live dot, and the view switch */
+/* Header: title with a live dot */
 .lf-live-head {
 	display: flex;
 	flex-wrap: wrap;
@@ -41,49 +40,12 @@
 	box-shadow: 0 0 0 3px rgba(var(--bs-success-rgb), .18);
 }
 
-.lf-live-switch {
-	display: inline-flex;
-	padding: 3px;
-	border: 1px solid var(--bs-border-color);
-	border-radius: 12px;
-	background-color: var(--bs-tertiary-bg);
-}
-
-.lf-live-switch button {
-	min-height: 32px;
-	padding: .2rem .65rem;
-	border: 0;
-	border-radius: 9px;
-	font-size: .75rem;
-	font-weight: 600;
-	color: var(--bs-secondary-color);
-	background: transparent;
-	transition: background-color .15s ease, color .15s ease;
-}
-
-.lf-live-switch button.is-active {
-	color: var(--bs-emphasis-color);
-	background-color: var(--bs-body-bg);
-	box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
-}
-
-.lf-live-switch button:focus-visible {
-	outline: 2px solid var(--bs-primary);
-	outline-offset: 1px;
-}
-
-/* Only one of the two is shown */
-.lf-live:not([data-view="detail"]) .lf-live-page,
-.lf-live[data-view="detail"] .lf-live-feed {
-	display: none;
-}
-
 .lf-live-stage {
 	pointer-events: none;
 	user-select: none;
 }
 
-/* ---------- Feed: the listing card, as in search results ---------- */
+/* ---------- The listing card, as in search results ---------- */
 .lf-live-feed.listing-card {
 	height: auto;
 }
@@ -120,8 +82,7 @@
 }
 
 .lf-live-empty[hidden],
-.lf-live [data-lf-live-photo][hidden],
-.lf-live [data-lf-live-page-photo][hidden] {
+.lf-live [data-lf-live-photo][hidden] {
 	display: none;
 }
 
@@ -140,50 +101,4 @@
 /* The placeholder needs no darkening gradient; keep it for real photos */
 .lf-live-feed .listing-card-media:has(.lf-live-empty:not([hidden]))::after {
 	display: none;
-}
-
-/* ---------- Detail: the listing page's main column, shrunk to the panel ---------- */
-.lf-live-page {
-	/* lays the page out at about a phone's width, then scales it to the panel */
-	zoom: .6;
-}
-
-.lf-live-page .listing-title {
-	overflow-wrap: anywhere;
-}
-
-.lf-live-gallery {
-	aspect-ratio: 4 / 3;
-	overflow: hidden;
-}
-
-.lf-live-gallery img {
-	display: block;
-	width: 100%;
-	height: 100%;
-	border-radius: 14px;
-	object-fit: cover;
-}
-
-.lf-live-gallery .lf-live-empty {
-	border-radius: 14px;
-	font-size: 1.1rem;
-}
-
-.lf-live-page .listing-description {
-	white-space: pre-line;
-	overflow-wrap: anywhere;
-}
-
-.lf-live-page [data-lf-live-price-card][hidden],
-.lf-live-page [data-lf-live-tags-section][hidden],
-.lf-live-page [data-lf-live-specs-section][hidden],
-.lf-live-page .listing-price-negotiable[hidden] {
-	display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.lf-live-switch button {
-		transition: none;
-	}
 }

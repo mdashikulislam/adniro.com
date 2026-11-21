@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 /*
  * The multi-step Photos step shows the same side panel as the details step (adniro): listing quality,
- * the live buyer preview and the tips, filled from the details saved in step 1, with photos scored live.
+ * the live buyer preview (not the selling tips), filled from the details saved in step 1, with photos scored live.
  */
 
 class PhotosStepPanelTest extends TestCase
@@ -37,8 +37,8 @@ class PhotosStepPanelTest extends TestCase
 
 	public function test_the_create_photos_step_shows_quality_and_preview_from_step_one(): void
 	{
-		// Arrange: step 1 saved a car with a brand
-		[$categoryId, $brandFieldId, $toyotaId] = $this->carWithBrand();
+		// Arrange: step 1 saved a car
+		$categoryId = (int)DB::table('categories')->whereNotNull('parent_id')->where('active', 1)->value('id');
 		$cityId = (int)DB::table('cities')->value('id');
 
 		// Act
@@ -46,7 +46,6 @@ class PhotosStepPanelTest extends TestCase
 			->withSession(['postInput' => [
 				'category_id' => $categoryId, 'title' => 'Toyota Corolla 2019', 'description' => '<p>One owner.</p><p>Full service history.</p>',
 				'price' => '14500', 'negotiable' => '1', 'city_id' => $cityId, 'contact_name' => 'Rafi', 'email' => 'rafi@example.test',
-				'tags' => ['corolla', 'toyota'], 'cf' => [$brandFieldId => $toyotaId],
 			]])
 			->get('/posts/create/photos');
 
@@ -59,11 +58,10 @@ class PhotosStepPanelTest extends TestCase
 		$this->assertTrue($state['state']['negotiable']);
 		$this->assertSame('Springfield', $state['state']['cityName']);
 		$this->assertSame('rafi@example.test', $state['state']['email']);
-		$this->assertSame(['corolla', 'toyota'], $state['tags']);
-		$this->assertContains('Toyota', array_merge(...array_column($state['details'], 'values')));
+		$this->assertNotSame('', $state['state']['categoryName']);
 		$this->assertStringEndsWith('/posts/create', $state['backUrl'], 'rows for step 1 fields go back to step 1');
 		$html = $response->getContent();
-		foreach (['data-lf-strength', 'data-lf-live ', 'data-lf-check="photos"', 'id="lfSection-photos"'] as $part) {
+		foreach (['data-lf-strength', 'aria-labelledby="lfLiveTitle"', 'data-lf-check="photos"', 'id="lfSection-photos"'] as $part) {
 			$this->assertStringContainsString($part, $html, $part);
 		}
 		$this->assertStringNotContainsString('offcanvas-lg', $html, 'on this page the panel sits under the photos on phones');
@@ -118,26 +116,7 @@ class PhotosStepPanelTest extends TestCase
 		$this->assertSame(0, $state['state']['categoryId']);
 		$this->assertSame('', $state['state']['title']);
 		$this->assertTrue($state['state']['priceShown']);
-		$this->assertSame([], $state['details']);
-		$this->assertSame([], $state['tags']);
-	}
-
-	/**
-	 * A category with its own "Car Brand" select field and a "Toyota" option. Created here, since the stock
-	 * links between categories and fields use fixed ids that other tests' reseeding moves.
-	 *
-	 * @return array{0: int, 1: int, 2: int} the category id, the field id and the option id
-	 */
-	private function carWithBrand(): array
-	{
-		$categoryId = (int)DB::table('categories')->whereNotNull('parent_id')->where('active', 1)->value('id');
-		$fieldId = DB::table('fields')->insertGetId([
-			'belongs_to' => 'posts', 'name' => json_encode(['en' => 'Car Brand']), 'type' => 'select', 'active' => 1,
-		]);
-		$optionId = DB::table('fields_options')->insertGetId(['field_id' => $fieldId, 'value' => json_encode(['en' => 'Toyota'])]);
-		DB::table('category_field')->insert(['category_id' => $categoryId, 'field_id' => $fieldId, 'disabled_in_subcategories' => 0]);
-
-		return [$categoryId, $fieldId, $optionId];
+		$this->assertSame('', $state['state']['cityName']);
 	}
 
 	private function panelState(TestResponse $response): array
