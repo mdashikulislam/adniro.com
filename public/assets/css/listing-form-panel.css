@@ -319,8 +319,6 @@
 
 .lf-check.is-done .lf-check-text {
 	color: var(--bs-emphasis-color);
-	text-decoration: line-through;
-	text-decoration-color: var(--bs-secondary-color);
 }
 
 .lf-check-worth {
