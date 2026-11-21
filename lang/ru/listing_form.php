@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'Только что',
 	'live_photo_next'    => 'Обложка: добавляется на следующем шаге',
 	'live_photo_below'   => 'Добавьте фото ниже: первое станет обложкой',
+	'live_photo_here'    => 'Добавьте фото: первое станет обложкой',
 	'live_description_empty' => 'Здесь появится ваше описание.',
 	'check_category'     => 'Категория выбрана',
 	'check_title'        => 'Понятный заголовок ({min}–{max} символов)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'Цена указана',
 	'check_city'         => 'Город выбран',
 	'check_contact'      => 'Контакты указаны',
+	'check_photos'       => 'Фото добавлены ({min}+)',
 	'check_done'         => 'Готово',
 	'check_todo'         => 'Осталось',
 	'strength'           => 'Оценка качества объявления',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'Покупатели ищут рядом с собой',
 	'hint_contact_todo'  => 'Эл. почта или номер телефона',
 	'hint_contact_done'  => 'Покупатели смогут с вами связаться',
+	'hint_photos_empty'  => 'Первое фото станет обложкой',
+	'hint_photos_more'   => 'Ещё {count} для полной галереи',
+	'hint_photos_good'   => 'Хорошая галерея',
 	'tips'               => 'Советы, как продать быстрее',
 
 	// Checks while filling in

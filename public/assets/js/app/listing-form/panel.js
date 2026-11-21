@@ -20,6 +20,8 @@
 	const strength = document.querySelector('[data-lf-strength]');
 	const items = Array.from(document.querySelectorAll('[data-lf-check]'));
 	const chipCounts = document.querySelectorAll('[data-lf-progress-count]');
+	const photosSection = document.getElementById('lfSection-photos');
+	const PHOTO_THUMB = '.file-preview-thumbnails .kv-preview-thumb';
 
 	/** A hint from strength-score.js: a translation key with values, or a literal text (a chosen name) */
 	function hintText(hint) {
@@ -31,7 +33,7 @@
 
 	/** Row labels carry the good-length targets, e.g. "Clear title (15–80 characters)" */
 	function labelText(key, limits) {
-		return LF.text('check_' + key, {min: key === 'title' ? limits.titleMin : limits.descriptionMin, max: limits.titleMax});
+		return LF.text('check_' + key, {min: {title: limits.titleMin, photos: limits.photosMin}[key] || limits.descriptionMin, max: limits.titleMax});
 	}
 
 	function drawItem(element, entry, limits) {
@@ -59,11 +61,19 @@
 		meter.setAttribute('aria-valuetext', result.score + '%, ' + tierLabel);
 	}
 
+	/** Photos added so far; undefined where the panel has no photos row (photos are added on another step) */
+	function photoCount() {
+		return photosSection ? photosSection.querySelectorAll(PHOTO_THUMB).length : undefined;
+	}
+
 	function update(state) {
 		if (!strength || !Strength) {
 			return;
 		}
-		const result = Strength.score(state, cfg);
+		const scored = items.some((element) => element.dataset.lfCheck === 'photos')
+			? Object.assign({}, state, {photoCount: photoCount()})
+			: state;
+		const result = Strength.score(scored, cfg);
 		items.forEach((element) => drawItem(element, result.items.find((entry) => entry.key === element.dataset.lfCheck), result.limits));
 		drawScore(result);
 		chipCounts.forEach((chip) => {
@@ -72,6 +82,12 @@
 	}
 
 	LF.onChange(update);
+
+	/* Adding or removing a photo changes no form field that LF watches */
+	if (photosSection && window.MutationObserver) {
+		new MutationObserver(() => window.requestAnimationFrame(() => update(LF.state())))
+			.observe(photosSection, {childList: true, subtree: true});
+	}
 
 	/* An item takes you to its field; on phones the sheet closes first */
 	document.addEventListener('click', (event) => {

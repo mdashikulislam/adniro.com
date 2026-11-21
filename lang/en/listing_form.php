@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'Just now',
 	'live_photo_next'    => 'Cover photo: added on the next step',
 	'live_photo_below'   => 'Add photos below: the first one is the cover',
+	'live_photo_here'    => 'Add photos: the first one is the cover',
 	'live_description_empty' => 'Your description appears here.',
 	'check_category'     => 'Category selected',
 	'check_title'        => 'Clear title ({min}–{max} characters)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'Price set',
 	'check_city'         => 'City selected',
 	'check_contact'      => 'Contact details added',
+	'check_photos'       => 'Photos added ({min}+)',
 	'check_done'         => 'Done',
 	'check_todo'         => 'To do',
 	'strength'           => 'Listing quality score',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'Buyers search near them',
 	'hint_contact_todo'  => 'An email or phone number',
 	'hint_contact_done'  => 'Buyers can reach you',
+	'hint_photos_empty'  => 'The first photo is the cover',
+	'hint_photos_more'   => '{count} more for a full gallery',
+	'hint_photos_good'   => 'Good gallery',
 	'tips'               => 'Tips to sell faster',
 
 	// Checks while filling in

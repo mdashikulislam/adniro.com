@@ -121,6 +121,9 @@
 	}
 
 	function chosenDetails() {
+		if (typeof LF.details === 'function') {
+			return LF.details(); // the Photos step: the details saved in step 1 (summary.js)
+		}
 		if (!customFields) {
 			return [];
 		}
@@ -158,6 +161,9 @@
 	// ---------- tags (the "More options" section) ----------
 
 	function chosenTags() {
+		if (typeof LF.tags === 'function') {
+			return LF.tags();
+		}
 		const field = LF.byName('tags[]');
 		if (!field) {
 			return [];

@@ -8,12 +8,13 @@
 (function (root) {
 	'use strict';
 
-	const WEIGHTS = {category: 15, title: 20, description: 25, price: 15, city: 15, contact: 10};
+	const WEIGHTS = {category: 15, title: 20, description: 25, photos: 15, price: 15, city: 15, contact: 10};
 	const TITLE_GOOD_MIN = 15;
 	const TITLE_GOOD_MAX = 80;
 	const TITLE_SHORT_SHARE = 0.5; // a too-short title earns up to half its points
 	const TITLE_LONG_SHARE = 0.7;  // a too-long title still earns most of them
 	const DESCRIPTION_GOOD = 200;
+	const PHOTOS_GOOD = 3;
 	const TIER_MINIMUMS = [['strong', 75], ['fair', 40], ['weak', 0]];
 
 	/**
@@ -32,6 +33,7 @@
 			titleMin: titleMin,
 			titleMax: Math.max(titleMin, Math.min(TITLE_GOOD_MAX, Number(config.titleMax) || TITLE_GOOD_MAX)),
 			descriptionMin: Math.max(DESCRIPTION_GOOD, Number(config.descriptionMin) || 0),
+			photosMin: PHOTOS_GOOD,
 		};
 	}
 
@@ -63,6 +65,20 @@
 		return {ratio: 1, hint: {key: 'hint_description_good'}, bar: 1};
 	}
 
+	/** @returns {?Rating} null when the form has no photos (multi-step mode adds them on the next step) */
+	function ratePhotos(count) {
+		if (typeof count !== 'number') {
+			return null;
+		}
+		if (count === 0) {
+			return {ratio: 0, hint: {key: 'hint_photos_empty'}, bar: 0};
+		}
+		if (count < PHOTOS_GOOD) {
+			return {ratio: count / PHOTOS_GOOD, hint: {key: 'hint_photos_more', params: {count: PHOTOS_GOOD - count}}, bar: count / PHOTOS_GOOD};
+		}
+		return {ratio: 1, hint: {key: 'hint_photos_good'}, bar: 1};
+	}
+
 	/** @returns {Rating} */
 	function chosen(isChosen, name, todoKey) {
 		return isChosen ? {ratio: 1, hint: name ? {text: name} : null} : {ratio: 0, hint: {key: todoKey}};
@@ -76,6 +92,7 @@
 			category: chosen(state.categoryId > 0, state.categoryName, 'hint_category_todo'),
 			title: rateTitle(state.title, limits),
 			description: rateDescription(state.description, limits),
+			photos: ratePhotos(state.photoCount),
 			price: state.priceShown
 				? {ratio: priceSet ? 1 : 0, hint: priceSet ? (state.negotiable ? {key: 'hint_price_negotiable'} : null) : {key: 'hint_price_todo'}}
 				: null,

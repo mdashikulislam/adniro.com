@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'Gerade eben',
 	'live_photo_next'    => 'Titelfoto: im nächsten Schritt',
 	'live_photo_below'   => 'Fügen Sie unten Fotos hinzu: Das erste ist das Titelfoto',
+	'live_photo_here'    => 'Fügen Sie Fotos hinzu: Das erste ist das Titelfoto',
 	'live_description_empty' => 'Hier erscheint Ihre Beschreibung.',
 	'check_category'     => 'Kategorie gewählt',
 	'check_title'        => 'Klarer Titel ({min}–{max} Zeichen)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'Preis angegeben',
 	'check_city'         => 'Stadt gewählt',
 	'check_contact'      => 'Kontaktdaten angegeben',
+	'check_photos'       => 'Fotos hinzugefügt ({min}+)',
 	'check_done'         => 'Erledigt',
 	'check_todo'         => 'Offen',
 	'strength'           => 'Qualitätsscore der Anzeige',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'Käufer suchen in ihrer Nähe',
 	'hint_contact_todo'  => 'Eine E-Mail oder Telefonnummer',
 	'hint_contact_done'  => 'Käufer können Sie erreichen',
+	'hint_photos_empty'  => 'Das erste Foto ist das Titelfoto',
+	'hint_photos_more'   => 'Noch {count} für eine volle Galerie',
+	'hint_photos_good'   => 'Gute Galerie',
 	'tips'               => 'Tipps für schnelleren Verkauf',
 
 	// Checks while filling in

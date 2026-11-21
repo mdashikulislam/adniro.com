@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'এইমাত্র',
 	'live_photo_next'    => 'কভার ছবি: পরের ধাপে যোগ হবে',
 	'live_photo_below'   => 'নিচে ছবি যোগ করুন: প্রথমটি কভার হবে',
+	'live_photo_here'    => 'ছবি যোগ করুন: প্রথমটি কভার হবে',
 	'live_description_empty' => 'আপনার বিবরণ এখানে দেখাবে।',
 	'check_category'     => 'বিভাগ বেছে নেওয়া হয়েছে',
 	'check_title'        => 'স্পষ্ট শিরোনাম ({min}–{max} অক্ষর)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'দাম দেওয়া হয়েছে',
 	'check_city'         => 'শহর বেছে নেওয়া হয়েছে',
 	'check_contact'      => 'যোগাযোগের তথ্য যোগ করা হয়েছে',
+	'check_photos'       => 'ছবি যোগ করা হয়েছে ({min}+)',
 	'check_done'         => 'সম্পন্ন',
 	'check_todo'         => 'বাকি',
 	'strength'           => 'বিজ্ঞাপনের মান স্কোর',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'ক্রেতারা কাছাকাছি খোঁজেন',
 	'hint_contact_todo'  => 'একটি ইমেইল বা ফোন নম্বর',
 	'hint_contact_done'  => 'ক্রেতারা আপনার সাথে যোগাযোগ করতে পারবেন',
+	'hint_photos_empty'  => 'প্রথম ছবিটি কভার হবে',
+	'hint_photos_more'   => 'পূর্ণ গ্যালারির জন্য আরও {count}টি',
+	'hint_photos_good'   => 'ভালো গ্যালারি',
 	'tips'               => 'দ্রুত বিক্রির টিপস',
 
 	// Checks while filling in

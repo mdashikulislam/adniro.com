@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'الآن',
 	'live_photo_next'    => 'صورة الغلاف: تُضاف في الخطوة التالية',
 	'live_photo_below'   => 'أضف الصور أدناه: الأولى هي صورة الغلاف',
+	'live_photo_here'    => 'أضف الصور: الأولى هي صورة الغلاف',
 	'live_description_empty' => 'يظهر وصفك هنا.',
 	'check_category'     => 'تم اختيار الفئة',
 	'check_title'        => 'عنوان واضح ({min}–{max} حرفًا)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'تم تحديد السعر',
 	'check_city'         => 'تم اختيار المدينة',
 	'check_contact'      => 'تمت إضافة بيانات التواصل',
+	'check_photos'       => 'تمت إضافة الصور ({min}+)',
 	'check_done'         => 'مكتمل',
 	'check_todo'         => 'غير مكتمل',
 	'strength'           => 'درجة جودة الإعلان',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'يبحث المشترون بالقرب منهم',
 	'hint_contact_todo'  => 'بريد إلكتروني أو رقم هاتف',
 	'hint_contact_done'  => 'يمكن للمشترين التواصل معك',
+	'hint_photos_empty'  => 'الصورة الأولى هي الغلاف',
+	'hint_photos_more'   => '{count} صورة إضافية لمعرض كامل',
+	'hint_photos_good'   => 'معرض جيد',
 	'tips'               => 'نصائح للبيع بسرعة أكبر',
 
 	// Checks while filling in

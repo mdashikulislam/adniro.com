@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'अभी',
 	'live_photo_next'    => 'कवर फ़ोटो: अगले चरण में जोड़ी जाएगी',
 	'live_photo_below'   => 'नीचे फ़ोटो जोड़ें: पहली फ़ोटो कवर होगी',
+	'live_photo_here'    => 'फ़ोटो जोड़ें: पहली फ़ोटो कवर होगी',
 	'live_description_empty' => 'आपका विवरण यहाँ दिखेगा।',
 	'check_category'     => 'श्रेणी चुनी गई',
 	'check_title'        => 'साफ़ शीर्षक ({min}–{max} अक्षर)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'कीमत तय',
 	'check_city'         => 'शहर चुना गया',
 	'check_contact'      => 'संपर्क विवरण जोड़ा गया',
+	'check_photos'       => 'फ़ोटो जोड़ी गईं ({min}+)',
 	'check_done'         => 'पूरा',
 	'check_todo'         => 'बाकी',
 	'strength'           => 'विज्ञापन गुणवत्ता स्कोर',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'खरीदार अपने आस-पास खोजते हैं',
 	'hint_contact_todo'  => 'ईमेल या फ़ोन नंबर',
 	'hint_contact_done'  => 'खरीदार आपसे संपर्क कर सकते हैं',
+	'hint_photos_empty'  => 'पहली फ़ोटो कवर होगी',
+	'hint_photos_more'   => 'पूरी गैलरी के लिए {count} और',
+	'hint_photos_good'   => 'अच्छी गैलरी',
 	'tips'               => 'जल्दी बेचने के सुझाव',
 
 	// Checks while filling in

@@ -42,6 +42,11 @@
 	$formActionUrl ??= request()->fullUrl();
 	$nextStepUrl ??= '/';
 	$nextStepLabel ??= t('submit');
+	
+	// adniro: the side panel (listing quality, live buyer preview, tips) from the saved listing
+	$photosPanelState = (config('listing_form.v2', true) && !empty($post))
+		? app(\App\Services\ListingForm\PanelState::class)->fromPost(is_array($post) ? $post : (array)$post)
+		: null;
 @endphp
 @section('content')
 	@include('front.common.spacer')
@@ -51,8 +56,8 @@
                 
                 @include('front.post.partials.notification')
                 
-                <div class="col-md-12">
-                    <div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3">
+                <div class="{{ $photosPanelState ? 'col-lg-8' : 'col-md-12' }}">
+                    <div class="container border rounded bg-body-tertiary p-4 p-lg-3 p-md-2 mb-sm-3" id="lfSection-photos">
 						
                         <h1 class="h3 fw-bold border-bottom pb-3 mb-4">
 							<i class="fa-solid fa-camera"></i> {{ t('Photos') }}
@@ -149,6 +154,12 @@
                         </div>
                     </div>
                 </div>
+				
+				@if ($photosPanelState)
+					<div class="col-lg-4 mt-4 mt-lg-0">
+						@include('front.post.createOrEdit.form.photos-panel', ['panelState' => $photosPanelState, 'post' => $post])
+					</div>
+				@endif
 	            
             </div>
         </div>

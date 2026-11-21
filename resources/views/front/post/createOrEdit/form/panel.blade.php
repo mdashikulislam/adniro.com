@@ -1,20 +1,30 @@
 {{--
- * adniro: the side panel of the redesigned listing form: live preview, checklist, tips.
- * A sticky column on large screens; a bottom sheet on phones (Bootstrap responsive offcanvas),
- * opened from the checklist button in the form's sticky bar. Filled by listing-form/*.js.
+ * adniro: the side panel of the redesigned listing form: listing quality, live buyer preview, tips.
+ * Details step: a sticky column on large screens and a bottom sheet on phones (Bootstrap responsive offcanvas),
+ * opened from the button in the form's sticky bar, filled from the form by listing-form/*.js.
+ * Multi-step Photos step ($panelState given): filled from the details saved in step 1 (listing-form/summary.js),
+ * with photos scored live; under the photos on phones, since that page has no sticky bar.
 --}}
 @section('body_class', 'page-listing-form')
 @php
 	$post ??= [];
-	$isOwner = $listingForm->isEdit && auth()->check() && auth()->user()->getAuthIdentifier() == data_get($post, 'user_id');
+	$panelState ??= null;
+	$onPhotosStep = is_array($panelState);
+	$listingForm ??= (object)['isEdit' => false];
+	$isOwner = !$onPhotosStep && $listingForm->isEdit && auth()->check() && auth()->user()->getAuthIdentifier() == data_get($post, 'user_id');
 	$checks = [
 		'category'    => '#catsContainer',
 		'title'       => '#title',
 		'description' => '#lfSection-what .lf-description',
+		'photos'      => '#lfSection-photos',
 		'price'       => '#price',
 		'city'        => '#cityBox',
 		'contact'     => '#lfSection-contact',
 	];
+	// Photos are scored where they are added: the multi-step Photos step
+	if (!$onPhotosStep) {
+		unset($checks['photos']);
+	}
 	// Good-length targets in the row labels; panel.js keeps them current (same rule as strength-score.js)
 	$titleGoodMin = max(15, (int)config('settings.listing_form.title_min_length', 2));
 	$labelLimits = [
@@ -22,11 +32,20 @@
 		'{max}' => max($titleGoodMin, min(80, (int)config('settings.listing_form.title_max_length', 150))),
 	];
 	$descriptionLimits = ['{min}' => max(200, (int)config('settings.listing_form.description_min_length', 5))];
+	$photoLimits = ['{min}' => 3]; // strength-score.js PHOTOS_GOOD
 	$tips = collect(range(1, 5))->map(fn ($i) => t('sell_quickly_advice_' . $i));
 	// Live buyer preview: a saved cover on edit pages; single-step pages also show the photos chosen in the form
 	$previewCover = (string)data_get($post, 'pictures.0.url.medium', '');
-	$previewPhotoHint = ($isSingleStep ?? false) ? trans('listing_form.live_photo_below') : trans('listing_form.live_photo_next');
+	$previewPhotoHint = match (true) {
+		$onPhotosStep => trans('listing_form.live_photo_here'),
+		($isSingleStep ?? false) => trans('listing_form.live_photo_below'),
+		default => trans('listing_form.live_photo_next'),
+	};
 @endphp
+@if ($onPhotosStep)
+<div class="lf-panel lf-panel-inline" id="lfPanel" data-lf-panel-state="{{ json_encode($panelState, JSON_UNESCAPED_UNICODE) }}">
+	<div class="lf-panel-body">
+@else
 <div class="offcanvas-lg offcanvas-bottom lf-panel" tabindex="-1" id="lfPanel" aria-labelledby="lfPanelTitle">
 	<div class="offcanvas-header d-lg-none">
 		<h2 class="offcanvas-title h5 mb-0" id="lfPanelTitle">{{ trans('listing_form.panel_title') }}</h2>
@@ -34,6 +53,7 @@
 		        aria-label="{{ trans('listing_form.panel_close') }}"></button>
 	</div>
 	<div class="offcanvas-body lf-panel-body">
+@endif
 
 		{{-- Listing quality: a ring with the score, a tier badge, and what each item is worth (listing-form/panel.js) --}}
 		<section class="lf-panel-card lf-strength" aria-labelledby="lfStrengthTitle" data-lf-strength data-tier="weak">
@@ -63,7 +83,7 @@
 					<li class="lf-check" data-lf-check="{{ $check }}">
 						<a href="#" class="lf-check-link" data-lf-target="{{ $target }}">
 							<span class="lf-check-icon" aria-hidden="true"></span>
-							<span class="lf-check-text" data-lf-label>{{ strtr(trans('listing_form.check_' . $check), $check === 'description' ? $descriptionLimits : $labelLimits) }}</span>
+							<span class="lf-check-text" data-lf-label>{{ strtr(trans('listing_form.check_' . $check), match ($check) { 'description' => $descriptionLimits, 'photos' => $photoLimits, default => $labelLimits }) }}</span>
 							<span class="lf-check-worth" data-lf-worth aria-hidden="true"></span>
 							<span class="visually-hidden lf-check-state"></span>
 						</a>
@@ -71,7 +91,7 @@
 				@endforeach
 			</ul>
 
-			@unless ($isSingleStep ?? false)
+			@unless (($isSingleStep ?? false) || $onPhotosStep)
 				<p class="lf-strength-photos">
 					<i class="bi bi-images" aria-hidden="true"></i> {{ trans('listing_form.strength_photos_next') }}
 				</p>

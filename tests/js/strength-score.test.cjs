@@ -121,6 +121,32 @@ test('done items name what was chosen', () => {
 	assert.deepEqual(item(result, 'city').hint, {text: 'Dhaka'});
 });
 
+test('photos only count where the form has them (single-step mode)', () => {
+	// Act
+	const multiStep = score(COMPLETE, CONFIG);
+	const singleStep = score({...COMPLETE, photoCount: 0}, CONFIG);
+
+	// Assert
+	assert.equal(item(multiStep, 'photos'), undefined);
+	assert.equal(item(singleStep, 'photos').done, false);
+	assert.equal(singleStep.items.length, 7);
+	assert.equal(singleStep.next.key, 'photos');
+	assert.deepEqual(item(singleStep, 'photos').hint, {key: 'hint_photos_empty'});
+});
+
+test('three photos make a full gallery; fewer earn part of the points', () => {
+	// Act
+	const one = item(score({...EMPTY, photoCount: 1}, CONFIG), 'photos');
+	const three = score({...COMPLETE, photoCount: 3}, CONFIG);
+
+	// Assert
+	assert.deepEqual(one.hint, {key: 'hint_photos_more', params: {count: 2}});
+	assert.equal(one.bar, 1 / 3);
+	assert.equal(item(three, 'photos').done, true);
+	assert.equal(three.score, 100);
+	assert.equal(three.tier, 'excellent');
+});
+
 test('tiers follow the score', () => {
 	// Act
 	const fair = score({...EMPTY, description: 'x'.repeat(200), title: 'Apple iPhone 17 Pro 256GB'}, CONFIG);

@@ -325,3 +325,10 @@
 		transition: none;
 	}
 }
+
+/* ---------- Photos step: the panel in the page flow (no bottom sheet there) ---------- */
+.lf-panel-inline .lf-panel-body {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}

@@ -55,6 +55,7 @@ return [
 	'live_just_now'      => 'À l\'instant',
 	'live_photo_next'    => 'Photo de couverture : ajoutée à l\'étape suivante',
 	'live_photo_below'   => 'Ajoutez des photos ci-dessous : la première sert de couverture',
+	'live_photo_here'    => 'Ajoutez des photos : la première sert de couverture',
 	'live_description_empty' => 'Votre description apparaît ici.',
 	'check_category'     => 'Catégorie choisie',
 	'check_title'        => 'Titre clair ({min} à {max} caractères)',
@@ -62,6 +63,7 @@ return [
 	'check_price'        => 'Prix indiqué',
 	'check_city'         => 'Ville choisie',
 	'check_contact'      => 'Coordonnées ajoutées',
+	'check_photos'       => 'Photos ajoutées ({min}+)',
 	'check_done'         => 'Fait',
 	'check_todo'         => 'À faire',
 	'strength'           => 'Score de qualité de l\'annonce',
@@ -88,6 +90,9 @@ return [
 	'hint_city_todo'     => 'Les acheteurs cherchent près de chez eux',
 	'hint_contact_todo'  => 'Un e-mail ou un numéro de téléphone',
 	'hint_contact_done'  => 'Les acheteurs peuvent vous joindre',
+	'hint_photos_empty'  => 'La première photo sert de couverture',
+	'hint_photos_more'   => 'Encore {count} pour une galerie complète',
+	'hint_photos_good'   => 'Belle galerie',
 	'tips'               => 'Conseils pour vendre plus vite',
 
 	// Checks while filling in
