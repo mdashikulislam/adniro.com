@@ -2,6 +2,7 @@
  * The AI box in the listing form (adniro:ai), ported from classifedz.com's ai.quickstart.js.
  * The seller describes the item once: typed, recorded (sent to the server when a speech-to-text model
  * is assigned) or dictated with the browser's own SpeechRecognition, optionally with up to four photos
+ * (chosen, or taken with the camera: the phone's camera app, or a camera window on computers)
  * (shrunk in the browser, read by the AI, then added to the form's Photos step by the server). posts/create/assistant/fill returns
  * the form's fields; this script fills the form the way a person would (the form's own category and
  * city functions, input/change events), highlights what changed, lists what still needs the seller,
@@ -114,36 +115,69 @@
 		'audio-capture': 'mic_missing'
 	};
 
-	// A site cannot switch a microphone on: only the person can, in the browser or the system. So when
-	// one is refused, missing or busy, a popup shows the steps for that case, then tries again on request.
+	// A site cannot switch a microphone or camera on: only the person can, in the browser or the system.
+	// So when one is refused, missing or busy, a popup shows the steps for that case, then offers a way on.
 	var IS_MAC = /Mac/i.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '');
-	var MIC_HELP_STEPS = {
-		mic_denied: ['step1', 'step2', IS_MAC ? 'step_mac' : null],
-		mic_missing: ['step1', IS_MAC ? 'step_mac' : null, 'step2'],
-		mic_busy: ['step1', 'step2']
+	var HELP_STEPS = {
+		mic_denied: ['mic_denied_step1', 'mic_denied_step2', IS_MAC ? 'mic_denied_step_mac' : null],
+		mic_missing: ['mic_missing_step1', IS_MAC ? 'mic_missing_step_mac' : null, 'mic_missing_step2'],
+		mic_busy: ['mic_busy_step1', 'mic_busy_step2'],
+		camera_denied: ['mic_denied_step1', 'camera_denied_step2', IS_MAC ? 'camera_denied_step_mac' : null],
+		camera_missing: ['camera_missing_step1', 'camera_missing_step2'],
+		camera_busy: ['mic_busy_step1', 'mic_busy_step2']
 	};
 
-	function showMicHelp(key) {
-		var steps = (MIC_HELP_STEPS[key] || []).filter(Boolean);
+	/**
+	 * @param {string} key  mic_denied, camera_busy, ...
+	 * @param {{icon: string, retry: function, otherLabel: string, other: function}} options
+	 */
+	function showDeviceHelp(key, options) {
+		var steps = (HELP_STEPS[key] || []).filter(Boolean);
 		if (!steps.length || typeof window.Swal === 'undefined') {
 			return; // the message under the box already says what happened
 		}
 		var list = steps.map(function (step) {
-			return '<li>' + t(key + '_' + step) + '</li>';
+			return '<li>' + t(step) + '</li>';
 		}).join('');
 		window.Swal.fire({
 			title: plain(key + '_title'),
 			html: '<ol class="ai-mic-help">' + list + '</ol>',
-			icon: key === 'mic_busy' ? 'info' : 'warning',
+			icon: /_busy$/.test(key) ? 'info' : 'warning',
 			showCancelButton: true,
-			confirmButtonText: '<i class="fa-solid fa-microphone"></i> ' + escapeHtml(plain('mic_try_again')),
-			cancelButtonText: escapeHtml(plain('mic_type_instead')),
+			confirmButtonText: '<i class="fa-solid ' + options.icon + '"></i> ' + escapeHtml(plain('mic_try_again')),
+			cancelButtonText: escapeHtml(options.otherLabel),
 			theme: (typeof window.isDarkThemeEnabled === 'function' && window.isDarkThemeEnabled()) ? 'dark' : 'light'
 		}).then(function (result) {
 			if (result.isConfirmed) {
+				options.retry();
+			} else if (result.dismiss === window.Swal.DismissReason.cancel) {
+				options.other();
+			}
+		});
+	}
+
+	function showMicHelp(key) {
+		showDeviceHelp(key, {
+			icon: 'fa-microphone',
+			retry: function () {
 				speakButton.click();
-			} else {
+			},
+			otherLabel: plain('mic_type_instead'),
+			other: function () {
 				textEl.focus();
+			}
+		});
+	}
+
+	function showCameraHelp(key) {
+		showDeviceHelp(key, {
+			icon: 'fa-camera',
+			retry: function () {
+				cameraButton.click();
+			},
+			otherLabel: plain('camera_choose'),
+			other: function () {
+				photoInput.click();
 			}
 		});
 	}
@@ -157,6 +191,9 @@
 		}
 		if (photoAddButton) {
 			photoAddButton.disabled = state;
+		}
+		if (cameraButton) {
+			cameraButton.disabled = state;
 		}
 		fillLabel.textContent = label || plain('fill');
 	}
@@ -708,6 +745,9 @@
 		});
 		thumbsEl.classList.toggle('d-none', photos.length === 0);
 		photoAddButton.classList.toggle('d-none', photos.length >= maxPhotos);
+		if (cameraButton && cameraButton.dataset.aiCameraFound === '1') {
+			cameraButton.classList.toggle('d-none', photos.length >= maxPhotos);
+		}
 	}
 
 	if (photoInput && photoAddButton && thumbsEl) {
@@ -719,23 +759,190 @@
 		photoInput.addEventListener('change', function () {
 			var chosen = Array.prototype.slice.call(photoInput.files || []);
 			photoInput.value = '';
-			var room = maxPhotos - photos.length;
-			if (chosen.length > room) {
-				setMessage(plain('photos_max').replace(':max', String(maxPhotos)), 'warning');
-			} else {
-				setMessage('');
-			}
-			Promise.all(chosen.slice(0, Math.max(0, room)).map(shrink)).then(function (files) {
-				files.forEach(function (file) {
-					if (file.size > maxPhotoBytes) {
-						setMessage(plain('photo_too_big').replace(':size', String(Math.round(maxPhotoBytes / 104857.6) / 10)), 'warning');
-						return;
-					}
-					photos.push({file: file, url: URL.createObjectURL(file)});
-				});
-				renderThumbs();
-			});
+			addPhotos(chosen);
 		});
+	}
+
+	/** Chosen, phone-camera and webcam photos alike: within the limit, resized, size-checked, then shown */
+	function addPhotos(chosen) {
+		var room = maxPhotos - photos.length;
+		if (chosen.length > room) {
+			setMessage(plain('photos_max').replace(':max', String(maxPhotos)), 'warning');
+		} else {
+			setMessage('');
+		}
+		return Promise.all(chosen.slice(0, Math.max(0, room)).map(shrink)).then(function (files) {
+			files.forEach(function (file) {
+				if (file.size > maxPhotoBytes) {
+					setMessage(plain('photo_too_big').replace(':size', String(Math.round(maxPhotoBytes / 104857.6) / 10)), 'warning');
+					return;
+				}
+				photos.push({file: file, url: URL.createObjectURL(file)});
+			});
+			renderThumbs();
+		});
+	}
+
+	// ---------- taking a photo with the camera ----------
+	// Phones and tablets open their camera app (the input's capture attribute); computers with a webcam
+	// get a small camera window. The button stays hidden on devices without a camera.
+
+	var cameraButton = box.querySelector('[data-ai-camera]');
+	var cameraInput = box.querySelector('.ai-assistant-camera-input');
+	var cameraModalEl = document.getElementById('aiCameraModal');
+	var CAMERA_ERRORS = {
+		NotAllowedError: 'camera_denied',
+		PermissionDeniedError: 'camera_denied',
+		SecurityError: 'camera_denied',
+		NotFoundError: 'camera_missing',
+		DevicesNotFoundError: 'camera_missing',
+		OverconstrainedError: 'camera_missing'
+	};
+	var CAPTURE_QUALITY = 0.92;
+	var isTouch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+	var canStream = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.isSecureContext);
+	var cameraStream = null;
+	var facingMode = 'environment';
+	var cameraModal = null;
+	var cameraVideo = cameraModalEl ? cameraModalEl.querySelector('.ai-camera-video') : null;
+	var switchButton = cameraModalEl ? cameraModalEl.querySelector('.ai-camera-switch') : null;
+
+	function hasCamera() {
+		if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+			return Promise.resolve(isTouch);
+		}
+		return navigator.mediaDevices.enumerateDevices().then(function (devices) {
+			return devices.some(function (device) {
+				return device.kind === 'videoinput';
+			});
+		}, function () {
+			return isTouch;
+		});
+	}
+
+	function stopCamera() {
+		if (cameraStream) {
+			cameraStream.getTracks().forEach(function (track) {
+				track.stop();
+			});
+			cameraStream = null;
+		}
+		if (cameraVideo) {
+			cameraVideo.srcObject = null;
+		}
+	}
+
+	function startCamera() {
+		stopCamera();
+		return navigator.mediaDevices.getUserMedia({video: {facingMode: facingMode, width: {ideal: 1920}, height: {ideal: 1080}}, audio: false})
+			.then(function (stream) {
+				cameraStream = stream;
+				cameraVideo.srcObject = stream;
+				var settings = stream.getVideoTracks()[0] ? stream.getVideoTracks()[0].getSettings() : {};
+				// Webcams face the person (no facingMode reported on most computers); a back camera does not
+				cameraVideo.classList.toggle('is-mirrored', settings.facingMode ? settings.facingMode === 'user' : true);
+				return cameraVideo.play().catch(function () {
+				});
+			});
+	}
+
+	/** Several cameras (front and back, or a laptop plus a USB webcam): offer to switch */
+	function showSwitchWhenUseful() {
+		navigator.mediaDevices.enumerateDevices().then(function (devices) {
+			var count = devices.filter(function (device) {
+				return device.kind === 'videoinput';
+			}).length;
+			switchButton.classList.toggle('d-none', count < 2);
+		}, function () {
+		});
+	}
+
+	function openCameraWindow() {
+		if (photos.length >= maxPhotos) {
+			return;
+		}
+		// Still closing after the last photo: open again once it has closed (closing stops the camera)
+		if (cameraModalEl.classList.contains('show') || cameraModalEl.style.display === 'block') {
+			cameraModalEl.addEventListener('hidden.bs.modal', openCameraWindow, {once: true});
+			return;
+		}
+		startCamera().then(function () {
+			if (!cameraModal) {
+				document.body.appendChild(cameraModalEl); // above the form, whatever its layout
+				cameraModal = window.bootstrap.Modal.getOrCreateInstance(cameraModalEl);
+			}
+			cameraModal.show();
+			showSwitchWhenUseful();
+		}, function (error) {
+			var cameraKey = CAMERA_ERRORS[error && error.name] || 'camera_busy';
+			setMessage(plain(cameraKey), 'danger');
+			showCameraHelp(cameraKey);
+		});
+	}
+
+	function capturePhoto() {
+		var width = cameraVideo.videoWidth;
+		var height = cameraVideo.videoHeight;
+		if (!width || !height) {
+			return;
+		}
+		var canvas = document.createElement('canvas');
+		canvas.width = width;
+		canvas.height = height;
+		canvas.getContext('2d').drawImage(cameraVideo, 0, 0, width, height);
+		canvas.toBlob(function (blob) {
+			if (blob) {
+				addPhotos([new File([blob], 'camera-' + Date.now() + '.jpg', {type: 'image/jpeg'})]);
+			}
+			cameraModal.hide();
+		}, 'image/jpeg', CAPTURE_QUALITY);
+	}
+
+	if (cameraButton && cameraInput && thumbsEl) {
+		hasCamera().then(function (found) {
+			cameraButton.classList.toggle('d-none', !found || photos.length >= maxPhotos);
+			cameraButton.dataset.aiCameraFound = found ? '1' : '0';
+		});
+		cameraButton.addEventListener('click', function () {
+			if (busy) {
+				return;
+			}
+			if (photos.length >= maxPhotos) {
+				setMessage(plain('photos_max').replace(':max', String(maxPhotos)), 'warning');
+				return;
+			}
+			if (isTouch || !canStream || !cameraModalEl || !window.bootstrap) {
+				cameraInput.click();
+				return;
+			}
+			openCameraWindow();
+		});
+		cameraInput.addEventListener('change', function () {
+			var taken = Array.prototype.slice.call(cameraInput.files || []);
+			cameraInput.value = '';
+			addPhotos(taken);
+		});
+		if (cameraModalEl) {
+			cameraModalEl.querySelector('.ai-camera-shoot').addEventListener('click', capturePhoto);
+			switchButton.addEventListener('click', function () {
+				facingMode = facingMode === 'environment' ? 'user' : 'environment';
+				startCamera().catch(function () {
+				});
+			});
+			// Capture only once the window has finished opening (a close request while it opens is ignored)
+			var shootButton = cameraModalEl.querySelector('.ai-camera-shoot');
+			cameraModalEl.addEventListener('show.bs.modal', function () {
+				shootButton.disabled = true;
+			});
+			cameraModalEl.addEventListener('shown.bs.modal', function () {
+				shootButton.disabled = false;
+				shootButton.focus();
+			});
+			cameraModalEl.addEventListener('hidden.bs.modal', function () {
+				stopCamera();
+			});
+		}
+		window.addEventListener('beforeunload', stopCamera);
 	}
 
 	// Example chips: show what a good description looks like

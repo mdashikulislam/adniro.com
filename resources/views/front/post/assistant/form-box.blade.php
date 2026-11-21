@@ -37,7 +37,14 @@
 			'denied_title', 'denied_step1', 'denied_step2', 'denied_step_mac',
 			'missing_title', 'missing_step1', 'missing_step_mac', 'missing_step2',
 			'busy_title', 'busy_step1', 'busy_step2', 'try_again', 'type_instead',
-		])->mapWithKeys(fn ($key) => ['mic_' . $key => trans('ai.assistant_mic_' . $key)]))->all();
+		])->mapWithKeys(fn ($key) => ['mic_' . $key => trans('ai.assistant_mic_' . $key)]))->merge([
+			// Taking a photo with the camera: the window's buttons, and what to do when the camera fails
+			'camera_shoot'  => trans('ai.box_camera_shoot'),
+			'camera_switch' => trans('ai.box_camera_switch'),
+		])->merge(collect([
+			'denied', 'missing', 'busy', 'denied_title', 'denied_step2', 'denied_step_mac',
+			'missing_title', 'missing_step1', 'missing_step2', 'busy_title', 'choose',
+		])->mapWithKeys(fn ($key) => ['camera_' . $key => trans('ai.assistant_camera_' . $key)]))->all();
 		$aiBoxExamples = ['phone', 'car', 'home', 'furniture'];
 	@endphp
 	<div class="col-12 mb-4 ai-assistant-wrap">
@@ -80,9 +87,15 @@
 					{{-- Photos: read by the AI, then added to the Photos step --}}
 					<div class="ai-assistant-photos">
 						<input type="file" class="d-none ai-assistant-photo-input" accept="image/*" multiple tabindex="-1" aria-hidden="true">
+						{{-- Phones and tablets: opens the camera app; computers with a webcam use the camera window below --}}
+						<input type="file" class="d-none ai-assistant-camera-input" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true">
 						<div class="ai-assistant-thumbs d-none"></div>
 						<button type="button" class="btn ai-assistant-photo-add" @disabled($aiBoxNoneLeft)>
-							<i class="fa-solid fa-camera"></i> {{ trans('ai.box_photos') }}
+							<i class="fa-regular fa-images"></i> {{ trans('ai.box_photos') }}
+						</button>
+						{{-- Shown by ai.formbox.js only when the device has a camera --}}
+						<button type="button" class="btn ai-assistant-photo-add ai-assistant-camera d-none" data-ai-camera @disabled($aiBoxNoneLeft)>
+							<i class="fa-solid fa-camera"></i> {{ trans('ai.box_take_photo') }}
 						</button>
 						<span class="ai-assistant-photo-hint">{{ trans('ai.box_photos_hint', ['max' => \App\Services\ListingAssistant\ListingAssistantService::MAX_PHOTOS]) }}</span>
 					</div>
@@ -139,17 +152,43 @@
 					<div class="ai-assistant-message small mt-2 d-none" role="status" aria-live="polite"></div>
 					<div class="ai-assistant-result mt-3 d-none" aria-live="polite"></div>
 					<p class="small text-secondary mt-2 mb-0">{{ trans('ai.box_privacy') }}</p>
+
+					{{-- Webcam window for computers (ai.formbox.js moves it to the page body and fills the video) --}}
+					<div class="modal fade ai-camera-modal" id="aiCameraModal" tabindex="-1" aria-labelledby="aiCameraTitle" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h2 class="modal-title h5" id="aiCameraTitle">{{ trans('ai.box_camera_title') }}</h2>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans('ai.box_camera_close') }}"></button>
+								</div>
+								<div class="modal-body">
+									<div class="ai-camera-stage">
+										<video class="ai-camera-video" autoplay playsinline muted></video>
+									</div>
+									<p class="ai-camera-hint">{{ trans('ai.box_camera_hint') }}</p>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-outline-secondary ai-camera-switch d-none">
+										<i class="fa-solid fa-camera-rotate"></i> {{ trans('ai.box_camera_switch') }}
+									</button>
+									<button type="button" class="btn btn-primary ai-camera-shoot">
+										<i class="fa-solid fa-circle-dot"></i> {{ trans('ai.box_camera_shoot') }}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
 				@endif
 			</div>
 		</div>
 	</div>
 
 	@pushOnce('after_styles_stack', 'ai_formbox_css')
-		<link href="{{ url('assets/css/ai-formbox.css') }}?v=4" rel="stylesheet">
+		<link href="{{ url('assets/css/ai-formbox.css') }}?v=5" rel="stylesheet">
 	@endPushOnce
 	@if ($aiBoxOn)
 		@pushOnce('after_scripts_stack', 'ai_formbox_js')
-			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=6"></script>
+			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=7"></script>
 		@endPushOnce
 	@endif
 @endif

@@ -408,6 +408,63 @@ class AiFormBoxTest extends TestCase
 		}
 	}
 
+	private const CAMERA_KEYS = [
+		'box_take_photo', 'box_camera_title', 'box_camera_hint', 'box_camera_shoot', 'box_camera_switch', 'box_camera_close',
+		'assistant_camera_denied', 'assistant_camera_missing', 'assistant_camera_busy',
+		'assistant_camera_denied_title', 'assistant_camera_denied_step2', 'assistant_camera_denied_step_mac',
+		'assistant_camera_missing_title', 'assistant_camera_missing_step1', 'assistant_camera_missing_step2',
+		'assistant_camera_busy_title', 'assistant_camera_choose',
+	];
+
+	public function test_the_box_can_take_a_photo_with_the_camera(): void
+	{
+		// Arrange
+		$this->actingAs($this->user(7));
+
+		// Act
+		$html = $this->renderBox();
+
+		// Assert: a hidden Take photo button (shown when a camera exists), a phone camera input and a webcam window
+		$this->assertMatchesRegularExpression('/<button[^>]*data-ai-camera[^>]*>/', $html);
+		$this->assertMatchesRegularExpression('/<input[^>]*class="[^"]*ai-assistant-camera-input[^"]*"[^>]*capture="environment"/', $html);
+		$this->assertStringContainsString('id="aiCameraModal"', $html);
+		$this->assertMatchesRegularExpression('/<video[^>]*playsinline/', $html);
+		foreach (['box_camera_shoot', 'box_camera_switch', 'assistant_camera_denied', 'assistant_camera_choose'] as $key) {
+			$this->assertStringContainsString(e(json_encode(trans('ai.' . $key), JSON_UNESCAPED_UNICODE)), $html, $key);
+		}
+	}
+
+	public function test_every_translation_has_the_camera_texts(): void
+	{
+		// Arrange
+		$english = require lang_path('en/ai.php');
+
+		foreach (glob(lang_path('*/ai.php')) as $file) {
+			// Act
+			$strings = require $file;
+
+			// Assert
+			foreach (self::CAMERA_KEYS as $key) {
+				$this->assertNotEmpty($strings[$key] ?? null, "{$file}: {$key}");
+				if ($file !== lang_path('en/ai.php')) {
+					$this->assertNotSame($english[$key], $strings[$key], "{$file}: {$key} is translated");
+				}
+			}
+		}
+	}
+
+	public function test_camera_photos_join_the_same_photo_list_as_chosen_ones(): void
+	{
+		// Arrange
+		$script = file_get_contents(public_path('assets/js/app/ai.formbox.js'));
+
+		// Assert: one shared path (limit, resize, size check); the webcam stream is stopped when the window closes
+		$this->assertGreaterThanOrEqual(3, substr_count($script, 'addPhotos('), 'chosen photos, phone camera, webcam capture');
+		foreach (["kind === 'videoinput'", 'getUserMedia({video:', 'toBlob(', 'hidden.bs.modal', 'stopCamera()', 'showCameraHelp('] as $hook) {
+			$this->assertStringContainsString($hook, $script, $hook);
+		}
+	}
+
 	public function test_only_a_refused_microphone_is_reported_as_blocked(): void
 	{
 		// Arrange

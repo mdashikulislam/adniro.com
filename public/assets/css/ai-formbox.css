@@ -171,3 +171,51 @@
 .ai-mic-help strong {
 	font-weight: 600;
 }
+
+/* Camera window for computers with a webcam (moved to the page body, so Bootstrap colours only) */
+.ai-camera-modal .modal-content {
+	border: 0;
+	border-radius: 20px;
+	overflow: hidden;
+}
+
+.ai-camera-stage {
+	position: relative;
+	aspect-ratio: 4 / 3;
+	border-radius: 14px;
+	overflow: hidden;
+	background-color: #0b0f14;
+}
+
+.ai-camera-video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* A camera that faces the person shows a mirror image, like every video call; the photo is not mirrored */
+.ai-camera-video.is-mirrored {
+	transform: scaleX(-1);
+}
+
+.ai-camera-hint {
+	margin: .65rem 0 0;
+	font-size: .85rem;
+	text-align: center;
+	color: var(--bs-secondary-color);
+}
+
+.ai-camera-modal .modal-footer {
+	gap: .5rem;
+}
+
+.ai-camera-modal .ai-camera-shoot {
+	display: inline-flex;
+	align-items: center;
+	gap: .45rem;
+	min-height: 44px;
+	padding-inline: 1.25rem;
+	border-radius: 999px;
+	font-weight: 600;
+}
