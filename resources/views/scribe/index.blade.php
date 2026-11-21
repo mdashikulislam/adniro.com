@@ -25607,7 +25607,7 @@ vary: Origin
             &quot;carousel_controls&quot;: &quot;0&quot;,
             &quot;carousel_ctrl_position&quot;: &quot;top-end&quot;,
             &quot;cookie_expiration&quot;: &quot;86400&quot;,
-            &quot;google_maps_javascript_api_key&quot;: &quot;AIzaSyD31p7CzP8EQHYBcquZtPm_el66o1xB0HE&quot;,
+            &quot;google_maps_javascript_api_key&quot;: &quot;YOUR_GOOGLE_MAPS_API_KEY&quot;,
             &quot;decimals_superscript&quot;: &quot;0&quot;
         },
         &quot;cron&quot;: {

@@ -144,30 +144,14 @@ if (is_array($value)) {
                     return id;
                 };
 
+                // No API key: YouTube serves each video's thumbnail at a public address
                 var fetchYouTube = function( videoId, callback ){
-
-                    var api = 'https://www.googleapis.com/youtube/v3/videos?id='+videoId+'&key=AIzaSyDQa76EpdNPzfeTAoZUut2AnvBA0jkx3FI&part=snippet';
-
-                    var video = {
+                    callback({
                         provider: 'youtube',
-                        id: null,
+                        id: videoId,
                         title: null,
-                        image: null,
-                        url: null
-                    };
-
-                    $.getJSON(api, function( data ){
-
-                        if (typeof(data.items[0]) != "undefined") {
-                            var v = data.items[0].snippet;
-
-                            video.id = videoId;
-                            video.title = v.title;
-                            video.image = v.thumbnails.maxres ? v.thumbnails.maxres.url : v.thumbnails.default.url;
-                            video.url = 'https://www.youtube.com/watch?v=' + video.id;
-
-                            callback(video);
-                        }
+                        image: 'https://i.ytimg.com/vi/' + encodeURIComponent(videoId) + '/hqdefault.jpg',
+                        url: 'https://www.youtube.com/watch?v=' + encodeURIComponent(videoId)
                     });
                 };
 
