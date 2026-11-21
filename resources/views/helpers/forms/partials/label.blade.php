@@ -21,6 +21,10 @@
 	$dotSepName = arrayFieldToDotNotation($name);
 	$id = !empty($id) ? $id : str_replace('.', '-', $dotSepName);
 	
+	// adniro:ai - point the label at a control whose ID differs from the field's (e.g. a rich editor's textarea)
+	$labelFor ??= null;
+	$id = !empty($labelFor) ? $labelFor : $id;
+	
 	// Handle error class
 	$errors ??= new ViewErrorBag;
 	$errorBag = ($errors instanceof ViewErrorBag) ? $errors : new ViewErrorBag;

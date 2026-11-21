@@ -238,8 +238,11 @@ class AiFormBoxTest extends TestCase
 		$this->assertStringContainsString('data-url="' . url('posts/create/assistant/fill') . '"', $html);
 		$this->assertStringContainsString('20 of 20 AI posts left today', $html);
 		$this->assertStringContainsString('ai.formbox.js', $html);
-		foreach (['resources/views/front/post/createOrEdit/multiSteps/create/post.blade.php', 'resources/views/front/post/createOrEdit/singleStep/create.blade.php'] as $form) {
-			$this->assertStringContainsString("@include('front.post.assistant.form-box')", file_get_contents(base_path($form)), $form);
+		// Both create pages use the shared form, which shows the box on new listings
+		$body = file_get_contents(resource_path('views/front/post/createOrEdit/form/body.blade.php'));
+		$this->assertStringContainsString("@includeWhen(!\$listingForm->isEdit, 'front.post.assistant.form-box')", $body);
+		foreach (['multiSteps/create/post.blade.php', 'singleStep/create.blade.php'] as $form) {
+			$this->assertStringContainsString("@include('front.post.createOrEdit.form.body'", file_get_contents(resource_path('views/front/post/createOrEdit/' . $form)), $form);
 		}
 	}
 	

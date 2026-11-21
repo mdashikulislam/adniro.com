@@ -96,6 +96,79 @@ class ListingFormPagesTest extends TestCase
 		$this->assertEmpty(array_diff($hooks, $ids), 'missing element IDs: ' . implode(', ', array_diff($hooks, $ids)));
 	}
 
+	public static function detailsPages(): array
+	{
+		return [
+			'multi-step create, guest'  => [self::MULTI, false, '/posts/create', ['title', 'description', 'price', 'cityId', 'contactName', 'email', 'phone']],
+			'multi-step edit details'   => [self::MULTI, true, '/posts/{id}/details', ['title', 'description', 'price', 'cityId', 'contactName', 'email', 'phone']],
+			'single-step create, member'=> [self::SINGLE, true, '/create', ['title', 'description', 'price', 'cityId', 'email', 'phone']],
+			'single-step edit'          => [self::SINGLE, true, '/edit/{id}', ['title', 'description', 'price', 'cityId', 'contactName', 'email', 'phone']],
+		];
+	}
+
+	#[DataProvider('detailsPages')]
+	public function test_labels_point_at_their_fields(string $mode, bool $asOwner, string $url, array $fields): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => $mode]);
+		$request = $asOwner ? $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID)) : $this;
+
+		// Act
+		$xpath = $this->formXPath($request->get(str_replace('{id}', (string)$this->postId, $url)));
+
+		// Assert: each label's "for" names an element on the page, and the required text fields say so
+		foreach ($fields as $field) {
+			$label = $xpath->query("//form[@id='payableForm']//label[@for][starts-with(@for, '{$field}') or contains(@for, '_{$field}')]")->item(0);
+			$this->assertNotNull($label, "a label for {$field}");
+			$for = $label->getAttribute('for');
+			$this->assertSame(1, $xpath->query("//*[@id='{$for}']")->length, "exactly one element with id {$for}");
+		}
+		$this->assertSame('true', $xpath->query("//input[@name='title']")->item(0)?->getAttribute('aria-required'));
+	}
+
+	public static function editPages(): array
+	{
+		return [
+			'multi-step edit details' => [self::MULTI, '/posts/{id}/details'],
+			'single-step edit'        => [self::SINGLE, '/edit/{id}'],
+		];
+	}
+
+	#[DataProvider('editPages')]
+	public function test_an_edit_page_shows_the_saved_listing(string $mode, string $url): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => $mode]);
+
+		// Act
+		$response = $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))
+			->get(str_replace('{id}', (string)$this->postId, $url));
+
+		// Assert
+		$xpath = $this->formXPath($response);
+		$this->assertSame('Grey corner sofa', $xpath->query("//input[@name='title']")->item(0)?->getAttribute('value'));
+		$this->assertSame('150', $xpath->query("//input[@name='price']")->item(0)?->getAttribute('value'));
+		$this->assertSame('Sam', $xpath->query("//input[@name='contact_name']")->item(0)?->getAttribute('value'));
+		$this->assertSame((string)$this->postId, $xpath->query("//input[@name='post_id']")->item(0)?->getAttribute('value'));
+		$this->assertSame('Springfield', $xpath->query("//input[@name='selected_city_name']")->item(0)?->getAttribute('value'));
+	}
+
+	public function test_the_multi_step_session_fills_the_create_page(): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => self::MULTI]);
+
+		// Act
+		$response = $this->withSession(['postInput' => ['title' => 'Oak table', 'price' => '80', 'contact_name' => 'Ana']])
+			->get('/posts/create');
+
+		// Assert
+		$xpath = $this->formXPath($response);
+		$this->assertSame('Oak table', $xpath->query("//input[@name='title']")->item(0)?->getAttribute('value'));
+		$this->assertSame('80', $xpath->query("//input[@name='price']")->item(0)?->getAttribute('value'));
+		$this->assertSame('Ana', $xpath->query("//input[@name='contact_name']")->item(0)?->getAttribute('value'));
+	}
+
 	public static function inactiveModeUrls(): array
 	{
 		return [
@@ -162,12 +235,7 @@ class ListingFormPagesTest extends TestCase
 	 */
 	private function formContract(TestResponse $response): array
 	{
-		$dom = new DOMDocument();
-		libxml_use_internal_errors(true);
-		$dom->loadHTML((string)$response->getContent());
-		libxml_clear_errors();
-
-		$xpath = new DOMXPath($dom);
+		$xpath = $this->formXPath($response);
 		$form = $xpath->query('//form[@id="payableForm"]')->item(0);
 		$this->assertNotNull($form, 'the page has the listing form');
 
@@ -181,5 +249,16 @@ class ListingFormPagesTest extends TestCase
 		}
 
 		return [array_values(array_unique($names)), array_values(array_unique($ids))];
+	}
+
+	private function formXPath(TestResponse $response): DOMXPath
+	{
+		$response->assertOk();
+		$dom = new DOMDocument();
+		libxml_use_internal_errors(true);
+		$dom->loadHTML((string)$response->getContent());
+		libxml_clear_errors();
+
+		return new DOMXPath($dom);
 	}
 }

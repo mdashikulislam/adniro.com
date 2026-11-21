@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (233)
+## Changed (237)
 
 Stock files we edited.
 
@@ -225,6 +225,7 @@ Stock files we edited.
 - `resources/views/admin/layouts/partials/sidebar.blade.php`
 - `resources/views/admin/panel/create.blade.php` (no marker comment)
 - `resources/views/admin/panel/edit.blade.php` (no marker comment)
+- `resources/views/admin/panel/fields/video.blade.php` (no marker comment)
 - `resources/views/admin/panel/form_content.blade.php` (no marker comment)
 - `resources/views/admin/panel/list.blade.php` (no marker comment)
 - `resources/views/admin/panel/reorder.blade.php` (no marker comment)
@@ -281,14 +282,14 @@ Stock files we edited.
 - `resources/views/front/post/createOrEdit/multiSteps/create/post.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/edit/packages.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/multiSteps/edit/photos.blade.php` (no marker comment)
-- `resources/views/front/post/createOrEdit/multiSteps/edit/post.blade.php` (no marker comment)
+- `resources/views/front/post/createOrEdit/multiSteps/edit/post.blade.php`
 - `resources/views/front/post/createOrEdit/multiSteps/partials/wizard.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/partials/category-modal.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/partials/category/select.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/partials/form-assets.blade.php`
 - `resources/views/front/post/createOrEdit/partials/right-sidebar.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/singleStep/create.blade.php`
-- `resources/views/front/post/createOrEdit/singleStep/edit.blade.php` (no marker comment)
+- `resources/views/front/post/createOrEdit/singleStep/edit.blade.php`
 - `resources/views/front/post/createOrEdit/singleStep/finish.blade.php`
 - `resources/views/front/post/show/index.blade.php`
 - `resources/views/front/post/show/partials/details.blade.php` (no marker comment)
@@ -347,6 +348,9 @@ Stock files we edited.
 - `resources/views/helpers/forms/fields/simplemde.blade.php` (no marker comment)
 - `resources/views/helpers/forms/fields/summernote.blade.php` (no marker comment)
 - `resources/views/helpers/forms/fields/tinymce.blade.php` (no marker comment)
+- `resources/views/helpers/forms/fields/video.blade.php` (no marker comment)
+- `resources/views/helpers/forms/partials/label.blade.php`
+- `resources/views/scribe/index.blade.php` (no marker comment)
 - `resources/views/vendor/mail/html/message.blade.php`
 - `resources/views/vendor/pagination/api/bootstrap-5.blade.php` (no marker comment)
 
@@ -583,7 +587,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (200)
+## Added (211)
 
 Files that are not part of LaraClassifier.
 
@@ -708,9 +712,11 @@ Files that are not part of LaraClassifier.
 - `app/Services/ListingAssistant/DraftPrompt.php`
 - `app/Services/ListingAssistant/DraftSanitizer.php`
 - `app/Services/ListingAssistant/DraftSchema.php`
+- `app/Services/ListingAssistant/FormPhotos.php`
 - `app/Services/ListingAssistant/LimitStatus.php`
 - `app/Services/ListingAssistant/ListingAssistantService.php`
 - `app/Services/ListingAssistant/LocationResolver.php`
+- `app/Services/ListingForm/ListingFormState.php`
 - `app/Services/SellerService.php`
 - `app/Services/StructuredDataService.php`
 
@@ -881,6 +887,15 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/common/consent/tracking.blade.php`
 - `resources/views/front/common/json-ld.blade.php`
 - `resources/views/front/post/assistant/form-box.blade.php`
+- `resources/views/front/post/createOrEdit/form/actions.blade.php`
+- `resources/views/front/post/createOrEdit/form/body.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/contact.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/details.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/finish.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/more.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/photos.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/price-location.blade.php`
+- `resources/views/front/post/createOrEdit/form/sections/what.blade.php`
 - `resources/views/front/search/partials/content.blade.php`
 - `resources/views/front/search/partials/posts/empty.blade.php`
 - `resources/views/front/search/partials/posts/template/grid_with_design.blade.php`
