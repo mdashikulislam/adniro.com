@@ -74,6 +74,43 @@
 	<div class="offcanvas-body lf-panel-body">
 @endif
 
+		{{-- Edit pages: manage the listing (view it, its photos, promote it), first in the panel --}}
+		@if ($isOwner)
+			<section class="lf-panel-card lf-manage" aria-labelledby="lfManageTitle">
+				<h2 class="lf-panel-heading" id="lfManageTitle">{{ trans('listing_form.manage_title') }}</h2>
+				<div class="lf-manage-list">
+					<a href="{{ urlGen()->post($post) }}" class="lf-manage-item">
+						<span class="lf-manage-icon" aria-hidden="true"><i class="bi bi-eye"></i></span>
+						<span class="lf-manage-text">
+							<span class="lf-manage-label">{{ t('Return to the listing') }}</span>
+							<span class="lf-manage-hint">{{ trans('listing_form.manage_view_hint') }}</span>
+						</span>
+						<i class="bi bi-chevron-right lf-manage-arrow" aria-hidden="true"></i>
+					</a>
+					@unless ($isSingleStep ?? false)
+						<a href="{{ url('posts/' . data_get($post, 'id') . '/photos') }}" class="lf-manage-item">
+							<span class="lf-manage-icon" aria-hidden="true"><i class="bi bi-images"></i></span>
+							<span class="lf-manage-text">
+								<span class="lf-manage-label">{{ t('Update Photos') }}</span>
+								<span class="lf-manage-hint">{{ trans('listing_form.manage_photos_hint', ['count' => $savedPhotoCount]) }}</span>
+							</span>
+							<i class="bi bi-chevron-right lf-manage-arrow" aria-hidden="true"></i>
+						</a>
+						@if (isset($countPackages) && isset($countPaymentMethods) && $countPackages > 0 && $countPaymentMethods > 0)
+							<a href="{{ url('posts/' . data_get($post, 'id') . '/payment') }}" class="lf-manage-item lf-manage-item-premium">
+								<span class="lf-manage-icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
+								<span class="lf-manage-text">
+									<span class="lf-manage-label">{{ t('Make It Premium') }}</span>
+									<span class="lf-manage-hint">{{ trans('listing_form.manage_premium_hint') }}</span>
+								</span>
+								<i class="bi bi-chevron-right lf-manage-arrow" aria-hidden="true"></i>
+							</a>
+						@endif
+					@endunless
+				</div>
+			</section>
+		@endif
+
 		{{-- Listing quality: a ring with the score, a tier badge, and what each item is worth (listing-form/panel.js) --}}
 		<section class="lf-panel-card lf-strength" aria-labelledby="lfStrengthTitle" data-lf-strength data-tier="weak">
 			<div class="lf-strength-head">
@@ -159,26 +196,6 @@
 				</article>
 			</div>
 		</section>
-
-		@if ($isOwner)
-			<section class="lf-panel-card lf-panel-actions">
-				<div class="d-grid gap-2">
-					<a href="{{ urlGen()->post($post) }}" class="btn btn-outline-primary">
-						<i class="fa-regular fa-hand-point-right"></i> {{ t('Return to the listing') }}
-					</a>
-					@if (!$isSingleStep)
-						<a href="{{ url('posts/' . data_get($post, 'id') . '/photos') }}" class="btn btn-secondary">
-							<i class="fa-solid fa-camera"></i> {{ t('Update Photos') }}
-						</a>
-						@if (isset($countPackages) && isset($countPaymentMethods) && $countPackages > 0 && $countPaymentMethods > 0)
-							<a href="{{ url('posts/' . data_get($post, 'id') . '/payment') }}" class="btn btn-success">
-								<i class="fa-regular fa-circle-check"></i> {{ t('Make It Premium') }}
-							</a>
-						@endif
-					@endif
-				</div>
-			</section>
-		@endif
 
 		{{-- Tips to sell faster: on the details step only, where the seller writes the listing --}}
 		@unless ($onPhotosStep)

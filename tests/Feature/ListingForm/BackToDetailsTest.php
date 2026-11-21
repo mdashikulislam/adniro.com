@@ -95,6 +95,37 @@ class BackToDetailsTest extends TestCase
 		$this->assertMatchesRegularExpression('/data-lf-cover="[^"]*front\.jpg"/', $response->getContent());
 	}
 
+	public function test_the_edit_page_opens_the_panel_with_a_card_to_manage_the_listing(): void
+	{
+		// Arrange: a saved listing with one photo
+		Storage::fake(StorageDisk::getDiskName());
+		$post = $this->stockListing('Apple iPhone 17 Pro', ['user_id' => self::OWNER_ID]);
+		\Illuminate\Support\Facades\DB::table('pictures')->insert([
+			'post_id' => $post->id, 'file_path' => 'files/us/' . $post->id . '/front.jpg', 'mime_type' => 'image/jpeg', 'position' => 0,
+			'active' => 1, 'created_at' => now(), 'updated_at' => now(),
+		]);
+
+		// Act
+		$html = $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))->get('/posts/' . $post->id . '/details')->getContent();
+
+		// Assert: first in the panel, before listing quality; the listing, its photos (with the count) and no old buttons
+		$manage = strpos($html, 'class="lf-panel-card lf-manage"');
+		$this->assertNotFalse($manage);
+		$this->assertLessThan(strpos($html, 'data-lf-strength'), $manage);
+		$this->assertStringContainsString('href="' . url('posts/' . $post->id . '/photos') . '" class="lf-manage-item"', $html);
+		$this->assertStringContainsString(e(trans('listing_form.manage_photos_hint', ['count' => 1])), $html);
+		$this->assertStringNotContainsString('lf-panel-actions', $html);
+	}
+
+	public function test_a_new_listing_has_no_manage_card(): void
+	{
+		// Act
+		$html = $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID))->get('/posts/create')->getContent();
+
+		// Assert
+		$this->assertStringNotContainsString('lf-manage', $html);
+	}
+
 	public function test_a_photo_that_is_gone_shows_the_add_photos_hint_not_a_default_picture(): void
 	{
 		// Arrange: the session still names a photo whose temporary file was cleaned up
