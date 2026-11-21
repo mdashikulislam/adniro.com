@@ -231,7 +231,6 @@
 
 /* ---------- Bottom app bar (phones): full width on the bottom edge, with a notch for the round Sell button ---------- */
 .adn-appbar {
-	--adn-bar-radius: 22px;
 	--adn-bar-surface: var(--bs-body-bg);
 	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 72%, #000);
 	--adn-sell-size: 52px;
@@ -253,7 +252,7 @@
 	background-color: var(--adn-bar-surface);
 }
 
-/* The surface: two sides (top corners rounded) and the curved notch between them, with one shadow around the shape */
+/* The surface: two square sides and the curved notch between them, with one shadow around the shape */
 .adn-appbar-shape {
 	position: absolute;
 	inset: 0;
@@ -264,14 +263,6 @@
 
 .adn-appbar-shape-side {
 	background-color: var(--adn-bar-surface);
-}
-
-.adn-appbar-shape-side:first-child {
-	border-start-start-radius: var(--adn-bar-radius);
-}
-
-.adn-appbar-shape-side:last-child {
-	border-start-end-radius: var(--adn-bar-radius);
 }
 
 .adn-appbar-notch {
