@@ -20,16 +20,8 @@
 @media (min-width: 992px) {
 	.lf-panel {
 		position: sticky;
-		/* below the site's fixed header */
+		/* below the site's fixed header; panel.js lowers it when the panel is taller than the screen */
 		inset-block-start: 5.75rem;
-		/* taller than the screen: scroll inside, so the bottom stays reachable */
-		max-block-size: calc(100vh - 6.75rem);
-		overflow-y: auto;
-		overscroll-behavior: contain;
-		scrollbar-width: thin;
-		/* room for focus rings and card shadows at the edges */
-		padding: 4px;
-		margin: -4px;
 	}
 
 	.lf-panel .lf-panel-body {

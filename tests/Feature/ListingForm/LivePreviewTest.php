@@ -27,6 +27,7 @@ class LivePreviewTest extends TestCase
 		$this->assertNotFalse($live, 'the live preview');
 		$this->assertGreaterThan($quality, $live, 'after listing quality');
 		$this->assertStringNotContainsString('lf-preview-card', $html, 'the old small preview is gone');
+		$this->assertStringContainsString('lf-tips', $html, 'the details step keeps the selling tips');
 	}
 
 	public function test_the_feed_view_is_the_sites_own_listing_card(): void

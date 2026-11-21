@@ -21,10 +21,18 @@
 		'city'        => '#cityBox',
 		'contact'     => '#lfSection-contact',
 	];
-	// Photos are scored where they are added: the multi-step Photos step
-	if (!$onPhotosStep) {
+	// Photos are scored on every step (when the site takes photos): live where they are added (single-step form,
+	// Photos step), else from the photos already saved; on multi-step step 1 the row leads to the Next button
+	$photosLimit = (int)($picturesLimit ?? config('settings.listing_form.pictures_limit', 5));
+	$photosHere = $onPhotosStep || ($isSingleStep ?? false);
+	if ($photosLimit <= 0) {
 		unset($checks['photos']);
+	} elseif (!$photosHere) {
+		$checks['photos'] = '#nextStepBtn';
 	}
+	$savedPhotoCount = $listingForm->isEdit
+		? count((array)data_get($post, 'pictures', []))
+		: count((array)session('picturesInput', []));
 	// Good-length targets in the row labels; panel.js keeps them current (same rule as strength-score.js)
 	$titleGoodMin = max(15, (int)config('settings.listing_form.title_min_length', 2));
 	$labelLimits = [
@@ -46,7 +54,8 @@
 <div class="lf-panel lf-panel-inline" id="lfPanel" data-lf-panel-state="{{ json_encode($panelState, JSON_UNESCAPED_UNICODE) }}">
 	<div class="lf-panel-body">
 @else
-<div class="offcanvas-lg offcanvas-bottom lf-panel" tabindex="-1" id="lfPanel" aria-labelledby="lfPanelTitle">
+<div class="offcanvas-lg offcanvas-bottom lf-panel" tabindex="-1" id="lfPanel" aria-labelledby="lfPanelTitle"
+     data-lf-photo-count="{{ $savedPhotoCount }}">
 	<div class="offcanvas-header d-lg-none">
 		<h2 class="offcanvas-title h5 mb-0" id="lfPanelTitle">{{ trans('listing_form.panel_title') }}</h2>
 		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#lfPanel"
@@ -234,16 +243,19 @@
 			</section>
 		@endif
 
-		<details class="lf-panel-card lf-tips">
-			<summary class="lf-tips-summary">
-				<i class="bi bi-lightbulb" aria-hidden="true"></i> {{ trans('listing_form.tips') }}
-			</summary>
-			<ul class="lf-tips-list">
-				@foreach ($tips as $tip)
-					<li>{{ $tip }}</li>
-				@endforeach
-			</ul>
-		</details>
+		{{-- Tips to sell faster: on the details step only, where the seller writes the listing --}}
+		@unless ($onPhotosStep)
+			<details class="lf-panel-card lf-tips">
+				<summary class="lf-tips-summary">
+					<i class="bi bi-lightbulb" aria-hidden="true"></i> {{ trans('listing_form.tips') }}
+				</summary>
+				<ul class="lf-tips-list">
+					@foreach ($tips as $tip)
+						<li>{{ $tip }}</li>
+					@endforeach
+				</ul>
+			</details>
+		@endunless
 
 	</div>
 </div>

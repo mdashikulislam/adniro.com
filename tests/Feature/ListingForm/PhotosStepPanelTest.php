@@ -35,7 +35,7 @@ class PhotosStepPanelTest extends TestCase
 		$this->postId = $this->stockListing('Grey corner sofa', ['user_id' => self::OWNER_ID])->id;
 	}
 
-	public function test_the_create_photos_step_shows_quality_preview_and_tips_from_step_one(): void
+	public function test_the_create_photos_step_shows_quality_and_preview_from_step_one(): void
 	{
 		// Arrange: step 1 saved a car with a brand
 		[$categoryId, $brandFieldId, $toyotaId] = $this->carWithBrand();
@@ -63,10 +63,11 @@ class PhotosStepPanelTest extends TestCase
 		$this->assertContains('Toyota', array_merge(...array_column($state['details'], 'values')));
 		$this->assertStringEndsWith('/posts/create', $state['backUrl'], 'rows for step 1 fields go back to step 1');
 		$html = $response->getContent();
-		foreach (['data-lf-strength', 'data-lf-live ', 'lf-tips', 'data-lf-check="photos"', 'id="lfSection-photos"'] as $part) {
+		foreach (['data-lf-strength', 'data-lf-live ', 'data-lf-check="photos"', 'id="lfSection-photos"'] as $part) {
 			$this->assertStringContainsString($part, $html, $part);
 		}
 		$this->assertStringNotContainsString('offcanvas-lg', $html, 'on this page the panel sits under the photos on phones');
+		$this->assertStringNotContainsString('lf-tips', $html, 'the selling tips stay on the details step');
 	}
 
 	public function test_the_edit_photos_step_shows_the_saved_listing(): void

@@ -61,9 +61,11 @@
 		meter.setAttribute('aria-valuetext', result.score + '%, ' + tierLabel);
 	}
 
-	/** Photos added so far; undefined where the panel has no photos row (photos are added on another step) */
+	/** Photos added so far: live where the photos are on this page, else the ones already saved (data-lf-photo-count) */
 	function photoCount() {
-		return photosSection ? photosSection.querySelectorAll(PHOTO_THUMB).length : undefined;
+		return photosSection
+			? photosSection.querySelectorAll(PHOTO_THUMB).length
+			: Number(panel && panel.dataset.lfPhotoCount) || 0;
 	}
 
 	function update(state) {
@@ -82,6 +84,25 @@
 	}
 
 	LF.onChange(update);
+
+	/* Large screens: the panel sticks below the header when it fits. When it is taller than the screen,
+	   it scrolls with the page and sticks once its end is in view, so nothing needs an inner scrollbar. */
+	const HEADER_OFFSET = 92; // px, the CSS inset-block-start (5.75rem)
+	const BOTTOM_GAP = 16;
+	const largeScreen = window.matchMedia ? window.matchMedia('(min-width: 992px)') : null;
+	function placePanel() {
+		if (!panel) {
+			return;
+		}
+		panel.style.top = (largeScreen && largeScreen.matches)
+			? Math.min(HEADER_OFFSET, window.innerHeight - panel.offsetHeight - BOTTOM_GAP) + 'px'
+			: '';
+	}
+	window.addEventListener('resize', placePanel);
+	if (window.ResizeObserver && panel) {
+		new ResizeObserver(placePanel).observe(panel);
+	}
+	placePanel();
 
 	/* Adding or removing a photo changes no form field that LF watches */
 	if (photosSection && window.MutationObserver) {

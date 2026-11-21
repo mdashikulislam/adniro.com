@@ -208,7 +208,9 @@ class ListingFormPagesTest extends TestCase
 		$sections = array_map(fn ($node) => $node->getAttribute('id'), iterator_to_array($xpath->query("//form[@id='payableForm']//*[contains(concat(' ', @class, ' '), ' lf-card ')]")));
 		$this->assertSame(['lfSection-what', 'lfSection-details', 'lfSection-price-location', 'lfSection-more', 'lfSection-contact', 'lfSection-finish'], array_values(array_diff($sections, ['lfSection-photos'])));
 		$this->assertSame($mode === self::SINGLE, in_array('lfSection-photos', $sections), 'photos are a section in single-step mode only');
-		$this->assertSame(6, $xpath->query("//*[@id='lfPanel']//*[@data-lf-check]")->length);
+		// Seven quality items in both modes, photos included (on multi-step step 1 it counts photos already saved)
+		$this->assertSame(7, $xpath->query("//*[@id='lfPanel']//*[@data-lf-check]")->length);
+		$this->assertSame(1, $xpath->query("//*[@id='lfPanel']//*[@data-lf-check='photos']")->length);
 		$this->assertSame('150', $xpath->query("//input[@name='title']")->item(0)?->getAttribute('maxlength'));
 		$this->assertNotNull($xpath->query("//label[@for='negotiable']//input[@id='negotiable']")->item(0), 'the whole Negotiable label toggles it');
 	}
