@@ -72,17 +72,23 @@ class ProviderModelCatalogTest extends TestCase
 			['id' => 'text-embedding-3-small'],
 			['id' => 'whisper-1'],
 			['id' => 'gpt-5-mini'],
+			['id' => 'gpt-4o-2024-08-06'],
+			['id' => 'gpt-9-unreleased'],
 		]])]);
 
 		// Act
 		$models = $this->byId(app(ProviderModelCatalog::class)->list($this->provider('openai')));
 
 		// Assert
-		$this->assertSame(['gpt-5-mini', 'whisper-1'], array_keys($models), 'sorted, embeddings dropped');
+		$this->assertSame(['gpt-4o-2024-08-06', 'gpt-5-mini', 'gpt-9-unreleased', 'whisper-1'], array_keys($models), 'sorted, embeddings dropped');
+		$this->assertSame(2.5, $models['gpt-4o-2024-08-06']['input_price'], 'a dated ID gets its family price');
+		$this->assertNull($models['gpt-9-unreleased']['input_price'], 'no guessed price for an unknown model');
 		$this->assertTrue($models['whisper-1']['transcription']);
 		$this->assertFalse($models['whisper-1']['vision']);
 		$this->assertTrue($models['gpt-5-mini']['vision']);
-		$this->assertNull($models['gpt-5-mini']['input_price']);
+		$this->assertSame(0.25, $models['gpt-5-mini']['input_price']);
+		$this->assertSame(2.0, $models['gpt-5-mini']['output_price']);
+		$this->assertNull($models['whisper-1']['input_price'], 'priced per minute, not per token');
 		Http::assertSent(fn (Request $request) => $request->hasHeader('Authorization', 'Bearer test-key-123456789'));
 	}
 

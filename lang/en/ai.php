@@ -83,7 +83,7 @@ return [
 	'catalog_load'          => 'Load models',
 	'catalog_loading'       => 'Loading models…',
 	'catalog_pick'          => 'Choose a model',
-	'catalog_hint'          => 'Lists the models this provider offers with its saved API key. Choosing one fills in the model ID, label, capabilities and, for Claude and OpenRouter models, the prices. Check them before saving.',
+	'catalog_hint'          => 'Lists the models this provider offers with its saved API key. Choosing one fills in the model ID, label, capabilities and, for Claude, OpenAI and OpenRouter models, the prices. Check them before saving.',
 	'catalog_loaded'        => ':count models found.',
 	'catalog_empty'         => 'The provider returned no models.',
 	'catalog_choose_provider' => 'Choose a provider first.',
