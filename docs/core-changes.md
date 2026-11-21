@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (252)
+## Changed (253)
 
 Stock files we edited.
 
@@ -285,6 +285,7 @@ Stock files we edited.
 - `resources/views/front/index.blade.php`
 - `resources/views/front/layouts/master.blade.php`
 - `resources/views/front/layouts/partials/footer.blade.php`
+- `resources/views/front/layouts/partials/header.blade.php`
 - `resources/views/front/layouts/partials/modal/countries.blade.php` (no marker comment)
 - `resources/views/front/layouts/partials/modal/languages.blade.php` (no marker comment)
 - `resources/views/front/layouts/partials/modal/location.blade.php` (no marker comment)
@@ -602,7 +603,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (259)
+## Added (271)
 
 Files that are not part of LaraClassifier.
 
@@ -843,46 +844,55 @@ Files that are not part of LaraClassifier.
 
 - `lang/ar/ai.php`
 - `lang/ar/listing_form.php`
+- `lang/ar/mobile_nav.php`
 
 ### lang/bn
 
 - `lang/bn/ai.php`
 - `lang/bn/listing_form.php`
+- `lang/bn/mobile_nav.php`
 
 ### lang/de
 
 - `lang/de/ai.php`
 - `lang/de/listing_form.php`
+- `lang/de/mobile_nav.php`
 
 ### lang/en
 
 - `lang/en/ai.php`
 - `lang/en/listing_form.php`
+- `lang/en/mobile_nav.php`
 
 ### lang/es
 
 - `lang/es/ai.php`
 - `lang/es/listing_form.php`
+- `lang/es/mobile_nav.php`
 
 ### lang/fr
 
 - `lang/fr/ai.php`
 - `lang/fr/listing_form.php`
+- `lang/fr/mobile_nav.php`
 
 ### lang/hi
 
 - `lang/hi/ai.php`
 - `lang/hi/listing_form.php`
+- `lang/hi/mobile_nav.php`
 
 ### lang/it
 
 - `lang/it/ai.php`
 - `lang/it/listing_form.php`
+- `lang/it/mobile_nav.php`
 
 ### lang/ru
 
 - `lang/ru/ai.php`
 - `lang/ru/listing_form.php`
+- `lang/ru/mobile_nav.php`
 
 ### public/assets
 
@@ -892,6 +902,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/listing-form-preview.css`
 - `public/assets/css/listing-form.css`
 - `public/assets/css/messenger.css`
+- `public/assets/css/mobile-nav.css`
 - `public/assets/js/app/ai.formbox.js`
 - `public/assets/js/app/consent.js`
 - `public/assets/js/app/guest-cache.js`
@@ -945,6 +956,8 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/common/consent/banner.blade.php`
 - `resources/views/front/common/consent/tracking.blade.php`
 - `resources/views/front/common/json-ld.blade.php`
+- `resources/views/front/layouts/partials/mobile-account-menu.blade.php`
+- `resources/views/front/layouts/partials/mobile-nav.blade.php`
 - `resources/views/front/post/assistant/form-box.blade.php`
 - `resources/views/front/post/createOrEdit/form/actions.blade.php`
 - `resources/views/front/post/createOrEdit/form/ai-tools.blade.php`
