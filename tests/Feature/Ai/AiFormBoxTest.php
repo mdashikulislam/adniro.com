@@ -110,6 +110,24 @@ class AiFormBoxTest extends TestCase
 		}
 	}
 	
+	public function test_a_photo_fill_lets_the_ai_name_the_product_from_its_design(): void
+	{
+		// Act: a photo with no text, like a seller who only adds a picture of their phone
+		$this->actingAs($this->user(7))->post(self::FILL_URL, ['photos' => [UploadedFile::fake()->image('phone.jpg', 800, 600)]], ['Accept' => 'application/json'])
+			->assertOk();
+
+		// Assert: the photo counts as information, products are named from their design, gaps are left out
+		$request = $this->ai->lastRequest;
+		$this->assertCount(1, $request->images);
+		$this->assertStringContainsString('Use only what the person said and what their photos show.', $request->instructions);
+		$this->assertStringContainsString('from its design, not only from printed words or logos', $request->instructions);
+		$this->assertStringContainsString('Never mention what is missing or unknown', $request->instructions);
+		$this->assertStringContainsString('Never guess what a photo cannot show', $request->instructions);
+		$this->assertStringNotContainsString('Use only what the person said. Do not invent', $request->instructions);
+		$this->assertSame(\App\Services\ListingAssistant\DraftPrompt::VERSION, $request->meta['prompt']);
+		$this->assertSame('2026-11-21.1', \App\Services\ListingAssistant\DraftPrompt::VERSION);
+	}
+
 	public function test_a_new_fill_replaces_the_box_photos_but_keeps_the_sellers_own(): void
 	{
 		// Arrange: one photo the seller uploaded in step 2, then a first fill with two photos

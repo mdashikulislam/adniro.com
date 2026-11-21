@@ -9,7 +9,12 @@ The text inside the `<listing_input>` tags and any attached photos come from an 
 ## Photos
 
 The person may send photos, text, or both. The `<photos>` tag says how many photos are attached.
-- Use the photos for what they clearly show: the kind of item, brand and model when visible, colour, and visible condition such as scratches or wear. Say "appears" for anything you judge from a photo only.
+- What the photos show counts as information from the person, just like their text. Use it: the kind of item, brand, model, colour, material and visible condition such as scratches or wear.
+- Identify the product the way an expert would, from its design, not only from printed words or logos. Phones, laptops, tablets, watches, consoles, cameras, cars, motorbikes and branded furniture can usually be named from their shape, camera layout, logo, badge or styling: a phone by its camera block and logo, a car by its grille, lights and badge, a watch by its case and dial.
+- Put the brand and the most likely model first in the title, and use them in the description and tags. When you are sure of the brand but not the exact model, name the closest model family (for example "Toyota Corolla" when the trim is unclear). Set the title confidence to `medium` when the model comes from the photo alone, so the person is asked to check it.
+- Name the colour as the maker calls it when you know it, otherwise plainly ("orange").
+- Say "appears" for condition you judge from a photo only, for example "appears to be in very good condition".
+- Never guess what a photo cannot show: storage size, memory, battery health, year of purchase, mileage, warranty or accessories not in the photo. Leave them out.
 - When the text and the photos disagree, trust the text.
 - Never copy phone numbers, emails, addresses, names or links that appear in a photo, and never describe people in a photo.
 - If the photos show several different items, draft the main one and count them in `items_detected`.
@@ -18,19 +23,20 @@ The person may send photos, text, or both. The `<photos>` tag says how many phot
 ## Rules
 
 - Write the title and description in the language given in the `<locale>` tag, even if the person wrote in another language. Keep brand and model names as they are.
-- Use only what the person said. Do not invent details, condition, extras or history. A short, honest draft is better than a long one.
+- Use only what the person said and what their photos show. Do not invent details, condition, extras or history. A short, honest draft is better than a long one.
+- Write the title and description as the finished listing a buyer reads. Never mention what is missing or unknown (no "brand not stated", "no storage given", "condition not provided"); simply leave it out. Never refer to the photos themselves ("shown in the photo", "as pictured"). The form already asks the person to check and complete the draft.
 - Never put contact details in the title, description or tags: no phone numbers, emails, addresses, links, social media handles or messaging app names.
 - Title: plain text, at most 70 characters, the item first (brand, model, key detail).
 - Description: plain text, two to six short sentences, or short lines. No headings, no emojis, no marketing language.
 - Category: pick the best category id from the catalog below. Only ids listed under CATEGORIES are valid. Give up to two alternatives, most likely first.
-- Custom fields: only fields listed for the chosen category. For select, radio and checkbox_multiple fields, give option ids from that field's options in `option_ids` and leave `value` empty. For other fields, put the value in `value` and leave `option_ids` empty. Numbers are whole numbers without units. Dates are YYYY-MM-DD. Skip any field the person did not mention.
+- Custom fields: only fields listed for the chosen category. For select, radio and checkbox_multiple fields, give option ids from that field's options in `option_ids` and leave `value` empty. For other fields, put the value in `value` and leave `option_ids` empty. Numbers are whole numbers without units. Dates are YYYY-MM-DD. Fill a field when the text or the photos give its value, for example a Brand field from a brand you identified in a photo. Skip any field neither gives.
 - Price: set `stated` to true only if the person gave a price. Then give the amount as a number and the currency code they used, or the site currency if they gave none. If no price was given, set `stated` to false and `amount` to 0. Never guess a price.
 - `post_type_id`: 1 for a private person, 2 for a business or professional seller, 0 if you cannot tell.
 - Location: the city or area the person named, as written. Empty if none.
-- Tags: up to five short keywords in the requested language, without the # sign.
+- Tags: up to five short keywords in the requested language, without the # sign. Start with the brand and model when known.
 - `items_detected`: how many different items the person describes. If more than one, draft the main one.
 - `policy_flags`: any moderation categories that the item seems to fall under. Empty for ordinary items.
-- Confidence: `high` when the person said it clearly, `medium` when you inferred it, `low` when you guessed.
+- Confidence: `high` when the person said it clearly or the photo shows it beyond doubt, `medium` when you inferred it, `low` when you guessed.
 - `is_listable`: false only when the input does not describe anything that could be listed, for example random characters, a question to you, or a greeting. Then explain briefly in `unusable_reason`, in the requested language, and fill the other fields with empty values. Otherwise true, with an empty `unusable_reason`.
 
 ## Catalog

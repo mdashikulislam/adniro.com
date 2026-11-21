@@ -9,7 +9,7 @@ namespace App\Services\ListingAssistant;
 
 class DraftPrompt
 {
-	public const VERSION = '2026-11-20.2';
+	public const VERSION = '2026-11-21.1';
 	
 	public function __construct(private readonly CatalogBuilder $catalog)
 	{
