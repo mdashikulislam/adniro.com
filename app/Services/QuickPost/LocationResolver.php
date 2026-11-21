@@ -18,6 +18,9 @@ class LocationResolver
 	/** About 100 km: beyond that, the nearest city is probably not where the person is. */
 	public const MAX_DEGREES = 1.0;
 	
+	/** A partial name needs at least this many characters, so "New" alone matches nothing. */
+	public const MIN_PREFIX_LENGTH = 4;
+	
 	/**
 	 * @return array{0: City|null, 1: string|null} The city and how it was found
 	 */
@@ -68,30 +71,58 @@ class LocationResolver
 		return $row ? City::query()->find($row->id) : null;
 	}
 	
+	/**
+	 * The place named in the text: an exact city name first, then a city whose name starts with
+	 * the given words ("New York" finds "New York City"). The most populated city wins a tie.
+	 */
 	private function byName(string $countryCode, string $text): ?City
 	{
-		$parts = array_values(array_filter(array_map('trim', preg_split('/[,;\/]+/u', $text) ?: [])));
+		$parts = array_values(array_filter(
+			array_slice(array_map('trim', preg_split('/[,;\/]+/u', $text) ?: []), 0, 3),
+			fn ($part) => mb_strlen($part) >= 2
+		));
 		
-		foreach (array_slice($parts, 0, 3) as $part) {
-			if (mb_strlen($part) < 2) {
+		// Names are stored as JSON translations, e.g. {"en":"Dhaka"}: match a whole translated value
+		foreach ($parts as $part) {
+			$city = $this->firstCity($countryCode, '%"' . self::escapeLike($part) . '"%', $part);
+			if ($city) {
+				return $city;
+			}
+		}
+		
+		// The start of a name, ending at a word
+		foreach ($parts as $part) {
+			if (mb_strlen($part) < self::MIN_PREFIX_LENGTH) {
 				continue;
 			}
-			
-			// Names are stored as JSON translations, e.g. {"en":"Dhaka"}: match a whole translated value
-			$needle = '%"' . addcslashes($part, '%_"\\') . '"%';
-			$row = DB::table('cities')
-				->where('country_code', $countryCode)
-				->where('active', 1)
-				->where(function ($query) use ($needle, $part) {
-					$query->where('name', 'like', $needle)->orWhere('name', $part);
-				})
-				->orderByDesc('population')
-				->first(['id']);
-			if ($row) {
-				return City::query()->find($row->id);
+			$city = $this->firstCity($countryCode, '%"' . self::escapeLike($part) . ' %');
+			if ($city) {
+				return $city;
 			}
 		}
 		
 		return null;
+	}
+	
+	private function firstCity(string $countryCode, string $pattern, ?string $plainName = null): ?City
+	{
+		$row = DB::table('cities')
+			->where('country_code', $countryCode)
+			->where('active', 1)
+			->where(function ($query) use ($pattern, $plainName) {
+				$query->where('name', 'like', $pattern);
+				if (!is_null($plainName)) {
+					$query->orWhere('name', $plainName);
+				}
+			})
+			->orderByDesc('population')
+			->first(['id']);
+		
+		return $row ? City::query()->find($row->id) : null;
+	}
+	
+	private static function escapeLike(string $value): string
+	{
+		return addcslashes($value, '%_"\\');
 	}
 }
