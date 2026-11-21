@@ -165,9 +165,10 @@
 	});
 
 	/* ---------- Card ---------- */
+	/* The cookie banner or a dialog is open (getClientRects: fixed elements have no offsetParent) */
 	function bottomIsBusy() {
 		var consent = document.getElementById('cookieConsent');
-		var consentShown = consent && !consent.classList.contains('d-none') && consent.offsetParent !== null;
+		var consentShown = !!consent && !consent.classList.contains('d-none') && consent.getClientRects().length > 0;
 		return consentShown || !!document.querySelector('.modal.show, .offcanvas.show');
 	}
 
