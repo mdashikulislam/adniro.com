@@ -1387,7 +1387,11 @@
 	padding: .5rem 0 0 !important;
 }
 
+/* The card body has no padding here, so this nested row's negative
+ * gutters would push the city list 12px past narrow phone screens. */
 .location-card .section-unboxed .row.px-4 {
+	margin-left: 0;
+	margin-right: 0;
 	padding-left: 0 !important;
 	padding-right: 0 !important;
 }
