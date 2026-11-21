@@ -2391,4 +2391,5 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'rows_per_page_hint' => 'हर खोज पेज पर विज्ञापनों की कितनी पंक्तियाँ दिखें; ग्रिड व्यू में यह पंक्तियाँ × कॉलम है, इसलिए आख़िरी पंक्ति हमेशा पूरी रहती है। Pagination > Listings per page इस्तेमाल करने के लिए खाली छोड़ें।',
 	'items_per_row_label' => 'प्रति पंक्ति आइटम',
 	'items_per_row_hint' => 'बड़ी स्क्रीन पर इस सेक्शन में प्रति पंक्ति विज्ञापन। टैबलेट पर अधिकतम 3 और फ़ोन पर 2 दिखते हैं।',
+	'recently_viewed_max_items_hint' => 'विज़िटर के हाल में देखे गए कितने विज्ञापन दिखाएँ, अधिकतम :max।',
 ];

@@ -2395,4 +2395,5 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'rows_per_page_hint' => 'প্রতিটি সার্চ পেজে কত সারি বিজ্ঞাপন দেখাবে; গ্রিড ভিউতে এটি সারি × কলাম, তাই শেষ সারি সবসময় পূর্ণ থাকে। Pagination > Listings per page ব্যবহার করতে খালি রাখুন।',
 	'items_per_row_label' => 'প্রতি সারিতে আইটেম',
 	'items_per_row_hint' => 'বড় স্ক্রিনে এই সেকশনে প্রতি সারিতে কতটি বিজ্ঞাপন। ট্যাবলেটে সর্বোচ্চ ৩টি এবং ফোনে ২টি দেখায়।',
+	'recently_viewed_max_items_hint' => 'ভিজিটরের সম্প্রতি দেখা কতটি বিজ্ঞাপন দেখাবে, সর্বোচ্চ :max টি।',
 ];

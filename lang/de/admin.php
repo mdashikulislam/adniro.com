@@ -2394,4 +2394,5 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'rows_per_page_hint' => 'Wie viele Anzeigenzeilen jede Suchseite zeigt; in der Rasteransicht sind das Zeilen × Spalten, die letzte Zeile ist also immer voll. Leer lassen, um Paginierung > Anzeigen pro Seite zu verwenden.',
 	'items_per_row_label' => 'Elemente pro Zeile',
 	'items_per_row_hint' => 'Anzeigen pro Zeile in diesem Bereich, auf großen Bildschirmen. Tablets zeigen bis zu 3, Telefone 2.',
+	'recently_viewed_max_items_hint' => 'Wie viele zuletzt angesehene Anzeigen des Besuchers angezeigt werden, bis zu :max.',
 ];

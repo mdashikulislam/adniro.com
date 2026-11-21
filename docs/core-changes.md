@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (240)
+## Changed (251)
 
 Stock files we edited.
 
@@ -82,8 +82,11 @@ Stock files we edited.
 - `app/Models/Post/SimilarByCategory.php` (no marker comment)
 - `app/Models/Post/SimilarByLocation.php` (no marker comment)
 - `app/Models/Scopes/ReviewedScope.php`
+- `app/Models/Section/Home/LatestListingsSection.php`
+- `app/Models/Section/Home/PremiumListingsSection.php`
 - `app/Models/Setting/AppSetting.php` (no marker comment)
 - `app/Models/Setting/ListingFormSetting.php`
+- `app/Models/Setting/ListingsListSetting.php`
 - `app/Models/Setting/SecuritySetting.php` (no marker comment)
 - `app/Models/Setting/StyleSetting.php` (no marker comment)
 - `app/Models/Traits/MetaTagTrait.php` (no marker comment)
@@ -111,7 +114,7 @@ Stock files we edited.
 - `app/Services/Post/List/SearchTrait.php`
 - `app/Services/Post/Show/DetailedTrait.php`
 - `app/Services/Post/ShowTrait.php`
-- `app/Services/Section/SectionDataTrait.php` (no marker comment)
+- `app/Services/Section/SectionDataTrait.php`
 
 ### bootstrap/app.php
 
@@ -171,14 +174,17 @@ Stock files we edited.
 
 ### lang/ar
 
+- `lang/ar/admin.php`
 - `lang/ar/global.php`
 
 ### lang/bn
 
+- `lang/bn/admin.php`
 - `lang/bn/global.php`
 
 ### lang/de
 
+- `lang/de/admin.php`
 - `lang/de/global.php`
 
 ### lang/en
@@ -190,22 +196,27 @@ Stock files we edited.
 
 ### lang/es
 
+- `lang/es/admin.php`
 - `lang/es/global.php`
 
 ### lang/fr
 
+- `lang/fr/admin.php`
 - `lang/fr/global.php`
 
 ### lang/hi
 
+- `lang/hi/admin.php`
 - `lang/hi/global.php`
 
 ### lang/it
 
+- `lang/it/admin.php`
 - `lang/it/global.php`
 
 ### lang/ru
 
+- `lang/ru/admin.php`
 - `lang/ru/global.php`
 
 ### packages/larapen
@@ -270,7 +281,7 @@ Stock files we edited.
 - `resources/views/front/account/saved-searches/index.blade.php` (no marker comment)
 - `resources/views/front/common/meta-robots.blade.php` (no marker comment)
 - `resources/views/front/countries.blade.php` (no marker comment)
-- `resources/views/front/index.blade.php` (no marker comment)
+- `resources/views/front/index.blade.php`
 - `resources/views/front/layouts/master.blade.php`
 - `resources/views/front/layouts/partials/footer.blade.php`
 - `resources/views/front/layouts/partials/modal/countries.blade.php` (no marker comment)
@@ -590,7 +601,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (254)
+## Added (256)
 
 Files that are not part of LaraClassifier.
 
@@ -609,6 +620,7 @@ Files that are not part of LaraClassifier.
 - `app/Helpers/Common/CookieConsent.php`
 - `app/Helpers/Common/ErrorPageMessage.php`
 - `app/Helpers/Common/ListingCardImage.php`
+- `app/Helpers/Common/ListingGrid.php`
 - `app/Helpers/Services/ListingCounts.php`
 
 ### app/Http
@@ -785,6 +797,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_21_000200_add_content_and_legal_pages.php`
 - `database/migrations/2026_11_21_000300_add_new_pages_to_footer_menu.php`
 - `database/migrations/2026_11_21_000400_rename_quickpost_to_listing_assistant.php`
+- `database/migrations/2026_11_22_000100_keep_search_page_at_three_listings_per_row.php`
 
 ### database/seeders
 

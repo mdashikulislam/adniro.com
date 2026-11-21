@@ -2619,4 +2619,5 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'rows_per_page_hint' => 'How many rows of listings each search page shows; in the grid view this is rows × columns, so the last row is always full. Leave empty to use Pagination > Listings per page.',
 	'items_per_row_label' => 'Items per row',
 	'items_per_row_hint' => 'Listings per row in this section, on wide screens. Tablets show up to 3 and phones 2.',
+	'recently_viewed_max_items_hint' => 'How many of the visitor\'s recently viewed listings to show, up to :max.',
 ];

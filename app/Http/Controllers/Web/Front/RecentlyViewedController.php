@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Front;
 
+use App\Helpers\Common\ListingGrid;
 use App\Http\Resources\EntityCollection;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
@@ -59,27 +60,42 @@ class RecentlyViewedController extends FrontController
 			return $this->response('', []);
 		}
 		
+		// adniro: the section's options (Admin > Homepage > Sections > Recently Viewed). All the listings still
+		// online are returned, so the browser keeps its history; only the first "max" are shown.
+		$onlineIds = $posts->pluck('id')->map(fn ($id) => (int)$id)->all();
+		$shown = $posts->take($this->maxItems($request))->values();
+
 		$params = ['embed' => ['category', 'parent', 'city', 'picture', 'pictures', 'currency', 'payment', 'package', 'savedByLoggedUser', 'postType']];
-		$postsCollection = new EntityCollection(PostResource::class, $posts, $params);
+		$postsCollection = new EntityCollection(PostResource::class, $shown, $params);
 		$data = (array)data_get($postsCollection->toResponse($request)->getData(true), 'data', []);
-		
+
 		$html = view('front.sections.home.partials.recently-viewed-items', [
 			'posts'      => $data,
 			'totalPosts' => count($data),
+			'customCols' => ListingGrid::columns($request->query('cols') ?: ListingGrid::HOMEPAGE_DEFAULT_COLUMNS),
 		])->render();
-		
-		return $this->response($html, array_map(fn ($post) => (int)data_get($post, 'id'), $data));
+
+		return $this->response($html, $onlineIds, count($data));
 	}
-	
+
+	/** Cards to show: the section's "Max items", 1 to MAX_ITEMS (MAX_ITEMS when not given) */
+	private function maxItems(Request $request): int
+	{
+		$max = filter_var($request->query('max'), FILTER_VALIDATE_INT);
+
+		return ($max === false || $max < 1) ? self::MAX_ITEMS : min($max, self::MAX_ITEMS);
+	}
+
 	/**
 	 * @param string $html
 	 * @param array $ids The listings that are still online (the browser forgets the other ones)
+	 * @param int|null $count The cards shown
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	private function response(string $html, array $ids): JsonResponse
+	private function response(string $html, array $ids, ?int $count = null): JsonResponse
 	{
 		return response()
-			->json(['html' => $html, 'ids' => $ids, 'count' => count($ids)])
+			->json(['html' => $html, 'ids' => $ids, 'count' => $count ?? count($ids)])
 			->header('Cache-Control', 'no-store, private');
 	}
 }

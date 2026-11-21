@@ -4,9 +4,7 @@
 @endsection
 @section('content')
 	<div class="main-container sectionable" id="homepage">
-		@php
-			$isRecentlyViewedShown = false;
-		@endphp
+		{{-- adniro: "Recently viewed" is a section like the others (Admin > Homepage > Sections) --}}
 		@if (!empty($sections))
 			@foreach($sections as $section)
 				@php
@@ -14,13 +12,6 @@
 					$sectionView = data_get($section, 'view');
 					$sectionData = (array)data_get($section, 'data');
 				@endphp
-				{{-- Recently viewed listings (one row), just before the latest listings --}}
-				@if (!$isRecentlyViewedShown && str_ends_with((string)$sectionView, 'latest-listings'))
-					@include('front.sections.home.recently-viewed')
-					@php
-						$isRecentlyViewedShown = true;
-					@endphp
-				@endif
 				@if (!empty($sectionView) && view()->exists($sectionView))
 					@include($sectionView, [
 						'sectionData'  => $sectionData,
@@ -29,10 +20,7 @@
 				@endif
 			@endforeach
 		@endif
-		@if (!$isRecentlyViewedShown)
-			@include('front.sections.home.recently-viewed')
-		@endif
-		
+
 	</div>
 	
 	@includeWhen(!auth()->check(), 'auth.login.partials.modal')

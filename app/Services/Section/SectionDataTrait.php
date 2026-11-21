@@ -130,6 +130,18 @@ trait SectionDataTrait
 	{
 		return $this->getListingsSection('latest', $values);
 	}
+
+	/**
+	 * adniro: recently viewed listings. Nothing to load here: the visitor's browser remembers the listings
+	 * it opened and asks for their cards (RecentlyViewedController), so the section works on cached pages.
+	 *
+	 * @param array|null $values
+	 * @return array
+	 */
+	protected function recentlyViewed(?array $values = []): array
+	{
+		return [];
+	}
 	
 	/**
 	 * Get listings' section

@@ -2,12 +2,24 @@
 	Homepage: "Recently viewed" listings, in one row.
 	The listings opened by the visitor are remembered in the browser (localStorage, see the listing page).
 	The section stays hidden for the visitors without history (& for the search engines).
+	Its options (Admin > Homepage > Sections > Recently Viewed): max items, items per row, spacing, animation.
 --}}
-<div class="container recently-viewed-section" id="recentlyViewed" hidden
+@php
+	$sectionOptions = $recentlyViewedOptions ?? [];
+	$maxItems = (int)($sectionOptions['max_items'] ?? \App\Http\Controllers\Web\Front\RecentlyViewedController::MAX_ITEMS);
+	$itemsPerRow = \App\Helpers\Common\ListingGrid::columns($sectionOptions['items_per_row'] ?? \App\Helpers\Common\ListingGrid::HOMEPAGE_DEFAULT_COLUMNS);
+	$cssClasses = $sectionOptions['css_classes'] ?? '';
+	$cssClasses = !empty($cssClasses) ? " {$cssClasses}" : '';
+	$htmlAttr = $sectionOptions['html_attributes'] ?? '';
+	$htmlAttr = !empty($htmlAttr) ? " {$htmlAttr}" : '';
+@endphp
+<div class="container recently-viewed-section{{ $cssClasses }}" id="recentlyViewed" hidden
      data-url="{{ url('listings/recently-viewed') }}"
      data-storage-key="adn_recently_viewed"
+     data-max="{{ $maxItems }}"
+     data-cols="{{ $itemsPerRow }}"
 >
-	<div class="card listing-section">
+	<div class="card listing-section"{!! $htmlAttr !!}>
 		<div class="card-header border-bottom-0 section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
 			<h2 class="h4 mb-0 fw-lighter section-title">{!! t('home_recently_viewed') !!}</h2>
 			<div class="recently-viewed-tools">
@@ -103,7 +115,10 @@
 		});
 		window.addEventListener('resize', refreshNav);
 		
-		fetch(sectionEl.dataset.url + '?ids=' + encodeURIComponent(ids.join(',')), {
+		var query = '?ids=' + encodeURIComponent(ids.join(','))
+			+ '&max=' + encodeURIComponent(sectionEl.dataset.max || '')
+			+ '&cols=' + encodeURIComponent(sectionEl.dataset.cols || '');
+		fetch(sectionEl.dataset.url + query, {
 			credentials: 'same-origin',
 			headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}
 		})

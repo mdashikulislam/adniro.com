@@ -2391,4 +2391,5 @@ To enable diacritics-insensitive searches, one of collations like: <code>utf8mb4
 	'rows_per_page_hint' => 'Quante righe di annunci mostra ogni pagina di ricerca; nella griglia sono righe × colonne, quindi l\'ultima riga è sempre piena. Lascia vuoto per usare Paginazione > Annunci per pagina.',
 	'items_per_row_label' => 'Elementi per riga',
 	'items_per_row_hint' => 'Annunci per riga in questa sezione, su schermi grandi. I tablet ne mostrano fino a 3 e i telefoni 2.',
+	'recently_viewed_max_items_hint' => 'Quanti annunci visti di recente dal visitatore mostrare, fino a :max.',
 ];
