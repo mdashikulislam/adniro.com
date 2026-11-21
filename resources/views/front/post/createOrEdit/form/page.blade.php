@@ -138,6 +138,7 @@
 	@endPushOnce
 	@pushOnce('after_styles_stack', 'listing_form_panel_css')
 		<link href="{{ url('assets/css/listing-form-panel.css') }}?v={{ @filemtime(public_path('assets/css/listing-form-panel.css')) }}" rel="stylesheet">
+		<link href="{{ url('assets/css/listing-form-preview.css') }}?v={{ @filemtime(public_path('assets/css/listing-form-preview.css')) }}" rel="stylesheet">
 	@endPushOnce
 	@pushOnce('after_styles_stack', 'listing_form_ai_css')
 		<link href="{{ url('assets/css/listing-form-ai.css') }}?v={{ @filemtime(public_path('assets/css/listing-form-ai.css')) }}" rel="stylesheet">
