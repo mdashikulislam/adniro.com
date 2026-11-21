@@ -312,6 +312,9 @@
 						@endphp
 						<div class="{{ $copyrightAlignClass }}">
 							&copy; {{ date('Y') }} {!! $siteName !!}. {{ t('all_rights_reserved') }}.
+							@if (\App\Helpers\Common\CookieConsent::required())
+								<a href="#" class="ms-2 link-secondary" data-cookie-settings>{{ t('cookie_settings') }}</a> {{-- adniro --}}
+							@endif
 						</div>
 						
 						@if (!$hidePoweredBy)

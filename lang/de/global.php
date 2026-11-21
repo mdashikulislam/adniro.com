@@ -1071,4 +1071,12 @@ return [
 	'mail_footer_preferences' => 'E-Mail-Einstellungen',
 	'mail_footer_reason' => 'Sie erhalten diese E-Mail, weil Sie ein Konto oder eine Anzeige bei :appName haben.',
 	'view_listing' => 'Anzeige ansehen',
+	
+	// adniro: cookie consent
+	'cookie_banner_title' => 'Cookies auf dieser Website',
+	'cookie_banner_text' => 'Wir verwenden notwendige Cookies für den Betrieb der Website. Mit Ihrer Zustimmung verwenden wir außerdem Analyse-Cookies, um zu verstehen, wie die Website genutzt wird.',
+	'cookie_banner_policy' => 'Cookie-Richtlinie',
+	'cookie_banner_decline' => 'Nur notwendige',
+	'cookie_banner_accept' => 'Alle akzeptieren',
+	'cookie_settings' => 'Cookie-Einstellungen',
 ];

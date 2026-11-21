@@ -1070,4 +1070,12 @@ return [
 	'mail_footer_preferences' => 'تفضيلات البريد',
 	'mail_footer_reason' => 'تتلقى هذه الرسالة لأن لديك حسابًا أو إعلانًا على :appName.',
 	'view_listing' => 'عرض الإعلان',
+	
+	// adniro: cookie consent
+	'cookie_banner_title' => 'ملفات تعريف الارتباط على هذا الموقع',
+	'cookie_banner_text' => 'نستخدم ملفات تعريف الارتباط الضرورية لتشغيل الموقع. وبإذنك، نستخدم أيضًا ملفات تحليلية لفهم كيفية استخدام الموقع.',
+	'cookie_banner_policy' => 'سياسة ملفات تعريف الارتباط',
+	'cookie_banner_decline' => 'الضرورية فقط',
+	'cookie_banner_accept' => 'قبول الكل',
+	'cookie_settings' => 'إعدادات ملفات تعريف الارتباط',
 ];

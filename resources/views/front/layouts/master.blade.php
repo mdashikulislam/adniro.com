@@ -169,7 +169,7 @@
 	
 	@include('front.layouts.partials.modal.countries')
 	@include('front.layouts.partials.modal.error')
-	@include('cookie-consent::index')
+	@include('front.common.consent.banner') {{-- adniro: replaces cookie-consent::index (decided in the browser) --}}
 	
 	@if (config('plugins.detectadsblocker.installed'))
 		@if (view()->exists('detectadsblocker::modal'))
@@ -262,8 +262,6 @@
 	@endforeach
 @endif
 
-@if (config('settings.footer.tracking_code'))
-	{!! printJs(config('settings.footer.tracking_code')) . "\n" !!}
-@endif
+@include('front.common.consent.tracking') {{-- adniro: tracking code runs after cookie consent --}}
 </body>
 </html>

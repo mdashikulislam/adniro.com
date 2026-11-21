@@ -1076,4 +1076,12 @@ Usa immagini reali del tuo prodotto, non cataloghi.',
 	'mail_footer_preferences' => 'Preferenze email',
 	'mail_footer_reason' => 'Ricevi questa email perché hai un account o un annuncio su :appName.',
 	'view_listing' => 'Vedi l\'annuncio',
+	
+	// adniro: cookie consent
+	'cookie_banner_title' => 'Cookie su questo sito',
+	'cookie_banner_text' => 'Usiamo cookie necessari per far funzionare il sito. Con il tuo consenso, usiamo anche cookie analitici per capire come viene usato il sito.',
+	'cookie_banner_policy' => 'Informativa sui cookie',
+	'cookie_banner_decline' => 'Solo necessari',
+	'cookie_banner_accept' => 'Accetta tutti',
+	'cookie_settings' => 'Impostazioni cookie',
 ];

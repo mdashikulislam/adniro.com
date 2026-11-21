@@ -1241,4 +1241,12 @@ return [
 	'mail_footer_preferences' => 'Email preferences',
 	'mail_footer_reason' => 'You are receiving this email because you have an account or a listing on :appName.',
 	'view_listing' => 'View listing',
+	
+	// adniro: cookie consent
+	'cookie_banner_title' => 'Cookies on this site',
+	'cookie_banner_text' => 'We use necessary cookies to run the site. With your permission, we also use analytics cookies to understand how the site is used.',
+	'cookie_banner_policy' => 'Cookie policy',
+	'cookie_banner_decline' => 'Necessary only',
+	'cookie_banner_accept' => 'Accept all',
+	'cookie_settings' => 'Cookie settings',
 ];

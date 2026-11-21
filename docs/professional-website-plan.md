@@ -230,6 +230,15 @@ Most important first:
 - **Emails.** Branded emails: logo, brand colour, help and safety links, and an unsubscribe or preferences link.
 
 ### Phase 5: content and legal (2 to 3 days, mostly writing)
+
+> **Status, 21 Nov 2026: done, with tests (222 passing) and checked in the browser. The texts are drafts in English: have them read by someone qualified before relying on them legally.**
+> - **Cookie consent:** with the cookie banner on (now switched on), the footer tracking code (Google Analytics) sits inert in a `<template>` and runs only after "Accept all". The banner is shown by `consent.js` in the browser, so cached guest pages work. "Cookie settings" in the footer reopens it. It replaces the server-side `cookie-consent` banner.
+> - **New pages:** About us, Posting rules and Cookie policy, linked in the footer and the page sidebar.
+> - **FAQ:** the stock text (wrong 3-month expiry) is replaced with current answers: 30 days online, 7 days to renew, the AI box, listing checks, contact privacy, verified sellers, reporting, account deletion.
+> - **Privacy policy:** your text is kept. Added "AI Features" (listing checks, the AI box, voice input) and "Analytics and Cookies", retention times in "Data Retention", renumbered the last two sections and updated the date.
+> - Texts live in `database/data/pages/`; the migrations only replace stock text, and `down()` restores what was there.
+>
+> Hard-coded facts to keep in step with the settings: 30 days online, 7 days to renew, up to 5 photos, and "Anthropic" as the AI provider. Other languages show the English text until translated.
 - **Pages.** Write About, a correct FAQ (including how AI moderation and quick post work), posting rules, a cookie policy, and a privacy policy that covers the AI providers, voice input, Analytics, retention and deletion.
 - **Cookie consent.** Load Analytics only after consent. The banner must be decided in JavaScript, because the guest page cache serves one copy of each page to everyone.
 

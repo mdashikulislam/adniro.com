@@ -1073,4 +1073,12 @@ return [
 	'mail_footer_preferences' => 'Настройки писем',
 	'mail_footer_reason' => 'Вы получили это письмо, потому что у вас есть аккаунт или объявление на :appName.',
 	'view_listing' => 'Открыть объявление',
+	
+	// adniro: cookie consent
+	'cookie_banner_title' => 'Файлы cookie на сайте',
+	'cookie_banner_text' => 'Мы используем необходимые файлы cookie для работы сайта. С вашего согласия мы также используем аналитические cookie, чтобы понимать, как используется сайт.',
+	'cookie_banner_policy' => 'Политика cookie',
+	'cookie_banner_decline' => 'Только необходимые',
+	'cookie_banner_accept' => 'Принять все',
+	'cookie_settings' => 'Настройки cookie',
 ];

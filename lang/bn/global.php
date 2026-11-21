@@ -1068,4 +1068,12 @@ return [
 	'mail_footer_preferences' => 'ইমেইল পছন্দসমূহ',
 	'mail_footer_reason' => 'আপনি এই ইমেইলটি পাচ্ছেন কারণ :appName-এ আপনার একটি অ্যাকাউন্ট বা বিজ্ঞাপন আছে।',
 	'view_listing' => 'বিজ্ঞাপন দেখুন',
+	
+	// adniro: cookie consent
+	'cookie_banner_title' => 'এই সাইটে কুকিজ',
+	'cookie_banner_text' => 'সাইট চালানোর জন্য আমরা প্রয়োজনীয় কুকিজ ব্যবহার করি। আপনার অনুমতি নিয়ে, সাইটটি কীভাবে ব্যবহার হয় তা বুঝতে আমরা অ্যানালিটিক্স কুকিজও ব্যবহার করি।',
+	'cookie_banner_policy' => 'কুকি নীতি',
+	'cookie_banner_decline' => 'শুধু প্রয়োজনীয়',
+	'cookie_banner_accept' => 'সব গ্রহণ করুন',
+	'cookie_settings' => 'কুকি সেটিংস',
 ];
