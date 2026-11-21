@@ -215,7 +215,7 @@ Most important first:
 
 ### Phase 4: trust and safety (4 to 6 days)
 
-> **Status, 21 Nov 2026: done except the messenger restyle, with tests (215 passing).**
+> **Status, 21 Nov 2026: done, with tests (216 passing).**
 > - **Seller card:** "Verified seller" badge for a confirmed email (decision 2; login rules unchanged), and "Active listings" counting only listings the public can see. Moderation-held and unreviewed listings no longer count on seller pages either.
 > - **Safety:** two more tips on listings (no deposits, never share codes); "Know more" now works. A "Report abuse" link sits next to the reference under the price.
 > - **Safety page:** the anti-scam page is the site's "tips" page with a current guide (migration; owner-edited text would be kept; English only, other languages show it until translated).
@@ -223,7 +223,7 @@ Most important first:
 > - **Emails:** brand colour (theme `adniro`), logo with alt text, and Help, Safety tips and Email preferences links plus a "why you got this" line.
 > - New texts in all 9 languages; "Verified seller" was English only before.
 >
-> Not done: the messenger restyle. It needs a signed-in look at the inbox and conversations; sign in on the local site in the browser pane and it can be done next.
+> - **Messenger restyle** (checked signed in, in Chrome, with a temporary test conversation that was removed afterwards): the listing card (photo, title, price, link) at the top of a conversation, own messages in the brand colour, larger message text, small round avatars, a rounder message box, and unread conversations tinted with an accent bar instead of yellow.
 - **Seller card.** A verified badge, "member since" and an active listing count on the listing page.
 - **Safety and reporting.** A safety tips card that links to a rewritten anti-scam page, and a "Report" link next to the price.
 - **Messages.** Restyle the messenger, with a safety banner in each conversation.

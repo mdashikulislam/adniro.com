@@ -20,6 +20,10 @@
 	$totalThreads = (int)data_get($apiResult, 'meta.total', 0);
 @endphp
 
+@push('after_styles_stack')
+	<link href="{{ url('assets/css/messenger.css') }}?v=1" rel="stylesheet"> {{-- adniro --}}
+@endpush
+
 @section('content')
 	@include('front.common.spacer')
     <div class="main-container">

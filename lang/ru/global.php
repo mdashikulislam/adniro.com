@@ -1072,4 +1072,5 @@ return [
 	'mail_footer_safety' => 'Советы по безопасности',
 	'mail_footer_preferences' => 'Настройки писем',
 	'mail_footer_reason' => 'Вы получили это письмо, потому что у вас есть аккаунт или объявление на :appName.',
+	'view_listing' => 'Открыть объявление',
 ];

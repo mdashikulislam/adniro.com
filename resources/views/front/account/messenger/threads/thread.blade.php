@@ -14,7 +14,7 @@
 	$isUnread = data_get($thread, 'p_is_unread');
 	
 	$borderBottom = !$isLastThread ? ' border-bottom pb-2' : '';
-	$unreadClass = $isUnread ? ' bg-warning-subtle fw-bold' : '';
+	$unreadClass = $isUnread ? ' thread-unread fw-bold py-2' : ''; // adniro: was a yellow background
 @endphp
 <div class="row hstack gap-0{{ $unreadClass . $borderBottom }} mb-2">
 	<div class="col-auto">

@@ -1070,4 +1070,5 @@ return [
 	'mail_footer_safety' => 'Consejos de seguridad',
 	'mail_footer_preferences' => 'Preferencias de correo',
 	'mail_footer_reason' => 'Recibes este correo porque tienes una cuenta o un anuncio en :appName.',
+	'view_listing' => 'Ver anuncio',
 ];

@@ -1069,4 +1069,5 @@ return [
 	'mail_footer_safety' => 'نصائح الأمان',
 	'mail_footer_preferences' => 'تفضيلات البريد',
 	'mail_footer_reason' => 'تتلقى هذه الرسالة لأن لديك حسابًا أو إعلانًا على :appName.',
+	'view_listing' => 'عرض الإعلان',
 ];

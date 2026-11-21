@@ -1240,4 +1240,5 @@ return [
 	'mail_footer_safety' => 'Safety tips',
 	'mail_footer_preferences' => 'Email preferences',
 	'mail_footer_reason' => 'You are receiving this email because you have an account or a listing on :appName.',
+	'view_listing' => 'View listing',
 ];

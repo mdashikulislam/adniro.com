@@ -1070,4 +1070,5 @@ return [
 	'mail_footer_safety' => 'Sicherheitstipps',
 	'mail_footer_preferences' => 'E-Mail-Einstellungen',
 	'mail_footer_reason' => 'Sie erhalten diese E-Mail, weil Sie ein Konto oder eine Anzeige bei :appName haben.',
+	'view_listing' => 'Anzeige ansehen',
 ];

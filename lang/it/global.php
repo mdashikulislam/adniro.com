@@ -1075,4 +1075,5 @@ Usa immagini reali del tuo prodotto, non cataloghi.',
 	'mail_footer_safety' => 'Consigli di sicurezza',
 	'mail_footer_preferences' => 'Preferenze email',
 	'mail_footer_reason' => 'Ricevi questa email perché hai un account o un annuncio su :appName.',
+	'view_listing' => 'Vedi l\'annuncio',
 ];

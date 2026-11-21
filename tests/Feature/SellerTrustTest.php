@@ -78,6 +78,22 @@ class SellerTrustTest extends TestCase
 		}
 	}
 	
+	public function test_a_conversation_starts_with_the_listing_it_is_about(): void
+	{
+		// Arrange
+		$this->user(7, ['email_verified_at' => now()]);
+		$this->listing(['title' => 'Grey corner sofa']);
+		$postId = (int)DB::table('posts')->value('id');
+		
+		// Act
+		$html = view('front.account.messenger.partials.listing-card', ['thread' => ['post_id' => $postId]])->render();
+		
+		// Assert
+		$this->assertStringContainsString('chat-listing-card', $html);
+		$this->assertStringContainsString('Grey corner sofa', $html);
+		$this->assertStringContainsString('View listing', $html);
+	}
+	
 	private function user(int $id, array $attributes = []): User
 	{
 		return User::query()->forceCreate(array_merge([

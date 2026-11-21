@@ -1067,4 +1067,5 @@ return [
 	'mail_footer_safety' => 'सुरक्षा सुझाव',
 	'mail_footer_preferences' => 'ईमेल प्राथमिकताएँ',
 	'mail_footer_reason' => 'आपको यह ईमेल इसलिए मिला है क्योंकि :appName पर आपका खाता या विज्ञापन है।',
+	'view_listing' => 'विज्ञापन देखें',
 ];

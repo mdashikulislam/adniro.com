@@ -1067,4 +1067,5 @@ return [
 	'mail_footer_safety' => 'নিরাপত্তা পরামর্শ',
 	'mail_footer_preferences' => 'ইমেইল পছন্দসমূহ',
 	'mail_footer_reason' => 'আপনি এই ইমেইলটি পাচ্ছেন কারণ :appName-এ আপনার একটি অ্যাকাউন্ট বা বিজ্ঞাপন আছে।',
+	'view_listing' => 'বিজ্ঞাপন দেখুন',
 ];

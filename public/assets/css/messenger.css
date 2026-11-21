@@ -1,0 +1,45 @@
+/*
+ * Messenger restyle (adniro, phase 4): calmer unread rows, the listing at the top of a conversation,
+ * brand-coloured own messages, small round avatars and a rounder message box.
+ */
+.chat-listing-card {
+	padding: .65rem .85rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 14px;
+	background: var(--bs-body-bg);
+	color: var(--bs-body-color);
+	transition: border-color .15s, box-shadow .15s;
+}
+.chat-listing-card:hover { border-color: var(--bs-primary); box-shadow: 0 6px 18px -12px rgba(var(--bs-primary-rgb), .6); }
+.chat-listing-thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.chat-listing-thumb-empty { display: inline-flex; align-items: center; justify-content: center; background: var(--bs-secondary-bg); color: var(--bs-secondary-color); }
+.chat-listing-title { font-weight: 600; }
+.chat-listing-price { color: var(--bs-primary); font-weight: 700; font-size: .9rem; }
+.chat-listing-link { color: var(--bs-primary); font-weight: 600; }
+.min-w-0 { min-width: 0; }
+
+/* Conversation */
+.message-chat .chat-item .msg {
+	display: inline-block;
+	max-width: 100%;
+	font-size: .95rem;
+	line-height: 1.45;
+	text-align: start;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+.message-chat .object-me .msg { background: var(--bs-primary) !important; color: #fff; }
+.message-chat .object-me .msg a { color: #fff; text-decoration: underline; }
+.message-chat .object-user .msg { background: var(--bs-secondary-bg) !important; }
+.message-chat .time-and-date { display: block; margin-top: .2rem; font-size: .75rem; }
+.message-chat .object-user-img { flex: 0 0 auto; width: auto; padding-right: 0; }
+.message-chat .object-user-img img { width: 40px; height: 40px; object-fit: cover; }
+
+/* Message box */
+.type-message .input-write { border-radius: 16px; padding: .7rem 1rem; resize: none; }
+
+/* Inbox: unread conversations */
+.thread-unread {
+	background: rgba(var(--bs-primary-rgb), .06);
+	box-shadow: inset 3px 0 0 var(--bs-primary);
+	border-radius: 10px;
+}

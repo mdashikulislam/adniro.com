@@ -25,6 +25,10 @@
 	$allowedFileFormatsJson = collect(getAllowedFileFormats())->toJson();
 @endphp
 
+@push('after_styles_stack')
+	<link href="{{ url('assets/css/messenger.css') }}?v=1" rel="stylesheet"> {{-- adniro --}}
+@endpush
+
 @section('content')
 	@include('front.common.spacer')
     <div class="main-container">
@@ -139,6 +143,7 @@
                                 @include('front.account.messenger.partials.sidebar')
                                 
                                 <div class="col-md-9 col-lg-10">
+                                    @include('front.account.messenger.partials.listing-card') {{-- adniro --}}
                                     @include('front.account.messenger.partials.safety-banner') {{-- adniro --}}
                                     <div class="p-0 m-0 message-chat">
                                         <div class="container mx-0 border rounded bg-body pb-3 mb-3">
