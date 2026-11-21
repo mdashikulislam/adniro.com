@@ -583,7 +583,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (195)
+## Added (199)
 
 Files that are not part of LaraClassifier.
 
@@ -686,6 +686,7 @@ Files that are not part of LaraClassifier.
 - `app/Services/Ai/Contracts/AiClientContract.php`
 - `app/Services/Ai/CostCalculator.php`
 - `app/Services/Ai/LaravelAiClient.php`
+- `app/Services/Ai/ModelCatalogException.php`
 - `app/Services/Ai/Moderation/ContentHash.php`
 - `app/Services/Ai/Moderation/ListingPayload.php`
 - `app/Services/Ai/Moderation/MappedVerdict.php`
@@ -696,8 +697,10 @@ Files that are not part of LaraClassifier.
 - `app/Services/Ai/Moderation/OnlineEmailGate.php`
 - `app/Services/Ai/Moderation/Policy.php`
 - `app/Services/Ai/Moderation/VerdictMapper.php`
+- `app/Services/Ai/ProviderModelCatalog.php`
 - `app/Services/Ai/SecretRedactor.php`
 - `app/Services/Ai/Support/AdminHtml.php`
+- `app/Services/Ai/Support/KnownModels.php`
 - `app/Services/Ai/Support/SchemaRules.php`
 - `app/Services/QuickPost/AiPostLimit.php`
 - `app/Services/QuickPost/CatalogBuilder.php`
@@ -852,6 +855,7 @@ Files that are not part of LaraClassifier.
 
 ### resources/views
 
+- `resources/views/admin/ai/model-catalog.blade.php`
 - `resources/views/admin/ai/moderation/_status.blade.php`
 - `resources/views/admin/ai/moderation/history.blade.php`
 - `resources/views/admin/ai/moderation/queue.blade.php`

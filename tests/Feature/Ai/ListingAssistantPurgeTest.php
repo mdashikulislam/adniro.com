@@ -8,17 +8,17 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /*
- * The hourly purge of quick post drafts and temporary uploads (adniro:ai).
+ * The hourly purge of listing assistant drafts and temporary uploads (adniro:ai).
  */
 
-class QuickPostPurgeTest extends TestCase
+class ListingAssistantPurgeTest extends TestCase
 {
-	use RefreshDatabase, QuickPostFixtures;
+	use RefreshDatabase, ListingAssistantFixtures;
 	
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->setUpQuickPost();
+		$this->setUpListingAssistant();
 		
 		Storage::fake(config('filesystems.default', 'public'));
 		config([

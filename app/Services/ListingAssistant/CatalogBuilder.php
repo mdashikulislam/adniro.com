@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\QuickPost;
+namespace App\Services\ListingAssistant;
 
 use App\Models\Category;
 use App\Models\CategoryField;
@@ -19,13 +19,13 @@ use Throwable;
 class CatalogBuilder
 {
 	public const SKIPPED_TYPES = ['file', 'video', 'date_range', 'url']; // url: the AI never writes links
-	private const VERSION_KEY = 'ai:quickpost_catalog_version';
+	private const VERSION_KEY = 'ai:listing_assistant_catalog_version';
 	
 	public function text(): string
 	{
 		$version = (string)Cache::get(self::VERSION_KEY, '1');
 		
-		return Cache::remember('ai:quickpost_catalog:' . $version, now()->addDay(), fn () => $this->build());
+		return Cache::remember('ai:listing_assistant_catalog:' . $version, now()->addDay(), fn () => $this->build());
 	}
 	
 	/**
@@ -37,7 +37,7 @@ class CatalogBuilder
 	{
 		$version = (string)Cache::get(self::VERSION_KEY, '1');
 		
-		return Cache::remember('ai:quickpost_catalog_fields:' . $version, now()->addDay(), fn () => $this->collect()['map']);
+		return Cache::remember('ai:listing_assistant_catalog_fields:' . $version, now()->addDay(), fn () => $this->collect()['map']);
 	}
 	
 	public static function invalidate(): void

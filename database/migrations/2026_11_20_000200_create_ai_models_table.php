@@ -32,7 +32,7 @@ return new class extends Migration
 			$table->boolean('last_test_ok')->nullable();
 			$table->string('last_test_error', 500)->nullable();
 			$table->timestamp('moderation_eval_passed_at')->nullable();
-			$table->timestamp('quickpost_eval_passed_at')->nullable();
+			$table->timestamp('listing_assistant_eval_passed_at')->nullable();
 			$table->timestamps();
 			
 			$table->unique(['ai_provider_id', 'model_id'], 'ai_models_provider_model_unique');

@@ -6,7 +6,7 @@ namespace App\Services\Ai;
  * The outcome of one AI request (adniro:ai).
  *
  * The client never throws for provider problems. Callers check $status:
- * moderation sends anything but "ok" to human review, quick post falls back to the normal form.
+ * moderation sends anything but "ok" to human review, the listing assistant falls back to the normal form.
  */
 
 final class AiResult

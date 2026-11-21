@@ -1,7 +1,7 @@
 /*
  * The AI box in the listing form (adniro:ai), ported from classifedz.com's ai.quickstart.js.
  * The seller describes the item once: typed, recorded (sent to the server when a speech-to-text model
- * is assigned) or dictated with the browser's own SpeechRecognition. posts/create/quick/fill returns
+ * is assigned) or dictated with the browser's own SpeechRecognition. posts/create/assistant/fill returns
  * the form's fields; this script fills the form the way a person would (the form's own category and
  * city functions, input/change events), highlights what changed, lists what still needs the seller,
  * and can undo it all. The seller then continues as usual.
@@ -9,28 +9,28 @@
 (function () {
 	'use strict';
 
-	var box = document.getElementById('aiQuick');
+	var box = document.getElementById('aiAssistant');
 	if (!box) {
 		return;
 	}
 	var form = box.closest('form');
-	var textEl = box.querySelector('.ai-quick-text');
-	var fillButton = box.querySelector('.ai-quick-fill');
+	var textEl = box.querySelector('.ai-assistant-text');
+	var fillButton = box.querySelector('.ai-assistant-fill');
 	if (!form || !textEl || !fillButton) {
 		return;
 	}
 
-	var fillLabel = box.querySelector('.ai-quick-fill-label');
-	var speakButton = box.querySelector('.ai-quick-speak');
-	var undoButton = box.querySelector('.ai-quick-undo');
-	var usageEl = box.querySelector('.ai-quick-usage');
-	var messageEl = box.querySelector('.ai-quick-message');
-	var resultEl = box.querySelector('.ai-quick-result');
-	var recordingEl = box.querySelector('.ai-quick-recording');
-	var timerEl = box.querySelector('.ai-quick-timer');
-	var stopButton = box.querySelector('.ai-quick-stop');
-	var cancelButton = box.querySelector('.ai-quick-cancel');
-	var usageTextEl = box.querySelector('.ai-quick-usage-text');
+	var fillLabel = box.querySelector('.ai-assistant-fill-label');
+	var speakButton = box.querySelector('.ai-assistant-speak');
+	var undoButton = box.querySelector('.ai-assistant-undo');
+	var usageEl = box.querySelector('.ai-assistant-usage');
+	var messageEl = box.querySelector('.ai-assistant-message');
+	var resultEl = box.querySelector('.ai-assistant-result');
+	var recordingEl = box.querySelector('.ai-assistant-recording');
+	var timerEl = box.querySelector('.ai-assistant-timer');
+	var stopButton = box.querySelector('.ai-assistant-stop');
+	var cancelButton = box.querySelector('.ai-assistant-cancel');
+	var usageTextEl = box.querySelector('.ai-assistant-usage-text');
 	var isWysiwyg = box.dataset.wysiwyg === '1';
 	var maxSeconds = parseInt(box.dataset.maxSeconds, 10) || 60;
 	var busy = false;
@@ -90,7 +90,7 @@
 
 	function setMessage(text, type) {
 		messageEl.textContent = text || '';
-		messageEl.className = 'ai-quick-message small mt-2 text-' + (type || 'secondary') + (text ? '' : ' d-none');
+		messageEl.className = 'ai-assistant-message small mt-2 text-' + (type || 'secondary') + (text ? '' : ' d-none');
 	}
 
 	function setBusy(state, label) {
@@ -560,7 +560,7 @@
 	undoButton.addEventListener('click', restore);
 
 	// Example chips: show what a good description looks like
-	Array.prototype.forEach.call(box.querySelectorAll('.ai-quick-chip'), function (chip) {
+	Array.prototype.forEach.call(box.querySelectorAll('.ai-assistant-chip'), function (chip) {
 		chip.addEventListener('click', function () {
 			if (textEl.disabled) {
 				return;

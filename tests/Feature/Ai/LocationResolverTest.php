@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Ai;
 
-use App\Services\QuickPost\LocationResolver;
+use App\Services\ListingAssistant\LocationResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;

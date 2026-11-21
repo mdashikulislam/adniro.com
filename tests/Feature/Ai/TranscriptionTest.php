@@ -8,7 +8,7 @@ use App\Models\AiUsageLog;
 use App\Models\Setting;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\LaravelAiClient;
-use App\Services\QuickPost\QuickPostService;
+use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;

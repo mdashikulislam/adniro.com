@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\QuickPost;
+namespace App\Services\ListingAssistant;
 
 use App\Models\PostDraft;
 use App\Models\User;
@@ -31,7 +31,7 @@ class AiPostLimit
 	
 	public function status(?User $user, ?string $ip): LimitStatus
 	{
-		[$limit, $period] = $this->settings->quickpostLimit($user ? 'member' : 'guest');
+		[$limit, $period] = $this->settings->listingAssistantLimit($user ? 'member' : 'guest');
 		
 		if ($user && !is_null($user->ai_post_limit)) {
 			$limit = (int)$user->ai_post_limit;
@@ -69,7 +69,7 @@ class AiPostLimit
 	 */
 	public function guestCapReached(): bool
 	{
-		$cap = (int)config('ai_features.quickpost.guest_daily_cap', 200);
+		$cap = (int)config('ai_features.listing_assistant.guest_daily_cap', 200);
 		if ($cap <= 0) {
 			return false;
 		}
@@ -86,7 +86,7 @@ class AiPostLimit
 	{
 		$key = $user ? 'user:' . $user->getKey() : 'ip:' . $ip;
 		
-		return Cache::lock('ai:quickpost_lock:' . $key, (int)config('ai_features.quickpost.timeout', 25) + 10);
+		return Cache::lock('ai:listing_assistant_lock:' . $key, (int)config('ai_features.listing_assistant.timeout', 25) + 10);
 	}
 	
 	/**

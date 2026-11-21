@@ -8,21 +8,21 @@ use App\Models\Permission;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\Ai\Contracts\AiClientContract;
-use App\Services\QuickPost\QuickPostService;
+use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /*
- * Shared set-up for the quick post tests (adniro:ai): a small catalog, two cities,
- * a fake AI client and quick post switched on.
+ * Shared set-up for the listing assistant tests (adniro:ai): a small catalog, two cities,
+ * a fake AI client and the listing assistant switched on.
  */
 
-trait QuickPostFixtures
+trait ListingAssistantFixtures
 {
 	protected FakeAiClient $ai;
 	protected AiModel $model;
 	
-	protected function setUpQuickPost(): void
+	protected function setUpListingAssistant(): void
 	{
 		
 		// The test database has no countries or languages: the app's localization middleware is
@@ -54,7 +54,7 @@ trait QuickPostFixtures
 		
 		$this->ai = new FakeAiClient();
 		$this->app->instance(AiClientContract::class, $this->ai);
-		$this->app->forgetInstance(QuickPostService::class);
+		$this->app->forgetInstance(ListingAssistantService::class);
 		
 		$provider = AiProvider::query()->create(['name' => 'Test', 'driver' => 'anthropic', 'api_key' => 'k', 'active' => true]);
 		$this->model = AiModel::query()->forceCreate([
@@ -97,8 +97,8 @@ trait QuickPostFixtures
 		}
 		Setting::query()->updateOrCreate(['name' => 'ai'], ['label' => 'AI', 'active' => 1, 'field_values' => array_merge([
 			'enabled'            => '1',
-			'quickpost_enabled'  => '1',
-			'quickpost_model_id' => (string)$this->model->id,
+			'listing_assistant_enabled'  => '1',
+			'listing_assistant_model_id' => (string)$this->model->id,
 		], $current, $overrides)]);
 	}
 

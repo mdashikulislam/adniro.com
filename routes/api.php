@@ -463,13 +463,13 @@ Route::prefix('captcha')
 Route::any('/webhooks/aws-ses', [WebhookController::class, 'awsSes']);
 
 
-// quick post: AI-drafted listings (adniro:ai)
-Route::prefix('quickpost')
-	->controller(\App\Http\Controllers\Api\QuickPostController::class)
+// AI listing assistant: AI-drafted listings for the mobile apps (adniro:ai)
+Route::prefix('listing-assistant')
+	->controller(\App\Http\Controllers\Api\ListingAssistantController::class)
 	->group(function ($router) {
-		Route::get('limit', 'limit')->name('api.quickpost.limit');
-		Route::post('drafts', 'draft')->name('api.quickpost.drafts');
-		Route::post('transcriptions', 'transcription')->name('api.quickpost.transcriptions');
+		Route::get('limit', 'limit')->name('api.listing-assistant.limit');
+		Route::post('drafts', 'draft')->name('api.listing-assistant.drafts');
+		Route::post('transcriptions', 'transcription')->name('api.listing-assistant.transcriptions');
 	});
 
 

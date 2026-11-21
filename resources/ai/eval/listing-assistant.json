@@ -1,5 +1,5 @@
 {
- "about": "Inputs for php artisan ai:quickpost-eval (adniro:ai). 'categories' lists the acceptable leaf category names in English (matched by name, since ids differ between sites); empty means the input is not a listing and must be marked not listable. 'price' is the stated price, or null when the person gave none (any price in the draft is then invented).",
+ "about": "Inputs for php artisan ai:listing-assistant-eval (adniro:ai). 'categories' lists the acceptable leaf category names in English (matched by name, since ids differ between sites); empty means the input is not a listing and must be marked not listable. 'price' is the stated price, or null when the person gave none (any price in the draft is then invented).",
  "cases": [
   {
    "id": "phone-en",

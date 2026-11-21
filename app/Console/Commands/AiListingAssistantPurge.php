@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Throwable;
 
 /*
- * php artisan ai:listing-assistant-purge (adniro:ai), scheduled hourly. The old name ai:quickpost-purge still works.
+ * php artisan ai:listing-assistant-purge (adniro:ai), scheduled hourly.
  *
  * Deletes expired AI listing assistant drafts (counted ones are emptied and kept 35 days for the AI post
  * limit), and temporary uploads older than 48 hours. Temporary
@@ -16,7 +16,7 @@ use Throwable;
  * from the normal form alike; nothing else ever cleaned them up.
  */
 
-class AiQuickpostPurge extends Command
+class AiListingAssistantPurge extends Command
 {
 	public const TEMP_DIR = 'temporary';
 	
@@ -31,9 +31,6 @@ class AiQuickpostPurge extends Command
 		{--dry-run : Only count what would be deleted}';
 	
 	protected $description = 'Delete expired AI listing assistant drafts and old temporary uploads (adniro:ai).';
-	
-	/** The name used before the quick post page became the AI box in the listing form. */
-	protected $aliases = ['ai:quickpost-purge'];
 	
 	public function handle(): int
 	{

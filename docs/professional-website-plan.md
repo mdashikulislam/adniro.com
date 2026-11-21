@@ -23,7 +23,7 @@ Sources:
 | 7 | Tests rendered only parts of pages, and front-end tests skip the localization middleware | Two broken templates passed the tests | Partly fixed: template guard tests |
 | 8 | Commit messages did not follow the owner's conventional format (`feat:`, `fix:`), and carried a Co-Authored-By trailer the owner's settings turn off | 12 commits with the wrong format | Open: follow the format from now on |
 | 9 | Tests written after the code instead of first, and coverage never measured | Owner's rules ask for test-first and 80% coverage | Open |
-| 10 | Several files exceed the owner's size guidance: `ModerationService` (600 lines), `composer.blade.php` (465), `LaravelAiClient` (454), `QuickPostController` (402) | Harder to maintain | Open: split |
+| 10 | Several files exceed the owner's size guidance: `ModerationService` (600 lines), `composer.blade.php` (465), `LaravelAiClient` (454), `ListingAssistantController` (402) | Harder to maintain | Open: split |
 | 11 | Translations into 8 languages were written by me, not by native speakers | Wording may be off in places | Open: native review |
 | 12 | Real publishing, voice on real phones and the Firefox recorder were never tried | Unknown bugs may remain in those paths | Open |
 | 13 | I said the evaluations had stopped when they had finished, because I misread the database clock (6 hours ahead of the stored times) | Wrong alarm, quickly corrected | Lesson noted |
@@ -282,7 +282,7 @@ Most important first:
   - Add feature tests for the home, listing, search, 404, sitemap and structured-data pages.
 
 ## 8. Decisions (answered 20 Nov 2026)
-1. **AI posting.** Port the classifedz.com AI box into the normal posting form. adniro's moderation, limits, budget and evaluations stay behind it; the separate composer page goes away. **Done 21 Nov 2026:** the box sits at the top of step 1 (and of the single-step form), fills the form in place through `POST posts/create/quick/fill`, and has undo, a checklist, example chips, voice (recording when a speech-to-text model is assigned, otherwise the browser's dictation) and texts in all 9 languages. `posts/create/quick` now redirects to the form. Photos are no longer sent to the AI from the web (the box runs before the photos step); the mobile API still accepts them.
+1. **AI posting.** Port the classifedz.com AI box into the normal posting form. adniro's moderation, limits, budget and evaluations stay behind it; the separate composer page goes away. **Done 21 Nov 2026:** the box sits at the top of step 1 (and of the single-step form), fills the form in place through `POST posts/create/assistant/fill`, and has undo, a checklist, example chips, voice (recording when a speech-to-text model is assigned, otherwise the browser's dictation) and texts in all 9 languages. `posts/create/quick` now redirects to the form. Photos are no longer sent to the AI from the web (the box runs before the photos step); the mobile API still accepts them.
 2. **Verified badge.** Email only. No SMS provider needed; phone verification stays off.
 3. **Countries.** The live server has 6 countries; keep those. The 16 local ones don't matter.
 4. **Guest posting.** Left to the admin: Admin > Settings > Listing form > "Guests can submit listings", and for AI drafts, Settings > AI > AI listing assistant > "Allow guests". Captcha covers guests once it is switched on.

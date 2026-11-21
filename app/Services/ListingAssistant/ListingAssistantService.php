@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\QuickPost;
+namespace App\Services\ListingAssistant;
 
 use App\Models\PostDraft;
 use App\Models\User;
@@ -12,13 +12,13 @@ use App\Services\Ai\Contracts\AiClientContract;
 use Illuminate\Support\Str;
 
 /*
- * Quick post: a person's description becomes the fields of a listing form (adniro:ai).
- * The draft call is synchronous; quick post never creates a listing itself.
+ * AI listing assistant: a person's description becomes the fields of a listing form (adniro:ai).
+ * The draft call is synchronous; the assistant never creates a listing itself.
  */
 
-class QuickPostService
+class ListingAssistantService
 {
-	public const FEATURE = 'quickpost_draft';
+	public const FEATURE = 'listing_assistant';
 	public const MAX_PHOTOS = 4;
 	
 	/** Remembered for the request: "Post an ad" links ask on every page. */
@@ -36,7 +36,7 @@ class QuickPostService
 	}
 	
 	/**
-	 * Quick post is offered: switched on, a usable model assigned, the multi-step form in use,
+	 * The listing assistant is offered: switched on, a usable model assigned, the multi-step form in use,
 	 * and the person allowed (members always, guests only when the admin allows them).
 	 */
 	public function available(?User $user): bool
@@ -48,11 +48,11 @@ class QuickPostService
 	
 	private function checkAvailable(?User $user): bool
 	{
-		if (!$this->settings->quickpostEnabled() || !isMultipleStepsFormEnabled()) {
+		if (!$this->settings->listingAssistantEnabled() || !isMultipleStepsFormEnabled()) {
 			return false;
 		}
 		
-		if (!$user && (!$this->settings->quickpostGuests() || !doesGuestHaveAbilityToCreateListings())) {
+		if (!$user && (!$this->settings->listingAssistantGuests() || !doesGuestHaveAbilityToCreateListings())) {
 			return false;
 		}
 		
@@ -61,7 +61,7 @@ class QuickPostService
 	
 	/**
 	 * Voice through a speech-to-text model on the server, for browsers without their own speech
-	 * recognition. Needs quick post and an assigned speech-to-text model.
+	 * recognition. Needs the listing assistant and an assigned speech-to-text model.
 	 */
 	public function serverVoiceAvailable(?User $user): bool
 	{
@@ -82,7 +82,7 @@ class QuickPostService
 			return ['ok' => false, 'reason' => $result->status];
 		}
 		
-		$text = DraftSanitizer::clean((string)($result->data['text'] ?? ''), (int)config('ai_features.quickpost.max_text', 2000));
+		$text = DraftSanitizer::clean((string)($result->data['text'] ?? ''), (int)config('ai_features.listing_assistant.max_text', 2000));
 		
 		return $text === '' ? ['ok' => false, 'reason' => 'empty'] : ['ok' => true, 'text' => $text];
 	}
@@ -107,7 +107,7 @@ class QuickPostService
 		$imageFiles = array_slice(array_values(array_filter((array)($context['image_files'] ?? []))), 0, self::MAX_PHOTOS);
 		
 		// With a photo, the text is optional
-		$min = (empty($photos) && empty($imageFiles)) ? (int)config('ai_features.quickpost.min_text', 10) : 0;
+		$min = (empty($photos) && empty($imageFiles)) ? (int)config('ai_features.listing_assistant.min_text', 10) : 0;
 		if (mb_strlen($text) < $min) {
 			return ['ok' => false, 'reason' => 'too_short', 'limit' => $this->limit->status($user, $ip)];
 		}
@@ -123,7 +123,7 @@ class QuickPostService
 		try {
 			// Read inside the lock, so parallel re-drafts cannot share the last free one
 			$root = $root?->fresh();
-			$free = $root && $root->redrafts < (int)config('ai_features.quickpost.free_redrafts', 2);
+			$free = $root && $root->redrafts < (int)config('ai_features.listing_assistant.free_redrafts', 2);
 			$status = $this->limit->status($user, $ip);
 			if (!$free && ($status->reached() || (!$user && $this->limit->guestCapReached()))) {
 				return ['ok' => false, 'reason' => 'limit', 'limit' => $status];
@@ -139,12 +139,12 @@ class QuickPostService
 				'ip'           => $ip,
 				'locale'       => $locale,
 				'country_code' => $countryCode ?: null,
-				'input_text'   => mb_substr($text, 0, (int)config('ai_features.quickpost.max_text', 2000)),
+				'input_text'   => mb_substr($text, 0, (int)config('ai_features.listing_assistant.max_text', 2000)),
 				'input_meta'   => array_filter(['lat' => $context['lat'] ?? null, 'lon' => $context['lon'] ?? null], fn ($v) => !is_null($v)),
 				'picture_paths' => $photos ?: null,
 				'status'       => PostDraft::NEW,
 				'redraft_of'   => $root?->id,
-				'expires_at'   => now()->addHours((int)config('ai_features.quickpost.draft_ttl', 48)),
+				'expires_at'   => now()->addHours((int)config('ai_features.listing_assistant.draft_ttl', 48)),
 			]);
 			
 			$images = [];
@@ -167,8 +167,8 @@ class QuickPostService
 				prompt: $this->prompt->prompt($text, $locale, (string)config('country.name'), $currency, count($images)),
 				schema: DraftSchema::schema(),
 				images: $images,
-				maxTokens: (int)config('ai_features.quickpost.max_tokens', 3000),
-				timeoutSeconds: (int)config('ai_features.quickpost.timeout', 25),
+				maxTokens: (int)config('ai_features.listing_assistant.max_tokens', 3000),
+				timeoutSeconds: (int)config('ai_features.listing_assistant.timeout', 25),
 				userId: $user?->getKey() ? (int)$user->getKey() : null,
 				ip: $ip,
 				subjectType: 'post_draft',

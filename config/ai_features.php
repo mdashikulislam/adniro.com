@@ -25,7 +25,7 @@ return [
 	// "vision": only models that support images can be assigned.
 	'features' => [
 		'moderation'      => ['vision' => true, 'transcription' => false],
-		'quickpost_draft' => ['vision' => true, 'transcription' => false],
+		'listing_assistant' => ['vision' => true, 'transcription' => false],
 		'transcription'   => ['vision' => false, 'transcription' => true],
 	],
 	
@@ -55,9 +55,9 @@ return [
 		'max_tokens' => 2000,
 	],
 	
-	// Quick post (drafting a listing from the user's text)
-	'quickpost' => [
-		'timeout'        => (int)env('AI_QUICKPOST_TIMEOUT', 25), // seconds, the browser waits 30
+	// AI listing assistant (the AI box in the listing form, and the mobile API)
+	'listing_assistant' => [
+		'timeout'        => (int)env('AI_LISTING_ASSISTANT_TIMEOUT', 25), // seconds, the browser waits 30
 		'min_text'       => 10,
 		'max_text'       => 2000,
 		'max_audio_kb'   => 5120, // a minute of compressed speech is far below this
@@ -68,6 +68,6 @@ return [
 		'rate_per_ip'    => 6,  // drafts a minute
 		'rate_per_user'  => 10, // drafts a minute
 		'voice_rate'     => 10, // voice recordings a minute
-		'guest_daily_cap' => (int)env('AI_QUICKPOST_GUEST_DAILY_CAP', 200), // AI drafts by all guests together, per day
+		'guest_daily_cap' => (int)env('AI_LISTING_ASSISTANT_GUEST_DAILY_CAP', 200), // AI drafts by all guests together, per day
 	],
 ];

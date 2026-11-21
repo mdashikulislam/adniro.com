@@ -27,8 +27,8 @@ class AiSetting extends BaseSetting
 			'enabled'                      => '0',
 			'moderation_model_id'          => null,
 			'moderation_fallback_model_id' => null,
-			'quickpost_model_id'           => null,
-			'quickpost_fallback_model_id'  => null,
+			'listing_assistant_model_id'           => null,
+			'listing_assistant_fallback_model_id'  => null,
 			'transcription_model_id'       => null,
 			'daily_budget_usd'             => '5',
 			'daily_call_limit'             => '500',
@@ -37,12 +37,12 @@ class AiSetting extends BaseSetting
 			'moderation_post_daily_limit'  => '10',
 			'moderation_when_unavailable'  => 'approve',
 			'moderation_alert_admins'      => '1',
-			'quickpost_enabled'            => '0',
-			'quickpost_guests'             => '0',
-			'quickpost_member_limit'       => '20',
-			'quickpost_member_period'      => 'day',
-			'quickpost_guest_limit'        => '5',
-			'quickpost_guest_period'       => 'day',
+			'listing_assistant_enabled'            => '0',
+			'listing_assistant_guests'             => '0',
+			'listing_assistant_member_limit'       => '20',
+			'listing_assistant_member_period'      => 'day',
+			'listing_assistant_guest_limit'        => '5',
+			'listing_assistant_guest_period'       => 'day',
 		];
 		
 		return array_merge($defaultValue, $value);
@@ -104,7 +104,7 @@ class AiSetting extends BaseSetting
 		
 		foreach ([
 			'moderation' => 'moderation',
-			'quickpost'  => 'quickpost_draft',
+			'listing_assistant' => 'listing_assistant',
 		] as $prefix => $feature) {
 			$fields[] = [
 				'name'        => $prefix . '_model_id',
@@ -206,35 +206,35 @@ class AiSetting extends BaseSetting
 			'tab'        => $tabName,
 		];
 		
-		// AI listing assistant (the AI box in the listing form; the keys keep the old "quickpost" name)
-		$tabName = trans('ai.setting_tab_quickpost');
+		// AI listing assistant (the AI box in the listing form)
+		$tabName = trans('ai.setting_tab_listing_assistant');
 		if (self::getPanelTabsType() == 'vertical') {
 			$fields[] = [
-				'name'  => 'ai_quickpost_sep',
+				'name'  => 'ai_listing_assistant_sep',
 				'type'  => 'custom_html',
 				'value' => $tabName,
 				'tab'   => $tabName,
 			];
 		}
 		$fields[] = [
-			'name'  => 'ai_quickpost_info',
+			'name'  => 'ai_listing_assistant_info',
 			'type'  => 'custom_html',
-			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_quickpost_info')) . '</div>',
+			'value' => '<div class="alert alert-light">' . e(trans('ai.setting_listing_assistant_info')) . '</div>',
 			'tab'   => $tabName,
 		];
 		$fields[] = [
-			'name'    => 'quickpost_enabled',
-			'label'   => trans('ai.setting_quickpost_enabled_label'),
+			'name'    => 'listing_assistant_enabled',
+			'label'   => trans('ai.setting_listing_assistant_enabled_label'),
 			'type'    => 'checkbox_switch',
-			'hint'    => trans('ai.setting_quickpost_enabled_hint'),
+			'hint'    => trans('ai.setting_listing_assistant_enabled_hint'),
 			'wrapper' => ['class' => 'col-md-6'],
 			'tab'     => $tabName,
 		];
 		$fields[] = [
-			'name'    => 'quickpost_guests',
-			'label'   => trans('ai.setting_quickpost_guests_label'),
+			'name'    => 'listing_assistant_guests',
+			'label'   => trans('ai.setting_listing_assistant_guests_label'),
 			'type'    => 'checkbox_switch',
-			'hint'    => trans('ai.setting_quickpost_guests_hint'),
+			'hint'    => trans('ai.setting_listing_assistant_guests_hint'),
 			'wrapper' => ['class' => 'col-md-6'],
 			'tab'     => $tabName,
 		];
@@ -246,20 +246,20 @@ class AiSetting extends BaseSetting
 		];
 		foreach (['member', 'guest'] as $who) {
 			$fields[] = [
-				'name'       => 'quickpost_' . $who . '_limit',
-				'label'      => trans('ai.setting_quickpost_' . $who . '_limit_label'),
+				'name'       => 'listing_assistant_' . $who . '_limit',
+				'label'      => trans('ai.setting_listing_assistant_' . $who . '_limit_label'),
 				'type'       => 'number',
 				'attributes' => ['min' => 0, 'step' => 1],
-				'hint'       => trans('ai.setting_quickpost_limit_hint'),
+				'hint'       => trans('ai.setting_listing_assistant_limit_hint'),
 				'wrapper'    => ['class' => 'col-md-3'],
 				'tab'        => $tabName,
 			];
 			$fields[] = [
-				'name'    => 'quickpost_' . $who . '_period',
-				'label'   => trans('ai.setting_quickpost_period_label'),
+				'name'    => 'listing_assistant_' . $who . '_period',
+				'label'   => trans('ai.setting_listing_assistant_period_label'),
 				'type'    => 'select2_from_array',
 				'options' => $periodOptions,
-				'hint'    => trans('ai.setting_quickpost_period_hint'),
+				'hint'    => trans('ai.setting_listing_assistant_period_hint'),
 				'wrapper' => ['class' => 'col-md-3'],
 				'tab'     => $tabName,
 			];

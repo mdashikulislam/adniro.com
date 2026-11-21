@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\City;
-use App\Services\QuickPost\LimitStatus;
-use App\Services\QuickPost\QuickPostService;
+use App\Services\ListingAssistant\LimitStatus;
+use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 
 /*
  * AI listing assistant for the mobile apps (adniro:ai): the same drafting as the AI box in the
- * website's listing form. The URLs keep the old "quickpost" name so existing apps keep working.
+ * website's listing form.
  *
  * The app sends text and up to four photos; the answer holds the draft in the same field names
  * as POST /api/posts, so the app shows it for review and then creates the listing as usual.
@@ -20,12 +20,12 @@ use Illuminate\Support\Facades\RateLimiter;
  * @group AI listing assistant
  */
 
-class QuickPostController extends BaseController
+class ListingAssistantController extends BaseController
 {
 	/** Looked up on each call: the router keeps controller instances between requests. */
-	private function service(): QuickPostService
+	private function service(): ListingAssistantService
 	{
-		return app(QuickPostService::class);
+		return app(ListingAssistantService::class);
 	}
 	
 	/**
@@ -61,22 +61,22 @@ class QuickPostController extends BaseController
 		$ip = $request->ip();
 		
 		if (!$this->service()->available($user)) {
-			return $this->fail(trans('ai.qp_off'), 'off', 403);
+			return $this->fail(trans('ai.assistant_off'), 'off', 403);
 		}
 		
-		$rateKey = $user ? 'quickpost:user:' . $user->getKey() : 'quickpost:ip:' . $ip;
-		$perMinute = (int)config($user ? 'ai_features.quickpost.rate_per_user' : 'ai_features.quickpost.rate_per_ip', 6);
+		$rateKey = $user ? 'listing-assistant:user:' . $user->getKey() : 'listing-assistant:ip:' . $ip;
+		$perMinute = (int)config($user ? 'ai_features.listing_assistant.rate_per_user' : 'ai_features.listing_assistant.rate_per_ip', 6);
 		if (RateLimiter::tooManyAttempts($rateKey, $perMinute)) {
 			$seconds = RateLimiter::availableIn($rateKey);
 			
-			return $this->fail(trans('ai.qp_rate', ['seconds' => $seconds]), 'rate', 429)->header('Retry-After', (string)$seconds);
+			return $this->fail(trans('ai.assistant_rate', ['seconds' => $seconds]), 'rate', 429)->header('Retry-After', (string)$seconds);
 		}
 		RateLimiter::hit($rateKey, 60);
 		
 		$allowed = collect(getServerAllowedImageFormats())->join(',');
 		$data = $request->validate([
-			'text'       => ['nullable', 'string', 'max:' . (int)config('ai_features.quickpost.max_text', 2000)],
-			'photos'     => ['nullable', 'array', 'max:' . QuickPostService::MAX_PHOTOS],
+			'text'       => ['nullable', 'string', 'max:' . (int)config('ai_features.listing_assistant.max_text', 2000)],
+			'photos'     => ['nullable', 'array', 'max:' . ListingAssistantService::MAX_PHOTOS],
 			'photos.*'   => ['file', 'mimes:' . $allowed, 'max:' . (int)config('settings.upload.max_image_size', 1000)],
 			'lat'        => ['nullable', 'numeric', 'between:-90,90'],
 			'lon'        => ['nullable', 'numeric', 'between:-180,180'],
@@ -96,13 +96,13 @@ class QuickPostController extends BaseController
 		if (!$outcome['ok']) {
 			$reason = $outcome['reason'];
 			$message = match ($reason) {
-				'too_short' => trans('ai.qp_too_short', ['min' => (int)config('ai_features.quickpost.min_text', 10)]),
-				'busy'      => trans('ai.qp_busy'),
-				'limit'     => trans('ai.qp_limit_reached', [
+				'too_short' => trans('ai.assistant_too_short', ['min' => (int)config('ai_features.listing_assistant.min_text', 10)]),
+				'busy'      => trans('ai.assistant_busy'),
+				'limit'     => trans('ai.assistant_limit_reached', [
 					'when' => $limit->resetsAt?->setTimezone((string)config('app.timezone', 'UTC'))->isoFormat('LLL') ?? '',
 				]),
-				'unusable'  => $outcome['message'] ?: trans('ai.qp_unusable'),
-				default     => trans('ai.qp_off'),
+				'unusable'  => $outcome['message'] ?: trans('ai.assistant_unusable'),
+				default     => trans('ai.assistant_off'),
 			};
 			$status = match ($reason) {
 				'limit' => 429,
@@ -152,19 +152,19 @@ class QuickPostController extends BaseController
 		$user = auth('sanctum')->user();
 		
 		if (!$this->service()->serverVoiceAvailable($user)) {
-			return $this->fail(trans('ai.qp_voice_unavailable'), 'off', 403);
+			return $this->fail(trans('ai.assistant_voice_unavailable'), 'off', 403);
 		}
 		
-		$rateKey = 'quickpost-voice:' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
+		$rateKey = 'listing-assistant-voice:' . ($user ? 'user:' . $user->getKey() : 'ip:' . $request->ip());
 		if (RateLimiter::tooManyAttempts($rateKey, 10)) {
 			$seconds = RateLimiter::availableIn($rateKey);
 			
-			return $this->fail(trans('ai.qp_rate', ['seconds' => $seconds]), 'rate', 429)->header('Retry-After', (string)$seconds);
+			return $this->fail(trans('ai.assistant_rate', ['seconds' => $seconds]), 'rate', 429)->header('Retry-After', (string)$seconds);
 		}
 		RateLimiter::hit($rateKey, 60);
 		
 		$request->validate([
-			'audio'    => ['required', 'file', 'mimetypes:audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave', 'max:' . (int)config('ai_features.quickpost.max_audio_kb', 5120)],
+			'audio'    => ['required', 'file', 'mimetypes:audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave', 'max:' . (int)config('ai_features.listing_assistant.max_audio_kb', 5120)],
 			'language' => ['nullable', 'string', 'max:20'],
 		]);
 		
@@ -172,7 +172,7 @@ class QuickPostController extends BaseController
 		$outcome = $this->service()->transcribe((string)$file->getRealPath(), $file->getMimeType(), $request->input('language'), $user, $request->ip());
 		
 		if (!$outcome['ok']) {
-			return $this->fail(trans($outcome['reason'] === 'empty' ? 'ai.qp_voice_no_speech' : 'ai.qp_voice_failed'), $outcome['reason'], 200);
+			return $this->fail(trans($outcome['reason'] === 'empty' ? 'ai.assistant_voice_no_speech' : 'ai.assistant_voice_failed'), $outcome['reason'], 200);
 		}
 		
 		return response()->json(['success' => true, 'message' => null, 'result' => ['text' => $outcome['text']]]);

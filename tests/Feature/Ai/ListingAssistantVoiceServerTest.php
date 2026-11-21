@@ -8,18 +8,18 @@ use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /*
- * Speech-to-text in the mobile API, through the quick post service (adniro:ai). The form's AI box
- * sends recordings to posts/create/quick/fill (see AiFormBoxTest).
+ * Speech-to-text in the mobile API, through the listing assistant service (adniro:ai). The form's AI box
+ * sends recordings to posts/create/assistant/fill (see AiFormBoxTest).
  */
 
-class QuickPostVoiceServerTest extends TestCase
+class ListingAssistantVoiceServerTest extends TestCase
 {
-	use RefreshDatabase, QuickPostFixtures;
+	use RefreshDatabase, ListingAssistantFixtures;
 	
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->setUpQuickPost();
+		$this->setUpListingAssistant();
 		config(['larapen.core.api.token' => 'test-api-token']);
 	}
 	
@@ -29,8 +29,8 @@ class QuickPostVoiceServerTest extends TestCase
 		$headers = ['Accept' => 'application/json', 'X-AppApiToken' => 'test-api-token'];
 		$user = $this->user(7);
 		
-		$this->actingAs($user, 'sanctum')->getJson('/api/quickpost/limit', $headers)->assertJson(['result' => ['voice' => true]]);
-		$this->actingAs($user, 'sanctum')->post('/api/quickpost/transcriptions', ['audio' => $this->recording(), 'language' => 'en'], $headers)
+		$this->actingAs($user, 'sanctum')->getJson('/api/listing-assistant/limit', $headers)->assertJson(['result' => ['voice' => true]]);
+		$this->actingAs($user, 'sanctum')->post('/api/listing-assistant/transcriptions', ['audio' => $this->recording(), 'language' => 'en'], $headers)
 			->assertOk()->assertJson(['success' => true, 'result' => ['text' => 'Grey sofa, three seats']]);
 	}
 	

@@ -1,8 +1,8 @@
 # AI for listings: moderation and quick post
 
-> **Update 2026-11-21: the quick post composer was replaced.** At the owner's choice, the AI now lives in a box at the top of the normal listing form, ported from classifedz.com. It fills the open form in place, through `POST posts/create/quick/fill` and the same draft service, limits and budget. The composer, its photo upload, one-screen review, form banner and `quickpost_one_screen` setting are gone, and `posts/create/quick` redirects to the form. Sections below that describe the composer are kept as history. See section 8 of docs/professional-website-plan.md.
+> **Update 2026-11-21: the quick post composer was replaced.** At the owner's choice, the AI now lives in a box at the top of the normal listing form, ported from classifedz.com. It fills the open form in place, through `POST posts/create/assistant/fill` and the same draft service, limits and budget. The composer, its photo upload, one-screen review, form banner and `listing_assistant_one_screen` setting are gone, and `posts/create/quick` redirects to the form. Sections below that describe the composer are kept as history. See section 8 of docs/professional-website-plan.md.
 >
-> **Name in admin: "AI listing assistant".** Admin screens no longer say "quick post": the settings tab is Settings > AI > AI listing assistant, the model is the "AI listing assistant model", and the commands are `ai:listing-assistant-eval` and `ai:listing-assistant-purge` (the old `ai:quickpost-*` names still work). Internal names keep "quickpost" (setting keys, the `quickpost_eval_passed_at` column, the `quickpost_draft` usage feature, `posts/create/quick/fill` and `/api/quickpost/*`), so stored data and the mobile apps are unaffected.
+> **Renamed to "AI listing assistant" (2026-11-21).** "Quick post" is gone from the code as well as the screens: `App\Services\ListingAssistant\ListingAssistantService`, settings `listing_assistant_*` (Settings > AI > AI listing assistant), config `ai_features.listing_assistant`, column `listing_assistant_eval_passed_at`, usage feature `listing_assistant`, routes `posts/create/assistant/fill` and `/api/listing-assistant/*`, and commands `ai:listing-assistant-eval` and `ai:listing-assistant-purge`. The migration `2026_11_21_000400_rename_quickpost_to_listing_assistant` renames what an older database stored. Names in the history sections below were updated by search and replace, so they show today's names.
 
 Plan only. Nothing in this document has been implemented.
 Prepared 2026-11-20 from two planner passes over the codebase, then checked against the code.
@@ -157,14 +157,14 @@ Not checked in a signed-in browser: the queue, reject form and history were chec
 
 ### Phase 6, quick post from text: built on branch `ai` (2026-11-20)
 Committed as `32820647`.
-Off by default. Covered by 21 more tests in `tests/Feature/Ai/QuickPostTest.php`, so 123 in all.
+Off by default. Covered by 21 more tests in `tests/Feature/Ai/ListingAssistantTest.php`, so 123 in all.
 
 The whole path was also checked in the browser on the local site. A temporary local model pointed at a mock OpenAI-compatible server on `127.0.0.1`, so no outside service was called. "Create Listing" opened the composer, a sentence went through a real HTTP request, and the step 1 form opened with the banner. It had the category, title, description, price, tags, city, and both custom fields filled, with Check badges where confidence was below high. Stopping the mock showed the fallback, with the text in the description of the normal form. The composer was also checked at phone width. The temporary model, settings and rows were removed afterwards.
 
 What exists:
 - **Composer** at `/posts/create/quick`. It has a text box with a counter, "Use my location", "Create my listing", the remaining AI posts, and "Fill the form myself". A progress overlay shows while drafting, with a 25-second server limit and a 30-second browser limit.
 - **"Post an ad"** links open the composer when quick post is available, through a guarded change in `getCreateListingLinkInfo()`.
-- **Draft.** One synchronous call to the quick post model. `DraftPrompt` sends the fixed instructions in `resources/ai/quickpost-instructions.md` plus the catalog as one stable system block, and the user's text inside `<listing_input>` tags.
+- **Draft.** One synchronous call to the quick post model. `DraftPrompt` sends the fixed instructions in `resources/ai/listing-assistant-instructions.md` plus the catalog as one stable system block, and the user's text inside `<listing_input>` tags.
 - **Catalog.** `CatalogBuilder` lists active leaf categories with their inherited field ids, then fields with option ids. It is in English, sorted and cached, and rebuilt when categories, fields, options or category fields change. File, video, date-range and URL fields are left out. From local data it is about 10 KB, roughly 3,000 tokens.
 - **Sanitizer.** `DraftSanitizer` enforces the rules in section 6, adds Check and Please add marks, strips links, emails and phone numbers, and takes the leading number from values like "128 GB".
 - **Location.** `LocationResolver` tries, in order, the nearest active city to the browser position within about 100 km, then a city named in the text, then the user's last listing. Everything stays inside the current country.
@@ -193,7 +193,7 @@ Core files touched, each marked `adniro:ai`:
 
 ### Phase 7, quick post photos: built on branch `ai` (2026-11-20)
 Committed as `5466c9bc`.
-Covered by 11 more tests in `tests/Feature/Ai/QuickPostPhotosTest.php`, so 134 in all. The quick post fixtures are now shared in `tests/Feature/Ai/QuickPostFixtures.php`.
+Covered by 11 more tests in `tests/Feature/Ai/QuickPostPhotosTest.php`, so 134 in all. The quick post fixtures are now shared in `tests/Feature/Ai/ListingAssistantFixtures.php`.
 
 Checked in the browser on the local site against the local mock model, as in phase 6:
 - A 3000 × 2000 test image was given to the photo input. It was shrunk in the browser and uploaded, and its server thumbnail appeared in the composer.
@@ -207,9 +207,9 @@ What exists:
 - **Photo tile in the composer.** It has "Add photos" with up to the site's picture limit, thumbnails and remove buttons. The browser shrinks each photo to a 1600 px JPEG before upload, which also converts HEIC where the browser can read it. Photos are uploaded one per request.
 - **`POST posts/create/quick/photos`.** It validates against the site's image formats and size, stores through `TmpUpload::image()` in `temporary/{session uid}`, and appends to `session('picturesInput')`. Those are the folder and key the photos step uses. A HEIC file the server cannot read gets a clear message. Removing a photo uses the photos step's own delete action.
 - **Photos to the model.** Up to 4 photos are re-encoded at 1024 px. The prompt says how many are attached. With a photo, the text is optional. The draft row keeps the photo paths.
-- **Photo rules** in `resources/ai/quickpost-instructions.md`. The model uses what is clearly visible, trusts the text when the two disagree, and never copies contact details from photos or describes people. A blurry photo leads to a request for a clearer one. The prompt version is now `2026-11-20.2`.
+- **Photo rules** in `resources/ai/listing-assistant-instructions.md`. The model uses what is clearly visible, trusts the text when the two disagree, and never copies contact details from photos or describes people. A blurry photo leads to a request for a clearer one. The prompt version is now `2026-11-20.2`.
 - **Fallbacks keep the photos.** When the AI fails, the photos stay for the normal form. When there is no text, the description is left alone.
-- **`ai:quickpost-purge`, run hourly.** It deletes expired drafts, and temporary uploads older than 48 hours from quick post and the normal form alike, with any folders left empty. It has a `--dry-run` option. This is decision 13, and it ends the old leak of abandoned uploads.
+- **`ai:listing-assistant-purge`, run hourly.** It deletes expired drafts, and temporary uploads older than 48 hours from quick post and the normal form alike, with any folders left empty. It has a `--dry-run` option. This is decision 13, and it ends the old leak of abandoned uploads.
 
 Found and fixed while checking:
 - **An emptied template.** An editing slip emptied the composer template. The tests did not see it because they render only the form partial, while the page needs the site layout. A new test checks the compiled composer template for its form, overlay and script hooks.
@@ -220,7 +220,7 @@ Core files touched, each marked `adniro:ai`:
 
 ### Phase 8, quick post voice: built on branch `ai` (2026-11-20)
 Committed as `5d5e64b3`.
-Browser speech-to-text only; nothing is sent to the server except the resulting text. Covered by 3 more tests in `tests/Feature/Ai/QuickPostVoiceTest.php`, so 137 in all.
+Browser speech-to-text only; nothing is sent to the server except the resulting text. Covered by 3 more tests in `tests/Feature/Ai/ListingAssistantVoiceTest.php`, so 137 in all.
 
 Checked in the browser on the local site. The pane's Chromium has speech recognition, so the mic and the language picker appeared, with "English (US)" first and the site's other languages after it. Real speech needs a microphone and Google's service, which the pane cannot provide, so a scripted recognizer stood in. It showed that interim words appear live and final words stay, that text typed earlier is kept, and that the chosen language is passed to the recognizer. The picker is locked while listening, and stopping resets the button. A blocked microphone shows its message. The layout was also checked at phone width. Not checked: real Chrome on Android, iOS Safari and Firefox.
 
@@ -244,13 +244,13 @@ Covered by 11 more tests in `tests/Feature/Ai/AiPolishTest.php`, so 148 in all.
 What exists:
 - **Translations.** The user-facing AI texts are translated into the 8 other active languages (fr, es, ar, de, it, ru, hi, bn) in `lang/{code}/ai.php`: the rejection email and SMS, owner banners and badges, the finish line, statuses, category names, and every quick post screen. That is 91 texts per language. Admin screens fall back to English key by key. A test checks that every language has every text with the same placeholders and plural parts. For Arabic, Russian, Hindi and Bengali, counts are phrased like "left today: 3 of 5" so they read correctly for every number.
 - **Mobile API.**
-  - `GET /api/quickpost/limit` gives whether quick post is available and the person's limit.
-  - `POST /api/quickpost/drafts` takes text, up to 4 photos, an optional position and a re-draft token. The photos are sent to the model and not stored.
+  - `GET /api/listing-assistant/limit` gives whether quick post is available and the person's limit.
+  - `POST /api/listing-assistant/drafts` takes text, up to 4 photos, an optional position and a re-draft token. The photos are sent to the model and not stored.
   - The draft comes back in the same field names as `POST /api/posts`, plus the city, marks, policy flags and the limit.
   - At the limit it answers 429 with `Retry-After` and the reset time. When quick post is off it answers 403.
   - Members are identified by their Sanctum token, guests by IP.
 - **AI spend widget** on the admin dashboard, for super admins. It shows today's spend, calls and failures, this month's spend, the share of the daily budget used, calls and cost per feature, the last 7 days, listings needing review, rejections today and quick post drafts today.
-- **Quick post evaluation.** `php artisan ai:quickpost-eval {model?}` runs the 40 inputs in `resources/ai/eval/quickpost.json`. They cover 36 listings in 7 languages and 4 non-listings, and category answers are matched by English leaf name because ids differ between sites. The gate is at least 80% right categories, no invented price, every non-listing recognised and at most one listing refused. A full run sets or clears `quickpost_eval_passed_at`.
+- **Quick post evaluation.** `php artisan ai:listing-assistant-eval {model?}` runs the 40 inputs in `resources/ai/eval/listing-assistant.json`. They cover 36 listings in 7 languages and 4 non-listings, and category answers are matched by English leaf name because ids differ between sites. The gate is at least 80% right categories, no invented price, every non-listing recognised and at most one listing refused. A full run sets or clears `listing_assistant_eval_passed_at`.
 - **Evaluations column.** The AI model list shows each model's last passed moderation and quick post evaluation.
 - **One-screen review**, on by default and controlled by Settings > AI > Quick post > "Review and publish on one screen". After a draft, the step 1 form opens at `/posts/create/quick/review`, with the photos shown above it and a Publish button.
   - Publishing validates with the step 1 request and saves with the same code as the last step of the normal form.
@@ -280,7 +280,7 @@ Core files touched, each marked `adniro:ai`:
 - **Unsent calls are not counted.** A call stopped before sending, such as with a missing key, no longer counts toward the daily call limit.
 
 ### Phase 10, server-side speech-to-text: built on branch `ai` (2026-11-20)
-Optional, and off until an admin assigns a speech-to-text model in Settings > AI > Models. Covered by 10 more tests in `tests/Feature/Ai/TranscriptionTest.php` and `tests/Feature/Ai/QuickPostVoiceServerTest.php`, so 161 in all.
+Optional, and off until an admin assigns a speech-to-text model in Settings > AI > Models. Covered by 10 more tests in `tests/Feature/Ai/TranscriptionTest.php` and `tests/Feature/Ai/ListingAssistantVoiceServerTest.php`, so 161 in all.
 
 What exists:
 - **`AiClientContract::transcribe()`,** implemented in `LaravelAiClient` with the Laravel AI SDK's `Transcription`. It uses the same provider registration, master switch, budget and call limit, usage log (feature `transcription`) and error redaction as the other features. The language is sent as an ISO 639-1 code, for example `bn` from `bn-BD`.
@@ -290,7 +290,7 @@ What exists:
   - It records with `MediaRecorder` for up to 60 seconds and uploads to `POST posts/create/quick/transcribe`.
   - The text is added to the box, with contact details removed.
   - A line says the recording goes to the AI service chosen by the site.
-- **API:** `POST /api/quickpost/transcriptions`. The limit endpoint now also reports whether server voice is available.
+- **API:** `POST /api/listing-assistant/transcriptions`. The limit endpoint now also reports whether server voice is available.
 - **Limits.** Recordings are capped at 5 MB, with 10 a minute per person. They are not counted as AI posts. They are counted in the AI budget and the daily call limit.
 - **Texts.** The recorder's four messages are in all 9 languages.
 
@@ -339,7 +339,7 @@ Not checked in a browser: the browser pane has its own speech recognition, so it
 ```
 feature code  ->  AiClientContract  ->  model assigned to that feature  ->  Laravel AI SDK  ->  provider
 ```
-- Feature code never names a provider or a model. It asks the contract for a structured result for a feature: `moderation`, `quickpost_draft` or `transcription`.
+- Feature code never names a provider or a model. It asks the contract for a structured result for a feature: `moderation`, `listing_assistant` or `transcription`.
 - The contract looks up which model the admin assigned to that feature, loads that provider's key and base URL, and makes the call.
 - If the primary model errors, times out or is rate limited, the fallback model for that feature is tried once.
 - Changing provider or model is an admin action. No deploy is needed.
@@ -370,7 +370,7 @@ ai_providers:  id, name, driver, api_key (encrypted), base_url NULL, active,
                last_tested_at, last_test_ok, last_test_error
 ai_models:     id, ai_provider_id, model_id, label, supports_vision, supports_structured_output,
                supports_transcription, input_price_per_mtok NULL, output_price_per_mtok NULL,
-               options json NULL, active, moderation_eval_passed_at NULL, quickpost_eval_passed_at NULL
+               options json NULL, active, moderation_eval_passed_at NULL, listing_assistant_eval_passed_at NULL
 ai_usage_logs: feature, ai_model_id, provider, model, user_id, ip, subject_type, subject_id,
                status, error_type, input_tokens, output_tokens, cached_tokens, cost_usd NULL,
                latency_ms, was_fallback, meta json, created_at
@@ -392,7 +392,7 @@ Settings on the Settings, AI screen:
 |---|---|---|
 | `enabled` | off | Master kill switch |
 | `moderation_model_id` / `moderation_fallback_model_id` | none | Must be vision-capable |
-| `quickpost_model_id` / `quickpost_fallback_model_id` | none | Must be vision-capable for photo drafting |
+| `listing_assistant_model_id` / `listing_assistant_fallback_model_id` | none | Must be vision-capable for photo drafting |
 | `transcription_model_id` | none | Optional. Enables server-side voice |
 | `daily_budget_usd` | 5 | All AI features together |
 | `moderation_mode` | `shadow` | `off`, `shadow`, `enforce` |
@@ -400,13 +400,13 @@ Settings on the Settings, AI screen:
 | `auto_approve_min_confidence` | `high` | |
 | `actor_daily_limit_moderation` | 30 | Per user or IP |
 | `notify_admin_on` | `needs_review_and_rejected` | |
-| `quickpost_enabled` | off | |
-| `quickpost_guests_enabled` | on | See decision 3 in section 10 |
-| `quickpost_user_limit` / `quickpost_user_limit_period` | 20 / `day` | AI posts per member. Period is `day`, `week`, `month` or `none` |
-| `quickpost_guest_limit` / `quickpost_guest_limit_period` | 5 / `day` | AI posts per guest, counted by IP. Same period choices |
-| `quickpost_max_images` | 4 | Images sent to the model |
-| `quickpost_voice_enabled` | on | |
-| `quickpost_policy_hints` | on | |
+| `listing_assistant_enabled` | off | |
+| `listing_assistant_guests_enabled` | on | See decision 3 in section 10 |
+| `listing_assistant_user_limit` / `listing_assistant_user_limit_period` | 20 / `day` | AI posts per member. Period is `day`, `week`, `month` or `none` |
+| `listing_assistant_guest_limit` / `listing_assistant_guest_limit_period` | 5 / `day` | AI posts per guest, counted by IP. Same period choices |
+| `listing_assistant_max_images` | 4 | Images sent to the model |
+| `listing_assistant_voice_enabled` | on | |
+| `listing_assistant_policy_hints` | on | |
 
 Guard rails when assigning a model:
 - Moderation and photo drafting accept only models marked vision-capable that have passed Test model.
@@ -615,7 +615,7 @@ Rough tap counts for a guest selling a used phone, counted from the form code an
 - Guests on a shared network share one count. That is one more reason for them to sign in.
 
 How it is counted:
-- The count is the number of successful `quickpost_draft` rows in `ai_usage_logs` for that user or IP since the start of the current period. No separate counter has to be kept in step.
+- The count is the number of successful `listing_assistant` rows in `ai_usage_logs` for that user or IP since the start of the current period. No separate counter has to be kept in step.
 - A short per-user lock around the draft call stops two parallel requests from passing the limit together.
 - A new nullable column `users.ai_post_limit` holds the per-user override.
 - The site-wide daily budget in USD still applies on top, as the ceiling for all AI use.
@@ -664,9 +664,9 @@ POST posts/create/quick/draft              returns JSON
 GET  posts/create/quick/{draft}/apply      draft into session, redirect to the normal form
 POST posts/create/quick/{draft}/publish    one-screen review, later phase
 ```
-- Routes live in a new `routes/web/front/quick-post.php`, included from `routes/web/front.php` before line 120.
-- `QuickPostController` extends the multi-step create base controller. Because the URL keeps `create` as its second segment, the existing package, payment and navigation logic applies unchanged.
-- New services under `app/Services/QuickPost/`: `QuickPostService`, `CatalogBuilder`, `DraftPrompt`, `DraftSchema`, `DraftSanitizer`, `LocationResolver`, `DraftImageLoader`, `DraftToPostInput`.
+- Routes live in a new `routes/web/front/listing-assistant.php`, included from `routes/web/front.php` before line 120.
+- `ListingAssistantController` extends the multi-step create base controller. Because the URL keeps `create` as its second segment, the existing package, payment and navigation logic applies unchanged.
+- New services under `app/Services/QuickPost/`: `ListingAssistantService`, `CatalogBuilder`, `DraftPrompt`, `DraftSchema`, `DraftSanitizer`, `LocationResolver`, `DraftImageLoader`, `DraftToPostInput`.
 - New `post_drafts` table: owner, session token, input, picture paths, raw and sanitised output, status, linked post, expiry.
 - The draft call is synchronous inside the AJAX request. No queue is involved.
 - Rate limit: 6 drafts a minute per IP, 10 per user, plus the admin-set AI post limit.

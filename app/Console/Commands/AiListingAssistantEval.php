@@ -7,25 +7,25 @@ use App\Models\Category;
 use App\Services\Ai\AiRequest;
 use App\Services\Ai\AiSettings;
 use App\Services\Ai\Contracts\AiClientContract;
-use App\Services\QuickPost\DraftPrompt;
-use App\Services\QuickPost\DraftSanitizer;
-use App\Services\QuickPost\DraftSchema;
-use App\Services\QuickPost\QuickPostService;
+use App\Services\ListingAssistant\DraftPrompt;
+use App\Services\ListingAssistant\DraftSanitizer;
+use App\Services\ListingAssistant\DraftSchema;
+use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Console\Command;
 use Throwable;
 
 /*
- * php artisan ai:listing-assistant-eval {model?} (adniro:ai). The old name ai:quickpost-eval still works.
+ * php artisan ai:listing-assistant-eval {model?} (adniro:ai).
  *
- * Runs the inputs in resources/ai/eval/quickpost.json through a model with the real drafting
+ * Runs the inputs in resources/ai/eval/listing-assistant.json through a model with the real drafting
  * prompt, catalog and sanitizer, and reports category accuracy, invented prices and whether
  * non-listings are recognised. Each case is one real AI call.
  *
  * Gate: at least 80% right categories, no invented price, every non-listing recognised and at
- * most one real listing wrongly refused. A model that passes gets "quickpost_eval_passed_at" set.
+ * most one real listing wrongly refused. A model that passes gets "listing_assistant_eval_passed_at" set.
  */
 
-class AiQuickpostEval extends Command
+class AiListingAssistantEval extends Command
 {
 	public const MIN_CATEGORY_ACCURACY = 0.8;
 	
@@ -35,9 +35,6 @@ class AiQuickpostEval extends Command
 		{--limit= : Run at most this many cases}';
 	
 	protected $description = 'Check a model against the AI listing assistant evaluation inputs (adniro:ai). Makes real AI calls.';
-	
-	/** The name used before the quick post page became the AI box in the listing form. */
-	protected $aliases = ['ai:quickpost-eval'];
 	
 	public function handle(AiClientContract $client, AiSettings $settings, DraftPrompt $prompt, DraftSanitizer $sanitizer): int
 	{
@@ -67,12 +64,12 @@ class AiQuickpostEval extends Command
 		foreach ($cases as $index => $case) {
 			$expectListing = !empty($case['categories']);
 			$result = $client->structured(new AiRequest(
-				feature: QuickPostService::FEATURE,
+				feature: ListingAssistantService::FEATURE,
 				instructions: $instructions,
 				prompt: $prompt->prompt((string)$case['text'], (string)($case['lang'] ?? 'en'), (string)config('country.name'), $currency),
 				schema: DraftSchema::schema(),
-				maxTokens: (int)config('ai_features.quickpost.max_tokens', 3000),
-				subjectType: 'quickpost_eval',
+				maxTokens: (int)config('ai_features.listing_assistant.max_tokens', 3000),
+				subjectType: 'listing_assistant_eval',
 				subjectId: $case['id'],
 				model: $model,
 			));
@@ -164,7 +161,7 @@ class AiQuickpostEval extends Command
 		]);
 		
 		if ($fullRun) {
-			$model->forceFill(['quickpost_eval_passed_at' => $passed ? now() : null])->save();
+			$model->forceFill(['listing_assistant_eval_passed_at' => $passed ? now() : null])->save();
 		} else {
 			$this->line('Partial run: the model\'s evaluation result was not changed.');
 		}
@@ -198,14 +195,14 @@ class AiQuickpostEval extends Command
 				->first();
 		}
 		
-		$id = $settings->modelIdsFor(QuickPostService::FEATURE)[0] ?? null;
+		$id = $settings->modelIdsFor(ListingAssistantService::FEATURE)[0] ?? null;
 		
 		return $id ? AiModel::query()->with('provider')->find($id) : null;
 	}
 	
 	private function cases(): array
 	{
-		$data = json_decode((string)file_get_contents(resource_path('ai/eval/quickpost.json')), true);
+		$data = json_decode((string)file_get_contents(resource_path('ai/eval/listing-assistant.json')), true);
 		$cases = (array)($data['cases'] ?? []);
 		
 		if ($only = $this->option('only')) {

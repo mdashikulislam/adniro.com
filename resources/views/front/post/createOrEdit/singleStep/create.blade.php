@@ -47,7 +47,7 @@
 									
 									<div class="row">
 										
-										@include('front.post.quick.form-box') {{-- adniro:ai --}}
+										@include('front.post.assistant.form-box') {{-- adniro:ai --}}
 										
 										{{-- category_id --}}
 										@php

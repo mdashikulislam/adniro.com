@@ -33,7 +33,7 @@ class AiSettings
 	
 	private const FEATURE_KEYS = [
 		'moderation'      => ['moderation_model_id', 'moderation_fallback_model_id'],
-		'quickpost_draft' => ['quickpost_model_id', 'quickpost_fallback_model_id'],
+		'listing_assistant' => ['listing_assistant_model_id', 'listing_assistant_fallback_model_id'],
 		'transcription'   => ['transcription_model_id', null],
 	];
 	
@@ -179,14 +179,14 @@ class AiSettings
 	 * When the AI cannot be used (over budget, or no usable model): approve the listing,
 	 * or hold it for an admin.
 	 */
-	public function quickpostEnabled(): bool
+	public function listingAssistantEnabled(): bool
 	{
-		return ($this->all()['quickpost_enabled'] ?? '0') == '1';
+		return ($this->all()['listing_assistant_enabled'] ?? '0') == '1';
 	}
 	
-	public function quickpostGuests(): bool
+	public function listingAssistantGuests(): bool
 	{
-		return ($this->all()['quickpost_guests'] ?? '0') == '1';
+		return ($this->all()['listing_assistant_guests'] ?? '0') == '1';
 	}
 	
 	/**
@@ -195,14 +195,14 @@ class AiSettings
 	 *
 	 * @return array{0: int, 1: string}
 	 */
-	public function quickpostLimit(string $who): array
+	public function listingAssistantLimit(string $who): array
 	{
 		$values = $this->all();
 		$who = $who === 'guest' ? 'guest' : 'member';
 		$default = $who === 'guest' ? 5 : 20;
 		
-		$limit = max(0, (int)($values['quickpost_' . $who . '_limit'] ?? $default));
-		$period = (string)($values['quickpost_' . $who . '_period'] ?? 'day');
+		$limit = max(0, (int)($values['listing_assistant_' . $who . '_limit'] ?? $default));
+		$period = (string)($values['listing_assistant_' . $who . '_period'] ?? 'day');
 		
 		return [$limit, in_array($period, ['day', 'week', 'month', 'none'], true) ? $period : 'day'];
 	}

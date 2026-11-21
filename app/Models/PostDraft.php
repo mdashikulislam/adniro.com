@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /*
- * A quick post draft (adniro:ai).
+ * An AI listing assistant draft (adniro:ai).
  */
 
 class PostDraft extends Model
@@ -15,7 +15,6 @@ class PostDraft extends Model
 	public const DRAFTED = 'drafted';
 	public const UNUSABLE = 'unusable';
 	public const FAILED = 'failed';
-	public const APPLIED = 'applied';
 	
 	protected $table = 'post_drafts';
 	
@@ -31,11 +30,6 @@ class PostDraft extends Model
 			'counted'       => 'boolean',
 			'expires_at'    => 'datetime',
 		];
-	}
-	
-	public function getRouteKeyName(): string
-	{
-		return 'token';
 	}
 	
 	public function user(): BelongsTo

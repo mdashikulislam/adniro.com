@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Web\Front\Post\QuickPost;
+namespace App\Http\Controllers\Web\Front\Post\ListingAssistant;
 
 use App\Http\Controllers\Controller;
-use App\Services\QuickPost\DraftForForm;
-use App\Services\QuickPost\LimitStatus;
-use App\Services\QuickPost\QuickPostService;
+use App\Services\ListingAssistant\DraftForForm;
+use App\Services\ListingAssistant\LimitStatus;
+use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\RateLimiter;
@@ -21,7 +20,7 @@ use Throwable;
  * Nothing is put into the session: the seller checks the form and submits it as usual.
  */
 
-class QuickPostController extends Controller
+class ListingAssistantController extends Controller
 {
 	private const AUDIO_TYPES = 'audio/webm,video/webm,audio/ogg,video/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/aac,audio/mpeg,audio/wav,audio/x-wav,audio/vnd.wave';
 
@@ -34,31 +33,23 @@ class QuickPostController extends Controller
 		'ai_unavailable' => 503,
 	];
 
-	/**
-	 * The old composer page: the box now lives in the normal form.
-	 */
-	public function composer(): RedirectResponse
-	{
-		return redirect()->to(urlGen()->addPost(), 301)->withHeaders(config('larapen.core.noCacheHeaders') ?? []);
-	}
-
-	public function fill(Request $request, QuickPostService $service, DraftForForm $presenter): JsonResponse
+	public function fill(Request $request, ListingAssistantService $service, DraftForForm $presenter): JsonResponse
 	{
 		$user = auth()->user();
 		$headers = config('larapen.core.noCacheHeaders') ?? [];
 
 		if (!$service->available($user)) {
-			return response()->json(['ok' => false, 'reason' => 'off', 'message' => trans('ai.qp_off')], 403, $headers);
+			return response()->json(['ok' => false, 'reason' => 'off', 'message' => trans('ai.assistant_off')], 403, $headers);
 		}
 
-		$perMinute = (int)config($user ? 'ai_features.quickpost.rate_per_user' : 'ai_features.quickpost.rate_per_ip', 6);
-		if ($throttled = $this->throttled('quickpost', $perMinute, $request, $headers)) {
+		$perMinute = (int)config($user ? 'ai_features.listing_assistant.rate_per_user' : 'ai_features.listing_assistant.rate_per_ip', 6);
+		if ($throttled = $this->throttled('listing-assistant', $perMinute, $request, $headers)) {
 			return $throttled;
 		}
 
 		$data = $request->validate([
-			'text'       => ['nullable', 'required_without:audio', 'string', 'max:' . (int)config('ai_features.quickpost.max_text', 2000)],
-			'audio'      => ['nullable', 'required_without:text', 'file', 'mimetypes:' . self::AUDIO_TYPES, 'max:' . (int)config('ai_features.quickpost.max_audio_kb', 5120)],
+			'text'       => ['nullable', 'required_without:audio', 'string', 'max:' . (int)config('ai_features.listing_assistant.max_text', 2000)],
+			'audio'      => ['nullable', 'required_without:text', 'file', 'mimetypes:' . self::AUDIO_TYPES, 'max:' . (int)config('ai_features.listing_assistant.max_audio_kb', 5120)],
 			'redraft_of' => ['nullable', 'string', 'max:40'],
 		]);
 
@@ -94,10 +85,10 @@ class QuickPostController extends Controller
 		}
 
 		$payload['message'] = match ($outcome['reason']) {
-			'too_short' => trans('ai.qp_too_short', ['min' => (int)config('ai_features.quickpost.min_text', 10)]),
-			'busy'      => trans('ai.qp_busy'),
+			'too_short' => trans('ai.assistant_too_short', ['min' => (int)config('ai_features.listing_assistant.min_text', 10)]),
+			'busy'      => trans('ai.assistant_busy'),
 			'limit'     => $this->limitReachedText($limit),
-			'unusable'  => $outcome['message'] ?: trans('ai.qp_unusable'),
+			'unusable'  => $outcome['message'] ?: trans('ai.assistant_unusable'),
 			default     => trans('ai.box_unavailable'),
 		};
 
@@ -147,7 +138,7 @@ class QuickPostController extends Controller
 			return null;
 		}
 
-		return trans_choice('ai.qp_left_' . $limit->period, (int)$limit->remaining(), [
+		return trans_choice('ai.assistant_left_' . $limit->period, (int)$limit->remaining(), [
 			'left'  => $limit->remaining(),
 			'limit' => $limit->limit,
 		]);
@@ -156,19 +147,19 @@ class QuickPostController extends Controller
 	/**
 	 * The recording as text, or the answer to send when it could not be used.
 	 */
-	private function transcribe(Request $request, UploadedFile $file, QuickPostService $service, array $headers): string|JsonResponse
+	private function transcribe(Request $request, UploadedFile $file, ListingAssistantService $service, array $headers): string|JsonResponse
 	{
 		if (!$service->serverVoiceAvailable(auth()->user())) {
-			return response()->json(['ok' => false, 'reason' => 'voice_off', 'message' => trans('ai.qp_voice_unavailable')], 403, $headers);
+			return response()->json(['ok' => false, 'reason' => 'voice_off', 'message' => trans('ai.assistant_voice_unavailable')], 403, $headers);
 		}
 
-		if ($throttled = $this->throttled('quickpost-voice', (int)config('ai_features.quickpost.voice_rate', 10), $request, $headers)) {
+		if ($throttled = $this->throttled('listing-assistant-voice', (int)config('ai_features.listing_assistant.voice_rate', 10), $request, $headers)) {
 			return $throttled;
 		}
 
 		$heard = $service->transcribe((string)$file->getRealPath(), $file->getMimeType(), app()->getLocale(), auth()->user(), $request->ip());
 		if (!$heard['ok']) {
-			$message = trans($heard['reason'] === 'empty' ? 'ai.qp_voice_no_speech' : 'ai.qp_voice_failed');
+			$message = trans($heard['reason'] === 'empty' ? 'ai.assistant_voice_no_speech' : 'ai.assistant_voice_failed');
 
 			return response()->json(['ok' => false, 'reason' => 'voice_failed', 'message' => $message], 422, $headers);
 		}
@@ -178,7 +169,7 @@ class QuickPostController extends Controller
 
 	private function limitReachedText(LimitStatus $limit): string
 	{
-		return trans('ai.qp_limit_reached', [
+		return trans('ai.assistant_limit_reached', [
 			'when' => $limit->resetsAt?->setTimezone((string)config('app.timezone', 'UTC'))->isoFormat('LLL') ?? '',
 		]);
 	}
@@ -195,7 +186,7 @@ class QuickPostController extends Controller
 			return response()->json([
 				'ok'      => false,
 				'reason'  => 'rate',
-				'message' => trans('ai.qp_rate', ['seconds' => RateLimiter::availableIn($rateKey)]),
+				'message' => trans('ai.assistant_rate', ['seconds' => RateLimiter::availableIn($rateKey)]),
 			], 429, $headers);
 		}
 		RateLimiter::hit($rateKey, 60);

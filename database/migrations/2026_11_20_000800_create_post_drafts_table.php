@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /*
- * Quick post drafts (adniro:ai). One row per AI draft request.
+ * AI listing assistant drafts (adniro:ai). One row per AI draft request.
  * A successful draft that counts against the AI post limit has counted = 1.
  */
 return new class extends Migration

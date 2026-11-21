@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\QuickPost;
+namespace App\Services\ListingAssistant;
 
 /*
  * The drafting request (adniro:ai). The instructions and the catalog form one stable system
@@ -17,12 +17,12 @@ class DraftPrompt
 	
 	public function instructions(): string
 	{
-		return rtrim((string)file_get_contents(resource_path('ai/quickpost-instructions.md'))) . "\n\n" . $this->catalog->text();
+		return rtrim((string)file_get_contents(resource_path('ai/listing-assistant-instructions.md'))) . "\n\n" . $this->catalog->text();
 	}
 	
 	public function prompt(string $text, string $locale, ?string $countryName, ?string $currency, int $photoCount = 0): string
 	{
-		$text = mb_substr(trim($text), 0, (int)config('ai_features.quickpost.max_text', 2000));
+		$text = mb_substr(trim($text), 0, (int)config('ai_features.listing_assistant.max_text', 2000));
 		
 		return '<locale>' . e($locale) . "</locale>\n"
 			. '<country>' . e((string)$countryName) . "</country>\n"

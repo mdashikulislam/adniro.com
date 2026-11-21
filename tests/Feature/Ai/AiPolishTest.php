@@ -5,26 +5,26 @@ namespace Tests\Feature\Ai;
 use App\Models\AiUsageLog;
 use App\Services\Ai\AiResult;
 use App\Services\Ai\AiSpend;
-use App\Services\QuickPost\QuickPostService;
+use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /*
- * Phase 9: translations, the mobile API, the spend widget, the quick post evaluation and the
+ * Phase 9: translations, the mobile API, the spend widget, the listing assistant evaluation and the
  * one-screen review (adniro:ai).
  */
 
 class AiPolishTest extends TestCase
 {
-	use RefreshDatabase, QuickPostFixtures;
+	use RefreshDatabase, ListingAssistantFixtures;
 	
-	private const USER_KEYS = '/^(mail_not_approved|sms_not|owner_|badge_|finish_|moderation_category_|qp_|box_|status_(approved|pending|needs_review|rejected|none))/';
+	private const USER_KEYS = '/^(mail_not_approved|sms_not|owner_|badge_|finish_|moderation_category_|assistant_|box_|status_(approved|pending|needs_review|rejected|none))/';
 	
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->setUpQuickPost();
+		$this->setUpListingAssistant();
 		config(['larapen.core.api.token' => 'test-api-token']);
 	}
 	
@@ -53,7 +53,7 @@ class AiPolishTest extends TestCase
 	{
 		app()->setLocale('bn');
 		$this->assertSame('অনুমোদিত নয়', trans('ai.badge_rejected'));
-		$this->assertStringContainsString('5-এর মধ্যে 3টি', trans_choice('ai.qp_left_day', 3, ['left' => 3, 'limit' => 5]));
+		$this->assertStringContainsString('5-এর মধ্যে 3টি', trans_choice('ai.assistant_left_day', 3, ['left' => 3, 'limit' => 5]));
 		$this->assertSame('General', trans('ai.setting_tab_general'));
 	}
 	
@@ -62,7 +62,7 @@ class AiPolishTest extends TestCase
 	public function test_the_api_reports_the_limit(): void
 	{
 		$this->actingAs($this->user(7), 'sanctum')
-			->getJson('/api/quickpost/limit', ['X-AppApiToken' => 'test-api-token'])
+			->getJson('/api/listing-assistant/limit', ['X-AppApiToken' => 'test-api-token'])
 			->assertOk()
 			->assertJson(['success' => true, 'result' => ['available' => true, 'limit' => ['limit' => 20, 'remaining' => 20, 'period' => 'day']]]);
 	}
@@ -71,7 +71,7 @@ class AiPolishTest extends TestCase
 	{
 		$this->ai->answer($this->draftAnswer());
 		
-		$response = $this->actingAs($this->user(7), 'sanctum')->post('/api/quickpost/drafts', [
+		$response = $this->actingAs($this->user(7), 'sanctum')->post('/api/listing-assistant/drafts', [
 			'text'   => 'iPhone 13 blue with box',
 			'photos' => [UploadedFile::fake()->image('a.jpg', 800, 600), UploadedFile::fake()->image('b.jpg', 800, 600)],
 			'lat'    => 39.80,
@@ -92,31 +92,31 @@ class AiPolishTest extends TestCase
 	
 	public function test_the_api_answers_429_with_the_reset_time_at_the_limit(): void
 	{
-		$this->setAi(['quickpost_member_limit' => '1']);
+		$this->setAi(['listing_assistant_member_limit' => '1']);
 		$this->ai->answer($this->draftAnswer());
 		$user = $this->user(7);
 		$headers = ['Accept' => 'application/json', 'X-AppApiToken' => 'test-api-token'];
 		
-		$this->actingAs($user, 'sanctum')->post('/api/quickpost/drafts', ['text' => 'iPhone 13 blue with box'], $headers)->assertOk();
-		$response = $this->actingAs($user, 'sanctum')->post('/api/quickpost/drafts', ['text' => 'iPhone 12 blue with box'], $headers);
+		$this->actingAs($user, 'sanctum')->post('/api/listing-assistant/drafts', ['text' => 'iPhone 13 blue with box'], $headers)->assertOk();
+		$response = $this->actingAs($user, 'sanctum')->post('/api/listing-assistant/drafts', ['text' => 'iPhone 12 blue with box'], $headers);
 		
 		$response->assertStatus(429)->assertJson(['success' => false, 'extra' => ['reason' => 'limit', 'limit' => ['remaining' => 0]]]);
 		$this->assertNotEmpty($response->headers->get('Retry-After'));
 		$this->assertNotNull($response->json('extra.limit.resets_at'));
 	}
 	
-	public function test_the_api_refuses_when_quick_post_is_off_and_does_not_fill_a_session_on_failure(): void
+	public function test_the_api_refuses_when_listing_assistant_is_off_and_does_not_fill_a_session_on_failure(): void
 	{
 		$headers = ['Accept' => 'application/json', 'X-AppApiToken' => 'test-api-token'];
 		
 		$this->ai->respond(fn () => new AiResult(AiResult::ERROR));
-		$this->actingAs($this->user(7), 'sanctum')->post('/api/quickpost/drafts', ['text' => 'Grey sofa, three seats'], $headers)
+		$this->actingAs($this->user(7), 'sanctum')->post('/api/listing-assistant/drafts', ['text' => 'Grey sofa, three seats'], $headers)
 			->assertOk()->assertJson(['success' => false, 'extra' => ['reason' => 'ai_unavailable']]);
 		$this->assertNull(session('postInput'));
 		
-		$this->setAi(['quickpost_enabled' => '0']);
-		$this->app->forgetInstance(QuickPostService::class);
-		$this->post('/api/quickpost/drafts', ['text' => 'Grey sofa, three seats'], $headers)
+		$this->setAi(['listing_assistant_enabled' => '0']);
+		$this->app->forgetInstance(ListingAssistantService::class);
+		$this->post('/api/listing-assistant/drafts', ['text' => 'Grey sofa, three seats'], $headers)
 			->assertForbidden()->assertJson(['success' => false, 'extra' => ['reason' => 'off']]);
 	}
 	
@@ -126,8 +126,8 @@ class AiPolishTest extends TestCase
 	{
 		$this->setAi(['daily_budget_usd' => '2']);
 		AiUsageLog::query()->create(['feature' => 'moderation', 'status' => 'ok', 'cost_usd' => 0.5, 'created_at' => now()]);
-		AiUsageLog::query()->create(['feature' => 'quickpost_draft', 'status' => 'ok', 'cost_usd' => 0.25, 'created_at' => now()]);
-		AiUsageLog::query()->create(['feature' => 'quickpost_draft', 'status' => 'error', 'cost_usd' => 0, 'created_at' => now()]);
+		AiUsageLog::query()->create(['feature' => 'listing_assistant', 'status' => 'ok', 'cost_usd' => 0.25, 'created_at' => now()]);
+		AiUsageLog::query()->create(['feature' => 'listing_assistant', 'status' => 'error', 'cost_usd' => 0, 'created_at' => now()]);
 		AiUsageLog::query()->create(['feature' => 'moderation', 'status' => 'ok', 'cost_usd' => 1, 'created_at' => now()->subDays(40)]);
 		
 		$summary = app(AiSpend::class)->summary();
@@ -137,7 +137,7 @@ class AiPolishTest extends TestCase
 		$this->assertSame(1, $summary['today_failed']);
 		$this->assertSame(38.0, (float)$summary['budget_used']);
 		$this->assertCount(7, $summary['days']);
-		$this->assertSame(2, $summary['features']['quickpost_draft']['calls']);
+		$this->assertSame(2, $summary['features']['listing_assistant']['calls']);
 		
 		$this->assertSame('', trim(view('admin.ai.spend-widget')->render()), 'hidden from people who are not super admins');
 		$this->actingAs($this->admin());
@@ -150,7 +150,7 @@ class AiPolishTest extends TestCase
 	
 	// --- AI listing assistant evaluation and model list --------------------
 	
-	public function test_the_quickpost_evaluation_grades_categories_prices_and_non_listings(): void
+	public function test_the_listing_assistant_evaluation_grades_categories_prices_and_non_listings(): void
 	{
 		$answer = function ($request) {
 			$base = $this->draftAnswer();
@@ -168,12 +168,12 @@ class AiPolishTest extends TestCase
 		
 		// A model that invents a price fails
 		$this->ai->answer($this->draftAnswer());
-		$this->artisan('ai:quickpost-eval', ['model' => $this->model->id, '--only' => 'phone-noprice'])->assertFailed();
+		$this->artisan('ai:listing-assistant-eval', ['model' => $this->model->id, '--only' => 'phone-noprice'])->assertFailed();
 		
 		// A full run that fails clears the model's pass
-		$this->model->forceFill(['quickpost_eval_passed_at' => now()])->save();
-		$this->artisan('ai:quickpost-eval', ['model' => $this->model->id])->assertFailed();
-		$this->assertNull($this->model->fresh()->quickpost_eval_passed_at);
+		$this->model->forceFill(['listing_assistant_eval_passed_at' => now()])->save();
+		$this->artisan('ai:listing-assistant-eval', ['model' => $this->model->id])->assertFailed();
+		$this->assertNull($this->model->fresh()->listing_assistant_eval_passed_at);
 		
 		$html = $this->model->fresh()->crudEvaluationsColumn();
 		$this->assertStringContainsString('Listing assistant –', $html);
@@ -182,14 +182,14 @@ class AiPolishTest extends TestCase
 	public function test_evaluations_stop_early_and_count_failed_calls_as_failures(): void
 	{
 		$noKey = fn () => new AiResult(AiResult::ERROR, errorType: 'missing_api_key', errorMessage: 'No API key');
-		$this->model->forceFill(['moderation_eval_passed_at' => now(), 'quickpost_eval_passed_at' => now()])->save();
+		$this->model->forceFill(['moderation_eval_passed_at' => now(), 'listing_assistant_eval_passed_at' => now()])->save();
 		
 		$this->ai->respond($noKey);
 		$this->artisan('ai:moderation-eval', ['model' => $this->model->id])
 			->expectsOutputToContain('Stopped: the first 3 calls failed with "error: No API key"')
 			->assertFailed();
 		$this->assertSame(3, $this->ai->calls);
-		$this->artisan('ai:quickpost-eval', ['model' => $this->model->id])
+		$this->artisan('ai:listing-assistant-eval', ['model' => $this->model->id])
 			->expectsOutputToContain('Stopped: the first 3 calls failed')
 			->assertFailed();
 		$this->assertNotNull($this->model->fresh()->moderation_eval_passed_at, 'an aborted run changes nothing');

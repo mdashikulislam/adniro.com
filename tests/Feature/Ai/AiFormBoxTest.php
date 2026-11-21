@@ -15,14 +15,14 @@ use Tests\TestCase;
 
 class AiFormBoxTest extends TestCase
 {
-	use RefreshDatabase, QuickPostFixtures;
+	use RefreshDatabase, ListingAssistantFixtures;
 
-	private const FILL_URL = '/posts/create/quick/fill';
+	private const FILL_URL = '/posts/create/assistant/fill';
 
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->setUpQuickPost();
+		$this->setUpListingAssistant();
 		$this->ai->answer($this->draftAnswer());
 	}
 
@@ -79,7 +79,7 @@ class AiFormBoxTest extends TestCase
 	public function test_refilling_the_same_item_is_free_twice(): void
 	{
 		// Arrange
-		$this->setAi(['quickpost_member_limit' => '1']);
+		$this->setAi(['listing_assistant_member_limit' => '1']);
 		$user = $this->user(7);
 		$first = $this->actingAs($user)->postJson(self::FILL_URL, ['text' => 'iPhone 13 blue with box'])->json('draft');
 
@@ -120,15 +120,15 @@ class AiFormBoxTest extends TestCase
 	public function test_clear_answers_when_the_box_cannot_help(): void
 	{
 		// Arrange
-		$this->setAi(['quickpost_member_limit' => '1']);
+		$this->setAi(['listing_assistant_member_limit' => '1']);
 		$user = $this->user(7);
 
 		// Act & Assert: too short, used up, switched off
 		$this->actingAs($user)->postJson(self::FILL_URL, ['text' => 'phone'])->assertStatus(422)->assertJson(['ok' => false, 'reason' => 'too_short']);
 		$this->actingAs($user)->postJson(self::FILL_URL, ['text' => 'iPhone 13 blue with box'])->assertOk();
 		$this->actingAs($user)->postJson(self::FILL_URL, ['text' => 'iPhone 12 red with box'])->assertStatus(429)->assertJson(['reason' => 'limit']);
-		$this->setAi(['quickpost_enabled' => '0']);
-		$this->app->forgetInstance(\App\Services\QuickPost\QuickPostService::class);
+		$this->setAi(['listing_assistant_enabled' => '0']);
+		$this->app->forgetInstance(\App\Services\ListingAssistant\ListingAssistantService::class);
 		$this->actingAs($user)->postJson(self::FILL_URL, ['text' => 'iPhone 12 red with box'])->assertStatus(403)->assertJson(['reason' => 'off']);
 		$this->assertSame(1, $this->ai->calls);
 	}
@@ -156,12 +156,12 @@ class AiFormBoxTest extends TestCase
 		$html = $this->renderBox();
 		
 		// Assert
-		$this->assertStringContainsString('id="aiQuick"', $html);
-		$this->assertStringContainsString('data-url="' . url('posts/create/quick/fill') . '"', $html);
+		$this->assertStringContainsString('id="aiAssistant"', $html);
+		$this->assertStringContainsString('data-url="' . url('posts/create/assistant/fill') . '"', $html);
 		$this->assertStringContainsString('20 of 20 AI posts left today', $html);
 		$this->assertStringContainsString('ai.formbox.js', $html);
 		foreach (['resources/views/front/post/createOrEdit/multiSteps/create/post.blade.php', 'resources/views/front/post/createOrEdit/singleStep/create.blade.php'] as $form) {
-			$this->assertStringContainsString("@include('front.post.quick.form-box')", file_get_contents(base_path($form)), $form);
+			$this->assertStringContainsString("@include('front.post.assistant.form-box')", file_get_contents(base_path($form)), $form);
 		}
 	}
 	
@@ -178,11 +178,11 @@ class AiFormBoxTest extends TestCase
 	public function test_the_box_is_hidden_when_ai_posting_is_off(): void
 	{
 		// Arrange
-		$this->setAi(['quickpost_enabled' => '0']);
+		$this->setAi(['listing_assistant_enabled' => '0']);
 		$this->actingAs($this->user(7));
 		
 		// Act
-		$html = view('front.post.quick.form-box')->render();
+		$html = view('front.post.assistant.form-box')->render();
 		
 		// Assert
 		$this->assertSame('', trim($html));
@@ -199,10 +199,9 @@ class AiFormBoxTest extends TestCase
 		}
 	}
 
-	public function test_the_old_composer_address_opens_the_normal_form(): void
+	public function test_the_post_a_listing_link_opens_the_normal_form(): void
 	{
 		// Act & Assert
-		$this->actingAs($this->user(7))->get('/posts/create/quick')->assertRedirect(urlGen()->addPost());
 		[$url] = getCreateListingLinkInfo();
 		$this->assertSame(urlGen()->addPost(), $url);
 	}
@@ -210,7 +209,7 @@ class AiFormBoxTest extends TestCase
 	/** The box with the script stack it pushes to, as the layout prints it. */
 	private function renderBox(): string
 	{
-		return \Illuminate\Support\Facades\Blade::render("@include('front.post.quick.form-box')\n@stack('after_scripts_stack')");
+		return \Illuminate\Support\Facades\Blade::render("@include('front.post.assistant.form-box')\n@stack('after_scripts_stack')");
 	}
 	
 	private function recording(): UploadedFile

@@ -43,7 +43,7 @@ class AiModel extends BaseModel
 			'last_test_ok'               => 'boolean',
 			'last_tested_at'             => 'datetime',
 			'moderation_eval_passed_at'  => 'datetime',
-			'quickpost_eval_passed_at'   => 'datetime',
+			'listing_assistant_eval_passed_at'   => 'datetime',
 		];
 	}
 	
@@ -178,7 +178,7 @@ class AiModel extends BaseModel
 		};
 		
 		return $badge(trans('ai.eval_moderation'), $this->moderation_eval_passed_at)
-			. ' ' . $badge(trans('ai.eval_quickpost'), $this->quickpost_eval_passed_at);
+			. ' ' . $badge(trans('ai.eval_listing_assistant'), $this->listing_assistant_eval_passed_at);
 	}
 	
 	public function crudStatusColumn(): string

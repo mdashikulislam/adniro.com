@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\QuickPost;
+namespace App\Services\ListingAssistant;
 
 use App\Models\City;
 use App\Models\Post;

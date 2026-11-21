@@ -31,7 +31,7 @@ class AiBudgetReserveTest extends TestCase
 		$budget = app(AiBudget::class);
 		
 		// Act & Assert
-		$this->assertSame(AiBudget::DAILY_BUDGET, $budget->check('quickpost_draft'));
+		$this->assertSame(AiBudget::DAILY_BUDGET, $budget->check('listing_assistant'));
 		$this->assertSame(AiBudget::DAILY_BUDGET, $budget->check('transcription'));
 		$this->assertNull($budget->check('moderation'));
 	}
@@ -43,7 +43,7 @@ class AiBudgetReserveTest extends TestCase
 		$budget = app(AiBudget::class);
 		
 		// Act & Assert
-		$this->assertSame(AiBudget::DAILY_CALL_LIMIT, $budget->check('quickpost_draft'));
+		$this->assertSame(AiBudget::DAILY_CALL_LIMIT, $budget->check('listing_assistant'));
 		$this->assertNull($budget->check('moderation'));
 	}
 	

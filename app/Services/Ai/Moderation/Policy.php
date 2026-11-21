@@ -4,7 +4,7 @@ namespace App\Services\Ai\Moderation;
 
 /*
  * Moderation policy: categories, their severity, the instructions and the answer schema (adniro:ai).
- * Shared with quick post, which shows the same categories as soft warnings.
+ * Shared with the listing assistant, which shows the same categories as soft warnings.
  */
 
 final class Policy

@@ -178,7 +178,7 @@ class AiModelController extends PanelController
 				'last_tested_at'            => null,
 				'last_test_error'           => null,
 				'moderation_eval_passed_at' => null,
-				'quickpost_eval_passed_at'  => null,
+				'listing_assistant_eval_passed_at'  => null,
 			])->save();
 			notification(trans('ai.model_retest_needed'), 'warning');
 		}

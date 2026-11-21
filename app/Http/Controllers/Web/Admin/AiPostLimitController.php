@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Models\Permission;
 use App\Models\User;
-use App\Services\QuickPost\AiPostLimit;
+use App\Services\ListingAssistant\AiPostLimit;
 use Illuminate\Http\Request;
 
 /*

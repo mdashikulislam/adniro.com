@@ -43,7 +43,7 @@
 				
 				<table class="table table-sm mb-3">
 					<tbody>
-						@foreach (['moderation', 'quickpost_draft', 'test'] as $feature)
+						@foreach (['moderation', 'listing_assistant', 'test'] as $feature)
 							<tr>
 								<td>{{ trans('ai.spend_feature_' . $feature) }}</td>
 								<td class="text-end">{{ $aiSpend['features'][$feature]['calls'] ?? 0 }} {{ trans('ai.spend_calls_short') }}</td>

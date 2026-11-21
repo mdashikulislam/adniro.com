@@ -90,7 +90,7 @@ class LaravelAiClient implements AiClientContract
 			schema: [],
 			userId: $userId,
 			ip: $ip,
-			subjectType: $isAdminTest ? 'ai_model' : 'quickpost_voice',
+			subjectType: $isAdminTest ? 'ai_model' : 'listing_assistant_voice',
 			subjectId: $model?->id,
 			meta: array_filter(['language' => $language]),
 			model: $model,
