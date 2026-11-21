@@ -1,0 +1,295 @@
+/*
+ * adniro: the phone header controls (country pill, account button, menu) and the bottom app bar
+ * (front/layouts/partials/mobile-nav.blade.php). Teal, soft and rounded, in light and dark.
+ */
+
+:root {
+	--adn-appbar-height: 64px;
+	--adn-appbar-safe: env(safe-area-inset-bottom, 0px);
+	--adn-tap: rgba(var(--bs-primary-rgb), .1);
+}
+
+/* ---------- Phone header ---------- */
+.adn-mhead-country {
+	display: inline-flex;
+	align-items: center;
+	gap: .35rem;
+	height: 36px;
+	margin-inline-start: .35rem;
+	padding: 0 .55rem 0 .45rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 999px;
+	color: var(--bs-secondary-color);
+	background-color: var(--bs-body-bg);
+	font-size: .7rem;
+	line-height: 1;
+	transition: border-color .15s ease, background-color .15s ease;
+}
+
+.adn-mhead-country img {
+	width: 22px;
+	height: 16px;
+	object-fit: cover;
+	border-radius: 4px;
+	outline: 1px solid rgba(0, 0, 0, .08);
+	outline-offset: -1px;
+}
+
+.adn-mhead-country:hover,
+.adn-mhead-country:focus-visible {
+	border-color: rgba(var(--bs-primary-rgb), .45);
+	background-color: rgba(var(--bs-primary-rgb), .05);
+}
+
+.adn-mhead-country.is-static {
+	padding-inline-end: .45rem;
+}
+
+.adn-mhead-btn {
+	display: inline-flex;
+}
+
+/* The menu button keeps Bootstrap's display: hidden from 1200px up, where the menu is always open */
+@media (max-width: 1199.98px) {
+	#mainNavbar .navbar-toggler {
+		display: inline-flex;
+	}
+}
+
+.adn-mhead-btn,
+#mainNavbar .navbar-toggler {
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	padding: 0;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 14px;
+	color: var(--bs-emphasis-color);
+	background-color: var(--bs-body-bg);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+	transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+}
+
+.adn-mhead-btn {
+	font-size: 1.2rem;
+	text-decoration: none;
+}
+
+.adn-mhead-btn:hover,
+.adn-mhead-btn:focus-visible,
+#mainNavbar .navbar-toggler:hover {
+	color: var(--bs-primary);
+	border-color: rgba(var(--bs-primary-rgb), .45);
+	background-color: rgba(var(--bs-primary-rgb), .06);
+}
+
+.adn-mhead-btn:active,
+#mainNavbar .navbar-toggler:active {
+	transform: scale(.96);
+}
+
+#mainNavbar .navbar-toggler:focus {
+	box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .25);
+}
+
+#mainNavbar .navbar-toggler-icon {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+@media (max-width: 1199.98px) {
+	/* One row: the logo gives way to the controls */
+	#mainNavbar .navbar-brand {
+		flex: 0 1 auto;
+		min-width: 0;
+		max-width: calc(100% - 170px); /* the country pill, account and menu buttons always fit beside it */
+		margin-inline-end: .25rem;
+		overflow: hidden;
+	}
+
+	.adn-mhead-account {
+		margin-inline-end: .5rem;
+	}
+
+	/* The country is in the header row already (.adn-mhead-country) */
+	#navbarNav .flag-menu {
+		display: none;
+	}
+}
+
+@media (max-width: 399.98px) {
+	#mainNavbar .navbar-brand .main-logo {
+		height: 30px;
+	}
+
+	.adn-mhead-country {
+		margin-inline-start: .15rem;
+	}
+}
+
+/* ---------- Bottom app bar (phones) ---------- */
+.adn-appbar {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 1030;
+	padding-bottom: var(--adn-appbar-safe);
+	border-top: 1px solid var(--bs-border-color-translucent);
+	background-color: rgba(var(--bs-body-bg-rgb), .94);
+	box-shadow: 0 -8px 24px -16px rgba(15, 23, 42, .35);
+	-webkit-backdrop-filter: saturate(1.4) blur(14px);
+	backdrop-filter: saturate(1.4) blur(14px);
+}
+
+.adn-appbar-list {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	align-items: end;
+	height: var(--adn-appbar-height);
+	margin: 0;
+	padding: 0 .25rem;
+	list-style: none;
+}
+
+.adn-appbar-link {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	gap: .15rem;
+	height: var(--adn-appbar-height);
+	padding-bottom: .5rem;
+	color: var(--bs-secondary-color);
+	text-decoration: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.adn-appbar-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 30px;
+	border-radius: 999px;
+	font-size: 1.2rem;
+	transition: background-color .2s ease, color .2s ease, transform .15s ease;
+}
+
+.adn-appbar-label {
+	max-width: 100%;
+	overflow: hidden;
+	font-size: .68rem;
+	font-weight: 600;
+	letter-spacing: .01em;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.adn-appbar-link:hover {
+	color: var(--bs-emphasis-color);
+}
+
+.adn-appbar-link:active .adn-appbar-icon {
+	transform: scale(.94);
+}
+
+.adn-appbar-link:focus-visible {
+	outline: none;
+}
+
+.adn-appbar-link:focus-visible .adn-appbar-icon,
+.adn-appbar-link:focus-visible .adn-appbar-sell-tile {
+	box-shadow: 0 0 0 2px var(--bs-body-bg), 0 0 0 4px var(--bs-primary);
+}
+
+/* The current page: a soft teal pill behind the filled icon */
+.adn-appbar-link.is-active {
+	color: var(--bs-primary);
+}
+
+.adn-appbar-link.is-active .adn-appbar-icon {
+	color: color-mix(in srgb, var(--bs-primary) 85%, #000);
+	background-color: rgba(var(--bs-primary-rgb), .14);
+}
+
+.adn-appbar-link.is-active .adn-appbar-label {
+	font-weight: 700;
+}
+
+/* Sell: a raised rounded-square tile in the middle */
+.adn-appbar-sell {
+	position: relative;
+	color: var(--bs-primary);
+}
+
+.adn-appbar-sell-tile {
+	position: absolute;
+	top: -18px;
+	left: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 54px;
+	height: 54px;
+	border: 4px solid var(--bs-body-bg);
+	border-radius: 18px;
+	color: #fff;
+	font-size: 1.45rem;
+	background: linear-gradient(145deg, color-mix(in srgb, var(--bs-primary) 80%, #fff), var(--bs-primary) 55%, color-mix(in srgb, var(--bs-primary) 80%, #000));
+	box-shadow: 0 10px 22px -8px rgba(var(--bs-primary-rgb), .7);
+	transform: translateX(-50%);
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.adn-appbar-sell .adn-appbar-label {
+	font-weight: 700;
+}
+
+.adn-appbar-sell:hover .adn-appbar-sell-tile {
+	box-shadow: 0 12px 26px -8px rgba(var(--bs-primary-rgb), .8);
+}
+
+.adn-appbar-sell:active .adn-appbar-sell-tile {
+	transform: translateX(-50%) scale(.95);
+}
+
+[dir="rtl"] .adn-appbar-sell-tile {
+	transform: translateX(50%);
+	left: auto;
+	right: 50%;
+}
+
+[dir="rtl"] .adn-appbar-sell:active .adn-appbar-sell-tile {
+	transform: translateX(50%) scale(.95);
+}
+
+[data-bs-theme="dark"] .adn-appbar {
+	box-shadow: none;
+}
+
+[data-bs-theme="dark"] .adn-appbar-link.is-active .adn-appbar-icon {
+	color: color-mix(in srgb, var(--bs-primary) 60%, #fff);
+	background-color: rgba(var(--bs-primary-rgb), .22);
+}
+
+/* Room for the bar: page content, the cookie banner and other bottom bars stay above it */
+@media (max-width: 767.98px) {
+	body.has-appbar {
+		padding-bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe));
+	}
+
+	body.has-appbar .cookie-consent {
+		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 12px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-appbar-icon,
+	.adn-appbar-sell-tile,
+	.adn-mhead-btn,
+	#mainNavbar .navbar-toggler {
+		transition: none;
+	}
+}

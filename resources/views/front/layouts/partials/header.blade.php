@@ -167,6 +167,26 @@
 				/>
 			</a>
 			
+			{{-- adniro: phone header: the country next to the logo, then the account button beside the menu --}}
+			@if ($showCountryFlagNextLogo && !empty($countryFlag32Url))
+				@if ($multiCountryIsEnabled)
+					<button type="button" class="adn-mhead-country d-xl-none" data-bs-toggle="modal" data-bs-target="#selectCountry"
+					        aria-label="{{ trans('mobile_nav.choose_country') }}: {{ $countryName }}">
+						<img src="{{ $countryFlag32Url }}" alt="" width="22" height="16">
+						<i class="bi bi-chevron-down" aria-hidden="true"></i>
+					</button>
+				@else
+					<span class="adn-mhead-country is-static d-xl-none">
+						<img src="{{ $countryFlag32Url }}" alt="{{ $countryName }}" width="22" height="16">
+					</span>
+				@endif
+			@endif
+			<a href="{{ $authUser ? route('account.overview') : route('auth.login.showForm') }}"
+			   class="adn-mhead-btn adn-mhead-account ms-auto d-xl-none"
+			   aria-label="{{ $authUser ? trans('mobile_nav.account') : trans('mobile_nav.sign_in') }}">
+				<i class="bi bi-person{{ $authUser ? '-check' : '' }}" aria-hidden="true"></i>
+			</a>
+
 			{{-- Toggle Nav (Mobile) --}}
 			<button class="navbar-toggler float-end"
 			        type="button"

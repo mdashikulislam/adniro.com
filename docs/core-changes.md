@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (251)
+## Changed (252)
 
 Stock files we edited.
 
@@ -44,6 +44,7 @@ Stock files we edited.
 
 ### app/Http
 
+- `app/Http/Controllers/Web/Admin/SectionController.php`
 - `app/Http/Controllers/Web/Admin/UserController.php`
 - `app/Http/Controllers/Web/Auth/RegisterController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/Browsing/Location/ModalController.php` (no marker comment)
@@ -601,7 +602,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (258)
+## Added (259)
 
 Files that are not part of LaraClassifier.
 
@@ -664,6 +665,7 @@ Files that are not part of LaraClassifier.
 - `app/Models/BlogCategory.php`
 - `app/Models/BlogPost.php`
 - `app/Models/HasSettings/Presets/Section/BlogPreset.php`
+- `app/Models/HasSettings/Presets/Section/RecentlyViewedPreset.php`
 - `app/Models/Post/SimilarNeighbors.php`
 - `app/Models/PostDraft.php`
 - `app/Models/PostModeration.php`

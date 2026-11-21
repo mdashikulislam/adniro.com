@@ -93,6 +93,8 @@
 	
 	{{-- Custom CSS (adniro: built from resources/css/front/custom.css, minified and versioned) --}}
 	<link href="{{ url(mix('dist/front/custom.css')) }}" rel="stylesheet">
+	{{-- adniro: phone header controls and the bottom app bar --}}
+	<link href="{{ url('assets/css/mobile-nav.css') }}?v={{ @filemtime(public_path('assets/css/mobile-nav.css')) }}" rel="stylesheet">
 	
     @yield('after_styles')
 	@stack('after_styles_stack')
@@ -131,7 +133,11 @@
 		@endforeach
 	@endif
 </head>
-<body class="bg-body text-body-emphasis skin @yield('body_class')">
+@php
+	// adniro: the phone app bar, except on the listing form (it has its own bottom bar)
+	$showAppbar = !request()->routeIs('listing.create.*', 'listing.edit.*');
+@endphp
+<body class="bg-body text-body-emphasis skin @yield('body_class'){{ $showAppbar ? ' has-appbar' : '' }}">
 {{-- adniro: keyboard users can skip the header and menus --}}
 <a href="#main-content" class="visually-hidden-focusable position-absolute top-0 start-0 m-2 px-3 py-2 bg-body border rounded shadow" style="z-index: 2000">{{ t('skip_to_content') }}</a>
 @section('header')
@@ -177,6 +183,8 @@
 @section('footer')
 	@include('front.layouts.partials.footer')
 @show
+
+@includeWhen($showAppbar, 'front.layouts.partials.mobile-nav')
 
 @include('front.common.js.init')
 
