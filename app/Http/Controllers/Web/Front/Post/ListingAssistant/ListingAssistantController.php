@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Front\Post\ListingAssistant;
 
 use App\Http\Controllers\Controller;
 use App\Services\ListingAssistant\DraftForForm;
+use App\Services\ListingAssistant\FormPhotos;
 use App\Services\ListingAssistant\LimitStatus;
 use App\Services\ListingAssistant\ListingAssistantService;
 use Illuminate\Http\JsonResponse;
@@ -33,7 +34,7 @@ class ListingAssistantController extends Controller
 		'ai_unavailable' => 503,
 	];
 
-	public function fill(Request $request, ListingAssistantService $service, DraftForForm $presenter): JsonResponse
+	public function fill(Request $request, ListingAssistantService $service, DraftForForm $presenter, FormPhotos $formPhotos): JsonResponse
 	{
 		$user = auth()->user();
 		$headers = config('larapen.core.noCacheHeaders') ?? [];
@@ -48,10 +49,13 @@ class ListingAssistantController extends Controller
 		}
 
 		$data = $request->validate([
-			'text'       => ['nullable', 'required_without:audio', 'string', 'max:' . (int)config('ai_features.listing_assistant.max_text', 2000)],
-			'audio'      => ['nullable', 'required_without:text', 'file', 'mimetypes:' . self::AUDIO_TYPES, 'max:' . (int)config('ai_features.listing_assistant.max_audio_kb', 5120)],
+			'text'       => ['nullable', 'required_without_all:audio,photos', 'string', 'max:' . (int)config('ai_features.listing_assistant.max_text', 2000)],
+			'audio'      => ['nullable', 'required_without_all:text,photos', 'file', 'mimetypes:' . self::AUDIO_TYPES, 'max:' . (int)config('ai_features.listing_assistant.max_audio_kb', 5120)],
+			'photos'     => ['nullable', 'array', 'max:' . ListingAssistantService::MAX_PHOTOS],
+			'photos.*'   => ['file', 'mimes:' . collect(getServerAllowedImageFormats())->join(','), 'max:' . (int)config('settings.upload.max_image_size', 1000)],
 			'redraft_of' => ['nullable', 'string', 'max:40'],
 		]);
+		$photos = (array)$request->file('photos', []);
 
 		$transcript = null;
 		if ($request->hasFile('audio')) {
@@ -63,8 +67,9 @@ class ListingAssistantController extends Controller
 		}
 
 		$outcome = $service->draft($transcript ?? (string)($data['text'] ?? ''), $user, $request->ip(), app()->getLocale(), [
-			'session_id' => $request->session()->getId(),
-			'redraft_of' => $data['redraft_of'] ?? null,
+			'session_id'  => $request->session()->getId(),
+			'redraft_of'  => $data['redraft_of'] ?? null,
+			'image_files' => $photos,
 		]);
 
 		/** @var LimitStatus $limit */
@@ -79,8 +84,10 @@ class ListingAssistantController extends Controller
 
 		if ($outcome['ok']) {
 			return response()->json($payload + [
-					'draft'  => $outcome['draft']->token,
-					'fields' => $presenter->present($outcome['draft']),
+					'draft'        => $outcome['draft']->token,
+					'fields'       => $presenter->present($outcome['draft']),
+					// The photos go on to the form's Photos step, so they are not uploaded twice
+					'photos_added' => $formPhotos->store($photos),
 				], 200, $headers);
 		}
 

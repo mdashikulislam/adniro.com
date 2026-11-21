@@ -583,17 +583,17 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (199)
+## Added (200)
 
 Files that are not part of LaraClassifier.
 
 ### app/Console
 
+- `app/Console/Commands/AiListingAssistantEval.php`
+- `app/Console/Commands/AiListingAssistantPurge.php`
 - `app/Console/Commands/AiModerationEval.php`
 - `app/Console/Commands/AiModerationSweep.php`
 - `app/Console/Commands/AiPing.php`
-- `app/Console/Commands/AiQuickpostEval.php`
-- `app/Console/Commands/AiQuickpostPurge.php`
 - `app/Console/Commands/ListingsWarmCounts.php`
 - `app/Console/Commands/UsersGenerateUsernames.php`
 
@@ -606,7 +606,7 @@ Files that are not part of LaraClassifier.
 
 ### app/Http
 
-- `app/Http/Controllers/Api/QuickPostController.php`
+- `app/Http/Controllers/Api/ListingAssistantController.php`
 - `app/Http/Controllers/HealthController.php`
 - `app/Http/Controllers/Web/Admin/AiModelController.php`
 - `app/Http/Controllers/Web/Admin/AiPostLimitController.php`
@@ -617,7 +617,7 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Front/Account/FollowsController.php`
 - `app/Http/Controllers/Web/Front/Account/ProfileCoverController.php`
 - `app/Http/Controllers/Web/Front/Blog/BlogController.php`
-- `app/Http/Controllers/Web/Front/Post/QuickPost/QuickPostController.php`
+- `app/Http/Controllers/Web/Front/Post/ListingAssistant/ListingAssistantController.php`
 - `app/Http/Controllers/Web/Front/RecentlyViewedController.php`
 - `app/Http/Controllers/Web/Front/SiteIconController.php`
 - `app/Http/Controllers/WebhookController.php`
@@ -702,15 +702,15 @@ Files that are not part of LaraClassifier.
 - `app/Services/Ai/Support/AdminHtml.php`
 - `app/Services/Ai/Support/KnownModels.php`
 - `app/Services/Ai/Support/SchemaRules.php`
-- `app/Services/QuickPost/AiPostLimit.php`
-- `app/Services/QuickPost/CatalogBuilder.php`
-- `app/Services/QuickPost/DraftForForm.php`
-- `app/Services/QuickPost/DraftPrompt.php`
-- `app/Services/QuickPost/DraftSanitizer.php`
-- `app/Services/QuickPost/DraftSchema.php`
-- `app/Services/QuickPost/LimitStatus.php`
-- `app/Services/QuickPost/LocationResolver.php`
-- `app/Services/QuickPost/QuickPostService.php`
+- `app/Services/ListingAssistant/AiPostLimit.php`
+- `app/Services/ListingAssistant/CatalogBuilder.php`
+- `app/Services/ListingAssistant/DraftForForm.php`
+- `app/Services/ListingAssistant/DraftPrompt.php`
+- `app/Services/ListingAssistant/DraftSanitizer.php`
+- `app/Services/ListingAssistant/DraftSchema.php`
+- `app/Services/ListingAssistant/LimitStatus.php`
+- `app/Services/ListingAssistant/ListingAssistantService.php`
+- `app/Services/ListingAssistant/LocationResolver.php`
 - `app/Services/SellerService.php`
 - `app/Services/StructuredDataService.php`
 
@@ -760,6 +760,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_21_000100_rewrite_anti_scam_page.php`
 - `database/migrations/2026_11_21_000200_add_content_and_legal_pages.php`
 - `database/migrations/2026_11_21_000300_add_new_pages_to_footer_menu.php`
+- `database/migrations/2026_11_21_000400_rename_quickpost_to_listing_assistant.php`
 
 ### database/seeders
 
@@ -844,10 +845,10 @@ Files that are not part of LaraClassifier.
 
 ### resources/ai
 
+- `resources/ai/eval/listing-assistant.json`
 - `resources/ai/eval/moderation.json`
-- `resources/ai/eval/quickpost.json`
+- `resources/ai/listing-assistant-instructions.md`
 - `resources/ai/moderation-policy.md`
-- `resources/ai/quickpost-instructions.md`
 
 ### resources/css
 
@@ -879,7 +880,7 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/common/consent/banner.blade.php`
 - `resources/views/front/common/consent/tracking.blade.php`
 - `resources/views/front/common/json-ld.blade.php`
-- `resources/views/front/post/quick/form-box.blade.php`
+- `resources/views/front/post/assistant/form-box.blade.php`
 - `resources/views/front/search/partials/content.blade.php`
 - `resources/views/front/search/partials/posts/empty.blade.php`
 - `resources/views/front/search/partials/posts/template/grid_with_design.blade.php`
@@ -894,6 +895,6 @@ Files that are not part of LaraClassifier.
 ### routes/web
 
 - `routes/web/ai-admin.php`
-- `routes/web/front/quick-post.php`
+- `routes/web/front/listing-assistant.php`
 - `routes/web/front/site-icons.php`
 

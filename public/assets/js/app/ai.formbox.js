@@ -1,7 +1,8 @@
 /*
  * The AI box in the listing form (adniro:ai), ported from classifedz.com's ai.quickstart.js.
  * The seller describes the item once: typed, recorded (sent to the server when a speech-to-text model
- * is assigned) or dictated with the browser's own SpeechRecognition. posts/create/assistant/fill returns
+ * is assigned) or dictated with the browser's own SpeechRecognition, optionally with up to four photos
+ * (shrunk in the browser, read by the AI, then added to the form's Photos step by the server). posts/create/assistant/fill returns
  * the form's fields; this script fills the form the way a person would (the form's own category and
  * city functions, input/change events), highlights what changed, lists what still needs the seller,
  * and can undo it all. The seller then continues as usual.
@@ -32,6 +33,12 @@
 	var cancelButton = box.querySelector('.ai-assistant-cancel');
 	var usageTextEl = box.querySelector('.ai-assistant-usage-text');
 	var isWysiwyg = box.dataset.wysiwyg === '1';
+	var photoInput = box.querySelector('.ai-assistant-photo-input');
+	var photoAddButton = box.querySelector('.ai-assistant-photo-add');
+	var thumbsEl = box.querySelector('.ai-assistant-thumbs');
+	var maxPhotos = parseInt(box.dataset.maxPhotos, 10) || 4;
+	var maxPhotoBytes = (parseInt(box.dataset.maxPhotoKb, 10) || 1000) * 1024;
+	var photos = []; // [{file: File, url: string}]
 	var maxSeconds = parseInt(box.dataset.maxSeconds, 10) || 60;
 	var busy = false;
 	var snapshot = null;
@@ -99,6 +106,9 @@
 		textEl.disabled = state;
 		if (speakButton) {
 			speakButton.disabled = state;
+		}
+		if (photoAddButton) {
+			photoAddButton.disabled = state;
 		}
 		fillLabel.textContent = label || plain('fill');
 	}
@@ -387,7 +397,7 @@
 			+ '<span>' + html + '</span></li>';
 	}
 
-	function showResult(data, filledCity, transcript) {
+	function showResult(data, filledCity, transcript, photosAdded) {
 		var items = [];
 		items.push(data.category
 			? row(true, t('row_category', {category: data.category.path}))
@@ -406,6 +416,9 @@
 			: row(false, data.city_name ? t('row_city_unknown', {city: data.city_name}) : t('row_no_city')));
 		if (data.tags && data.tags.length) {
 			items.push(row(true, t('row_tags', {tags: data.tags.join(', ')})));
+		}
+		if (photosAdded > 0) {
+			items.push(row(true, t('row_photos', {count: photosAdded})));
 		}
 		if (transcript) {
 			items.push('<li class="list-group-item px-0 py-1 border-0 small text-secondary">' + t('row_heard', {text: transcript}) + '</li>');
@@ -428,7 +441,7 @@
 		}
 	}
 
-	function apply(data, transcript) {
+	function apply(data, transcript, photosAdded) {
 		snapshot = takeSnapshot();
 
 		if (data.category) {
@@ -458,7 +471,7 @@
 		if (transcript && !textEl.value.trim()) {
 			textEl.value = transcript;
 		}
-		showResult(data, filledCity, transcript);
+		showResult(data, filledCity, transcript, photosAdded || 0);
 		undoButton.classList.remove('d-none');
 		setMessage('');
 	}
@@ -476,6 +489,9 @@
 		if (lastDraft) {
 			body.append('redraft_of', lastDraft);
 		}
+		photos.forEach(function (photo) {
+			body.append('photos[]', photo.file, photo.file.name);
+		});
 
 		return fetch(box.dataset.url, {
 			method: 'POST',
@@ -511,7 +527,7 @@
 				return;
 			}
 			lastDraft = res.data.draft || lastDraft;
-			apply(res.data.fields, res.data.transcript);
+			apply(res.data.fields, res.data.transcript, res.data.photos_added);
 		}).catch(function () {
 			setBusy(false);
 			setMessage(plain('timeout'), 'danger');
@@ -535,7 +551,7 @@
 			return;
 		}
 		var text = textEl.value.trim();
-		if (text.length < 8) {
+		if (text.length < 8 && photos.length === 0) {
 			setMessage(plain('too_short'), 'warning');
 			textEl.focus();
 			return;
@@ -546,7 +562,9 @@
 		setMessage('');
 		setBusy(true, plain('filling'));
 		var body = new FormData();
-		body.append('text', text);
+		if (text !== '') {
+			body.append('text', text);
+		}
 		send(body);
 	});
 
@@ -558,6 +576,99 @@
 	});
 
 	undoButton.addEventListener('click', restore);
+
+	// ---------- photos ----------
+
+	var SHRINK_EDGE = 1600; // px, long edge; the AI and the listing need no more
+	var SHRINK_QUALITY = 0.85;
+
+	/** A copy of a large photo, resized to JPEG in the browser; the original when it is small or cannot be read. */
+	function shrink(file) {
+		return new Promise(function (resolve) {
+			if (!/^image\//.test(file.type) || !window.URL || !document.createElement('canvas').toBlob) {
+				resolve(file);
+				return;
+			}
+			var url = URL.createObjectURL(file);
+			var img = new Image();
+			img.onload = function () {
+				var scale = Math.min(1, SHRINK_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
+				URL.revokeObjectURL(url);
+				if (scale === 1 && file.size <= maxPhotoBytes) {
+					resolve(file);
+					return;
+				}
+				var canvas = document.createElement('canvas');
+				canvas.width = Math.round(img.naturalWidth * scale);
+				canvas.height = Math.round(img.naturalHeight * scale);
+				canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+				canvas.toBlob(function (blob) {
+					var name = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+					resolve(blob ? new File([blob], name, {type: 'image/jpeg'}) : file);
+				}, 'image/jpeg', SHRINK_QUALITY);
+			};
+			img.onerror = function () {
+				URL.revokeObjectURL(url);
+				resolve(file);
+			};
+			img.src = url;
+		});
+	}
+
+	function renderThumbs() {
+		thumbsEl.textContent = '';
+		photos.forEach(function (photo, index) {
+			var item = document.createElement('div');
+			item.className = 'ai-assistant-thumb';
+			var img = document.createElement('img');
+			img.src = photo.url;
+			img.alt = '';
+			var remove = document.createElement('button');
+			remove.type = 'button';
+			remove.className = 'ai-assistant-thumb-remove';
+			remove.setAttribute('aria-label', plain('photo_remove'));
+			remove.title = plain('photo_remove');
+			remove.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+			remove.addEventListener('click', function () {
+				URL.revokeObjectURL(photo.url);
+				photos.splice(index, 1);
+				renderThumbs();
+			});
+			item.appendChild(img);
+			item.appendChild(remove);
+			thumbsEl.appendChild(item);
+		});
+		thumbsEl.classList.toggle('d-none', photos.length === 0);
+		photoAddButton.classList.toggle('d-none', photos.length >= maxPhotos);
+	}
+
+	if (photoInput && photoAddButton && thumbsEl) {
+		photoAddButton.addEventListener('click', function () {
+			if (!busy) {
+				photoInput.click();
+			}
+		});
+		photoInput.addEventListener('change', function () {
+			var chosen = Array.prototype.slice.call(photoInput.files || []);
+			photoInput.value = '';
+			var room = maxPhotos - photos.length;
+			if (chosen.length > room) {
+				setMessage(plain('photos_max').replace(':max', String(maxPhotos)), 'warning');
+			} else {
+				setMessage('');
+			}
+			Promise.all(chosen.slice(0, Math.max(0, room)).map(shrink)).then(function (files) {
+				files.forEach(function (file) {
+					if (file.size > maxPhotoBytes) {
+						setMessage(plain('photo_too_big').replace(':size', String(Math.round(maxPhotoBytes / 104857.6) / 10)), 'warning');
+						return;
+					}
+					photos.push({file: file, url: URL.createObjectURL(file)});
+				});
+				renderThumbs();
+			});
+		});
+	}
 
 	// Example chips: show what a good description looks like
 	Array.prototype.forEach.call(box.querySelectorAll('.ai-assistant-chip'), function (chip) {

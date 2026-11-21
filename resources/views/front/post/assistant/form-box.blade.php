@@ -16,6 +16,7 @@
 			'fill', 'filling', 'listening', 'speak', 'rec_pause', 'rec_continue', 'rec_short', 'too_short', 'confirm_replace',
 			'restored', 'error', 'done', 'row_category', 'row_no_category', 'row_title', 'row_no_title', 'row_price', 'row_no_price',
 			'row_details', 'row_check_details', 'row_city', 'row_city_unknown', 'row_no_city', 'row_tags', 'row_heard',
+			'row_photos', 'photo_remove', 'photos_max', 'photo_too_big',
 		])->mapWithKeys(fn ($key) => [$key => trans('ai.box_' . $key)])->merge([
 			'timeout'     => trans('ai.assistant_timeout'),
 			'mic_denied'  => trans('ai.assistant_voice_denied'),
@@ -30,6 +31,8 @@
 		     data-selection-url="{{ url('browsing/categories/select') }}"
 		     data-max-seconds="{{ (int)config('ai_features.listing_assistant.max_audio_seconds', 60) }}"
 		     data-server-voice="{{ $aiBoxServerVoice ? '1' : '0' }}"
+		     data-max-photos="{{ \App\Services\ListingAssistant\ListingAssistantService::MAX_PHOTOS }}"
+		     data-max-photo-kb="{{ (int)config('settings.upload.max_image_size', 1000) }}"
 		     data-speech-lang="{{ $aiBoxSpeech['default'] }}"
 		     data-strings="{{ json_encode($aiBoxStrings, JSON_UNESCAPED_UNICODE) }}"
 		>
@@ -56,6 +59,16 @@
 						        title="{{ trans('ai.box_speak') }}" aria-label="{{ trans('ai.box_speak') }}">
 							<i class="fa-solid fa-microphone"></i>
 						</button>
+					</div>
+
+					{{-- Photos: read by the AI, then added to the Photos step --}}
+					<div class="ai-assistant-photos">
+						<input type="file" class="d-none ai-assistant-photo-input" accept="image/*" multiple tabindex="-1" aria-hidden="true">
+						<div class="ai-assistant-thumbs d-none"></div>
+						<button type="button" class="btn ai-assistant-photo-add" @disabled($aiBoxNoneLeft)>
+							<i class="fa-solid fa-camera"></i> {{ trans('ai.box_photos') }}
+						</button>
+						<span class="ai-assistant-photo-hint">{{ trans('ai.box_photos_hint', ['max' => \App\Services\ListingAssistant\ListingAssistantService::MAX_PHOTOS]) }}</span>
 					</div>
 
 					<div class="ai-assistant-chips">
@@ -116,11 +129,11 @@
 	</div>
 
 	@pushOnce('after_styles_stack', 'ai_formbox_css')
-		<link href="{{ url('assets/css/ai-formbox.css') }}?v=2" rel="stylesheet">
+		<link href="{{ url('assets/css/ai-formbox.css') }}?v=3" rel="stylesheet">
 	@endPushOnce
 	@if ($aiBoxOn)
 		@pushOnce('after_scripts_stack', 'ai_formbox_js')
-			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=2"></script>
+			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=3"></script>
 		@endPushOnce
 	@endif
 @endif

@@ -90,6 +90,84 @@ class AiFormBoxTest extends TestCase
 		$second->assertOk()->assertJson(['ok' => true]);
 	}
 
+	public function test_photos_are_read_by_the_ai_and_put_into_the_photos_step(): void
+	{
+		// Arrange
+		$disk = \Illuminate\Support\Facades\Storage::fake(\App\Helpers\Common\Files\Storage\StorageDisk::getDiskName());
+		$photos = [UploadedFile::fake()->image('front.jpg', 800, 600), UploadedFile::fake()->image('back.jpg', 800, 600)];
+		
+		// Act: photos alone are enough, no text needed
+		$response = $this->actingAs($this->user(7))->post(self::FILL_URL, ['photos' => $photos], ['Accept' => 'application/json']);
+		
+		// Assert
+		$response->assertOk()->assertJson(['ok' => true, 'photos_added' => 2]);
+		$this->assertCount(2, $this->ai->lastRequest->images);
+		$pictures = session('picturesInput');
+		$this->assertCount(2, $pictures);
+		foreach ($pictures as $path) {
+			$this->assertStringStartsWith('temporary/' . session('uid') . '/', $path);
+			$disk->assertExists($path);
+		}
+	}
+	
+	public function test_a_new_fill_replaces_the_box_photos_but_keeps_the_sellers_own(): void
+	{
+		// Arrange: one photo the seller uploaded in step 2, then a first fill with two photos
+		$disk = \Illuminate\Support\Facades\Storage::fake(\App\Helpers\Common\Files\Storage\StorageDisk::getDiskName());
+		$disk->put('temporary/own/mine.jpg', 'x');
+		session(['picturesInput' => ['temporary/own/mine.jpg']]);
+		$user = $this->user(7);
+		$this->actingAs($user)->post(self::FILL_URL, ['text' => 'iPhone 13 blue with box', 'photos' => [
+			UploadedFile::fake()->image('a.jpg'), UploadedFile::fake()->image('b.jpg'),
+		]], ['Accept' => 'application/json'])->assertOk();
+		$first = array_slice(session('picturesInput'), 1);
+		
+		// Act
+		$response = $this->actingAs($user)->post(self::FILL_URL, ['text' => 'iPhone 13 blue with box', 'photos' => [
+			UploadedFile::fake()->image('c.jpg'),
+		]], ['Accept' => 'application/json']);
+		
+		// Assert
+		$response->assertOk()->assertJson(['photos_added' => 1]);
+		$pictures = session('picturesInput');
+		$this->assertCount(2, $pictures);
+		$this->assertSame('temporary/own/mine.jpg', $pictures[0]);
+		foreach ($first as $path) {
+			$disk->assertMissing($path);
+		}
+	}
+	
+	public function test_photos_respect_the_sites_photo_limit_and_are_kept_only_after_a_draft(): void
+	{
+		// Arrange
+		\Illuminate\Support\Facades\Storage::fake(\App\Helpers\Common\Files\Storage\StorageDisk::getDiskName());
+		config(['settings.listing_form.pictures_limit' => 1]);
+		$user = $this->user(7);
+		
+		// Act & Assert: over the limit, only what fits is kept
+		$this->actingAs($user)->post(self::FILL_URL, ['photos' => [UploadedFile::fake()->image('a.jpg'), UploadedFile::fake()->image('b.jpg')]], ['Accept' => 'application/json'])
+			->assertOk()->assertJson(['photos_added' => 1]);
+		
+		// Act & Assert: a failed draft keeps nothing new
+		session()->forget(['picturesInput', \App\Services\ListingAssistant\FormPhotos::SESSION_KEY]);
+		$this->ai->respond(fn () => new AiResult(AiResult::ERROR));
+		$this->actingAs($user)->post(self::FILL_URL, ['photos' => [UploadedFile::fake()->image('c.jpg')]], ['Accept' => 'application/json'])
+			->assertStatus(503);
+		$this->assertEmpty(session('picturesInput'));
+	}
+	
+	public function test_too_many_or_wrong_files_are_refused(): void
+	{
+		// Arrange
+		$user = $this->user(7);
+		$five = array_map(fn ($i) => UploadedFile::fake()->image($i . '.jpg'), range(1, 5));
+		
+		// Act & Assert
+		$this->actingAs($user)->post(self::FILL_URL, ['photos' => $five], ['Accept' => 'application/json'])->assertStatus(422);
+		$this->actingAs($user)->post(self::FILL_URL, ['photos' => [UploadedFile::fake()->create('notes.pdf', 10, 'application/pdf')]], ['Accept' => 'application/json'])->assertStatus(422);
+		$this->assertSame(0, $this->ai->calls);
+	}
+	
 	public function test_a_recording_is_turned_into_text_and_then_into_fields(): void
 	{
 		// Arrange
