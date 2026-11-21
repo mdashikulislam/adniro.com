@@ -125,7 +125,21 @@ class AiFormBoxTest extends TestCase
 		$this->assertStringContainsString('Never guess what a photo cannot show', $request->instructions);
 		$this->assertStringNotContainsString('Use only what the person said. Do not invent', $request->instructions);
 		$this->assertSame(\App\Services\ListingAssistant\DraftPrompt::VERSION, $request->meta['prompt']);
-		$this->assertSame('2026-11-21.1', \App\Services\ListingAssistant\DraftPrompt::VERSION);
+		$this->assertSame('2026-11-21.2', \App\Services\ListingAssistant\DraftPrompt::VERSION);
+	}
+
+	public function test_the_description_is_a_full_listing_without_guessed_facts(): void
+	{
+		// Act
+		$this->actingAs($this->user(7))->post(self::FILL_URL, ['photos' => [UploadedFile::fake()->image('phone.jpg', 800, 600)]], ['Accept' => 'application/json'])
+			->assertOk();
+
+		// Assert: an opening line, the model's standard features as a list, then the condition
+		$instructions = $this->ai->lastRequest->instructions;
+		$this->assertStringContainsString('Key features:', $instructions);
+		$this->assertStringContainsString('the same on every unit of that model', $instructions);
+		$this->assertStringContainsString('Leave out anything that differs between units', $instructions);
+		$this->assertStringNotContainsString('two to six short sentences', $instructions);
 	}
 
 	public function test_a_new_fill_replaces_the_box_photos_but_keeps_the_sellers_own(): void

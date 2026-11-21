@@ -16,6 +16,7 @@ use App\Models\PostDraft;
 final class DraftForForm
 {
 	private const PATH_SEPARATOR = ' › ';
+	private const BULLET = '/^\s*[-•*]\s+(.+)$/u';
 
 	/**
 	 * @return array{category: ?array, post_type_id: ?int, title: string, html: string, text: string, price: int|float|null, tags: string[], cf: array, cf_labels: string[], city: ?array, city_name: ?string, marks: array}
@@ -69,9 +70,40 @@ final class DraftForForm
 	/** Plain text as escaped paragraphs, for the rich text editor. */
 	public static function paragraphs(string $text): string
 	{
-		$paragraphs = array_filter(array_map('trim', preg_split("/\n{2,}/u", $text) ?: []));
+		$blocks = array_filter(array_map('trim', preg_split("/\n{2,}/u", $text) ?: []));
 
-		return implode('', array_map(fn ($p) => '<p>' . implode('<br>', array_map('e', explode("\n", $p))) . '</p>', $paragraphs));
+		return implode('', array_map([self::class, 'block'], $blocks));
+	}
+
+	/** One block of text: its lines as a paragraph, and runs of "- ", "• " or "* " lines as a list. */
+	private static function block(string $block): string
+	{
+		$html = '';
+		$lines = [];
+		$items = [];
+		foreach (explode("\n", $block) as $line) {
+			if (preg_match(self::BULLET, $line, $match)) {
+				$html .= self::paragraph($lines);
+				$lines = [];
+				$items[] = '<li>' . e(trim($match[1])) . '</li>';
+				continue;
+			}
+			$html .= self::bulletList($items);
+			$items = [];
+			$lines[] = e(trim($line));
+		}
+
+		return $html . self::paragraph($lines) . self::bulletList($items);
+	}
+
+	private static function paragraph(array $lines): string
+	{
+		return $lines ? '<p>' . implode('<br>', $lines) . '</p>' : '';
+	}
+
+	private static function bulletList(array $items): string
+	{
+		return $items ? '<ul>' . implode('', $items) . '</ul>' : '';
 	}
 
 	/** @return array{id: int, name: string, parent_id: ?int, type: string, path: string}|null */
