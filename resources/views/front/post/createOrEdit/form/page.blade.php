@@ -25,7 +25,7 @@
 		'priceHintUrl'   => app(\App\Services\ListingForm\PriceHint::class)->enabled() ? url('posts/price-hint') : null,
 		'postId'         => $listingForm->postId,
 	];
-	$lfScripts = ['fields', 'counters', 'validate', 'preview', 'panel', 'undo-stack', 'ai-field-tools', 'price-hint'];
+	$lfScripts = ['fields', 'counters', 'validate', 'preview', 'strength-score', 'panel', 'undo-stack', 'ai-field-tools', 'price-hint'];
 @endphp
 
 @if ($lfV2)

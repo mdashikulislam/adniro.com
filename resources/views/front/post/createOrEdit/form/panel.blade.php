@@ -42,27 +42,56 @@
 			</div>
 		</section>
 
-		{{-- What is still missing --}}
-		<section class="lf-panel-card lf-checklist" aria-labelledby="lfChecklistTitle">
-			<div class="lf-checklist-head">
-				<h2 class="lf-panel-heading" id="lfChecklistTitle">{{ trans('listing_form.checklist') }}</h2>
-				<span class="lf-checklist-count" data-lf-progress-text></span>
+		{{-- Listing strength: a weighted score with a tier, the one step that helps most, live hints (listing-form/panel.js) --}}
+		<section class="lf-panel-card lf-strength" aria-labelledby="lfStrengthTitle" data-lf-strength data-tier="weak">
+			<div class="lf-strength-head">
+				<h2 class="lf-panel-heading" id="lfStrengthTitle">{{ trans('listing_form.strength') }}</h2>
+				<p class="lf-strength-score" aria-hidden="true"><span data-lf-score>0</span><span class="lf-strength-of">/100</span></p>
 			</div>
-			<div class="progress lf-progress" role="progressbar" aria-labelledby="lfChecklistTitle"
-			     aria-valuemin="0" aria-valuemax="{{ count($checks) }}" aria-valuenow="0" data-lf-progress>
-				<div class="progress-bar" style="width: 0%"></div>
+			<div class="lf-strength-meter" role="meter" aria-labelledby="lfStrengthTitle"
+			     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-lf-meter>
+				@foreach (['weak', 'fair', 'strong', 'excellent'] as $tier)
+					<span class="lf-strength-step" data-lf-step="{{ $tier }}"></span>
+				@endforeach
 			</div>
-			<ul class="lf-checklist-list">
+			<p class="lf-strength-tier" aria-live="polite">
+				<strong data-lf-tier>{{ trans('listing_form.strength_weak') }}</strong>
+				<span data-lf-tier-text>{{ trans('listing_form.strength_weak_text') }}</span>
+			</p>
+
+			<a href="#" class="lf-next" data-lf-next data-lf-target="" hidden>
+				<span class="lf-next-body">
+					<span class="lf-next-label">{{ trans('listing_form.strength_next') }}</span>
+					<span class="lf-next-text" data-lf-next-text></span>
+				</span>
+				<span class="lf-points lf-next-points" data-lf-next-points></span>
+				<i class="bi bi-arrow-right lf-next-arrow" aria-hidden="true"></i>
+			</a>
+
+			<ul class="lf-strength-list">
 				@foreach ($checks as $check => $target)
 					<li class="lf-check" data-lf-check="{{ $check }}">
 						<a href="#" class="lf-check-link" data-lf-target="{{ $target }}">
 							<span class="lf-check-icon" aria-hidden="true"></span>
-							<span class="lf-check-text">{{ trans('listing_form.check_' . $check) }}</span>
+							<span class="lf-check-body">
+								<span class="lf-check-text">{{ trans('listing_form.check_' . $check) }}</span>
+								<span class="lf-check-hint" data-lf-hint></span>
+								@if (in_array($check, ['title', 'description']))
+									<span class="lf-check-bar" aria-hidden="true"><span data-lf-bar></span></span>
+								@endif
+							</span>
+							<span class="lf-points" data-lf-points aria-hidden="true"></span>
 							<span class="visually-hidden lf-check-state"></span>
 						</a>
 					</li>
 				@endforeach
 			</ul>
+
+			@unless ($isSingleStep ?? false)
+				<p class="lf-strength-photos">
+					<i class="bi bi-images" aria-hidden="true"></i> {{ trans('listing_form.strength_photos_next') }}
+				</p>
+			@endunless
 		</section>
 
 		@if ($isOwner)
