@@ -4,7 +4,7 @@
  */
 
 :root {
-	--adn-appbar-height: 64px;
+	--adn-appbar-height: 66px;
 	--adn-appbar-safe: env(safe-area-inset-bottom, 0px);
 	--adn-tap: rgba(var(--bs-primary-rgb), .1);
 }
@@ -229,27 +229,60 @@
 	background-color: rgba(var(--bs-danger-rgb), .1);
 }
 
-/* ---------- Bottom app bar (phones) ---------- */
+/* ---------- Bottom app bar (phones): a floating rounded bar with a notch for the round Sell button ---------- */
 .adn-appbar {
+	--adn-bar-gap: 10px;
+	--adn-bar-radius: 22px;
+	--adn-bar-surface: var(--bs-body-bg);
+	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 72%, #000);
+	--adn-sell-size: 52px;
+	--adn-sell-ring: 4px;
 	position: fixed;
-	inset-inline: 0;
-	bottom: 0;
+	inset-inline: var(--adn-bar-gap);
+	bottom: calc(var(--adn-bar-gap) + var(--adn-appbar-safe));
 	z-index: 1030;
-	padding-bottom: var(--adn-appbar-safe);
-	border-top: 1px solid var(--bs-border-color-translucent);
-	background-color: rgba(var(--bs-body-bg-rgb), .94);
-	box-shadow: 0 -8px 24px -16px rgba(15, 23, 42, .35);
-	-webkit-backdrop-filter: saturate(1.4) blur(14px);
-	backdrop-filter: saturate(1.4) blur(14px);
+	height: var(--adn-appbar-height);
+}
+
+/* The surface: two rounded sides and the curved notch between them, with one shadow around the whole shape */
+.adn-appbar-shape {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: 1fr 114px 1fr;
+	filter: drop-shadow(0 8px 18px rgba(15, 23, 42, .16)) drop-shadow(0 1px 2px rgba(15, 23, 42, .08));
+}
+
+.adn-appbar-shape-side {
+	background-color: var(--adn-bar-surface);
+}
+
+.adn-appbar-shape-side:first-child {
+	border-start-start-radius: var(--adn-bar-radius);
+	border-end-start-radius: var(--adn-bar-radius);
+}
+
+.adn-appbar-shape-side:last-child {
+	border-start-end-radius: var(--adn-bar-radius);
+	border-end-end-radius: var(--adn-bar-radius);
+}
+
+.adn-appbar-notch {
+	display: block;
+	width: 116px;
+	height: 100%;
+	margin-inline: -1px; /* no hairline between the pieces */
+	fill: var(--adn-bar-surface);
 }
 
 .adn-appbar-list {
+	position: relative;
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
 	align-items: end;
-	height: var(--adn-appbar-height);
+	height: 100%;
 	margin: 0;
-	padding: 0 .25rem;
+	padding: 0 .35rem;
 	list-style: none;
 }
 
@@ -258,10 +291,10 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-end;
-	gap: .15rem;
+	gap: .2rem;
 	height: var(--adn-appbar-height);
-	padding-bottom: .5rem;
-	color: var(--bs-secondary-color);
+	padding-bottom: .45rem;
+	color: color-mix(in srgb, var(--bs-emphasis-color) 82%, transparent);
 	text-decoration: none;
 	-webkit-tap-highlight-color: transparent;
 }
@@ -270,19 +303,18 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 52px;
-	height: 30px;
+	width: 56px;
+	height: 32px;
 	border-radius: 999px;
-	font-size: 1.2rem;
+	font-size: 1.25rem;
 	transition: background-color .2s ease, color .2s ease, transform .15s ease;
 }
 
 .adn-appbar-label {
 	max-width: 100%;
 	overflow: hidden;
-	font-size: .68rem;
-	font-weight: 600;
-	letter-spacing: .01em;
+	font-size: .74rem;
+	font-weight: 500;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
@@ -301,44 +333,45 @@
 
 .adn-appbar-link:focus-visible .adn-appbar-icon,
 .adn-appbar-link:focus-visible .adn-appbar-sell-tile {
-	box-shadow: 0 0 0 2px var(--bs-body-bg), 0 0 0 4px var(--bs-primary);
+	box-shadow: 0 0 0 2px var(--adn-bar-surface), 0 0 0 4px var(--bs-primary);
 }
 
-/* The current page: a soft teal pill behind the filled icon */
+/* The current page: a mint pill behind the filled icon, in the site's teal */
 .adn-appbar-link.is-active {
-	color: var(--bs-primary);
+	color: var(--adn-teal-deep);
 }
 
 .adn-appbar-link.is-active .adn-appbar-icon {
-	color: color-mix(in srgb, var(--bs-primary) 85%, #000);
-	background-color: rgba(var(--bs-primary-rgb), .14);
+	color: var(--adn-teal-deep);
+	background-color: rgba(var(--bs-primary-rgb), .2);
 }
 
 .adn-appbar-link.is-active .adn-appbar-label {
 	font-weight: 700;
 }
 
-/* Sell: a raised rounded-square tile in the middle */
+/* Sell: a round teal button sitting in the notch */
 .adn-appbar-sell {
 	position: relative;
-	color: var(--bs-primary);
+	color: var(--adn-teal-deep);
 }
 
 .adn-appbar-sell-tile {
 	position: absolute;
-	top: -18px;
+	top: calc((var(--adn-sell-size) / -2) - 1px); /* a small gap between its ring and the notch's curve */
 	left: 50%;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 54px;
-	height: 54px;
-	border: 4px solid var(--bs-body-bg);
-	border-radius: 18px;
+	box-sizing: content-box;
+	width: var(--adn-sell-size);
+	height: var(--adn-sell-size);
+	border: var(--adn-sell-ring) solid color-mix(in srgb, var(--adn-bar-surface) 90%, var(--bs-primary));
+	border-radius: 50%;
 	color: #fff;
-	font-size: 1.45rem;
-	background: linear-gradient(145deg, color-mix(in srgb, var(--bs-primary) 80%, #fff), var(--bs-primary) 55%, color-mix(in srgb, var(--bs-primary) 80%, #000));
-	box-shadow: 0 10px 22px -8px rgba(var(--bs-primary-rgb), .7);
+	font-size: 1.55rem;
+	background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--bs-primary) 82%, #fff), var(--bs-primary) 55%, var(--adn-teal-deep));
+	box-shadow: 0 10px 20px -6px rgba(var(--bs-primary-rgb), .55), 0 2px 4px rgba(15, 23, 42, .12);
 	transform: translateX(-50%);
 	transition: transform .2s ease, box-shadow .2s ease;
 }
@@ -348,7 +381,7 @@
 }
 
 .adn-appbar-sell:hover .adn-appbar-sell-tile {
-	box-shadow: 0 12px 26px -8px rgba(var(--bs-primary-rgb), .8);
+	box-shadow: 0 12px 24px -6px rgba(var(--bs-primary-rgb), .65), 0 2px 4px rgba(15, 23, 42, .12);
 }
 
 .adn-appbar-sell:active .adn-appbar-sell-tile {
@@ -356,9 +389,9 @@
 }
 
 [dir="rtl"] .adn-appbar-sell-tile {
-	transform: translateX(50%);
-	left: auto;
 	right: 50%;
+	left: auto;
+	transform: translateX(50%);
 }
 
 [dir="rtl"] .adn-appbar-sell:active .adn-appbar-sell-tile {
@@ -366,22 +399,26 @@
 }
 
 [data-bs-theme="dark"] .adn-appbar {
-	box-shadow: none;
+	--adn-bar-surface: var(--bs-tertiary-bg);
+	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 55%, #fff);
+}
+
+[data-bs-theme="dark"] .adn-appbar-shape {
+	filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .5));
 }
 
 [data-bs-theme="dark"] .adn-appbar-link.is-active .adn-appbar-icon {
-	color: color-mix(in srgb, var(--bs-primary) 60%, #fff);
-	background-color: rgba(var(--bs-primary-rgb), .22);
+	background-color: rgba(var(--bs-primary-rgb), .28);
 }
 
 /* Room for the bar: page content, the cookie banner and other bottom bars stay above it */
 @media (max-width: 767.98px) {
 	body.has-appbar {
-		padding-bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe));
+		padding-bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 24px);
 	}
 
 	body.has-appbar .cookie-consent {
-		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 12px);
+		bottom: calc(var(--adn-appbar-height) + var(--adn-appbar-safe) + 34px);
 	}
 }
 

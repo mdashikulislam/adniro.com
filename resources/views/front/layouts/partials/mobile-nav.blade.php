@@ -45,6 +45,14 @@
 	];
 @endphp
 <nav class="adn-appbar d-md-none" aria-label="{{ trans('mobile_nav.label') }}" data-adn-appbar>
+	{{-- The bar's shape: two rounded sides and a curved notch in the middle for the Sell button --}}
+	<div class="adn-appbar-shape" aria-hidden="true">
+		<span class="adn-appbar-shape-side"></span>
+		<svg class="adn-appbar-notch" viewBox="0 0 114 66" preserveAspectRatio="none" focusable="false">
+			<path d="M0 0H9C21 0 25 8 30 17C37 31 46 38 57 38C68 38 77 31 84 17C89 8 93 0 105 0H114V66H0Z"/>
+		</svg>
+		<span class="adn-appbar-shape-side"></span>
+	</div>
 	<ul class="adn-appbar-list">
 		@foreach ($mobileNavItems as $item)
 			@if ($item === 'sell')
