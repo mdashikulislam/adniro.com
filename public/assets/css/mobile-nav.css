@@ -235,7 +235,7 @@
 	--adn-teal-deep: color-mix(in srgb, var(--bs-primary) 72%, #000);
 	--adn-sell-size: 52px;
 	--adn-sell-ring: 4px;
-	--adn-pulse-rgb: 139, 92, 246; /* soft violet #8b5cf6 */
+	--adn-pulse-rgb: var(--bs-primary-rgb); /* the button's own teal */
 	position: fixed;
 	inset-inline: 0;
 	bottom: var(--adn-appbar-safe);
@@ -380,7 +380,7 @@
 	transition: transform .2s ease, box-shadow .2s ease;
 }
 
-/* A soft radar pulse: two light violet rings grow a little way out of the button and fade, one after the other */
+/* A soft radar pulse: two rings in the button's teal grow a little way out of it and fade, one after the other */
 .adn-appbar-sell-tile::before,
 .adn-appbar-sell-tile::after {
 	content: "";
