@@ -379,6 +379,36 @@
 	transition: transform .2s ease, box-shadow .2s ease;
 }
 
+/* A soft radar pulse: two thin teal rings grow out of the button and fade, one after the other */
+.adn-appbar-sell-tile::before,
+.adn-appbar-sell-tile::after {
+	content: "";
+	position: absolute;
+	inset: calc(var(--adn-sell-ring) * -1);
+	border: 2px solid rgba(var(--bs-primary-rgb), .45);
+	border-radius: 50%;
+	opacity: 0;
+	pointer-events: none;
+	animation: adnRadarPulse 2.8s cubic-bezier(.2, .6, .35, 1) infinite;
+}
+
+.adn-appbar-sell-tile::after {
+	animation-delay: 1.4s;
+}
+
+@keyframes adnRadarPulse {
+	0% {
+		opacity: .6;
+		transform: scale(1);
+	}
+
+	75%,
+	100% {
+		opacity: 0;
+		transform: scale(1.5);
+	}
+}
+
 .adn-appbar-sell .adn-appbar-label {
 	font-weight: 700;
 }
@@ -428,5 +458,10 @@
 	.adn-mhead-btn,
 	#mainNavbar .navbar-toggler {
 		transition: none;
+	}
+
+	.adn-appbar-sell-tile::before,
+	.adn-appbar-sell-tile::after {
+		animation: none;
 	}
 }
