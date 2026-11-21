@@ -39,7 +39,34 @@ class MobileNavTest extends TestCase
 		$this->assertMatchesRegularExpression('/class="adn-appbar-link is-active"\s+aria-current="page"[^>]*>\s*<span class="adn-appbar-icon"[^>]*>\s*<i class="bi bi-house-door-fill"/', $appbar);
 		$this->assertStringContainsString('href="' . url('posts/create') . '" class="adn-appbar-link adn-appbar-sell"', $appbar);
 		$this->assertSame(2, substr_count($appbar, 'href="' . route('auth.login.showForm') . '"'));
-		$this->assertStringContainsString('class="adn-mhead-btn adn-mhead-account', $html);
+		$this->assertStringContainsString('class="dropdown adn-mhead-account', $html);
+	}
+
+	public function test_the_header_account_button_opens_a_menu_of_account_links_for_a_member(): void
+	{
+		// Arrange
+		$member = $this->stockMember(self::MEMBER_ID);
+
+		// Act
+		$menu = $this->accountMenu($this->actingAs($member)->get('/')->assertOk()->getContent());
+
+		// Assert: a dropdown, with the member's name, account links and log out last
+		$this->assertStringContainsString('data-bs-toggle="dropdown"', $menu);
+		$this->assertStringContainsString('Member ' . self::MEMBER_ID, $menu);
+		$this->assertStringContainsString('href="' . urlGen()->accountOverview() . '"', $menu);
+		$this->assertStringContainsString('href="' . url('account/saved-posts') . '"', $menu);
+		$this->assertSame(1, substr_count($menu, 'href="' . urlGen()->signOut() . '"'));
+		$this->assertGreaterThan(strrpos($menu, urlGen()->accountOverview()), strpos($menu, 'adn-account-menu-logout'));
+	}
+
+	public function test_the_header_account_menu_offers_log_in_and_sign_up_to_a_guest(): void
+	{
+		// Act
+		$menu = $this->accountMenu($this->get('/')->assertOk()->getContent());
+
+		// Assert
+		$this->assertStringContainsString('href="' . route('auth.login.showForm') . '"', $menu);
+		$this->assertStringContainsString('href="' . route('auth.register.showForm') . '"', $menu);
 	}
 
 	public function test_a_guest_who_may_not_post_is_sent_to_sign_in_by_sell(): void
@@ -102,6 +129,14 @@ class MobileNavTest extends TestCase
 		// Assert
 		$this->assertStringNotContainsString('data-adn-appbar', $html);
 		$this->assertDoesNotMatchRegularExpression('/<body[^>]*class="[^"]*has-appbar/', $html);
+	}
+
+	private function accountMenu(string $html): string
+	{
+		$start = strpos($html, '<div class="dropdown adn-mhead-account');
+		$this->assertNotFalse($start);
+
+		return substr($html, $start, strpos($html, 'class="navbar-toggler', $start) - $start);
 	}
 
 	private function appbar(string $html): string

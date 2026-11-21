@@ -129,6 +129,106 @@
 	}
 }
 
+/* ---------- Phone account menu (mobile-account-menu.blade.php) ---------- */
+.adn-account-menu {
+	--bs-dropdown-min-width: 260px;
+	--bs-dropdown-padding-y: .4rem;
+	--bs-dropdown-border-radius: 18px;
+	--bs-dropdown-link-active-bg: rgba(var(--bs-primary-rgb), .1);
+	--bs-dropdown-link-active-color: var(--bs-primary);
+	max-width: calc(100vw - 24px);
+	max-height: calc(100dvh - 160px);
+	margin-top: .5rem !important;
+	padding-inline: .4rem;
+	overflow-y: auto;
+	border-color: var(--bs-border-color-translucent);
+	box-shadow: 0 2px 6px rgba(15, 23, 42, .06), 0 18px 40px -16px rgba(15, 23, 42, .3);
+}
+
+.adn-account-menu-head {
+	display: flex;
+	align-items: center;
+	gap: .65rem;
+	margin: 0 0 .35rem;
+	padding: .55rem .55rem .7rem;
+	border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.adn-account-menu-avatar {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	color: #fff;
+	font-weight: 800;
+	background: linear-gradient(145deg, color-mix(in srgb, var(--bs-primary) 80%, #fff), var(--bs-primary));
+}
+
+.adn-account-menu-who {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.25;
+}
+
+.adn-account-menu-name {
+	overflow: hidden;
+	font-weight: 700;
+	color: var(--bs-emphasis-color);
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.adn-account-menu-email {
+	overflow: hidden;
+	font-size: .78rem;
+	color: var(--bs-secondary-color);
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.adn-account-menu-item {
+	display: flex;
+	align-items: center;
+	gap: .7rem;
+	min-height: 44px;
+	padding: .35rem .5rem;
+	border-radius: 12px;
+	font-size: .92rem;
+	font-weight: 600;
+}
+
+.adn-account-menu-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	font-size: .95rem;
+	color: color-mix(in srgb, var(--bs-primary) 80%, #000);
+	background-color: rgba(var(--bs-primary-rgb), .1);
+}
+
+[data-bs-theme="dark"] .adn-account-menu-icon {
+	color: color-mix(in srgb, var(--bs-primary) 55%, #fff);
+	background-color: rgba(var(--bs-primary-rgb), .2);
+}
+
+.adn-account-menu-logout,
+.adn-account-menu-logout:hover {
+	color: var(--bs-danger);
+}
+
+.adn-account-menu-logout .adn-account-menu-icon {
+	color: var(--bs-danger);
+	background-color: rgba(var(--bs-danger-rgb), .1);
+}
+
 /* ---------- Bottom app bar (phones) ---------- */
 .adn-appbar {
 	position: fixed;

@@ -181,11 +181,7 @@
 					</span>
 				@endif
 			@endif
-			<a href="{{ $authUser ? route('account.overview') : route('auth.login.showForm') }}"
-			   class="adn-mhead-btn adn-mhead-account ms-auto d-xl-none"
-			   aria-label="{{ $authUser ? trans('mobile_nav.account') : trans('mobile_nav.sign_in') }}">
-				<i class="bi bi-person{{ $authUser ? '-check' : '' }}" aria-hidden="true"></i>
-			</a>
+			@include('front.layouts.partials.mobile-account-menu')
 
 			{{-- Toggle Nav (Mobile) --}}
 			<button class="navbar-toggler float-end"
