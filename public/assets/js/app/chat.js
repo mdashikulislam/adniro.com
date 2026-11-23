@@ -9,7 +9,7 @@
  * Everything written to the page goes through textContent: message text is never treated as HTML.
  *
  * Parts, loaded before this file: chat-kit.js (helpers), chat-inbox.js (the list), chat-log.js (the messages),
- * chat-safety.js (block and report), chat-photo.js (shrinking photos).
+ * chat-reply.js (replying to one message), chat-safety.js (block and report), chat-photo.js (shrinking photos).
  */
 (function (window, document) {
 	'use strict';
@@ -69,6 +69,10 @@
 		photoPreview: $('[data-chat-photo-preview]'),
 		photoImg: $('[data-chat-photo-img]'),
 		photoRemove: $('[data-chat-photo-remove]'),
+		replying: $('[data-chat-replying]'),
+		replyingName: $('[data-chat-replying-name]'),
+		replyingBody: $('[data-chat-replying-body]'),
+		replyingCancel: $('[data-chat-replying-cancel]'),
 		error: $('[data-chat-error]'),
 		composer: $('[data-chat-composer]'),
 		photoInput: $('[data-chat-photo-input]'),
@@ -94,7 +98,7 @@
 		ticks: 0
 	};
 
-	/* ---------- Parts (chat-kit.js, chat-inbox.js, chat-log.js, chat-safety.js) ---------- */
+	/* ---------- Parts (chat-kit.js, chat-inbox.js, chat-log.js, chat-reply.js, chat-safety.js) ---------- */
 	var kit = window.AdnChatKit(T);
 	var fill = kit.fill;
 	var urlFor = kit.urlFor;
@@ -132,19 +136,17 @@
 	var lastIdFromOther = log.lastIdFromOther;
 	var fitToKeyboard = log.fitToKeyboard;
 	var releasePhotos = log.releasePhotos;
+	var reply = window.AdnChatReply(ctx);
 
-	var safety = window.AdnChatSafety(ctx, function (open, thread) {
+	window.AdnChatSafety(ctx, function (open, thread) {
 		open.thread = thread;
 		patchThread(thread.id, thread);
 		open.online = false;
 		setStatus('');
 		renderComposer();
+		renderLog();
 		joinPresence();
 	});
-	var setBlocked = safety.setBlocked;
-	var confirmBlock = safety.confirmBlock;
-	var reportModal = safety.reportModal;
-	var submitReport = safety.submitReport;
 
 	/* ---------- Conversation: header, listing, composer ---------- */
 	function setStatus(kind) {
@@ -348,13 +350,14 @@
 		hideTyping();
 		showError('');
 		clearPhoto();
+		reply.clear();
 		els.input.value = '';
 		growInput();
 		els.older.hidden = true;
 		els.newBtn.hidden = true;
 
+		renderComposer(); // first: whether messages get a Reply button depends on it
 		renderLog();
-		renderComposer();
 		renderInbox();
 		scrollToBottom();
 		joinPresence();
@@ -429,6 +432,9 @@
 
 		var form = new FormData();
 		form.append('client_uuid', local.client_uuid);
+		if (local.reply_to) {
+			form.append('reply_to', local.reply_to.id);
+		}
 		if (local.photo) {
 			form.append('photo', local.photo, 'photo.jpg');
 		} else {
@@ -486,6 +492,7 @@
 			body: photo ? '' : text,
 			image: photo ? {url: photo.preview, thumb: photo.preview} : null,
 			photo: photo ? photo.blob : null,
+			reply_to: reply.take(),
 			at: new Date().toISOString(),
 			state: 'sending'
 		};
@@ -739,31 +746,6 @@
 	}, {passive: true});
 
 	els.newBtn.addEventListener('click', scrollToBottom);
-
-	els.block.addEventListener('click', function () {
-		if (store.open.thread.blocked_by_me) {
-			setBlocked(false);
-		} else {
-			confirmBlock();
-		}
-	});
-	els.blocked.addEventListener('click', function (event) {
-		if (event.target.closest('[data-chat-unblock]')) {
-			setBlocked(false);
-		}
-	});
-	els.report.addEventListener('click', function () {
-		var modal = reportModal();
-		if (modal) {
-			modal.show();
-		}
-	});
-	if (els.reportModal) {
-		els.reportModal.querySelector('[data-chat-report-form]').addEventListener('submit', function (event) {
-			event.preventDefault();
-			submitReport(event.target);
-		});
-	}
 
 	window.addEventListener('adn:chat:message', function (event) {
 		onLiveMessage(event.detail);

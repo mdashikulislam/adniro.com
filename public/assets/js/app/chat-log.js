@@ -61,6 +61,16 @@
 			return ref;
 		}
 
+		/** Inside a reply: who and what it answers. A tap goes to that message (chat-reply.js). */
+		function quoteNode(quote) {
+			var node = el('button', 'adn-chat-quote');
+			node.type = 'button';
+			node.dataset.chatQuote = quote.id;
+			node.appendChild(el('strong', '', quote.user_id === ME ? T.you : store.open.other.name));
+			node.appendChild(el('span', '', quote.type === 'image' ? T.photo : quote.text));
+			return node;
+		}
+
 		function messageNode(message, previous) {
 			var mine = message.user_id === ME;
 			var date = new Date(message.at);
@@ -75,11 +85,14 @@
 			node.classList.toggle('is-seen', mine && isSeen(message));
 
 			if (message.post) {
-			node.appendChild(listingRef(message.post));
-		}
+				node.appendChild(listingRef(message.post));
+			}
 
-		var bubble = el('div', 'adn-chat-bubble');
+			var bubble = el('div', 'adn-chat-bubble');
 			bubble.appendChild(el('span', 'visually-hidden', (mine ? T.you : store.open.other.name) + ': '));
+			if (message.reply_to) {
+				bubble.appendChild(quoteNode(message.reply_to));
+			}
 			if (message.type === 'image' && message.image) {
 				bubble.classList.add('is-photo');
 				var link = el('a');
@@ -102,7 +115,19 @@
 				meta.appendChild(tickFor(message));
 			}
 			bubble.appendChild(meta);
-			node.appendChild(bubble);
+
+			// The bubble, with a Reply button beside it once the message is saved
+			var line = el('div', 'adn-chat-line');
+			line.appendChild(bubble);
+			if (message.id && store.open.canSend) {
+				var reply = el('button', 'adn-chat-reply-btn');
+				reply.type = 'button';
+				reply.dataset.chatReply = node.dataset.key;
+				reply.setAttribute('aria-label', T.reply);
+				reply.appendChild(icon('reply-fill'));
+				line.appendChild(reply);
+			}
+			node.appendChild(line);
 
 			if (!mine && message.caution) {
 				node.appendChild(el('p', 'adn-chat-note', T.caution));

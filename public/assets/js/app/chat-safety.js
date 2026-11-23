@@ -1,6 +1,6 @@
 /*
  * adniro: chat safety (assets/js/app/chat.js): block or unblock the other person, and report the conversation
- * to the admins. Confirmations use SweetAlert2, the site's one dialog style.
+ * to the admins, and the buttons that do it. Confirmations use SweetAlert2, the site's one dialog style.
  */
 (function (window) {
 	'use strict';
@@ -84,11 +84,29 @@
 			});
 		}
 
-		return {
-			setBlocked: setBlocked,
-			confirmBlock: confirmBlock,
-			reportModal: reportModal,
-			submitReport: submitReport
-		};
+		els.block.addEventListener('click', function () {
+			if (store.open.thread.blocked_by_me) {
+				setBlocked(false);
+			} else {
+				confirmBlock();
+			}
+		});
+		els.blocked.addEventListener('click', function (event) {
+			if (event.target.closest('[data-chat-unblock]')) {
+				setBlocked(false);
+			}
+		});
+		els.report.addEventListener('click', function () {
+			var modal = reportModal();
+			if (modal) {
+				modal.show();
+			}
+		});
+		if (els.reportModal) {
+			els.reportModal.querySelector('[data-chat-report-form]').addEventListener('submit', function (event) {
+				event.preventDefault();
+				submitReport(event.target);
+			});
+		}
 	};
 })(window);

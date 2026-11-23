@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Front\Chat;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Front\Chat\SendChatMessageRequest;
+use App\Models\Chat\ChatMessage;
 use App\Models\Chat\ChatThread;
 use App\Models\Post;
 use App\Services\Chat\ChatAccess;
@@ -99,6 +100,16 @@ class ChatMessageController extends Controller
 		return response()->json(['unread_total' => ChatUnread::total((int)$request->user()->id)]);
 	}
 
+	/** The message being replied to: one of this conversation's, or none. */
+	private function repliedMessage(ChatThread $chatThread, SendChatMessageRequest $request): ?ChatMessage
+	{
+		if (!$request->filled('reply_to')) {
+			return null;
+		}
+
+		return ChatMessage::query()->where('thread_id', $chatThread->id)->find((int)$request->input('reply_to'));
+	}
+
 	private function sendIn(ChatThread $chatThread, SendChatMessageRequest $request, ?Post $about = null): JsonResponse
 	{
 		$userId = (int)$request->user()->id;
@@ -109,6 +120,7 @@ class ChatMessageController extends Controller
 			$request->file('photo'),
 			$request->input('client_uuid'),
 			$about,
+			$this->repliedMessage($chatThread, $request),
 		);
 
 		$chatThread->load(ChatPresenter::THREAD_RELATIONS);

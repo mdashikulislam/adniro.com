@@ -96,6 +96,17 @@ Message bubble
   text      15/21, wraps anywhere (overflow-wrap), links are underlined and open in a new tab
   a11y      each bubble: "You, 10:42, seen: text" / "Sam, 10:41: text" as a hidden label; ticks have text
 
+Reply to a message (C3)
+  button    beside every saved bubble (outside it, on the inner side): reply icon, 32px with a 40px hit area;
+            appears on hover or focus, always faintly on touch screens; hidden when the chat cannot be written in
+  bar       above the message box while replying: 3px accent edge, the person's name (accent-strong, sm/700),
+            one line of the message ("Photo" for a photo), a close button (40px); Esc-free: the button cancels
+  quote     at the top of the reply's bubble: the name and up to two lines of the message, on a tinted block with
+            a 3px edge; a button: a tap scrolls the message area to the original and rings it for 1.4s
+            (a steady ring, no animation, under reduced motion)
+  rules     only a message of the same conversation can be quoted; a deleted original leaves a plain message
+  a11y      "Reply" on the button; the bar is labelled "Replying to {name}"; the quote is a real button
+
 Typing indicator
   content   a "theirs" bubble with three dots that rise in turn (1.2s); still under reduced motion
   a11y      hidden from the log; the header status says "Typing…"

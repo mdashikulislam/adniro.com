@@ -231,6 +231,9 @@ Step 2 is the only one that changes the server: one systemd service and one ngin
 
 ## As built (branch `chat`, 2026-11-23)
 
+**Added after the owner tried it: replying to one message.** `threads_messages.reply_to_id` (migration
+`2026_11_23_000500`); the reply carries a short quote, and only a message of the same conversation can be quoted.
+
 **Changed after the owner tried it: one conversation per two people, not per listing and buyer.** A seller with
 several listings appeared several times in the same person's inbox. Now two people have one conversation;
 "Chat with seller" on another listing opens it with that listing ready, and the message sent from a listing

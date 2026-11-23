@@ -82,6 +82,41 @@ class ChatConversationTest extends ChatTestCase
 		$this->assertSame(1, DB::table('threads')->count());
 	}
 
+	public function test_a_reply_carries_a_short_quote_of_the_message_it_answers(): void
+	{
+		// Arrange
+		$thread = $this->conversation(['Is this still available?', 'Yes, it is.']);
+		$questionId = (int)DB::table('threads_messages')->where('thread_id', $thread->id)->min('id');
+		Event::fake([ChatEvent::class]);
+
+		// Act
+		$response = $this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/messages', [
+			'body' => 'It can be collected today.', 'reply_to' => $questionId,
+		]);
+
+		// Assert: in the reply, in the history and in what is pushed live
+		$quote = ['id' => $questionId, 'user_id' => self::BUYER_ID, 'type' => 'text', 'text' => 'Is this still available?'];
+		$response->assertCreated()->assertJsonPath('message.reply_to', $quote);
+		$history = $this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id . '/messages')->json('messages');
+		$this->assertSame([null, null, $quote], array_column($history, 'reply_to'));
+		Event::assertDispatched(ChatEvent::class, fn (ChatEvent $event) => $event->name === ChatEvent::MESSAGE && $event->payload['message']['reply_to'] === $quote);
+	}
+
+	public function test_a_reply_cannot_quote_a_message_of_another_conversation(): void
+	{
+		// Arrange: a private message between the seller and someone else
+		$thread = $this->conversation();
+		$this->actingAs($this->outsider)->postJson('/chat/listings/' . $this->listing->id, ['body' => 'My card number is 1234']);
+		$privateId = (int)DB::table('threads_messages')->where('body', 'My card number is 1234')->value('id');
+
+		// Act
+		$response = $this->actingAs($this->buyer)->postJson('/chat/api/threads/' . $thread->id . '/messages', ['body' => 'Hello', 'reply_to' => $privateId]);
+
+		// Assert: sent as a normal message, quoting nothing
+		$response->assertCreated()->assertJsonPath('message.reply_to', null);
+		$this->assertNull(DB::table('threads_messages')->where('id', $response->json('message.id'))->value('reply_to_id'));
+	}
+
 	public function test_the_same_tap_sent_twice_is_saved_once(): void
 	{
 		// Arrange

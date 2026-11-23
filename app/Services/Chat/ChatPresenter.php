@@ -68,7 +68,7 @@ class ChatPresenter
 	 */
 	public static function messages($messages): array
 	{
-		$messages->loadMissing('post.picture');
+		$messages->loadMissing(['post.picture', 'replyTo']);
 
 		return $messages->map(fn (ChatMessage $message) => self::message($message))->values()->all();
 	}
@@ -88,9 +88,25 @@ class ChatPresenter
 				'thumb' => route('chat.file', ['message' => $message->id, 'size' => 'thumb']),
 			],
 			'post'        => empty($message->post_id) ? null : self::post($message->post),
+			'reply_to'    => empty($message->reply_to_id) ? null : self::quote($message->replyTo),
 			'client_uuid' => $message->client_uuid,
 			'at'          => $message->created_at?->toIso8601String(),
 			'caution'     => ChatSafety::needsCaution($message->body),
+		];
+	}
+
+	/** The short quote of a message shown inside a reply to it. */
+	public static function quote(?ChatMessage $message): ?array
+	{
+		if ($message === null) {
+			return null;
+		}
+
+		return [
+			'id'      => (int)$message->id,
+			'user_id' => (int)$message->user_id,
+			'type'    => $message->isImage() ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
+			'text'    => Str::limit(self::oneLine((string)$message->body), self::SNIPPET_LENGTH),
 		];
 	}
 

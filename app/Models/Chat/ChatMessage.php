@@ -21,7 +21,7 @@ class ChatMessage extends Model
 
 	protected $table = 'threads_messages';
 
-	protected $fillable = ['thread_id', 'post_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid'];
+	protected $fillable = ['thread_id', 'post_id', 'reply_to_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid'];
 
 	public function thread(): BelongsTo
 	{
@@ -32,6 +32,12 @@ class ChatMessage extends Model
 	public function post(): BelongsTo
 	{
 		return $this->belongsTo(Post::class, 'post_id')->withoutGlobalScopes();
+	}
+
+	/** The earlier message this one replies to (none once that message is deleted). */
+	public function replyTo(): BelongsTo
+	{
+		return $this->belongsTo(self::class, 'reply_to_id');
 	}
 
 	public function user(): BelongsTo

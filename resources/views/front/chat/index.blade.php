@@ -12,7 +12,9 @@
 @section('body_class', ' adn-chat-page' . ($chatIsOpen ? ' is-chat-open' : ''))
 
 @push('after_styles_stack')
-	<link href="{{ url('assets/css/chat.css') }}?v={{ @filemtime(public_path('assets/css/chat.css')) }}" rel="stylesheet">
+	@foreach (['chat', 'chat-messages'] as $chatStyle)
+		<link href="{{ url('assets/css/' . $chatStyle . '.css') }}?v={{ @filemtime(public_path('assets/css/' . $chatStyle . '.css')) }}" rel="stylesheet">
+	@endforeach
 @endpush
 
 @section('content')
@@ -90,6 +92,16 @@
 
 						<div class="adn-chat-quick" data-chat-quick role="group" aria-label="{{ trans('chat.quick_replies_label') }}" hidden></div>
 
+						<div class="adn-chat-replying" data-chat-replying hidden>
+							<span class="adn-chat-replying-text">
+								<strong data-chat-replying-name></strong>
+								<span data-chat-replying-body></span>
+							</span>
+							<button type="button" class="adn-chat-icon-btn" data-chat-replying-cancel aria-label="{{ trans('chat.cancel_reply') }}">
+								<i class="bi bi-x-lg" aria-hidden="true"></i>
+							</button>
+						</div>
+
 						<div class="adn-chat-photo-preview" data-chat-photo-preview hidden>
 							<img alt="" data-chat-photo-img width="64" height="64">
 							<button type="button" class="adn-chat-photo-remove" data-chat-photo-remove aria-label="{{ trans('chat.remove_photo') }}"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
@@ -123,7 +135,7 @@
 @endsection
 
 @push('after_scripts_stack')
-	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-safety', 'chat-photo', 'chat'] as $chatScript)
+	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-reply', 'chat-safety', 'chat-photo', 'chat'] as $chatScript)
 		<script src="{{ url('assets/js/app/' . $chatScript . '.js') }}?v={{ @filemtime(public_path('assets/js/app/' . $chatScript . '.js')) }}" defer></script>
 	@endforeach
 @endpush

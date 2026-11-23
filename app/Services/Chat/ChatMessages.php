@@ -24,6 +24,7 @@ class ChatMessages
 	 * Saves a text or a photo from one participant and pushes it to both. With the same client_uuid it
 	 * returns the message already saved, so a double tap or a retry never sends twice.
 	 * $about is the listing the message was sent from ("Chat with seller"): it is shown on the message.
+	 * $replyTo is the earlier message of this conversation it answers: a short quote of it is shown.
 	 */
 	public static function send(
 		ChatThread $thread,
@@ -32,6 +33,7 @@ class ChatMessages
 		?UploadedFile $photo = null,
 		?string $clientUuid = null,
 		?Post $about = null,
+		?ChatMessage $replyTo = null,
 	): ChatMessage {
 		$existing = self::findByClientUuid((int)$thread->id, $clientUuid);
 		if ($existing !== null) {
@@ -41,7 +43,7 @@ class ChatMessages
 		$photoPath = $photo !== null ? ChatPhotos::store($photo, (int)$thread->id) : null;
 
 		try {
-			$message = DB::transaction(fn () => self::save($thread, $senderId, $body, $photoPath, $clientUuid, $about));
+			$message = DB::transaction(fn () => self::save($thread, $senderId, $body, $photoPath, $clientUuid, $about, $replyTo));
 		} catch (UniqueConstraintViolationException) {
 			ChatPhotos::delete($photoPath);
 
@@ -130,11 +132,20 @@ class ChatMessages
 		return $readUpTo;
 	}
 
-	private static function save(ChatThread $thread, int $senderId, ?string $body, ?string $photoPath, ?string $clientUuid, ?Post $about): ChatMessage
-	{
+	private static function save(
+		ChatThread $thread,
+		int $senderId,
+		?string $body,
+		?string $photoPath,
+		?string $clientUuid,
+		?Post $about,
+		?ChatMessage $replyTo,
+	): ChatMessage {
 		$message = ChatMessage::query()->create([
 			'thread_id'   => $thread->id,
 			'post_id'     => $about?->id,
+			// Only a message of this same conversation can be quoted
+			'reply_to_id' => $replyTo !== null && (int)$replyTo->thread_id === (int)$thread->id ? $replyTo->id : null,
 			'user_id'     => $senderId,
 			'type'        => $photoPath !== null ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
 			'body'        => $body,

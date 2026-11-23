@@ -28,10 +28,10 @@ class ChatPagesTest extends ChatTestCase
 		$this->assertNull($state['open']);
 		$this->assertSame(['id' => self::SELLER_ID, 'name' => 'Member ' . self::SELLER_ID], $state['me']);
 		$this->assertCount(4, $state['quick_replies']);
-		foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-safety', 'chat-photo', 'chat'] as $script) {
+		foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-reply', 'chat-safety', 'chat-photo', 'chat'] as $script) {
 			$response->assertSee('assets/js/app/' . $script . '.js', false);
 		}
-		$response->assertSee('assets/css/chat.css', false);
+		$response->assertSee('assets/css/chat.css', false)->assertSee('assets/css/chat-messages.css', false);
 	}
 
 	public function test_a_conversation_page_opens_with_its_latest_messages(): void

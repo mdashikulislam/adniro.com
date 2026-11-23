@@ -37,6 +37,7 @@ class SendChatMessageRequest extends FormRequest
 				'dimensions:max_width=' . ChatPhotos::MAX_SIDE . ',max_height=' . ChatPhotos::MAX_SIDE,
 			],
 			'client_uuid' => ['nullable', 'uuid'],
+			'reply_to'    => ['nullable', 'integer', 'min:1'],
 		];
 	}
 
