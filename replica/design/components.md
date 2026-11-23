@@ -71,17 +71,12 @@ Email the seller button and dialog (C1)
 
 Inbox row (C2)
   one row per person, whatever the number of listings talked about
-  face      avatar 48: the member's photo in a thin ring when they uploaded one; if not, their initial
-            (800) on one of six soft colours, always the same one for the same name (teal, blue, violet,
-            amber, rose, green; dark text on a pale ground, and the reverse in dark mode)
-  listing   the listing the chat is about, as a 24px rounded picture on the corner of the face
-  text      name (15/700) · the listing's title (sm/600, accent) · last message (sm, one line)
-  last line my own message starts with its tick: one grey tick (sent) or two teal ticks (seen), "You: " is
-            still said to screen readers; a photo, an offer or a deleted message starts with a small icon
-  meta      time (xs; teal and bold when unread) · muted mark · unread count (pill, accent-strong, soft glow)
-  states    default, hover (surface), active conversation (accent-soft fading out, hairline, 3px accent bar
-            at the start edge), unread (name and last message bold)
-  a11y      one link per row; the face is decoration; the unread count has a spoken label
+  parts     avatar 44 (photo or initials) + online dot · name (title) · the listing last talked about (sm) ·
+            last message (sm, one line, "You: " prefix for my own, "Photo" for a photo) · time (xs) ·
+            unread count (pill, accent-strong)
+  states    default, hover (surface), active conversation (accent-soft + 3px accent bar at the start edge),
+            unread (name and last message bold), blocked (muted, "Blocked" tag)
+  a11y      one link per row; the unread count has a spoken label ("3 unread messages")
 
 Inbox filter (C2)
   variants  All, Unread (segmented pills, the count on Unread)
