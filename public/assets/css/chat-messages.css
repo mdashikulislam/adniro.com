@@ -620,6 +620,44 @@ div.adn-chat-ref .adn-chat-ref-text span {
 	font-variant-numeric: tabular-nums;
 }
 
+/*
+ * "Shift + Enter for a new line": only where Enter sends (a computer with a keyboard and a mouse), and only
+ * while the message box has the cursor. It sits in the space under the box, so nothing moves when it shows.
+ */
+.adn-chat-hint {
+	position: absolute;
+	inset-inline-start: 14px;
+	bottom: -16px;
+	display: none;
+	font-size: .6875rem;
+	line-height: 1.2;
+	color: var(--adn-chat-muted);
+	white-space: nowrap;
+	opacity: 0;
+	transition: opacity var(--adn-chat-fast) ease;
+}
+
+.adn-chat-hint kbd {
+	padding: 0 .3rem;
+	border: 1px solid var(--adn-chat-border);
+	border-radius: 4px;
+	font-family: inherit;
+	font-size: .625rem;
+	font-weight: 600;
+	color: var(--adn-chat-muted);
+	background-color: var(--adn-chat-surface);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.adn-chat-hint {
+		display: block;
+	}
+
+	.adn-chat-input:focus ~ .adn-chat-hint {
+		opacity: 1;
+	}
+}
+
 .adn-chat-send {
 	display: inline-flex;
 	flex: 0 0 auto;
@@ -671,8 +709,9 @@ div.adn-chat-ref .adn-chat-ref-text span {
 		max-width: 62%;
 	}
 
+	/* Room under the message box for the new-line hint and the character counter */
 	.adn-chat-composer {
-		padding: .6rem .75rem .75rem;
+		padding: .6rem .75rem 1.25rem;
 	}
 }
 
@@ -706,6 +745,7 @@ div.adn-chat-ref .adn-chat-ref-text span {
 	.adn-chat-ref,
 	.adn-chat-reply-btn,
 	.adn-chat-send,
+	.adn-chat-hint,
 	.adn-chat-input {
 		transition: none;
 	}

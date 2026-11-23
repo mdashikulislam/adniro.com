@@ -115,7 +115,9 @@
 							</button>
 							<label class="visually-hidden" for="adnChatInput">{{ trans('chat.message_label') }}</label>
 							<div class="adn-chat-input-wrap">
-								<textarea id="adnChatInput" class="adn-chat-input" rows="1" maxlength="{{ $chatState['limits']['body_max'] }}" placeholder="{{ trans('chat.message_placeholder') }}" data-chat-input autocomplete="off"></textarea>
+								<textarea id="adnChatInput" class="adn-chat-input" rows="1" maxlength="{{ $chatState['limits']['body_max'] }}" placeholder="{{ trans('chat.message_placeholder') }}" data-chat-input autocomplete="off" aria-describedby="adnChatHint"></textarea>
+								{{-- Computers only, while writing: Enter sends, so say how to make a new line --}}
+								<span class="adn-chat-hint" id="adnChatHint">{!! str_replace(':keys', '<kbd>Shift</kbd> + <kbd>Enter</kbd>', e(trans('chat.new_line_hint'))) !!}</span>
 								<span class="adn-chat-count" data-chat-count hidden></span>
 							</div>
 							<button type="submit" class="adn-chat-send" data-chat-send disabled aria-label="{{ trans('chat.send') }}">

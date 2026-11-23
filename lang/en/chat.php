@@ -20,6 +20,7 @@ return [
 	'add_photo'      => 'Add a photo',
 	'remove_photo'   => 'Remove the photo',
 	'cancel_reply'   => 'Cancel reply',
+	'new_line_hint'  => ':keys for a new line',
 	'quick_replies_label' => 'Quick replies',
 	'view_listing'   => 'View listing',
 	'block'          => 'Block',

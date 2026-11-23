@@ -20,6 +20,7 @@ return [
 	'add_photo'      => 'Добавить фото',
 	'remove_photo'   => 'Убрать фото',
 	'cancel_reply'   => 'Отменить ответ',
+	'new_line_hint'  => ':keys — новая строка',
 	'quick_replies_label' => 'Быстрые ответы',
 	'view_listing'   => 'Смотреть объявление',
 	'block'          => 'Заблокировать',

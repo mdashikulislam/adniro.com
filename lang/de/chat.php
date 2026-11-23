@@ -20,6 +20,7 @@ return [
 	'add_photo'      => 'Foto hinzufügen',
 	'remove_photo'   => 'Foto entfernen',
 	'cancel_reply'   => 'Antwort abbrechen',
+	'new_line_hint'  => ':keys für eine neue Zeile',
 	'quick_replies_label' => 'Schnellantworten',
 	'view_listing'   => 'Anzeige ansehen',
 	'block'          => 'Blockieren',

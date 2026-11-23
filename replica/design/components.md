@@ -130,6 +130,9 @@ Composer (C3, C4)
             "You blocked this person. Unblock" / "You can't reply to this chat."
   limits    2000 characters; the counter appears from 1800
   keys      Enter sends, Shift+Enter makes a new line (desktop); on phones Enter makes a new line
+  hint      "Shift + Enter for a new line" (xs, muted, the two keys as small key caps) under the text box,
+            on computers only and only while the box has the cursor; it sits in reserved space, so nothing
+            moves; the text box is described by it for screen readers
   a11y      the text box has a label ("Message"); buttons have labels ("Send", "Add a photo")
 
 Photo preview (C3, C4)

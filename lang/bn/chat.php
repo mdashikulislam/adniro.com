@@ -20,6 +20,7 @@ return [
 	'add_photo'      => 'ছবি যোগ করুন',
 	'remove_photo'   => 'ছবি সরান',
 	'cancel_reply'   => 'উত্তর বাতিল করুন',
+	'new_line_hint'  => 'নতুন লাইনের জন্য :keys',
 	'quick_replies_label' => 'দ্রুত উত্তর',
 	'view_listing'   => 'বিজ্ঞাপন দেখুন',
 	'block'          => 'ব্লক',

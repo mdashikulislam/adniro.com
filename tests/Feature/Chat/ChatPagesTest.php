@@ -32,6 +32,8 @@ class ChatPagesTest extends ChatTestCase
 			$response->assertSee('assets/js/app/' . $script . '.js', false);
 		}
 		$response->assertSee('assets/css/chat.css', false)->assertSee('assets/css/chat-messages.css', false);
+		// Enter sends on a computer: the message box says how to make a new line
+		$response->assertSee('<span class="adn-chat-hint" id="adnChatHint"><kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span>', false);
 	}
 
 	public function test_a_conversation_page_opens_with_its_latest_messages(): void
