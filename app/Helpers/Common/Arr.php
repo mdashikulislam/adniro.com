@@ -18,6 +18,7 @@ namespace App\Helpers\Common;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use stdClass;
 use Throwable;
 
@@ -693,13 +694,50 @@ class Arr extends \Illuminate\Support\Arr
 			return array_key_exists($key, Arr::fromObject($object));
 		}
 		
-		if ($object instanceof Collection || $object instanceof Model) {
+		// adniro: a model answers from what it holds. toArray() computed every appended field and every nested
+		// relation of the model (tens of milliseconds for a listing) just to say whether one key is there, and
+		// the checks that ask (isVerifiedPost(), the listing's address) run several times per listing on a page.
+		if ($object instanceof Model) {
+			return self::modelHasKey($key, $object);
+		}
+		
+		if ($object instanceof Collection) {
 			return array_key_exists($key, $object->toArray());
 		}
 		
 		if (is_string($object)) {
 			if (str($object)->isJson()) {
 				return array_key_exists($key, json_decode($object, true));
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * adniro: whether a model's toArray() would have this key, without building the array: a visible attribute,
+	 * an appended field, or a loaded relation (named as toArray() names it).
+	 *
+	 * @param string $key
+	 * @param \Illuminate\Database\Eloquent\Model $model
+	 * @return bool
+	 */
+	private static function modelHasKey(string $key, Model $model): bool
+	{
+		$isShown = function (string $name) use ($model): bool {
+			$visible = $model->getVisible();
+			
+			return !in_array($name, $model->getHidden(), true) && (empty($visible) || in_array($name, $visible, true));
+		};
+		
+		if ($isShown($key) && (array_key_exists($key, $model->getAttributes()) || $model->hasAppended($key))) {
+			return true;
+		}
+		
+		foreach (array_keys($model->getRelations()) as $relation) {
+			$name = $model::$snakeAttributes ? Str::snake($relation) : $relation;
+			if ($name === $key && $isShown($relation)) {
+				return true;
 			}
 		}
 		

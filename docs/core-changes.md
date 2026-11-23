@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (258)
+## Changed (259)
 
 Stock files we edited.
 
@@ -24,6 +24,7 @@ Stock files we edited.
 
 ### app/Helpers
 
+- `app/Helpers/Common/Arr.php`
 - `app/Helpers/Common/CacheManager.php` (no marker comment)
 - `app/Helpers/Common/Files/Thumbnail.php` (no marker comment)
 - `app/Helpers/Common/Functions/helpers.php` (no marker comment)
@@ -115,7 +116,7 @@ Stock files we edited.
 
 ### app/Services
 
-- `app/Services/MenuItemService.php` (no marker comment)
+- `app/Services/MenuItemService.php`
 - `app/Services/Post/List/Search/CategoryTrait.php` (no marker comment)
 - `app/Services/Post/List/Search/SidebarTrait.php` (no marker comment)
 - `app/Services/Post/List/SearchTrait.php`

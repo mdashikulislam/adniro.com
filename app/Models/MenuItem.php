@@ -782,6 +782,9 @@ class MenuItem extends BaseModel
 					return '';
 				}
 				
+				// adniro: a label that shows something of the member's own (below: their name, their unread chat
+				// count) must also be named in MenuItemService::isPersonalEntry(), or one member's menu would be
+				// kept in the cache and shown to the others
 				$userNamePattern = '{user.name}';
 				if (str_contains($value, $userNamePattern)) {
 					$authUser = auth(getAuthGuard())->user();

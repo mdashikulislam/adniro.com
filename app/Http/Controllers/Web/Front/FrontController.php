@@ -107,7 +107,8 @@ class FrontController extends Controller
 		foreach ($menuLocation as $location => $locationVar) {
 			$data = [];
 			try {
-				$data = getServiceData((new MenuItemService())->getEntries(location: $location, params: $params));
+				// adniro: the finished menu, from the cache (it was rebuilt from its entries on every page)
+				$data = (new MenuItemService())->getSiteMenu(location: $location, params: $params);
 			} catch (\Throwable $e) {
 			}
 			
