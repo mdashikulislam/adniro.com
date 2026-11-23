@@ -49,6 +49,7 @@ class ChatSafetyController extends Controller
 			['reason' => $request->input('reason'), 'note' => $request->input('note')],
 		);
 
+		ThreadReport::forgetOpenCount();
 		$this->tellAdmins($report);
 
 		return response()->json(['reported' => true], 201);

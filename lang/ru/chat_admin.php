@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'Жалобы на чаты',
+	'reports_title' => 'Жалобы на чаты',
+	'reports_help' => 'Переписки, на которые пожаловались участники. Откройте жалобу, чтобы прочитать переписку, и закройте её, когда вопрос решён. Здесь можно читать только те переписки, на которые пожаловались.',
+	'status_open' => 'Открытые',
+	'status_closed' => 'Закрытые',
+	'reports_empty_open' => 'Открытых жалоб нет.',
+	'reports_empty_closed' => 'Закрытых жалоб пока нет.',
+	'col_reason' => 'Причина',
+	'col_reported' => 'На кого жалоба',
+	'col_reporter' => 'Кто пожаловался',
+	'col_when' => 'Когда',
+	'col_status' => 'Статус',
+	'col_note' => 'Комментарий',
+	'open_report' => 'Открыть',
+	'report_title' => 'Жалоба на чат № :id',
+	'back_to_reports' => 'Назад к жалобам',
+	'closed_by' => 'Закрыл(а) :name, :when',
+	'open_member' => 'Открыть профиль (изменить, заблокировать или удалить)',
+	'other_reports' => '{1} Ещё :count жалоба на этого участника|[2,*] Ещё жалоб на этого участника: :count',
+	'close_report' => 'Закрыть жалобу',
+	'close_help' => 'Закрытие только отмечает жалобу как рассмотренную. Чтобы принять меры, откройте профиль участника.',
+	'reopen_report' => 'Открыть снова',
+	'report_closed' => 'Жалоба № :id закрыта.',
+	'report_reopened' => 'Жалоба № :id снова открыта.',
+	'conversation' => 'Переписка',
+	'messages_shown' => '[0,1] :count сообщение из :total.|[2,*] Последние сообщения: :count из :total.',
+	'about_listing' => 'Об объявлении «:title»',
+	'taken_back' => 'Отправитель удалил это сообщение (:when). Участники его больше не видят.',
+	'no_messages' => 'В этой переписке не осталось сообщений.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'Чат включён',
+	'setting_enabled_hint' => 'Выключено: никто не может отправлять сообщения, кнопка «Написать продавцу» скрыта. Читать переписки по-прежнему можно.',
+	'setting_photos_enabled_label' => 'Фото в чате',
+	'setting_photos_enabled_hint' => 'Выключено: можно отправлять только текст.',
+	'setting_messages_per_minute_label' => 'Сообщений в минуту на участника',
+	'setting_messages_per_minute_hint' => 'Аккаунты в первый день получают меньше половины.',
+	'setting_messages_per_day_label' => 'Сообщений в день на участника',
+	'setting_messages_per_day_hint' => 'Аккаунты в первый день получают пятую часть.',
+	'setting_unsend_minutes_label' => 'Минут на удаление отправленного сообщения',
+	'setting_unsend_minutes_hint' => 'Сколько времени участник может удалить своё сообщение. 0 отключает функцию. В жалобе всегда сохраняется вся переписка.',
+	'setting_unread_email_enabled_label' => 'Писать участникам о непрочитанных сообщениях',
+	'setting_unread_email_enabled_hint' => 'Одно письмо на участника, а не на каждое сообщение. Каждый участник может отключить его сам.',
+	'setting_unread_email_delay_minutes_label' => 'Минут до письма о непрочитанных',
+	'setting_unread_email_delay_minutes_hint' => 'Сколько сообщение ждёт непрочитанным до отправки письма.',
+];

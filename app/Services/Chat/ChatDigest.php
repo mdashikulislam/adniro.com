@@ -11,20 +11,24 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /*
- * The unread-messages email (adniro). A member who has left messages unread for ten minutes gets one email
+ * The unread-messages email (adniro). A member who has left messages unread for ten minutes (the delay, and
+ * the email itself, are set in Admin > Settings > Chat) gets one email
  * listing those conversations; a conversation is not mentioned again until it has a newer message, and at
  * most once an hour. Muted or hidden conversations, blocked people, members without an email address and
  * members who turned the email off (ChatEmailChoice) are skipped. It is written in the member's own language.
  */
 class ChatDigest
 {
-	public const UNREAD_AFTER_MINUTES = 10;
 	public const AGAIN_AFTER_MINUTES = 60;
 	private const MAX_MEMBERS_PER_RUN = 200;
 
 	/** Sends the emails that are due. Returns how many members were emailed. */
 	public static function send(): int
 	{
+		if (!ChatSettings::unreadEmailEnabled()) {
+			return 0;
+		}
+
 		$sent = 0;
 		foreach (self::due()->groupBy('user_id')->take(self::MAX_MEMBERS_PER_RUN) as $userId => $participants) {
 			$sent += self::sendTo((int)$userId, $participants) ? 1 : 0;
@@ -45,7 +49,7 @@ class ChatDigest
 			->whereNull($threads . '.deleted_at')
 			->visible()
 			->where($participants . '.unread_count', '>', 0)
-			->where($threads . '.last_message_at', '<=', now()->subMinutes(self::UNREAD_AFTER_MINUTES))
+			->where($threads . '.last_message_at', '<=', now()->subMinutes(ChatSettings::unreadEmailDelayMinutes()))
 			->where(function ($query) use ($participants, $threads) {
 				$query->whereNull($participants . '.digest_sent_at')
 					->orWhere(function ($again) use ($participants, $threads) {

@@ -10,6 +10,8 @@ use App\Services\Chat\ChatEmailChoice;
 use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatPhotos;
 use App\Services\Chat\ChatPresenter;
+use App\Services\Chat\ChatSafety;
+use App\Services\Chat\ChatSettings;
 use App\Services\Chat\ChatUnread;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -33,7 +35,7 @@ class ChatController extends FrontController
 		$chatThread = ChatAccess::threadFor($thread, $userId)->load(ChatPresenter::THREAD_RELATIONS);
 
 		return $this->page($request, [
-			'open' => ['thread' => ChatPresenter::thread($chatThread, $userId)] + ChatMessages::history($chatThread),
+			'open' => ['thread' => ChatPresenter::thread($chatThread, $userId)] + ChatMessages::history($chatThread, $userId),
 		]);
 	}
 
@@ -73,7 +75,7 @@ class ChatController extends FrontController
 		$chatThread = ChatAccess::threadFor((int)$existing->id, $userId)->load(ChatPresenter::THREAD_RELATIONS);
 
 		return $this->page($request, [
-			'open' => ['thread' => ChatPresenter::thread($chatThread, $userId), 'about' => $about] + ChatMessages::history($chatThread),
+			'open' => ['thread' => ChatPresenter::thread($chatThread, $userId), 'about' => $about] + ChatMessages::history($chatThread, $userId),
 		]);
 	}
 
@@ -92,7 +94,12 @@ class ChatController extends FrontController
 			'unread_total'  => ChatUnread::total($userId),
 			'emails'        => ChatEmailChoice::isOn($user),
 			'quick_replies' => array_values((array)trans('chat.quick_replies')),
+			'safety'        => ChatSafety::browserPatterns(),
+			// Turned off in Admin > Settings > Chat: conversations can be read, nothing can be sent
+			'paused'        => !ChatSettings::isEnabled(),
 			'limits'        => [
+				'photos'         => ChatSettings::photosEnabled(),
+				'unsend_minutes' => ChatSettings::unsendMinutes(),
 				'body_max'       => ChatMessages::BODY_MAX,
 				'photo_max_kb'   => ChatPhotos::MAX_UPLOAD_KB,
 				'history_page'   => ChatMessages::PAGE_SIZE,
@@ -107,6 +114,8 @@ class ChatController extends FrontController
 				'block'    => route('chat.api.block', ['user' => '__ID__']),
 				'report'   => route('chat.api.report', ['thread' => '__ID__']),
 				'settings' => route('chat.api.settings'),
+				'hide'     => route('chat.api.hide', ['thread' => '__ID__']),
+				'unsend'   => route('chat.api.unsend', ['thread' => '__ID__', 'message' => '__MESSAGE__']),
 				'browse'   => urlGen()->searchWithoutQuery(),
 			],
 			'text'          => (array)trans('chat.js') + ['too_fast' => trans('chat.error_too_fast')],

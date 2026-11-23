@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'Signalements de discussions',
+	'reports_title' => 'Signalements de discussions',
+	'reports_help' => 'Les discussions signalées par les membres. Ouvrez-en une pour la lire, puis fermez le signalement une fois traité. Seules les discussions signalées peuvent être lues ici.',
+	'status_open' => 'Ouverts',
+	'status_closed' => 'Fermés',
+	'reports_empty_open' => 'Aucun signalement ouvert.',
+	'reports_empty_closed' => 'Aucun signalement fermé pour le moment.',
+	'col_reason' => 'Motif',
+	'col_reported' => 'Membre signalé',
+	'col_reporter' => 'Signalé par',
+	'col_when' => 'Quand',
+	'col_status' => 'Statut',
+	'col_note' => 'Note',
+	'open_report' => 'Ouvrir',
+	'report_title' => 'Signalement de discussion n° :id',
+	'back_to_reports' => 'Retour aux signalements',
+	'closed_by' => 'Fermé par :name, :when',
+	'open_member' => 'Ouvrir ce membre (modifier, suspendre ou supprimer)',
+	'other_reports' => '{1} :count autre signalement concernant ce membre|[2,*] :count autres signalements concernant ce membre',
+	'close_report' => 'Fermer le signalement',
+	'close_help' => 'Fermer indique seulement que le signalement est traité. Pour agir sur le membre, ouvrez son compte.',
+	'reopen_report' => 'Rouvrir',
+	'report_closed' => 'Signalement n° :id fermé.',
+	'report_reopened' => 'Signalement n° :id rouvert.',
+	'conversation' => 'La discussion',
+	'messages_shown' => '[0,1] :count message sur :total.|[2,*] Les :count derniers messages sur :total.',
+	'about_listing' => 'Au sujet de l\'annonce « :title »',
+	'taken_back' => 'L\'expéditeur a supprimé ce message (:when). Les membres ne le voient plus.',
+	'no_messages' => 'Cette discussion ne contient plus aucun message.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'Discussions activées',
+	'setting_enabled_hint' => 'Désactivé : personne ne peut envoyer de message et « Discuter avec le vendeur » est masqué. Les membres peuvent toujours lire leurs discussions.',
+	'setting_photos_enabled_label' => 'Photos dans les discussions',
+	'setting_photos_enabled_hint' => 'Désactivé : seul le texte peut être envoyé.',
+	'setting_messages_per_minute_label' => 'Messages par minute, par membre',
+	'setting_messages_per_minute_hint' => 'Les comptes créés le jour même ont droit à moins de la moitié.',
+	'setting_messages_per_day_label' => 'Messages par jour, par membre',
+	'setting_messages_per_day_hint' => 'Les comptes créés le jour même ont droit à un cinquième.',
+	'setting_unsend_minutes_label' => 'Minutes pour supprimer un message envoyé',
+	'setting_unsend_minutes_hint' => 'Durée pendant laquelle un membre peut reprendre un message. 0 désactive la fonction. Un signalement conserve toujours la discussion complète.',
+	'setting_unread_email_enabled_label' => 'Prévenir les membres par e-mail des messages non lus',
+	'setting_unread_email_enabled_hint' => 'Un e-mail par membre, jamais un par message. Chaque membre peut aussi le désactiver pour lui-même.',
+	'setting_unread_email_delay_minutes_label' => 'Minutes avant l\'e-mail des messages non lus',
+	'setting_unread_email_delay_minutes_hint' => 'Durée pendant laquelle un message attend sans être lu avant l\'envoi de l\'e-mail.',
+];

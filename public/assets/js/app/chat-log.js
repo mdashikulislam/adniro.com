@@ -6,8 +6,10 @@
 	'use strict';
 
 	var NEAR_BOTTOM_PX = 140;
+	var MINUTE_MS = 60000;
+	var NEW_LINE_GAP_PX = 12;
 
-	/** @param {{T: Object, ME: number, els: Object, store: Object, kit: Object}} ctx */
+	/** @param {{T: Object, ME: number, LIMITS: Object, els: Object, store: Object, kit: Object}} ctx */
 	window.AdnChatLog = function (ctx) {
 		var T = ctx.T;
 		var ME = ctx.ME;
@@ -67,8 +69,25 @@
 			node.type = 'button';
 			node.dataset.chatQuote = quote.id;
 			node.appendChild(el('strong', '', quote.user_id === ME ? T.you : store.open.other.name));
-			node.appendChild(el('span', '', quote.type === 'image' ? T.photo : quote.text));
+			var quoted = quote.type === 'unsent' ? T.message_deleted : (quote.type === 'image' ? T.photo : quote.text);
+			node.appendChild(el('span', '', quoted));
 			return node;
+		}
+
+		/** The sender can take a message back for a while after sending it (Admin > Settings > Chat). */
+		function canUnsend(message) {
+			var age = Date.now() - new Date(message.at).getTime();
+			return message.user_id === ME && !!message.id && !message.unsent && age < ctx.LIMITS.unsend_minutes * MINUTE_MS;
+		}
+
+		/** A small round button beside a bubble: Reply, or Delete on my own recent messages. */
+		function sideButton(name, key, label, iconName) {
+			var button = el('button', 'adn-chat-reply-btn');
+			button.type = 'button';
+			button.dataset[name] = key;
+			button.setAttribute('aria-label', label);
+			button.appendChild(icon(iconName));
+			return button;
 		}
 
 		function messageNode(message, previous) {
@@ -93,7 +112,11 @@
 			if (message.reply_to) {
 				bubble.appendChild(quoteNode(message.reply_to));
 			}
-			if (message.type === 'image' && message.image) {
+			if (message.unsent) {
+				bubble.classList.add('is-unsent');
+				bubble.appendChild(icon('slash-circle'));
+				bubble.appendChild(el('span', '', T.message_deleted));
+			} else if (message.type === 'image' && message.image) {
 				bubble.classList.add('is-photo');
 				var link = el('a');
 				link.href = message.image.url;
@@ -119,13 +142,13 @@
 			// The bubble, with a Reply button beside it once the message is saved
 			var line = el('div', 'adn-chat-line');
 			line.appendChild(bubble);
-			if (message.id && store.open.canSend) {
-				var reply = el('button', 'adn-chat-reply-btn');
-				reply.type = 'button';
-				reply.dataset.chatReply = node.dataset.key;
-				reply.setAttribute('aria-label', T.reply);
-				reply.appendChild(icon('reply-fill'));
-				line.appendChild(reply);
+			if (message.id && store.open.canSend && !message.unsent) {
+				line.appendChild(sideButton('chatReply', node.dataset.key, T.reply, 'reply-fill'));
+			}
+			if (canUnsend(message)) {
+				var unsend = sideButton('chatUnsend', node.dataset.key, T.delete_message, 'trash3');
+				unsend.classList.add('is-delete');
+				line.appendChild(unsend);
 			}
 			node.appendChild(line);
 
@@ -149,12 +172,50 @@
 			return node;
 		}
 
+		function keyOf(message) {
+			return message.client_uuid || ('m' + message.id);
+		}
+
+		/**
+		 * The first message this member has not read: the conversation says how many are unread, and they are
+		 * the last ones the other person sent. Null when everything is read, or the first one is not loaded.
+		 */
+		function firstUnreadKey() {
+			var open = store.open;
+			var unread = open.thread ? open.thread.unread : 0;
+			var theirs = open.messages.filter(function (message) {
+				return message.user_id !== ME && !!message.id;
+			});
+			return unread > 0 && theirs.length >= unread ? keyOf(theirs[theirs.length - unread]) : null;
+		}
+
+		function newLineNode() {
+			var node = el('div', 'adn-chat-day adn-chat-newline');
+			node.dataset.chatNewline = '1';
+			node.appendChild(el('span', '', T.new_messages));
+			return node;
+		}
+
+		/** Opens at the "New messages" line when there is one, at the last message otherwise. */
+		function scrollToStart() {
+			var line = els.messages.querySelector('[data-chat-newline]');
+			if (!line) {
+				scrollToBottom();
+				return;
+			}
+			els.log.scrollTop += line.getBoundingClientRect().top - els.log.getBoundingClientRect().top - NEW_LINE_GAP_PX;
+			els.newBtn.hidden = true;
+		}
+
 		function renderLog() {
 			var fragment = document.createDocumentFragment();
 			store.open.messages.forEach(function (message, index, all) {
 				var previous = index > 0 ? all[index - 1] : null;
 				if (!previous || !sameDay(new Date(previous.at), new Date(message.at))) {
 					fragment.appendChild(dayNode(new Date(message.at)));
+				}
+				if (store.open.newFrom && keyOf(message) === store.open.newFrom) {
+					fragment.appendChild(newLineNode());
 				}
 				fragment.appendChild(messageNode(message, previous));
 			});
@@ -317,6 +378,8 @@
 		}
 
 		return {
+			firstUnreadKey: firstUnreadKey,
+			scrollToStart: scrollToStart,
 			render: renderLog,
 			isNearBottom: isNearBottom,
 			scrollToBottom: scrollToBottom,

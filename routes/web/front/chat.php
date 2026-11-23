@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\Front\Chat\ChatController;
+use App\Http\Controllers\Web\Front\Chat\ChatDeleteController;
 use App\Http\Controllers\Web\Front\Chat\ChatEmailController;
 use App\Http\Controllers\Web\Front\Chat\ChatFileController;
 use App\Http\Controllers\Web\Front\Chat\ChatMessageController;
@@ -44,6 +45,13 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 			Route::post('threads/{thread}/messages', [ChatMessageController::class, 'send'])
 				->middleware('throttle:chat-send')
 				->name('chat.api.send');
+			// Delete the conversation for me; take back a message I sent
+			Route::delete('threads/{thread}', [ChatDeleteController::class, 'conversation'])
+				->middleware('throttle:30,1')
+				->name('chat.api.hide');
+			Route::delete('threads/{thread}/messages/{message}', [ChatDeleteController::class, 'message'])
+				->middleware('throttle:30,1')
+				->name('chat.api.unsend');
 			Route::post('threads/{thread}/read', [ChatMessageController::class, 'read'])
 				->middleware('throttle:60,1')
 				->name('chat.api.read');

@@ -6,7 +6,7 @@
  * - Shows a small pop-up when a message arrives while the member is on another page.
  * - When a live server is configured (Laravel Reverb), loads the two socket libraries after the page has
  *   finished, opens one connection, listens on the member's own private channel and passes what arrives on as
- *   window events for the chat page: adn:chat:message, adn:chat:read, adn:chat:state.
+ *   window events for the chat page: adn:chat:message, adn:chat:read, adn:chat:unsent, adn:chat:state.
  * - A tab hidden for five minutes closes its connection; it reconnects when it is shown again.
  * Without a live server nothing is loaded and nothing is polled here: the chat page checks by itself.
  */
@@ -200,6 +200,10 @@
 			.listen('.chat.read', function (detail) {
 				setUnread(detail.unread_total);
 				emit('read', detail);
+			})
+			.listen('.chat.unsent', function (detail) {
+				setUnread(detail.unread_total); // a message taken back before it was read no longer counts
+				emit('unsent', detail);
 			});
 
 		/**

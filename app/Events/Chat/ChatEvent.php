@@ -13,6 +13,7 @@ class ChatEvent implements ShouldBroadcastNow
 {
 	public const MESSAGE = 'chat.message';
 	public const READ = 'chat.read';
+	public const UNSENT = 'chat.unsent';
 	public const CHANNEL_PREFIX = 'chat.user.';
 
 	public function __construct(

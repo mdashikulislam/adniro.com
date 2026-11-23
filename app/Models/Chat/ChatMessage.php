@@ -21,7 +21,12 @@ class ChatMessage extends Model
 
 	protected $table = 'threads_messages';
 
-	protected $fillable = ['thread_id', 'post_id', 'reply_to_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid'];
+	protected $fillable = ['thread_id', 'post_id', 'reply_to_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid', 'unsent_at'];
+
+	protected function casts(): array
+	{
+		return ['unsent_at' => 'datetime'];
+	}
 
 	public function thread(): BelongsTo
 	{
@@ -43,6 +48,12 @@ class ChatMessage extends Model
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class, 'user_id')->withoutGlobalScopes();
+	}
+
+	/** Taken back by its sender: shown to both people as "Message deleted"; the row is kept for reports. */
+	public function isUnsent(): bool
+	{
+		return $this->unsent_at !== null;
 	}
 
 	public function isImage(): bool

@@ -9,8 +9,9 @@
  * Everything written to the page goes through textContent: message text is never treated as HTML.
  *
  * Parts, loaded before this file: chat-kit.js (helpers), chat-inbox.js (the list), chat-log.js (the messages),
- * chat-reply.js (replying to one message), chat-safety.js (block and report), chat-settings.js (the email
- * switch), chat-photo.js (shrinking photos).
+ * chat-presence.js (online and typing), chat-reply.js (replying to one message), chat-safety.js (block and
+ * report), chat-delete.js (taking a message back, deleting a chat), chat-drafts.js (text not sent yet),
+ * chat-guard.js (a question before a risky message), chat-settings.js (the email switch), chat-photo.js.
  */
 (function (window, document) {
 	'use strict';
@@ -28,8 +29,6 @@
 
 	var CATCH_UP_MS = 10000;
 	var INBOX_EVERY_TICKS = 3;
-	var TYPING_SEND_MS = 2500;
-	var TYPING_SHOW_MS = 4000;
 	var OFFLINE_BAR_AFTER_MS = 4000;
 	var LOAD_OLDER_PX = 60;
 	var COUNTER_FROM = 200;
@@ -55,6 +54,7 @@
 		block: $('[data-chat-block]'),
 		blockLabel: $('[data-chat-block-label]'),
 		report: $('[data-chat-report]'),
+		deleteChat: $('[data-chat-delete-chat]'),
 		offline: $('[data-chat-offline]'),
 		listing: $('[data-chat-listing]'),
 		listingPhoto: $('[data-chat-listing-photo]'),
@@ -115,7 +115,7 @@
 		kit.listingInto(els, post, store.open && (store.open.about || store.open.draft) ? T.asking_about : T.last_enquiry);
 	};
 
-	var ctx = {T: T, URLS: URLS, ME: ME, els: els, store: store, kit: kit};
+	var ctx = {T: T, URLS: URLS, ME: ME, LIMITS: boot.limits, els: els, store: store, kit: kit};
 
 	var inbox = window.AdnChatInbox(ctx);
 	var renderInbox = inbox.render;
@@ -139,6 +139,15 @@
 	var releasePhotos = log.releasePhotos;
 	var reply = window.AdnChatReply(ctx);
 
+	var presence = window.AdnChatPresence(ctx, log);
+	var setStatus = presence.setStatus;
+	var hideTyping = presence.hideTyping;
+	var joinPresence = presence.join;
+	var leavePresence = presence.leave;
+	var whisperTyping = presence.whisper;
+
+	var drafts = window.AdnChatDrafts(ctx);
+	var guard = window.AdnChatGuard(ctx, boot.safety);
 	window.AdnChatSettings(ctx);
 
 	window.AdnChatSafety(ctx, function (open, thread) {
@@ -152,34 +161,6 @@
 	});
 
 	/* ---------- Conversation: header, listing, composer ---------- */
-	function setStatus(kind) {
-		var online = !!store.open && store.open.online;
-		var state = kind === 'typing' ? 'typing' : (online ? 'online' : '');
-		els.status.textContent = state ? T[state] : '';
-		els.status.classList.toggle('is-online', state === 'online');
-		els.status.classList.toggle('is-typing', state === 'typing');
-		els.avatar.classList.toggle('is-online', online);
-	}
-
-	function hideTyping() {
-		window.clearTimeout(store.typingTimer);
-		els.typing.hidden = true;
-		if (store.open) {
-			setStatus('');
-		}
-	}
-
-	function showTyping() {
-		var stick = isNearBottom();
-		els.typing.hidden = false;
-		setStatus('typing');
-		if (stick) {
-			scrollToBottom();
-		}
-		window.clearTimeout(store.typingTimer);
-		store.typingTimer = window.setTimeout(hideTyping, TYPING_SHOW_MS);
-	}
-
 	function renderQuickReplies() {
 		var open = store.open;
 		var hasWritten = open.messages.some(function (message) {
@@ -204,12 +185,14 @@
 	function renderComposer() {
 		var open = store.open;
 		var thread = open.thread;
-		open.canSend = open.draft ? true : !!(thread && thread.can_send);
+		open.canSend = !boot.paused && (open.draft ? true : !!(thread && thread.can_send));
 
 		els.composer.hidden = !open.canSend;
 		els.blocked.hidden = open.canSend;
 		els.blocked.textContent = '';
-		if (!open.canSend && thread) {
+		if (boot.paused) {
+			els.blocked.textContent = T.paused;
+		} else if (!open.canSend && thread) {
 			els.blocked.appendChild(document.createTextNode((thread.blocked_by_me ? T.blocked_by_me : T.cannot_send) + ' '));
 			if (thread.blocked_by_me) {
 				var unblock = el('button', '', els.block.dataset.unblockLabel);
@@ -221,6 +204,7 @@
 
 		els.block.parentNode.hidden = !thread;
 		els.report.parentNode.hidden = !thread;
+		els.deleteChat.parentNode.hidden = !thread;
 		els.blockLabel.textContent = thread && thread.blocked_by_me ? els.block.dataset.unblockLabel : els.block.dataset.blockLabel;
 		renderQuickReplies();
 	}
@@ -255,48 +239,6 @@
 	}
 
 	/* ---------- Opening and closing a conversation ---------- */
-	function leavePresence() {
-		if (store.presence) {
-			store.presence.leave();
-		}
-		store.presence = null;
-	}
-
-	function joinPresence() {
-		leavePresence();
-		var open = store.open;
-		var connection = live();
-		if (!open || !open.thread || !open.thread.can_send || !connection || !connection.join) {
-			return;
-		}
-
-		store.presence = connection.join(open.thread.id, {
-			here: function (ids) {
-				open.online = ids.some(function (id) {
-					return id !== ME;
-				});
-				setStatus('');
-			},
-			joining: function (id) {
-				if (id !== ME) {
-					open.online = true;
-					setStatus('');
-				}
-			},
-			leaving: function (id) {
-				if (id !== ME) {
-					open.online = false;
-					hideTyping();
-				}
-			},
-			typing: function (id) {
-				if (id !== ME && store.open === open) {
-					showTyping();
-				}
-			}
-		});
-	}
-
 	/** Tells the server how far this member has read, once per new message, only while the tab is visible. */
 	function markRead() {
 		var open = store.open;
@@ -344,6 +286,8 @@
 		// Already read on the server: nothing to tell it until a newer message arrives
 		open.readSent = open.thread && open.thread.unread > 0 ? 0 : lastIdFromOther();
 		open.syncedId = lastServerId();
+		// Where the messages this member has not read yet begin: a "New messages" line is drawn there
+		open.newFrom = log.firstUnreadKey();
 
 		body.classList.add('is-chat-open');
 		els.pick.hidden = true;
@@ -355,15 +299,16 @@
 		showError('');
 		clearPhoto();
 		reply.clear();
-		els.input.value = '';
+		els.input.value = drafts.load(open); // what was typed here earlier and not sent
 		growInput();
+		updateSendButton();
 		els.older.hidden = true;
 		els.newBtn.hidden = true;
 
 		renderComposer(); // first: whether messages get a Reply button depends on it
 		renderLog();
 		renderInbox();
-		scrollToBottom();
+		log.scrollToStart();
 		joinPresence();
 		markRead();
 		fitToKeyboard();
@@ -515,19 +460,31 @@
 			return;
 		}
 		showError('');
-		if (photo) {
-			store.photo = null; // the message keeps the preview, so it is not revoked here
-			els.photoPreview.hidden = true;
-			els.photoInput.value = '';
-			sendMessage('', photo);
-		}
-		if (text) {
-			sendMessage(text, null);
-		}
-		els.input.value = '';
-		growInput();
-		updateSendButton();
-		els.input.focus();
+		var open = store.open;
+		// A phone number, an email address or "pay outside" wording is asked about first (chat-guard.js)
+		guard.confirm(text).then(function (confirmed) {
+			if (store.open !== open) {
+				return;
+			}
+			if (!confirmed) {
+				els.input.focus();
+				return;
+			}
+			if (photo && store.photo === photo) {
+				store.photo = null; // the message keeps the preview, so it is not revoked here
+				els.photoPreview.hidden = true;
+				els.photoInput.value = '';
+				sendMessage('', photo);
+			}
+			if (text) {
+				drafts.clear(open);
+				sendMessage(text, null);
+			}
+			els.input.value = '';
+			growInput();
+			updateSendButton();
+			els.input.focus();
+		});
 	}
 
 	function pickPhoto(file) {
@@ -555,14 +512,6 @@
 		});
 	}
 
-	function whisperTyping() {
-		var now = Date.now();
-		if (store.presence && now - store.typingSentAt > TYPING_SEND_MS) {
-			store.typingSentAt = now;
-			store.presence.typing();
-		}
-	}
-
 	/* ---------- Staying up to date ---------- */
 	function catchUp() {
 		var open = store.open;
@@ -574,6 +523,7 @@
 				return;
 			}
 			var added = data.messages.map(upsertMessage).some(Boolean);
+			deleting.markUnsentIds(data.unsent);
 			data.messages.forEach(function (message) {
 				open.syncedId = Math.max(open.syncedId, message.id);
 			});
@@ -705,6 +655,7 @@
 		growInput();
 		updateSendButton();
 		whisperTyping();
+		drafts.save(store.open, els.input.value);
 	});
 
 	els.input.addEventListener('keydown', function (event) {
@@ -776,6 +727,16 @@
 	window.setInterval(fallbackTick, CATCH_UP_MS);
 
 	/* ---------- Start ---------- */
+	var deleting = window.AdnChatDelete(ctx, {
+		log: log,
+		inbox: inbox,
+		close: function () {
+			closeOpen();
+			window.history.pushState({}, '', URLS.inbox);
+			fitToKeyboard();
+		}
+	});
+	els.photoBtn.hidden = !boot.limits.photos;
 	els.block.dataset.blockLabel = els.blockLabel.textContent;
 	els.block.dataset.unblockLabel = root.dataset.unblockLabel || '';
 	renderInbox();

@@ -209,4 +209,7 @@ Route::middleware(['admin', 'clearance', 'banned.user', 'no.http.cache'])
 
 		// AI providers and models (adniro:ai)
 		require __DIR__ . '/ai-admin.php';
+		
+		// Chat reports (adniro)
+		require __DIR__ . '/chat-admin.php';
 	});

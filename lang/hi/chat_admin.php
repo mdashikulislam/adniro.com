@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'चैट शिकायतें',
+	'reports_title' => 'चैट शिकायतें',
+	'reports_help' => 'वे बातचीत जिनकी सदस्यों ने शिकायत की है। पढ़ने के लिए एक खोलें, और निपटारा होने पर शिकायत बंद करें। यहाँ केवल शिकायत की गई बातचीत ही पढ़ी जा सकती है।',
+	'status_open' => 'खुली',
+	'status_closed' => 'बंद',
+	'reports_empty_open' => 'कोई खुली शिकायत नहीं।',
+	'reports_empty_closed' => 'अभी कोई बंद शिकायत नहीं।',
+	'col_reason' => 'कारण',
+	'col_reported' => 'जिसकी शिकायत हुई',
+	'col_reporter' => 'शिकायतकर्ता',
+	'col_when' => 'कब',
+	'col_status' => 'स्थिति',
+	'col_note' => 'टिप्पणी',
+	'open_report' => 'खोलें',
+	'report_title' => 'चैट शिकायत #:id',
+	'back_to_reports' => 'शिकायतों पर वापस',
+	'closed_by' => ':name ने बंद की, :when',
+	'open_member' => 'इस सदस्य को खोलें (संपादित, निलंबित या हटाएँ)',
+	'other_reports' => '{1} इस सदस्य के बारे में :count और शिकायत|[2,*] इस सदस्य के बारे में :count और शिकायतें',
+	'close_report' => 'शिकायत बंद करें',
+	'close_help' => 'बंद करने से केवल यह दर्ज होता है कि शिकायत देख ली गई। सदस्य पर कार्रवाई के लिए उनका खाता खोलें।',
+	'reopen_report' => 'फिर खोलें',
+	'report_closed' => 'शिकायत #:id बंद हुई।',
+	'report_reopened' => 'शिकायत #:id फिर खोली गई।',
+	'conversation' => 'बातचीत',
+	'messages_shown' => '[0,1] :total में से :count संदेश।|[2,*] :total में से आख़िरी :count संदेश।',
+	'about_listing' => 'विज्ञापन ":title" के बारे में',
+	'taken_back' => 'भेजने वाले ने यह संदेश हटा दिया (:when)। सदस्यों को यह अब नहीं दिखता।',
+	'no_messages' => 'इस बातचीत में अब कोई संदेश नहीं बचा।',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'चैट चालू है',
+	'setting_enabled_hint' => 'बंद: कोई संदेश नहीं भेज सकता और "विक्रेता से चैट करें" छिपा रहता है। सदस्य अपनी बातचीत पढ़ सकते हैं।',
+	'setting_photos_enabled_label' => 'चैट में फ़ोटो',
+	'setting_photos_enabled_hint' => 'बंद: केवल टेक्स्ट भेजा जा सकता है।',
+	'setting_messages_per_minute_label' => 'प्रति सदस्य, प्रति मिनट संदेश',
+	'setting_messages_per_minute_hint' => 'पहले दिन के खातों को इसके आधे से कम मिलता है।',
+	'setting_messages_per_day_label' => 'प्रति सदस्य, प्रति दिन संदेश',
+	'setting_messages_per_day_hint' => 'पहले दिन के खातों को इसका पाँचवाँ हिस्सा मिलता है।',
+	'setting_unsend_minutes_label' => 'भेजा गया संदेश हटाने के लिए मिनट',
+	'setting_unsend_minutes_hint' => 'सदस्य कितनी देर तक संदेश वापस ले सकता है। 0 से यह बंद हो जाता है। शिकायत में पूरी बातचीत हमेशा रहती है।',
+	'setting_unread_email_enabled_label' => 'अपठित संदेशों के बारे में सदस्यों को ईमेल करें',
+	'setting_unread_email_enabled_hint' => 'प्रति सदस्य एक ईमेल, हर संदेश पर नहीं। हर सदस्य इसे अपने लिए बंद भी कर सकता है।',
+	'setting_unread_email_delay_minutes_label' => 'अपठित संदेशों के ईमेल से पहले मिनट',
+	'setting_unread_email_delay_minutes_hint' => 'ईमेल भेजने से पहले संदेश कितनी देर अपठित रहता है।',
+];

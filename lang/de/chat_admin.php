@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'Chat-Meldungen',
+	'reports_title' => 'Chat-Meldungen',
+	'reports_help' => 'Chats, die Mitglieder gemeldet haben. Öffne eine Meldung, um den Chat zu lesen, und schließe sie, wenn sie erledigt ist. Hier können nur gemeldete Chats gelesen werden.',
+	'status_open' => 'Offen',
+	'status_closed' => 'Geschlossen',
+	'reports_empty_open' => 'Keine offenen Meldungen.',
+	'reports_empty_closed' => 'Noch keine geschlossenen Meldungen.',
+	'col_reason' => 'Grund',
+	'col_reported' => 'Gemeldetes Mitglied',
+	'col_reporter' => 'Gemeldet von',
+	'col_when' => 'Wann',
+	'col_status' => 'Status',
+	'col_note' => 'Notiz',
+	'open_report' => 'Öffnen',
+	'report_title' => 'Chat-Meldung Nr. :id',
+	'back_to_reports' => 'Zurück zu den Meldungen',
+	'closed_by' => 'Geschlossen von :name, :when',
+	'open_member' => 'Dieses Mitglied öffnen (bearbeiten, sperren oder löschen)',
+	'other_reports' => '{1} :count weitere Meldung zu diesem Mitglied|[2,*] :count weitere Meldungen zu diesem Mitglied',
+	'close_report' => 'Meldung schließen',
+	'close_help' => 'Schließen markiert die Meldung nur als erledigt. Um gegen das Mitglied vorzugehen, öffne dessen Konto.',
+	'reopen_report' => 'Wieder öffnen',
+	'report_closed' => 'Meldung Nr. :id geschlossen.',
+	'report_reopened' => 'Meldung Nr. :id wieder geöffnet.',
+	'conversation' => 'Der Chat',
+	'messages_shown' => '[0,1] :count Nachricht von :total.|[2,*] Die letzten :count Nachrichten von :total.',
+	'about_listing' => 'Zur Anzeige „:title“',
+	'taken_back' => 'Der Absender hat diese Nachricht gelöscht (:when). Mitglieder sehen sie nicht mehr.',
+	'no_messages' => 'In diesem Chat sind keine Nachrichten mehr vorhanden.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'Chat ist eingeschaltet',
+	'setting_enabled_hint' => 'Aus: Niemand kann Nachrichten senden und „Mit Verkäufer chatten“ ist ausgeblendet. Mitglieder können ihre Chats weiterhin lesen.',
+	'setting_photos_enabled_label' => 'Fotos im Chat',
+	'setting_photos_enabled_hint' => 'Aus: Es kann nur Text gesendet werden.',
+	'setting_messages_per_minute_label' => 'Nachrichten pro Minute, pro Mitglied',
+	'setting_messages_per_minute_hint' => 'Konten am ersten Tag erhalten weniger als die Hälfte davon.',
+	'setting_messages_per_day_label' => 'Nachrichten pro Tag, pro Mitglied',
+	'setting_messages_per_day_hint' => 'Konten am ersten Tag erhalten ein Fünftel davon.',
+	'setting_unsend_minutes_label' => 'Minuten zum Löschen einer gesendeten Nachricht',
+	'setting_unsend_minutes_hint' => 'Wie lange ein Mitglied eine Nachricht zurücknehmen kann. 0 schaltet es aus. Eine Meldung behält immer den ganzen Chat.',
+	'setting_unread_email_enabled_label' => 'Mitglieder per E-Mail über ungelesene Nachrichten informieren',
+	'setting_unread_email_enabled_hint' => 'Eine E-Mail pro Mitglied, nie eine pro Nachricht. Jedes Mitglied kann sie auch für sich selbst ausschalten.',
+	'setting_unread_email_delay_minutes_label' => 'Minuten bis zur E-Mail über ungelesene Nachrichten',
+	'setting_unread_email_delay_minutes_hint' => 'Wie lange eine Nachricht ungelesen wartet, bevor die E-Mail gesendet wird.',
+];

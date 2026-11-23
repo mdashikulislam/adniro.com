@@ -20,12 +20,27 @@ class ChatBroadcaster
 	public static function messageSent(ChatThread $thread, ChatMessage $message): void
 	{
 		$thread->load(ChatPresenter::THREAD_RELATIONS);
-		$payload = ChatPresenter::message($message);
 
 		foreach ($thread->participants as $participant) {
 			$userId = (int)$participant->user_id;
 			self::push(new ChatEvent(ChatEvent::MESSAGE, $userId, [
-				'message'      => $payload,
+				// As this person may see it: no quote of something they deleted with the conversation
+				'message'      => ChatPresenter::message($message, (int)$participant->cleared_message_id),
+				'thread'       => ChatPresenter::thread($thread, $userId),
+				'unread_total' => ChatUnread::total($userId),
+			]));
+		}
+	}
+
+	/** The message's place is taken by "Message deleted" for both people, and in the inbox line if it was the last. */
+	public static function messageUnsent(ChatThread $thread, ChatMessage $message): void
+	{
+		$thread->load(ChatPresenter::THREAD_RELATIONS);
+
+		foreach ($thread->participants as $participant) {
+			$userId = (int)$participant->user_id;
+			self::push(new ChatEvent(ChatEvent::UNSENT, $userId, [
+				'message'      => ChatPresenter::message($message),
 				'thread'       => ChatPresenter::thread($thread, $userId),
 				'unread_total' => ChatUnread::total($userId),
 			]));

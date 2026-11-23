@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Front\Chat;
 use App\Http\Controllers\Controller;
 use App\Models\Chat\ChatMessage;
 use App\Services\Chat\ChatAccess;
+use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatPhotos;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -20,7 +21,11 @@ class ChatFileController extends Controller
 	public function __invoke(Request $request, int $message): StreamedResponse
 	{
 		$chatMessage = ChatMessage::query()->findOrFail($message);
-		abort_unless(ChatAccess::isParticipant((int)$chatMessage->thread_id, (int)$request->user()->id), 404);
+		$userId = (int)$request->user()->id;
+		$thread = ChatAccess::threadFor((int)$chatMessage->thread_id, $userId);
+		// A photo its sender took back is no longer shown to anyone here, nor one the member deleted with
+		// the conversation
+		abort_if($chatMessage->isUnsent() || (int)$chatMessage->id <= ChatMessages::clearedUpTo($thread, $userId), 404);
 		abort_unless($chatMessage->isImage() && ChatPhotos::isChatPath($chatMessage->file_path), 404);
 
 		$path = $request->query('size') === 'thumb' ? ChatPhotos::thumbPath($chatMessage->file_path) : $chatMessage->file_path;

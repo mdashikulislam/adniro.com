@@ -11,5 +11,7 @@
 		@if ($hasSafetyPage)
 			<a {!! $safetyLink !!}>{{ t('chat_safety_link') }}</a>
 		@endif
+		{{-- The commonest scam in a chat is a fake "support" message --}}
+		<span class="adn-chat-safety-never">{{ trans('chat.never_asks') }}</span>
 	</span>
 </div>

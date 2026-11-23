@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (257)
+## Changed (258)
 
 Stock files we edited.
 
@@ -68,6 +68,7 @@ Stock files we edited.
 - `app/Http/Kernel.php` (no marker comment)
 - `app/Http/Middleware/DemoRestriction.php` (no marker comment)
 - `app/Http/Middleware/GetLocalization.php` (no marker comment)
+- `app/Http/Middleware/InputRequest/XssProtection.php`
 - `app/Http/Middleware/TipsMessages.php`
 - `app/Http/Middleware/TrustProxies.php`
 - `app/Http/Requests/Front/UserRequest.php` (no marker comment)
@@ -656,7 +657,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (336)
+## Added (347)
 
 Files that are not part of LaraClassifier.
 
@@ -697,9 +698,11 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Front/Account/ProfileCoverController.php`
 - `app/Http/Controllers/Web/Front/Blog/BlogController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatController.php`
+- `app/Http/Controllers/Web/Front/Chat/ChatEmailController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatFileController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatMessageController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatSafetyController.php`
+- `app/Http/Controllers/Web/Front/Chat/EmailSellerController.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/Concerns/AiJsonResponses.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/ListingAssistantController.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/WritingHelpController.php`
@@ -715,6 +718,7 @@ Files that are not part of LaraClassifier.
 - `app/Http/Requests/Admin/AiProviderRequest.php`
 - `app/Http/Requests/Admin/BlogCategoryRequest.php`
 - `app/Http/Requests/Admin/BlogPostRequest.php`
+- `app/Http/Requests/Front/Chat/EmailSellerRequest.php`
 - `app/Http/Requests/Front/Chat/ReportChatRequest.php`
 - `app/Http/Requests/Front/Chat/SendChatMessageRequest.php`
 
@@ -751,6 +755,7 @@ Files that are not part of LaraClassifier.
 - `app/Notifications/ChatReported.php`
 - `app/Notifications/ChatUnreadDigest.php`
 - `app/Notifications/Concerns/PlainMailText.php`
+- `app/Notifications/ListingEnquiry.php`
 - `app/Notifications/PostNotApproved.php`
 
 ### app/Observers
@@ -802,8 +807,10 @@ Files that are not part of LaraClassifier.
 - `app/Services/Ai/Support/SchemaRules.php`
 - `app/Services/Chat/ChatAccess.php`
 - `app/Services/Chat/ChatBroadcaster.php`
+- `app/Services/Chat/ChatCleanup.php`
 - `app/Services/Chat/ChatConversations.php`
 - `app/Services/Chat/ChatDigest.php`
+- `app/Services/Chat/ChatEmailChoice.php`
 - `app/Services/Chat/ChatLive.php`
 - `app/Services/Chat/ChatMessages.php`
 - `app/Services/Chat/ChatPhotos.php`
@@ -894,6 +901,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_23_000300_point_the_messages_menu_entry_to_live_chat.php`
 - `database/migrations/2026_11_23_000400_keep_one_conversation_per_two_people.php`
 - `database/migrations/2026_11_23_000500_add_replies_to_chat_messages.php`
+- `database/migrations/2026_11_23_000600_add_chat_email_choice_to_users.php`
 
 ### database/seeders
 
@@ -1018,8 +1026,10 @@ Files that are not part of LaraClassifier.
 - `public/assets/js/app/chat-photo.js`
 - `public/assets/js/app/chat-reply.js`
 - `public/assets/js/app/chat-safety.js`
+- `public/assets/js/app/chat-settings.js`
 - `public/assets/js/app/chat.js`
 - `public/assets/js/app/consent.js`
+- `public/assets/js/app/email-seller.js`
 - `public/assets/js/app/guest-cache.js`
 - `public/assets/js/app/listing-form/ai-field-tools.js`
 - `public/assets/js/app/listing-form/counters.js`
@@ -1086,6 +1096,7 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/blog/partials/card.blade.php`
 - `resources/views/front/blog/partials/sidebar.blade.php`
 - `resources/views/front/blog/show.blade.php`
+- `resources/views/front/chat/emails-off.blade.php`
 - `resources/views/front/chat/index.blade.php`
 - `resources/views/front/chat/partials/report-dialog.blade.php`
 - `resources/views/front/chat/partials/safety.blade.php`
@@ -1112,6 +1123,7 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/post/createOrEdit/form/sections/photos.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/price-location.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/what.blade.php`
+- `resources/views/front/post/show/partials/email-seller.blade.php`
 - `resources/views/front/search/partials/content.blade.php`
 - `resources/views/front/search/partials/posts/empty.blade.php`
 - `resources/views/front/search/partials/posts/template/grid_with_design.blade.php`

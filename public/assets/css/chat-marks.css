@@ -1,0 +1,58 @@
+/*
+ * adniro: live chat, the marks added to the message log after the first version (assets/css/chat-messages.css
+ * has the bubbles themselves): a deleted message, the Delete button, the "New messages" line, and the last
+ * line of the safety note. Colours and sizes are the tokens of assets/css/chat.css.
+ */
+
+/* Delete, beside my own recent messages: the same button, red when pointed at */
+.adn-chat-reply-btn.is-delete:hover {
+	color: var(--adn-chat-danger);
+}
+
+/* A message its sender took back: only its place is left (mine or theirs, the same quiet outline) */
+.adn-chat-msg .adn-chat-bubble.is-unsent,
+.adn-chat-msg.is-mine .adn-chat-bubble.is-unsent {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	font-style: italic;
+	color: var(--adn-chat-muted);
+	background-color: transparent;
+	box-shadow: inset 0 0 0 1px var(--adn-chat-border);
+}
+
+.adn-chat-msg .adn-chat-bubble.is-unsent .adn-chat-meta {
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-bubble.is-unsent .adn-chat-tick {
+	display: none;
+}
+
+/* "New messages": where the ones not read yet begin */
+.adn-chat-newline {
+	position: relative;
+}
+
+.adn-chat-newline::before {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	top: 50%;
+	height: 1px;
+	background-color: var(--adn-chat-accent);
+	opacity: .45;
+}
+
+.adn-chat-newline span {
+	position: relative;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-accent-soft);
+}
+
+/* The safety note at the top of a conversation: its last line, "Adniro will never ask…" */
+.adn-chat-safety-never {
+	display: block;
+	margin-top: .2rem;
+	font-weight: 600;
+}

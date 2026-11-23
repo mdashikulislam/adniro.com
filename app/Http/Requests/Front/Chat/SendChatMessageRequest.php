@@ -5,6 +5,7 @@ namespace App\Http\Requests\Front\Chat;
 use App\Rules\BlacklistWordRule;
 use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatPhotos;
+use App\Services\Chat\ChatSettings;
 use Illuminate\Foundation\Http\FormRequest;
 
 /*
@@ -17,6 +18,18 @@ class SendChatMessageRequest extends FormRequest
 	public function authorize(): bool
 	{
 		return $this->user() !== null;
+	}
+
+	/** Chat or photos turned off in Admin > Settings > Chat: nothing is sent; conversations can still be read. */
+	public function withValidator($validator): void
+	{
+		$validator->after(function ($validator) {
+			if (!ChatSettings::isEnabled()) {
+				$validator->errors()->add('body', trans('chat.error_paused'));
+			} elseif ($this->hasFile('photo') && !ChatSettings::photosEnabled()) {
+				$validator->errors()->add('photo', trans('chat.error_photos_off'));
+			}
+		});
 	}
 
 	protected function prepareForValidation(): void

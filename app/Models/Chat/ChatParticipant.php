@@ -15,7 +15,7 @@ class ChatParticipant extends Model
 {
 	protected $table = 'threads_participants';
 
-	protected $fillable = ['thread_id', 'user_id', 'last_read', 'last_read_message_id', 'unread_count', 'muted_until', 'digest_sent_at'];
+	protected $fillable = ['thread_id', 'user_id', 'last_read', 'last_read_message_id', 'cleared_message_id', 'unread_count', 'muted_until', 'digest_sent_at'];
 
 	protected function casts(): array
 	{

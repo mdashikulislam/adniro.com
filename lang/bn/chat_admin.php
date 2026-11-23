@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'চ্যাট অভিযোগ',
+	'reports_title' => 'চ্যাট অভিযোগ',
+	'reports_help' => 'সদস্যরা যেসব কথোপকথন নিয়ে অভিযোগ করেছেন। পড়তে একটি খুলুন, আর মীমাংসা হলে অভিযোগটি বন্ধ করুন। এখানে শুধু অভিযোগ করা কথোপকথনই পড়া যায়।',
+	'status_open' => 'খোলা',
+	'status_closed' => 'বন্ধ',
+	'reports_empty_open' => 'কোনো খোলা অভিযোগ নেই।',
+	'reports_empty_closed' => 'এখনও কোনো বন্ধ অভিযোগ নেই।',
+	'col_reason' => 'কারণ',
+	'col_reported' => 'যার বিরুদ্ধে অভিযোগ',
+	'col_reporter' => 'অভিযোগকারী',
+	'col_when' => 'কখন',
+	'col_status' => 'অবস্থা',
+	'col_note' => 'নোট',
+	'open_report' => 'খুলুন',
+	'report_title' => 'চ্যাট অভিযোগ #:id',
+	'back_to_reports' => 'অভিযোগের তালিকায় ফিরুন',
+	'closed_by' => ':name বন্ধ করেছেন, :when',
+	'open_member' => 'এই সদস্যকে খুলুন (সম্পাদনা, স্থগিত বা মুছে ফেলা)',
+	'other_reports' => '{1} এই সদস্যের বিরুদ্ধে আরও :countটি অভিযোগ|[2,*] এই সদস্যের বিরুদ্ধে আরও :countটি অভিযোগ',
+	'close_report' => 'অভিযোগ বন্ধ করুন',
+	'close_help' => 'বন্ধ করলে শুধু বোঝায় অভিযোগটি দেখা হয়েছে। সদস্যের বিরুদ্ধে ব্যবস্থা নিতে তাঁর অ্যাকাউন্ট খুলুন।',
+	'reopen_report' => 'আবার খুলুন',
+	'report_closed' => 'অভিযোগ #:id বন্ধ হয়েছে।',
+	'report_reopened' => 'অভিযোগ #:id আবার খোলা হয়েছে।',
+	'conversation' => 'কথোপকথন',
+	'messages_shown' => '[0,1] :totalটির মধ্যে :countটি বার্তা।|[2,*] :totalটির মধ্যে শেষ :countটি বার্তা।',
+	'about_listing' => '":title" বিজ্ঞাপন নিয়ে',
+	'taken_back' => 'প্রেরক এই বার্তাটি মুছে ফেলেছেন (:when)। সদস্যরা এটি আর দেখতে পান না।',
+	'no_messages' => 'এই কথোপকথনে আর কোনো বার্তা নেই।',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'চ্যাট চালু আছে',
+	'setting_enabled_hint' => 'বন্ধ: কেউ বার্তা পাঠাতে পারবে না এবং "বিক্রেতার সাথে চ্যাট" লুকানো থাকবে। সদস্যরা তাঁদের কথোপকথন পড়তে পারবেন।',
+	'setting_photos_enabled_label' => 'চ্যাটে ছবি',
+	'setting_photos_enabled_hint' => 'বন্ধ: শুধু লেখা পাঠানো যাবে।',
+	'setting_messages_per_minute_label' => 'প্রতি সদস্য, প্রতি মিনিটে বার্তা',
+	'setting_messages_per_minute_hint' => 'প্রথম দিনের অ্যাকাউন্ট এর অর্ধেকেরও কম পায়।',
+	'setting_messages_per_day_label' => 'প্রতি সদস্য, প্রতি দিনে বার্তা',
+	'setting_messages_per_day_hint' => 'প্রথম দিনের অ্যাকাউন্ট এর পাঁচ ভাগের এক ভাগ পায়।',
+	'setting_unsend_minutes_label' => 'পাঠানো বার্তা মোছার সময় (মিনিট)',
+	'setting_unsend_minutes_hint' => 'একজন সদস্য কতক্ষণ পর্যন্ত বার্তা ফিরিয়ে নিতে পারবেন। 0 দিলে বন্ধ। অভিযোগে সবসময় পুরো কথোপকথন থাকে।',
+	'setting_unread_email_enabled_label' => 'না-পড়া বার্তার জন্য সদস্যদের ইমেইল করুন',
+	'setting_unread_email_enabled_hint' => 'প্রতি সদস্যকে একটি ইমেইল, প্রতি বার্তায় নয়। প্রত্যেক সদস্য নিজেও এটি বন্ধ করতে পারেন।',
+	'setting_unread_email_delay_minutes_label' => 'না-পড়া বার্তার ইমেইলের আগে মিনিট',
+	'setting_unread_email_delay_minutes_hint' => 'ইমেইল পাঠানোর আগে একটি বার্তা কতক্ষণ না-পড়া অবস্থায় অপেক্ষা করবে।',
+];

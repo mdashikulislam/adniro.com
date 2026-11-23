@@ -1680,7 +1680,8 @@ function doesGuestHaveAbilityToCreateListings($authUser = null): bool
 
 /**
  * adniro: where "Chat with seller" goes for this listing: the chat for a signed-in member, the sign-in pop-up
- * for a guest, and nowhere (null) for the owner, or when the listing is not public or has no member account.
+ * for a guest, and nowhere (null) for the owner, when the listing is not public or has no member account, or
+ * while the chat is turned off (Admin > Settings > Chat).
  *
  * @param $post
  * @return string|null
@@ -1690,7 +1691,7 @@ function chatStartUrl($post): ?string
 	$post = is_array($post) ? Arr::toObject($post) : $post;
 	$sellerId = (int)data_get($post, 'user_id');
 	
-	if (empty($post) || $sellerId === 0 || !isVerifiedPost($post)) {
+	if (empty($post) || $sellerId === 0 || !isVerifiedPost($post) || !\App\Services\Chat\ChatSettings::isEnabled()) {
 		return null;
 	}
 	if (!auth()->check()) {

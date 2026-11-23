@@ -54,6 +54,12 @@ install the free `ext-uv` PHP extension (`pecl install uv`) and restart the serv
 The unread-messages email is sent by the scheduler (`chat:unread-digest`, every minute): no extra setup.
 Members turn it off with the gear on the chat page or the link at the bottom of the email.
 
+**Admin > Settings > Chat** turns the chat on or off (off: nothing can be sent, "Chat with seller" is hidden,
+conversations can still be read), and sets photos, the send limits, how long a message can be taken back, and
+the unread email and its delay. **Admin > Users > Chat reports** lists the conversations members reported: open
+one to read it, act on the member from their account, then close the report. A report is also emailed to the
+site's contact address, with a link.
+
 Listings posted without a member account have no chat: they get "Email the seller" instead, a form for
 signed-in members that the site sends to the listing's address (at most 2 a day per member and listing, and
 10 a day to one listing from everybody).

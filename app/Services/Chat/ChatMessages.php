@@ -19,6 +19,7 @@ class ChatMessages
 	public const PAGE_SIZE = 30;
 	public const BODY_MAX = 2000;
 	public const CATCH_UP_MAX = 100;
+	private const UNSENT_NEWS_HOURS = 24;
 
 	/**
 	 * Saves a text or a photo from one participant and pushes it to both. With the same client_uuid it
@@ -57,14 +58,17 @@ class ChatMessages
 	}
 
 	/**
-	 * A page of history, oldest first: the latest messages, or the ones before a given message.
+	 * A page of history for one participant, oldest first: the latest messages, or the ones before a given
+	 * message. What the member deleted from their own list (hideFor) is left out.
 	 *
 	 * @return array{messages: array<int, array>, has_more: bool}
 	 */
-	public static function history(ChatThread $thread, ?int $beforeId = null): array
+	public static function history(ChatThread $thread, int $viewerId, ?int $beforeId = null): array
 	{
+		$clearedUpTo = self::clearedUpTo($thread, $viewerId);
 		$rows = ChatMessage::query()
 			->where('thread_id', $thread->id)
+			->where('id', '>', $clearedUpTo)
 			->when($beforeId !== null, fn ($query) => $query->where('id', '<', $beforeId))
 			->orderByDesc('id')
 			->limit(self::PAGE_SIZE + 1)
@@ -73,7 +77,7 @@ class ChatMessages
 		$hasMore = $rows->count() > self::PAGE_SIZE;
 
 		return [
-			'messages' => ChatPresenter::messages($rows->take(self::PAGE_SIZE)->reverse()->values()),
+			'messages' => ChatPresenter::messages($rows->take(self::PAGE_SIZE)->reverse()->values(), $clearedUpTo),
 			'has_more' => $hasMore,
 		];
 	}
@@ -82,21 +86,104 @@ class ChatMessages
 	 * Messages newer than the one the browser already has (after a reconnect, and the fallback check while the
 	 * live connection is down), oldest first. "has_more" tells the browser to ask again for the rest.
 	 *
-	 * @return array{messages: array<int, array>, has_more: bool}
+	 * @return array{messages: array<int, array>, has_more: bool, unsent: array<int, int>}
 	 */
-	public static function after(ChatThread $thread, int $afterId): array
+	public static function after(ChatThread $thread, int $viewerId, int $afterId): array
 	{
+		$clearedUpTo = self::clearedUpTo($thread, $viewerId);
 		$rows = ChatMessage::query()
 			->where('thread_id', $thread->id)
-			->where('id', '>', $afterId)
+			->where('id', '>', max($afterId, $clearedUpTo))
 			->orderBy('id')
 			->limit(self::CATCH_UP_MAX + 1)
 			->get();
 
 		return [
-			'messages' => ChatPresenter::messages($rows->take(self::CATCH_UP_MAX)->values()),
+			'messages' => ChatPresenter::messages($rows->take(self::CATCH_UP_MAX)->values(), $clearedUpTo),
 			'has_more' => $rows->count() > self::CATCH_UP_MAX,
+			'unsent'   => self::recentlyUnsent($thread),
 		];
+	}
+
+	/**
+	 * Messages taken back lately. Without a live connection this is how a browser learns that a message it
+	 * already shows has become "Message deleted".
+	 *
+	 * @return array<int, int>
+	 */
+	private static function recentlyUnsent(ChatThread $thread): array
+	{
+		return ChatMessage::query()
+			->where('thread_id', $thread->id)
+			->where('unsent_at', '>=', now()->subHours(self::UNSENT_NEWS_HOURS))
+			->orderByDesc('id')
+			->limit(self::CATCH_UP_MAX)
+			->pluck('id')
+			->map(fn ($id) => (int)$id)
+			->all();
+	}
+
+	/**
+	 * The sender takes a message back. Both people then see "Message deleted" in its place, at once. The row
+	 * and its text stay in the database: a reported conversation can still be read by the admins, so taking a
+	 * message back never removes evidence. The caller has checked that it is the sender's and still in time.
+	 */
+	public static function unsend(ChatThread $thread, ChatMessage $message): ChatMessage
+	{
+		if ($message->isUnsent()) {
+			return $message;
+		}
+
+		DB::transaction(function () use ($thread, $message) {
+			$message->update(['unsent_at' => now()]);
+
+			// Not read yet (and not deleted with the conversation): it no longer counts as unread
+			ChatParticipant::query()
+				->where('thread_id', $thread->id)
+				->where('user_id', '!=', $message->user_id)
+				->where('unread_count', '>', 0)
+				->where(fn ($query) => $query->whereNull('last_read_message_id')->orWhere('last_read_message_id', '<', $message->id))
+				->where(fn ($query) => $query->whereNull('cleared_message_id')->orWhere('cleared_message_id', '<', $message->id))
+				->decrement('unread_count');
+		});
+
+		ChatUnread::forget(...$thread->participants->pluck('user_id')->map(fn ($id) => (int)$id)->all());
+		ChatBroadcaster::messageUnsent($thread->load('participants'), $message);
+
+		return $message;
+	}
+
+	/** Whether the sender may still take this message back. */
+	public static function canUnsend(ChatMessage $message, int $userId): bool
+	{
+		$minutes = ChatSettings::unsendMinutes();
+
+		return (int)$message->user_id === $userId
+			&& !$message->isUnsent()
+			&& $minutes > 0
+			&& $message->created_at !== null
+			&& $message->created_at->gte(now()->subMinutes($minutes));
+	}
+
+	/**
+	 * The member deletes the conversation from their own list. The other person keeps everything. For this
+	 * member it leaves the list and the badge, and what was said so far is not shown to them again, even when
+	 * a new message brings the conversation back.
+	 */
+	public static function hideFor(ChatThread $thread, int $userId): void
+	{
+		ChatParticipant::query()
+			->where('thread_id', $thread->id)
+			->where('user_id', $userId)
+			->update(['deleted_at' => now(), 'cleared_message_id' => $thread->last_message_id, 'unread_count' => 0]);
+
+		ChatUnread::forget($userId);
+	}
+
+	/** The last message this member deleted with the conversation: nothing up to it is shown to them. */
+	public static function clearedUpTo(ChatThread $thread, int $userId): int
+	{
+		return (int)($thread->participantFor($userId)?->cleared_message_id ?? 0);
 	}
 
 	/**
@@ -134,9 +221,10 @@ class ChatMessages
 			}
 			$readUpTo = max($upTo, $alreadyReadUpTo);
 
+			// What the member deleted with the conversation is never counted again
 			$stillUnread = ChatMessage::query()
 				->where('thread_id', $thread->id)
-				->where('id', '>', $readUpTo)
+				->where('id', '>', max($readUpTo, (int)$participant->cleared_message_id))
 				->where('user_id', '!=', $userId)
 				->count();
 

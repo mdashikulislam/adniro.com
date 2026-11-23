@@ -260,7 +260,8 @@ Steps 0 to 3 are built and tested on local. What differs from the plan above, an
 - **Listings posted without an account** (guest posting) have no "Chat with seller": there is no member to talk
   to. They get "Email the seller" instead (see round 1 below). The phone and WhatsApp buttons stay.
 - **Scripts:** the page's code is small files (`chat-kit`, `chat-inbox`, `chat-log`, `chat-reply`, `chat-safety`,
-  `chat-settings`, `chat-photo`, `chat`), none over 800 lines, plus `chat-live` on every page for signed-in
+  `chat-settings`, `chat-photo`, `chat`, and since round 2 `chat-presence`, `chat-delete`, `chat-drafts`,
+  `chat-guard`), none over 800 lines, plus `chat-live` on every page for signed-in
   members and `email-seller` on listings without a member account.
 - **Going live with sockets** is three steps on the server, written down in `docs/operations.md` ("Live chat")
   with the files in `deploy/reverb/`. Until they are done the chat works with the 10-second check.
@@ -289,6 +290,26 @@ Steps 0 to 3 are built and tested on local. What differs from the plan above, an
   notes no longer tell anyone to cache the config.
 
 Not done: A10 (the old attachment's direct link), which needs a change on the live server.
+
+**Round 2 of the audit (section B: B1, B3, B4, B5, B6, B8, B14), built on local:**
+
+- **Take a message back.** For an hour after sending (a setting), the sender can delete a message: both people
+  see "Message deleted" in its place, at once (`threads_messages.unsent_at`, event `chat.unsent`). The row and
+  its text stay, so a report still shows it; a photo taken back no longer opens for members.
+- **Delete a chat for me.** It leaves the member's list and badge; the other person keeps it. It comes back
+  with the next message, without the old ones (`threads_participants.cleared_message_id`).
+- **Admin > Users > Chat reports.** The list of reports, one report with the whole conversation (also what was
+  taken back, and its photos), close and reopen (`thread_reports.closed_by`, `closed_at`). Super admins and
+  staff who can edit members. Only reported conversations can be read. The report email now has the two
+  names and a link to the report.
+- **Admin > Settings > Chat.** Chat on or off, photos, messages per minute and per day, minutes to take a
+  message back, the unread email and its delay (`ChatSettings`, each value kept inside a safe range).
+  With the chat off, nothing can be sent and "Chat with seller" is hidden; conversations can still be read.
+- **A question before a risky message** (a phone number, an email address, "pay outside" wording): send anyway
+  or edit. Once per conversation and kind. The browser uses the server's own patterns (`ChatSafety`).
+- **"Adniro will never ask you for a code, a password or a payment in a chat"** in the safety note.
+- **Drafts** are kept per conversation in the browser (30 days), and **a "New messages" line** shows where the
+  unread ones begin when a chat is opened.
 
 Design: `replica/design/` (tokens, 27 colour pairs with 0 failing AA, and the component specs).
 

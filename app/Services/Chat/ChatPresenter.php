@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 class ChatPresenter
 {
 	private const SNIPPET_LENGTH = 90;
+	private const TYPE_UNSENT = 'unsent';
 
 	/** Relations a conversation needs before it is presented. */
 	public const THREAD_RELATIONS = ['participants.user', 'post.picture', 'lastMessage'];
@@ -46,17 +47,11 @@ class ChatPresenter
 			'url'           => route('chat.show', ['thread' => $thread->id], false),
 			'other'         => self::person($other?->user, $otherId),
 			'post'          => self::post($thread->post) ?? self::deletedListing($thread->subject),
-			'last'          => $last === null ? null : [
-				'id'   => (int)$last->id,
-				'mine' => (int)$last->user_id === $viewerId,
-				'type' => (string)$last->type,
-				'text' => Str::limit(self::oneLine((string)$last->body), self::SNIPPET_LENGTH),
-				'at'   => $last->created_at?->toIso8601String(),
-			],
+			'last'          => self::lastLine($last, $viewerId, (int)($me->cleared_message_id ?? 0)),
 			'unread'        => (int)($me->unread_count ?? 0),
 			'read_up_to'    => (int)($other->last_read_message_id ?? 0),
 			'blocked_by_me' => in_array($otherId, $blocks['blocked'], true),
-			'can_send'      => $otherId > 0 && $other?->user !== null
+			'can_send'      => ChatSettings::isEnabled() && $otherId > 0 && $other?->user !== null
 				&& !in_array($otherId, $blocks['blocked'], true)
 				&& !in_array($otherId, $blocks['blockers'], true),
 		];
@@ -64,35 +59,40 @@ class ChatPresenter
 
 	/**
 	 * Several messages, with the listings they are about loaded in one query.
+	 * $clearedUpTo: the viewer deleted the conversation up to this message (ChatMessages::clearedUpTo); a reply
+	 * that quotes something older shows no quote to them.
 	 *
 	 * @param \Illuminate\Support\Collection<int, ChatMessage> $messages
 	 */
-	public static function messages($messages): array
+	public static function messages($messages, int $clearedUpTo = 0): array
 	{
 		$messages->loadMissing(['post.picture', 'replyTo']);
 
-		return $messages->map(fn (ChatMessage $message) => self::message($message))->values()->all();
+		return $messages->map(fn (ChatMessage $message) => self::message($message, $clearedUpTo))->values()->all();
 	}
 
-	public static function message(ChatMessage $message): array
+	public static function message(ChatMessage $message, int $clearedUpTo = 0): array
 	{
-		$isImage = $message->isImage() && !empty($message->file_path);
+		$isUnsent = $message->isUnsent();
+		$isImage = !$isUnsent && $message->isImage() && !empty($message->file_path);
 
 		return [
 			'id'          => (int)$message->id,
 			'thread_id'   => (int)$message->thread_id,
 			'user_id'     => (int)$message->user_id,
 			'type'        => $isImage ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
-			'body'        => (string)$message->body,
+			// A message taken back by its sender leaves no text, photo or quote behind: only its place
+			'unsent'      => $isUnsent,
+			'body'        => $isUnsent ? '' : (string)$message->body,
 			'image'       => !$isImage ? null : [
 				'url'   => route('chat.file', ['message' => $message->id], false),
 				'thumb' => route('chat.file', ['message' => $message->id, 'size' => 'thumb'], false),
 			],
 			'post'        => empty($message->post_id) ? null : self::post($message->post),
-			'reply_to'    => empty($message->reply_to_id) ? null : self::quote($message->replyTo),
+			'reply_to'    => $isUnsent || (int)$message->reply_to_id <= $clearedUpTo ? null : self::quote($message->replyTo),
 			'client_uuid' => $message->client_uuid,
 			'at'          => $message->created_at?->toIso8601String(),
-			'caution'     => ChatSafety::needsCaution($message->body),
+			'caution'     => !$isUnsent && ChatSafety::needsCaution($message->body),
 		];
 	}
 
@@ -106,9 +106,35 @@ class ChatPresenter
 		return [
 			'id'      => (int)$message->id,
 			'user_id' => (int)$message->user_id,
-			'type'    => $message->isImage() ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
-			'text'    => Str::limit(self::oneLine((string)$message->body), self::SNIPPET_LENGTH),
+			'type'    => self::lineType($message),
+			'text'    => $message->isUnsent() ? '' : Str::limit(self::oneLine((string)$message->body), self::SNIPPET_LENGTH),
 		];
+	}
+
+	/** The inbox line: the conversation's last message, unless this member deleted the conversation after it. */
+	private static function lastLine(?ChatMessage $last, int $viewerId, int $clearedUpTo): ?array
+	{
+		if ($last === null || (int)$last->id <= $clearedUpTo) {
+			return null;
+		}
+
+		return [
+			'id'   => (int)$last->id,
+			'mine' => (int)$last->user_id === $viewerId,
+			'type' => self::lineType($last),
+			'text' => $last->isUnsent() ? '' : Str::limit(self::oneLine((string)$last->body), self::SNIPPET_LENGTH),
+			'at'   => $last->created_at?->toIso8601String(),
+		];
+	}
+
+	/** "text", "image", or "unsent" for a message its sender took back. */
+	private static function lineType(ChatMessage $message): string
+	{
+		if ($message->isUnsent()) {
+			return self::TYPE_UNSENT;
+		}
+
+		return $message->isImage() ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT;
 	}
 
 	public static function person(?User $user, int $fallbackId = 0): array

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\Chat\ChatEvent;
 use App\Models\User;
 use App\Services\Chat\ChatAccess;
+use App\Services\Chat\ChatSettings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -20,8 +21,9 @@ class ChatServiceProvider extends ServiceProvider
 {
 	private const NEW_ACCOUNT_HOURS = 24;
 
+	/** An account's first day gets this share of the send limits set in Admin > Settings > Chat. */
+	private const NEW_ACCOUNT_SHARE = ['minute' => 0.4, 'day' => 0.2];
 	/** [per minute, per day] for an established member and for an account's first day. */
-	private const SEND_LIMITS = ['member' => [20, 300], 'new' => [8, 60]];
 	private const START_LIMITS = ['member' => [5, 30], 'new' => [2, 10]];
 	private const REPORTS_PER_HOUR = 5;
 	/** "Email the seller" (listings without a member account): a real email each time, so far fewer than chat. */
@@ -57,7 +59,7 @@ class ChatServiceProvider extends ServiceProvider
 
 	private function registerLimits(): void
 	{
-		RateLimiter::for('chat-send', fn (Request $request) => $this->limits($request, self::SEND_LIMITS, 'send'));
+		RateLimiter::for('chat-send', fn (Request $request) => $this->limits($request, $this->sendLimits(), 'send'));
 		RateLimiter::for('chat-start', fn (Request $request) => $this->limits($request, self::START_LIMITS, 'start'));
 		RateLimiter::for('chat-email-seller', fn (Request $request) => array_merge(
 			$this->limits($request, self::EMAIL_SELLER_LIMITS, 'email-seller'),
@@ -69,6 +71,21 @@ class ChatServiceProvider extends ServiceProvider
 		RateLimiter::for('chat-report', function (Request $request) {
 			return Limit::perHour(self::REPORTS_PER_HOUR)->by('chat-report:' . $request->user()?->id);
 		});
+	}
+
+	/** @return array{member: array{0: int, 1: int}, new: array{0: int, 1: int}} [per minute, per day] */
+	private function sendLimits(): array
+	{
+		$perMinute = ChatSettings::messagesPerMinute();
+		$perDay = ChatSettings::messagesPerDay();
+
+		return [
+			'member' => [$perMinute, $perDay],
+			'new'    => [
+				max(1, (int)round($perMinute * self::NEW_ACCOUNT_SHARE['minute'])),
+				max(1, (int)round($perDay * self::NEW_ACCOUNT_SHARE['day'])),
+			],
+		];
 	}
 
 	/** @return array<int, Limit> */

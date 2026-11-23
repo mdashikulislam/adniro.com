@@ -35,7 +35,7 @@ class ChatMessageController extends Controller
 		$userId = (int)$request->user()->id;
 		$chatThread = ChatAccess::threadFor($thread, $userId)->load(ChatPresenter::THREAD_RELATIONS);
 
-		return response()->json(['thread' => ChatPresenter::thread($chatThread, $userId)] + ChatMessages::history($chatThread));
+		return response()->json(['thread' => ChatPresenter::thread($chatThread, $userId)] + ChatMessages::history($chatThread, $userId));
 	}
 
 	/** Older messages (?before=id), or the ones the browser has missed (?after=id). */
@@ -45,14 +45,14 @@ class ChatMessageController extends Controller
 		$chatThread = ChatAccess::threadFor($thread, $userId);
 
 		if ($request->filled('after')) {
-			return response()->json(ChatMessages::after($chatThread, (int)$request->query('after')) + [
+			return response()->json(ChatMessages::after($chatThread, $userId, (int)$request->query('after')) + [
 				'read_up_to' => (int)($chatThread->otherParticipant($userId)?->last_read_message_id ?? 0),
 			]);
 		}
 
 		$before = $request->filled('before') ? (int)$request->query('before') : null;
 
-		return response()->json(ChatMessages::history($chatThread, $before));
+		return response()->json(ChatMessages::history($chatThread, $userId, $before));
 	}
 
 	/** A message sent from a listing: finds or creates the conversation with its seller, then sends. */
@@ -106,7 +106,12 @@ class ChatMessageController extends Controller
 			return null;
 		}
 
-		return ChatMessage::query()->where('thread_id', $chatThread->id)->find((int)$request->input('reply_to'));
+		// Only a message this member can still see: not one taken back, nor one they deleted with the conversation
+		return ChatMessage::query()
+			->where('thread_id', $chatThread->id)
+			->whereNull('unsent_at')
+			->where('id', '>', ChatMessages::clearedUpTo($chatThread, (int)$request->user()->id))
+			->find((int)$request->input('reply_to'));
 	}
 
 	private function sendIn(ChatThread $chatThread, SendChatMessageRequest $request, ?Post $about = null): JsonResponse

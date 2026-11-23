@@ -17,6 +17,7 @@ class ChatReported extends BaseNotification
 
 	private const LAST_MESSAGES = 6;
 	private const MESSAGE_LIMIT = 200;
+	private const NAME_LIMIT = 40;
 
 	public function __construct(protected ThreadReport $report)
 	{
@@ -29,14 +30,23 @@ class ChatReported extends BaseNotification
 
 	public function toMail($notifiable): MailMessage
 	{
-		$report = $this->report;
+		$report = $this->report->loadMissing(['reporter', 'thread.participants.user']);
 		$thread = $report->thread;
 		$subject = self::plainMailText($thread?->subject, 60);
+		$reportedId = $report->reportedUserId();
+		$names = [
+			(int)$report->reporter_id => $this->nameOf($report->reporter?->name, (int)$report->reporter_id),
+			$reportedId               => $this->nameOf($thread?->participantFor($reportedId)?->user?->name, $reportedId),
+		];
 
 		$mail = (new MailMessage)
 			->subject(trans('chat.report_mail_subject', ['title' => $subject]))
 			->greeting(trans('chat.report_mail_greeting'))
-			->line(e(trans('chat.report_mail_intro', ['id' => $report->thread_id, 'title' => $subject, 'reporter' => $report->reporter_id])))
+			->line(e(trans('chat.report_mail_intro', [
+				'title'    => $subject,
+				'reporter' => $names[(int)$report->reporter_id],
+				'reported' => $names[$reportedId],
+			])))
 			->line('<strong>' . e(trans('chat.report_mail_reason')) . '</strong> ' . e(trans('chat.js.reason_' . $report->reason)));
 
 		if (!empty($report->note)) {
@@ -51,9 +61,18 @@ class ChatReported extends BaseNotification
 			->reverse();
 		foreach ($messages as $message) {
 			$text = $message->isImage() ? '[' . trans('chat.js.photo') . ']' : self::plainMailText($message->body, self::MESSAGE_LIMIT);
-			$mail->line(e('#' . $message->user_id . ': ' . $text));
+			$mail->line(e(($names[(int)$message->user_id] ?? '#' . $message->user_id) . ': ' . $text));
 		}
 
-		return $mail->salutation(trans('mail.footer_salutation', ['appName' => config('app.name')]));
+		// The whole conversation, and closing the report, are in the admin panel
+		return $mail
+			->action(trans('chat.report_mail_action'), urlGen()->adminUrl('chat-reports/' . $report->id))
+			->salutation(trans('mail.footer_salutation', ['appName' => config('app.name')]));
+	}
+
+	/** A member's name with their number, safe for an email. */
+	private function nameOf(?string $name, int $userId): string
+	{
+		return trim(self::plainMailText($name ?? trans('chat.deleted_member'), self::NAME_LIMIT) . ' #' . $userId);
 	}
 }

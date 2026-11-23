@@ -12,7 +12,7 @@
 @section('body_class', ' adn-chat-page' . ($chatIsOpen ? ' is-chat-open' : ''))
 
 @push('after_styles_stack')
-	@foreach (['chat', 'chat-messages'] as $chatStyle)
+	@foreach (['chat', 'chat-messages', 'chat-marks'] as $chatStyle)
 		<link href="{{ url('assets/css/' . $chatStyle . '.css') }}?v={{ @filemtime(public_path('assets/css/' . $chatStyle . '.css')) }}" rel="stylesheet">
 	@endforeach
 @endpush
@@ -77,6 +77,7 @@
 								<ul class="dropdown-menu dropdown-menu-end adn-chat-menu">
 									<li><a class="dropdown-item" href="#" data-chat-view-listing><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> {{ trans('chat.view_listing') }}</a></li>
 									<li><button type="button" class="dropdown-item" data-chat-block><i class="bi bi-slash-circle" aria-hidden="true"></i> <span data-chat-block-label>{{ trans('chat.block') }}</span></button></li>
+									<li><button type="button" class="dropdown-item" data-chat-delete-chat><i class="bi bi-trash3" aria-hidden="true"></i> {{ trans('chat.delete_chat') }}</button></li>
 									<li><button type="button" class="dropdown-item text-danger" data-chat-report><i class="bi bi-flag" aria-hidden="true"></i> {{ trans('chat.report') }}</button></li>
 								</ul>
 							</div>
@@ -154,7 +155,7 @@
 @endsection
 
 @push('after_scripts_stack')
-	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-reply', 'chat-safety', 'chat-settings', 'chat-photo', 'chat'] as $chatScript)
+	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-presence', 'chat-reply', 'chat-safety', 'chat-delete', 'chat-drafts', 'chat-guard', 'chat-settings', 'chat-photo', 'chat'] as $chatScript)
 		<script src="{{ url('assets/js/app/' . $chatScript . '.js') }}?v={{ @filemtime(public_path('assets/js/app/' . $chatScript . '.js')) }}" defer></script>
 	@endforeach
 @endpush

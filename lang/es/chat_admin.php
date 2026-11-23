@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'Denuncias de chats',
+	'reports_title' => 'Denuncias de chats',
+	'reports_help' => 'Conversaciones que los miembros han denunciado. Abre una para leerla y cierra la denuncia cuando esté resuelta. Aquí solo se pueden leer las conversaciones denunciadas.',
+	'status_open' => 'Abiertas',
+	'status_closed' => 'Cerradas',
+	'reports_empty_open' => 'No hay denuncias abiertas.',
+	'reports_empty_closed' => 'Todavía no hay denuncias cerradas.',
+	'col_reason' => 'Motivo',
+	'col_reported' => 'Miembro denunciado',
+	'col_reporter' => 'Denunciado por',
+	'col_when' => 'Cuándo',
+	'col_status' => 'Estado',
+	'col_note' => 'Nota',
+	'open_report' => 'Abrir',
+	'report_title' => 'Denuncia de chat n.º :id',
+	'back_to_reports' => 'Volver a las denuncias',
+	'closed_by' => 'Cerrada por :name, :when',
+	'open_member' => 'Abrir este miembro (editar, suspender o eliminar)',
+	'other_reports' => '{1} :count denuncia más sobre este miembro|[2,*] :count denuncias más sobre este miembro',
+	'close_report' => 'Cerrar la denuncia',
+	'close_help' => 'Cerrar solo marca la denuncia como resuelta. Para actuar sobre el miembro, abre su cuenta.',
+	'reopen_report' => 'Reabrir',
+	'report_closed' => 'Denuncia n.º :id cerrada.',
+	'report_reopened' => 'Denuncia n.º :id reabierta.',
+	'conversation' => 'La conversación',
+	'messages_shown' => '[0,1] :count mensaje de :total.|[2,*] Los últimos :count mensajes de :total.',
+	'about_listing' => 'Sobre el anuncio «:title»',
+	'taken_back' => 'El remitente eliminó este mensaje (:when). Los miembros ya no lo ven.',
+	'no_messages' => 'En esta conversación ya no quedan mensajes.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'El chat está activado',
+	'setting_enabled_hint' => 'Desactivado: nadie puede enviar mensajes y «Chatear con el vendedor» se oculta. Los miembros pueden seguir leyendo sus conversaciones.',
+	'setting_photos_enabled_label' => 'Fotos en el chat',
+	'setting_photos_enabled_hint' => 'Desactivado: solo se puede enviar texto.',
+	'setting_messages_per_minute_label' => 'Mensajes por minuto, por miembro',
+	'setting_messages_per_minute_hint' => 'Las cuentas en su primer día reciben menos de la mitad.',
+	'setting_messages_per_day_label' => 'Mensajes por día, por miembro',
+	'setting_messages_per_day_hint' => 'Las cuentas en su primer día reciben una quinta parte.',
+	'setting_unsend_minutes_label' => 'Minutos para eliminar un mensaje enviado',
+	'setting_unsend_minutes_hint' => 'Cuánto tiempo tiene un miembro para retirar un mensaje. 0 lo desactiva. Una denuncia siempre conserva la conversación completa.',
+	'setting_unread_email_enabled_label' => 'Avisar a los miembros por correo de los mensajes sin leer',
+	'setting_unread_email_enabled_hint' => 'Un correo por miembro, nunca uno por mensaje. Cada miembro también puede desactivarlo para sí mismo.',
+	'setting_unread_email_delay_minutes_label' => 'Minutos antes del correo de mensajes sin leer',
+	'setting_unread_email_delay_minutes_hint' => 'Cuánto tiempo espera un mensaje sin leer antes de enviar el correo.',
+];

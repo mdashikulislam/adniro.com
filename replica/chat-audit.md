@@ -40,6 +40,10 @@ the new email form also lost everything after a "<".
 
 Ordered by how much users would notice.
 
+**Status (2026-11-23): round 2 is built on local, on branch `chat`, with tests: B1, B3, B4, B5, B6, B8 and B14.**
+Two limits, on purpose: the quick replies stay in the language files (an admin text box would lose their
+translations), and the warning before sending (B5) still knows English "pay outside" words only (section C).
+
 | # | missing | why it matters | seen on | size |
 | --- | --- | --- | --- | --- |
 | B1 | **Delete a conversation (for me) and delete my own message** | A message sent to the wrong person stays for good; an inbox can never be cleaned. | Vinted and Kleinanzeigen: delete for yourself only (verified) | M |

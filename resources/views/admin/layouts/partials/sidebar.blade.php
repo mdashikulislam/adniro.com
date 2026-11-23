@@ -178,6 +178,23 @@
 										</a>
 									</li>
 								@endif
+								@if (\App\Http\Middleware\ChatReportAccess::allows($authUser))
+									{{-- Chat reports (adniro): conversations reported by members --}}
+									@php
+										$chatReportCount = cache()->remember(\App\Models\Chat\ThreadReport::OPEN_COUNT_CACHE, 60, fn () => \App\Models\Chat\ThreadReport::query()
+											->where('status', \App\Models\Chat\ThreadReport::STATUS_OPEN)->count());
+									@endphp
+									<li class="sidebar-item">
+										<a href="{{ urlGen()->adminUrl('chat-reports') }}" class="sidebar-link">
+											<i class="mdi mdi-adjust"></i>
+											<span class="hide-menu">{{ trans('chat_admin.reports_sidebar') }}
+												@if ($chatReportCount > 0)
+													<span class="badge rounded-pill bg-warning text-dark ms-1">{{ $chatReportCount }}</span>
+												@endif
+											</span>
+										</a>
+									</li>
+								@endif
 								@if (doesUserHavePermission($authUser, 'admin.role.view') || userHasSuperAdminPermissions())
 									<li class="sidebar-item">
 										<a href="{{ urlGen()->adminUrl('roles') }}" class="sidebar-link">

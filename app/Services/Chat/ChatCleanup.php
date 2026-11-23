@@ -70,7 +70,7 @@ class ChatCleanup
 			$unread = ChatMessage::query()
 				->where('thread_id', $thread->id)
 				->where('user_id', '!=', $participant->user_id)
-				->where('id', '>', (int)$participant->last_read_message_id)
+				->where('id', '>', max((int)$participant->last_read_message_id, (int)$participant->cleared_message_id))
 				->count();
 
 			$participant->update(['unread_count' => $unread]);

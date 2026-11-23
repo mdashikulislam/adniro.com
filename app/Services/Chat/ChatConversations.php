@@ -20,6 +20,9 @@ class ChatConversations
 	/** Why this member cannot chat about this listing, or null when they can. */
 	public static function cannotStartReason(Post $post, User $buyer): ?string
 	{
+		if (!ChatSettings::isEnabled()) {
+			return trans('chat.error_paused');
+		}
 		if (empty($post->user_id)) {
 			return trans('chat.error_no_seller_account');
 		}

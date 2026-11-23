@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'بلاغات المحادثات',
+	'reports_title' => 'بلاغات المحادثات',
+	'reports_help' => 'المحادثات التي أبلغ عنها الأعضاء. افتح بلاغاً لقراءة المحادثة، ثم أغلقه عند معالجته. لا يمكن هنا قراءة سوى المحادثات المبلَّغ عنها.',
+	'status_open' => 'مفتوحة',
+	'status_closed' => 'مغلقة',
+	'reports_empty_open' => 'لا توجد بلاغات مفتوحة.',
+	'reports_empty_closed' => 'لا توجد بلاغات مغلقة بعد.',
+	'col_reason' => 'السبب',
+	'col_reported' => 'العضو المبلَّغ عنه',
+	'col_reporter' => 'المبلِّغ',
+	'col_when' => 'متى',
+	'col_status' => 'الحالة',
+	'col_note' => 'ملاحظة',
+	'open_report' => 'فتح',
+	'report_title' => 'بلاغ محادثة رقم :id',
+	'back_to_reports' => 'العودة إلى البلاغات',
+	'closed_by' => 'أغلقه :name، :when',
+	'open_member' => 'فتح هذا العضو (تعديل أو إيقاف أو حذف)',
+	'other_reports' => '{1} بلاغ آخر عن هذا العضو: :count|[2,*] بلاغات أخرى عن هذا العضو: :count',
+	'close_report' => 'إغلاق البلاغ',
+	'close_help' => 'الإغلاق يعني فقط أن البلاغ تمت معالجته. لاتخاذ إجراء بحق العضو، افتح حسابه.',
+	'reopen_report' => 'إعادة الفتح',
+	'report_closed' => 'تم إغلاق البلاغ رقم :id.',
+	'report_reopened' => 'تمت إعادة فتح البلاغ رقم :id.',
+	'conversation' => 'المحادثة',
+	'messages_shown' => '[0,1] :count رسالة من :total.|[2,*] آخر :count رسالة من :total.',
+	'about_listing' => 'حول الإعلان ":title"',
+	'taken_back' => 'حذف المرسل هذه الرسالة (:when). لم يعد الأعضاء يرونها.',
+	'no_messages' => 'لم تعد في هذه المحادثة أي رسائل.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'المحادثات مفعّلة',
+	'setting_enabled_hint' => 'إيقاف: لا يستطيع أحد إرسال الرسائل ويُخفى زر "تحدث مع البائع". يمكن للأعضاء قراءة محادثاتهم.',
+	'setting_photos_enabled_label' => 'الصور في المحادثة',
+	'setting_photos_enabled_hint' => 'إيقاف: يمكن إرسال النص فقط.',
+	'setting_messages_per_minute_label' => 'الرسائل في الدقيقة لكل عضو',
+	'setting_messages_per_minute_hint' => 'الحسابات في يومها الأول تحصل على أقل من النصف.',
+	'setting_messages_per_day_label' => 'الرسائل في اليوم لكل عضو',
+	'setting_messages_per_day_hint' => 'الحسابات في يومها الأول تحصل على الخُمس.',
+	'setting_unsend_minutes_label' => 'الدقائق المتاحة لحذف رسالة مرسلة',
+	'setting_unsend_minutes_hint' => 'المدة التي يستطيع العضو خلالها سحب رسالته. 0 يوقف الميزة. يحتفظ البلاغ دائماً بالمحادثة كاملة.',
+	'setting_unread_email_enabled_label' => 'إرسال بريد للأعضاء عن الرسائل غير المقروءة',
+	'setting_unread_email_enabled_hint' => 'بريد واحد لكل عضو، وليس بريداً لكل رسالة. يستطيع كل عضو إيقافه لنفسه أيضاً.',
+	'setting_unread_email_delay_minutes_label' => 'الدقائق قبل بريد الرسائل غير المقروءة',
+	'setting_unread_email_delay_minutes_hint' => 'المدة التي تنتظرها الرسالة غير مقروءة قبل إرسال البريد.',
+];

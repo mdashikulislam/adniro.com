@@ -123,6 +123,37 @@ Reply to a message (C3)
   rules     only a message of the same conversation can be quoted; a deleted original leaves a plain message
   a11y      "Reply" on the button; the bar is labelled "Replying to {name}"; the quote is a real button
 
+Deleted message (C3)
+  when      its sender took it back (for a while after sending; the time is an admin setting)
+  content   in the bubble's place, on the same side: a slash-circle icon and "Message deleted", italic, muted,
+            a 1px outline and no fill, mine and theirs alike; the time stays, the tick does not
+  rules     no Reply or Delete button; a quote of it reads "Message deleted"; the inbox line too
+
+Delete button (C3)
+  where     beside my own bubbles, next to Reply, while the message can still be taken back
+  content   trash icon, the Reply button's shape and behaviour (32px, 40px hit area); red when pointed at
+  action    SweetAlert2 confirm: "Delete this message?" + "It is removed for both of you…"
+  a11y      "Delete message" on the button
+
+New messages line (C3)
+  when      a chat is opened with unread messages
+  content   a hairline in the accent colour across the log with a pill "New messages" (accent-soft, accent
+            text), before the first unread message; the log opens there, not at the end
+
+Question before a risky message (C3)
+  when      the text has a phone number, an email address, or "pay outside" wording; once per chat and kind
+  content   SweetAlert2 warning: a title ("Share your contact details?" / "Careful with payments"), two lines
+            of why, "Edit message" (focused) and "Send anyway"
+
+Delete chat (C3)
+  where     the conversation's menu (⋮), above Report
+  action    SweetAlert2 confirm: "Delete the chat with {name}?" and what it does; then the inbox, with a toast
+
+Chat paused (C3, C4)
+  when      an admin turned the chat off
+  content   the composer's place takes one line: "Chat is paused for the moment. You can still read your
+            messages."
+
 Typing indicator
   content   a "theirs" bubble with three dots that rise in turn (1.2s); still under reduced motion
   a11y      hidden from the log; the header status says "Typing…"

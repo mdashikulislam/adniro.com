@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'Segnalazioni chat',
+	'reports_title' => 'Segnalazioni chat',
+	'reports_help' => 'Conversazioni segnalate dai membri. Aprine una per leggerla e chiudi la segnalazione quando è stata gestita. Qui si possono leggere solo le conversazioni segnalate.',
+	'status_open' => 'Aperte',
+	'status_closed' => 'Chiuse',
+	'reports_empty_open' => 'Nessuna segnalazione aperta.',
+	'reports_empty_closed' => 'Ancora nessuna segnalazione chiusa.',
+	'col_reason' => 'Motivo',
+	'col_reported' => 'Membro segnalato',
+	'col_reporter' => 'Segnalato da',
+	'col_when' => 'Quando',
+	'col_status' => 'Stato',
+	'col_note' => 'Nota',
+	'open_report' => 'Apri',
+	'report_title' => 'Segnalazione chat n. :id',
+	'back_to_reports' => 'Torna alle segnalazioni',
+	'closed_by' => 'Chiusa da :name, :when',
+	'open_member' => 'Apri questo membro (modifica, sospendi o elimina)',
+	'other_reports' => '{1} :count altra segnalazione su questo membro|[2,*] :count altre segnalazioni su questo membro',
+	'close_report' => 'Chiudi la segnalazione',
+	'close_help' => 'Chiudere indica solo che la segnalazione è stata gestita. Per intervenire sul membro, apri il suo account.',
+	'reopen_report' => 'Riapri',
+	'report_closed' => 'Segnalazione n. :id chiusa.',
+	'report_reopened' => 'Segnalazione n. :id riaperta.',
+	'conversation' => 'La conversazione',
+	'messages_shown' => '[0,1] :count messaggio su :total.|[2,*] Gli ultimi :count messaggi su :total.',
+	'about_listing' => 'Sull\'annuncio «:title»',
+	'taken_back' => 'Il mittente ha eliminato questo messaggio (:when). I membri non lo vedono più.',
+	'no_messages' => 'In questa conversazione non ci sono più messaggi.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'La chat è attiva',
+	'setting_enabled_hint' => 'Disattivata: nessuno può inviare messaggi e «Chatta con il venditore» è nascosto. I membri possono comunque leggere le loro conversazioni.',
+	'setting_photos_enabled_label' => 'Foto in chat',
+	'setting_photos_enabled_hint' => 'Disattivate: si può inviare solo testo.',
+	'setting_messages_per_minute_label' => 'Messaggi al minuto, per membro',
+	'setting_messages_per_minute_hint' => 'Gli account al primo giorno ne ricevono meno della metà.',
+	'setting_messages_per_day_label' => 'Messaggi al giorno, per membro',
+	'setting_messages_per_day_hint' => 'Gli account al primo giorno ne ricevono un quinto.',
+	'setting_unsend_minutes_label' => 'Minuti per eliminare un messaggio inviato',
+	'setting_unsend_minutes_hint' => 'Per quanto tempo un membro può ritirare un messaggio. 0 lo disattiva. Una segnalazione conserva sempre la conversazione completa.',
+	'setting_unread_email_enabled_label' => 'Avvisa i membri via e-mail dei messaggi non letti',
+	'setting_unread_email_enabled_hint' => 'Un\'e-mail per membro, mai una per messaggio. Ogni membro può anche disattivarla per sé.',
+	'setting_unread_email_delay_minutes_label' => 'Minuti prima dell\'e-mail dei messaggi non letti',
+	'setting_unread_email_delay_minutes_hint' => 'Per quanto tempo un messaggio resta non letto prima dell\'invio dell\'e-mail.',
+];

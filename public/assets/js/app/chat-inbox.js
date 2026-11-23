@@ -40,7 +40,7 @@
 				text.appendChild(el('span', 'adn-chat-row-listing', thread.post.title));
 			}
 			if (thread.last) {
-				var snippet = thread.last.type === 'image' ? T.photo : thread.last.text;
+				var snippet = thread.last.type === 'unsent' ? T.message_deleted : (thread.last.type === 'image' ? T.photo : thread.last.text);
 				text.appendChild(el('span', 'adn-chat-row-last', (thread.last.mine ? T.you + ': ' : '') + snippet));
 			}
 			row.appendChild(text);
@@ -170,7 +170,16 @@
 			renderInbox();
 		}
 
+		/** The member deleted the conversation from their list. */
+		function removeThread(threadId) {
+			store.threads = store.threads.filter(function (thread) {
+				return thread.id !== threadId;
+			});
+			renderInbox();
+		}
+
 		return {
+			remove: removeThread,
 			render: renderInbox,
 			message: inboxMessage,
 			load: loadInbox,

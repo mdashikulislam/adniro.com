@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * adniro: the admin's side of the live chat: Admin > Users > Chat reports and Admin > Settings > Chat.
+ */
+return [
+	'reports_sidebar' => 'Chat reports',
+	'reports_title' => 'Chat reports',
+	'reports_help' => 'Conversations that members reported. Open one to read it, and close the report when it is dealt with. Only reported conversations can be read here.',
+	'status_open' => 'Open',
+	'status_closed' => 'Closed',
+	'reports_empty_open' => 'No open reports.',
+	'reports_empty_closed' => 'No closed reports yet.',
+	'col_reason' => 'Reason',
+	'col_reported' => 'Reported member',
+	'col_reporter' => 'Reported by',
+	'col_when' => 'When',
+	'col_status' => 'Status',
+	'col_note' => 'Note',
+	'open_report' => 'Open',
+	'report_title' => 'Chat report #:id',
+	'back_to_reports' => 'Back to the reports',
+	'closed_by' => 'Closed by :name, :when',
+	'open_member' => 'Open this member (edit, suspend or delete)',
+	'other_reports' => '{1} :count other report about this member|[2,*] :count other reports about this member',
+	'close_report' => 'Close the report',
+	'close_help' => 'Closing only marks the report as dealt with. To act on the member, open their account.',
+	'reopen_report' => 'Reopen',
+	'report_closed' => 'Report #:id closed.',
+	'report_reopened' => 'Report #:id reopened.',
+	'conversation' => 'The conversation',
+	'messages_shown' => '[0,1] :count message of :total.|[2,*] The last :count messages of :total.',
+	'about_listing' => 'About the listing ":title"',
+	'taken_back' => 'The sender deleted this message (:when). Members no longer see it.',
+	'no_messages' => 'This conversation has no messages left.',
+
+	// Admin > Settings > Chat
+	'setting_enabled_label' => 'Chat is on',
+	'setting_enabled_hint' => 'Off: nobody can send messages and "Chat with seller" is hidden. Members can still read their conversations.',
+	'setting_photos_enabled_label' => 'Photos in chat',
+	'setting_photos_enabled_hint' => 'Off: only text can be sent.',
+	'setting_messages_per_minute_label' => 'Messages per minute, per member',
+	'setting_messages_per_minute_hint' => 'Accounts on their first day get less than half of this.',
+	'setting_messages_per_day_label' => 'Messages per day, per member',
+	'setting_messages_per_day_hint' => 'Accounts on their first day get a fifth of this.',
+	'setting_unsend_minutes_label' => 'Minutes to delete a sent message',
+	'setting_unsend_minutes_hint' => 'How long a member can take a message back. 0 turns it off. A report always keeps the full conversation.',
+	'setting_unread_email_enabled_label' => 'Email members about unread messages',
+	'setting_unread_email_enabled_hint' => 'One email per member, never one per message. Each member can also turn it off for themselves.',
+	'setting_unread_email_delay_minutes_label' => 'Minutes before the unread email',
+	'setting_unread_email_delay_minutes_hint' => 'How long a message waits unread before the email is sent.',
+];
