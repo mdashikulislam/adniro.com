@@ -4493,26 +4493,40 @@ a.seller-fact-value:hover {
 	z-index: 1;
 }
 
+/*
+ * adniro: the card's head (who posted, or "Manage listing") is a tinted band of its own, as tall as what is
+ * in it, with the facts starting right under its edge. It was a fixed 74px strip painted behind the card,
+ * which cut across the avatar and the name wherever they happened to end.
+ */
 .seller-card {
 	position: relative;
-}
-
-.seller-card::before {
-	content: "";
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	height: 74px;
-	background: linear-gradient(135deg, rgba(var(--bs-primary-rgb), .16) 0%, rgba(var(--bs-primary-rgb), .04) 100%);
+	overflow: hidden; /* the band follows the card's rounded top corners */
 }
 
 .seller-card .card-body {
+	--seller-card-pad: 1.35rem;
 	position: relative;
+	padding: var(--seller-card-pad);
 }
 
-.seller-card .seller-profile {
-	margin-top: .15rem;
+.seller-card .seller-profile,
+.seller-card .seller-card-head {
+	margin: calc(var(--seller-card-pad) * -1) calc(var(--seller-card-pad) * -1) 0;
+	padding: 1.15rem var(--seller-card-pad) 1.05rem;
+	border-bottom: 1px solid rgba(var(--bs-primary-rgb), .14);
+	background:
+		radial-gradient(120% 140% at 0% 0%, rgba(var(--bs-primary-rgb), .16), transparent 62%),
+		rgba(var(--bs-primary-rgb), .05);
+}
+
+.seller-card .seller-card-head {
+	margin-bottom: 1rem;
+}
+
+/* The band's own edge is the line above the facts */
+.seller-card .seller-profile + .seller-facts {
+	margin-top: 0;
+	border-top: 0;
 }
 
 .seller-avatar {
