@@ -76,7 +76,26 @@ class SiteMenuCacheTest extends TestCase
 		}
 	}
 
-	public function test_a_members_menu_with_a_personal_entry_is_built_each_time(): void
+	public function test_a_members_own_menu_is_kept_for_them_alone_and_only_briefly(): void
+	{
+		// Arrange: the header shows the member's name
+		$service = new MenuItemService();
+		$member = $this->stockMember(71);
+		$this->actingAs($member);
+		$this->assertContains('Member 71', $this->shownLabels($service->getSiteMenu('header', self::PARAMS)));
+
+		// Act: the name changes behind the cache's back
+		$member->name = 'Renamed Member';
+		$soonAfter = $this->shownLabels($service->getSiteMenu('header', self::PARAMS));
+		$this->travel(3)->minutes();
+		$later = $this->shownLabels($service->getSiteMenu('header', self::PARAMS));
+
+		// Assert: the kept menu for two minutes, then the member's menu is built again
+		$this->assertContains('Member 71', $soonAfter);
+		$this->assertContains('Renamed Member', $later);
+	}
+
+	public function test_a_menu_with_a_personal_entry_is_not_shared_between_members(): void
 	{
 		// Arrange: the footer has nothing personal; the header shows the member's name and unread chats
 		$service = new MenuItemService();
@@ -130,21 +149,16 @@ class SiteMenuCacheTest extends TestCase
 	public function test_on_a_live_site_only_the_sites_own_address_gets_a_kept_menu(): void
 	{
 		// Arrange
-		$service = new MenuItemService();
-		$isKept = fn () => (fn () => $this->isOnOwnHost())->call($service);
 		config(['app.url' => 'https://www.adniro.test']);
-		$from = fn (string $host) => $this->app->instance('request', \Illuminate\Http\Request::create('https://' . $host . '/'));
+		$from = fn (string $host) => \Illuminate\Http\Request::create('https://' . $host . '/');
 
 		// Act & Assert: anywhere but live, any address
-		$from('made-up.example');
-		$this->assertTrue($isKept());
+		$this->assertTrue(\App\Helpers\Common\SiteHost::isOwn($from('made-up.example')));
 
 		$this->app->detectEnvironment(fn () => 'production');
-		$this->assertFalse($isKept());
-		$from('www.adniro.test');
-		$this->assertTrue($isKept());
-		$from('adniro.test');
-		$this->assertTrue($isKept());
+		$this->assertFalse(\App\Helpers\Common\SiteHost::isOwn($from('made-up.example')));
+		$this->assertTrue(\App\Helpers\Common\SiteHost::isOwn($from('www.adniro.test')));
+		$this->assertTrue(\App\Helpers\Common\SiteHost::isOwn($from('adniro.test')));
 	}
 
 	public function test_the_entry_of_the_page_being_looked_at_is_marked_on_that_page_only(): void

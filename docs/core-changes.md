@@ -118,7 +118,7 @@ Stock files we edited.
 
 - `app/Services/MenuItemService.php`
 - `app/Services/Post/List/Search/CategoryTrait.php` (no marker comment)
-- `app/Services/Post/List/Search/SidebarTrait.php` (no marker comment)
+- `app/Services/Post/List/Search/SidebarTrait.php`
 - `app/Services/Post/List/SearchTrait.php`
 - `app/Services/Post/Show/DetailedTrait.php`
 - `app/Services/Post/ShowTrait.php`
@@ -658,7 +658,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (401)
+## Added (403)
 
 Files that are not part of LaraClassifier.
 
@@ -683,6 +683,7 @@ Files that are not part of LaraClassifier.
 - `app/Helpers/Common/ErrorPageMessage.php`
 - `app/Helpers/Common/ListingCardImage.php`
 - `app/Helpers/Common/ListingGrid.php`
+- `app/Helpers/Common/SiteHost.php`
 - `app/Helpers/Services/ListingCounts.php`
 
 ### app/Http
@@ -834,6 +835,7 @@ Files that are not part of LaraClassifier.
 - `app/Services/Chat/ChatTidy.php`
 - `app/Services/Chat/ChatTools.php`
 - `app/Services/Chat/ChatUnread.php`
+- `app/Services/GuestPageStore.php`
 - `app/Services/ListingAssistant/AiPostLimit.php`
 - `app/Services/ListingAssistant/CatalogBuilder.php`
 - `app/Services/ListingAssistant/DraftForForm.php`

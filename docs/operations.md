@@ -89,6 +89,16 @@ Config is deliberately **not** cached: LaraClassifier reads several `.env` value
 
 If an admin changes the listing URL format (Admin > Settings > SEO > permalinks), run `php artisan route:clear && php artisan route:cache`.
 
+## 4b. Speed: what is kept ready
+
+Three things are kept in the cache (Redis) so pages are not rebuilt for every visitor. None needs setting up.
+
+- **Guest pages.** With `GUEST_PAGE_CACHE=true`, a page built for a visitor without a session is kept by Cloudflare for ten minutes, and by the server itself for the same ten minutes (each Cloudflare location has its own cache, so most first visits still reach the server). A change can therefore take up to ten minutes to show to guests. Not kept: anything with a query string other than a page number, pages for visitors with a session or a chosen language, and anything outside the site's own address. An answer from the server's copy carries the header `X-Guest-Store: hit`.
+- **Menus.** The finished header and footer menus are kept for ten minutes (a member's own header, which shows their name, for two). They are dropped at once when a menu entry is saved.
+- **Search sidebar cities.** Kept as the list the page shows.
+
+To drop all of it at once: Admin > "Clear cache", or `php artisan cache:clear` on the server (run as the web user).
+
 ## 5. Health and monitoring
 
 - **Health check:** `GET /health` answers `200` with `{"status":"ok"}` when the database, cache, storage and scheduler all work (and the live chat's socket server, where live chat is on), and `503` otherwise. Point an uptime monitor (UptimeRobot, Better Stack, Pingdom…) at it, checking every 1–5 minutes. "scheduler: fail" means the cron line is missing or not running.

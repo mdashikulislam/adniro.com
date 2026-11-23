@@ -64,4 +64,6 @@ if grep -q '^BROADCAST_DRIVER=reverb' .env; then
 	artisan reverb:restart
 fi
 
-echo "Deployed. Check: curl -s https://$(grep -E '^APP_URL=' .env | sed -E 's#^APP_URL=https?://##')/health"
+# The site's address, with or without quotes around it in .env
+SITE_URL="$(grep -E '^APP_URL=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'"' | sed -E 's#/+$##')"
+echo "Deployed. Check: curl -s ${SITE_URL}/health"

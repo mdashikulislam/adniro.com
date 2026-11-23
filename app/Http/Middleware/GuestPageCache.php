@@ -13,10 +13,15 @@
  *
  * The CSRF token embedded in cached pages is refreshed on demand by
  * public/assets/js/app/guest-cache.js through the "common/csrf-token" endpoint.
+ *
+ * adniro: the server keeps its own copy of these pages too (App\Services\GuestPageStore), for the same time,
+ * and answers from it before anything else runs: each CDN location has its own cache, so most first visits
+ * to a page still reached the server.
  */
 
 namespace App\Http\Middleware;
 
+use App\Services\GuestPageStore;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +32,16 @@ class GuestPageCache
 	 * Seconds a guest page may be kept by the CDN
 	 */
 	public const EDGE_TTL = 600;
+	
+	/**
+	 * adniro: the least time the CDN is given for a page answered from the server's own copy
+	 */
+	public const STORED_MIN_TTL = 30;
+	
+	/**
+	 * adniro: cookies that change what a guest's page shows (SetDefaultLocale, Localization\Country)
+	 */
+	protected const PERSONAL_COOKIES = ['langCode', 'ipCountryCode'];
 	
 	/**
 	 * Request attribute set when the current request is a cacheable guest page view
@@ -55,6 +70,14 @@ class GuestPageCache
 		$isCacheable = $this->isCacheableGuestRequest($request);
 		
 		if ($isCacheable) {
+			// adniro: the page was built for another guest a moment ago: the same page, without building it.
+			// Never for a request that already has a member on it: a signed-in visitor always carries a
+			// session cookie and is turned away above, but a member can be set without one (tests do)
+			$kept = auth()->hasUser() ? null : GuestPageStore::get($request);
+			if ($kept !== null) {
+				return $this->fromStore($request, $kept);
+			}
+			
 			$request->attributes->set(self::ATTRIBUTE, true);
 			
 			// Keep the session in memory only: nothing is written to Redis for cookie-less guests
@@ -87,8 +110,33 @@ class GuestPageCache
 		// Conditional requests: crawlers (Googlebot...) send back the ETag they got, and an
 		// unchanged page is answered with an empty "304 Not Modified" instead of the full HTML
 		$this->setEtag($response);
+		GuestPageStore::put($request, $response); // adniro: before an unchanged page is emptied into a "304"
 		$response->isNotModified($request);
 
+		return $response;
+	}
+
+	/**
+	 * adniro: the answer from the server's own copy: the same page and headers, and the CDN may keep it only
+	 * for the time the copy has left, so a page is never older than EDGE_TTL in all.
+	 *
+	 * @param array{content: string, headers: array<string, array<int, string>>, etag: ?string, age: int} $kept
+	 */
+	protected function fromStore(Request $request, array $kept): Response
+	{
+		$request->attributes->set(self::ATTRIBUTE, true);
+		
+		$response = new \Illuminate\Http\Response($kept['content'], 200, $kept['headers']);
+		$secondsLeft = max(self::STORED_MIN_TTL, self::EDGE_TTL - $kept['age']);
+		$response->headers->set('Cache-Control', 'public, max-age=0, s-maxage=' . $secondsLeft . ', stale-while-revalidate=60');
+		$response->headers->set('Vary', 'Accept-Encoding');
+		$response->headers->set('X-Guest-Cache', 'cacheable');
+		$response->headers->set('X-Guest-Store', 'hit');
+		if (!empty($kept['etag'])) {
+			$response->headers->set('ETag', $kept['etag']);
+		}
+		$response->isNotModified($request);
+		
 		return $response;
 	}
 
@@ -136,6 +184,9 @@ class GuestPageCache
 				$cookieName === $sessionCookie
 				|| str_starts_with($cookieName, 'remember_web')
 				|| str_starts_with($cookieName, 'remember_')
+				// adniro: a language the visitor chose, or a country worked out from their IP: their page is
+				// not everybody's page
+				|| in_array($cookieName, self::PERSONAL_COOKIES, true)
 			) {
 				return false;
 			}

@@ -17,6 +17,7 @@
 namespace App\Services;
 
 use App\Helpers\Common\PaginationHelper;
+use App\Helpers\Common\SiteHost;
 use App\Http\Requests\Admin\MenuItemRequest;
 use App\Http\Resources\EntityCollection;
 use App\Http\Resources\MenuItemResource;
@@ -34,6 +35,9 @@ class MenuItemService extends BaseService
 {
 	/** adniro: how long a finished site menu is kept (getSiteMenu) */
 	private const SITE_MENU_SECONDS = 600;
+	
+	/** adniro: how long a member's own menu is kept, when it has something personal in it */
+	private const PERSONAL_MENU_SECONDS = 120;
 	
 	/** adniro: entries whose label or link is the member's own: unread chats, where they post a listing */
 	private const PERSONAL_ROUTES = [
@@ -64,9 +68,9 @@ class MenuItemService extends BaseService
 	 * - which entry is the page being looked at (it is marked as current).
 	 * - the settings its links and looks are drawn from (header, footer, sign-in pop-up, who may post).
 	 * It is forgotten with the menu entries themselves (same cache group), and after ten minutes in any case.
-	 * A member's menu is built each time, as before, when one of its entries is personal: it shows the
-	 * member's name or their unread chat count, links to where this member posts a listing, or depends on a
-	 * role or a permission (isPersonalEntry). On a live site a menu is only kept for the site's own address.
+	 * A member's menu with a personal entry in it (it shows the member's name or their unread chat count, links
+	 * to where this member posts a listing, or depends on a role or a permission: isPersonalEntry) is kept
+	 * for that member alone, for two minutes. On a live site a menu is only kept for the site's own address.
 	 *
 	 * @param string $location
 	 * @param array $params
@@ -77,9 +81,17 @@ class MenuItemService extends BaseService
 		$menuItems = $this->cachedEntries($location, null, $params);
 		$build = fn () => getServiceData($this->entriesResponse($menuItems, $params));
 		
-		$visitor = $this->visitorKind($menuItems);
-		if ($visitor === null || !$this->isOnOwnHost()) {
+		if (!SiteHost::isOwn()) {
 			return $build();
+		}
+		
+		$visitor = $this->visitorKind($menuItems);
+		$seconds = self::SITE_MENU_SECONDS;
+		if ($visitor === null) {
+			// A menu with something personal in it is kept for that member alone, and briefly: their name,
+			// roles or package can change (the unread chat count is put right by the page's own script)
+			$visitor = 'member:' . auth()->id() . ($this->isImpersonating() ? ':as' : '');
+			$seconds = self::PERSONAL_MENU_SECONDS;
 		}
 		
 		$cacheParams = array_merge($params, [
@@ -101,12 +113,26 @@ class MenuItemService extends BaseService
 			])),
 		]);
 		
-		return caching()->remember(MenuItem::class, $cacheParams, $build, self::SITE_MENU_SECONDS);
+		return caching()->remember(MenuItem::class, $cacheParams, $build, $seconds);
+	}
+	
+	/**
+	 * adniro: an admin looking at the site as a member gets a menu of their own ("Leave" instead of "Log Out")
+	 *
+	 * @return bool
+	 */
+	private function isImpersonating(): bool
+	{
+		try {
+			return (bool)app('impersonate')->isImpersonating();
+		} catch (\Throwable $e) {
+			return false;
+		}
 	}
 	
 	/**
 	 * adniro: "guest" or "member" when every visitor of that kind sees the same menu; null for a member whose
-	 * menu has a personal entry, which differs from one member to the next.
+	 * menu has a personal entry, which differs from one member to the next (it is then kept per member).
 	 *
 	 * @param iterable $menuItems
 	 * @return string|null
@@ -145,24 +171,6 @@ class MenuItemService extends BaseService
 			|| !empty(array_intersect($conditions, ['role', 'permission', 'impersonating', 'authentic']))
 			|| str_contains((string)$menuItem->getRawOriginal('label'), '{user.')
 			|| in_array($menuItem->route_name, self::PERSONAL_ROUTES, true);
-	}
-	
-	/**
-	 * adniro: a menu's links carry the address the visitor came by. On a live site only the site's own
-	 * address (with or without "www") gets a kept menu, so made-up host names cannot fill the cache.
-	 *
-	 * @return bool
-	 */
-	private function isOnOwnHost(): bool
-	{
-		if (!app()->isProduction()) {
-			return true;
-		}
-		
-		$withoutWww = fn (?string $host) => preg_replace('/^www\./', '', strtolower((string)$host));
-		$ownHost = $withoutWww(parse_url((string)config('app.url'), PHP_URL_HOST) ?: '');
-		
-		return $ownHost !== '' && $withoutWww(request()->getHost()) === $ownHost;
 	}
 	
 	/**

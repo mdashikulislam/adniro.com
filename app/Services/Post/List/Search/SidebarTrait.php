@@ -130,6 +130,9 @@ trait SidebarTrait
 			'country' => config('country.code'),
 			'cityIds' => implode(',', $topCityIds),
 			'limit'   => $limit,
+			// adniro: kept as plain arrays, in the language they are shown in (see below)
+			'locale'  => app()->getLocale(),
+			'form'    => 'array',
 		];
 		
 		$cities = caching()->remember(City::class, $cacheParams, function () use ($topCityIds, $limit) {
@@ -151,16 +154,17 @@ trait SidebarTrait
 				$cities = $cities->concat($moreCities)->values();
 			}
 			
-			return $cities;
+			// adniro: the cities are kept as the arrays the page uses. They were kept as models and turned
+			// into arrays (translated name, slug) on every search: fifty at a time, a quarter of the page's time
+			return $cities->map(fn ($city) => $city->toArray())->all();
 		});
 		
 		// Live listings counts (in the category)
-		return $cities->map(function ($city) use ($listingsPerCity) {
-			$city = $city->toArray();
+		return array_map(function (array $city) use ($listingsPerCity) {
 			$city['posts_count'] = $listingsPerCity[$city['id']] ?? 0;
 			
 			return $city;
-		})->all();
+		}, (array)$cities);
 	}
 	
 	/**
