@@ -657,7 +657,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (398)
+## Added (401)
 
 Files that are not part of LaraClassifier.
 
@@ -1045,6 +1045,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/chat-messages.css`
 - `public/assets/css/chat-offers.css`
 - `public/assets/css/chat-photos.css`
+- `public/assets/css/chat-quick.css`
 - `public/assets/css/chat-tidy.css`
 - `public/assets/css/chat.css`
 - `public/assets/css/listing-form-ai.css`
@@ -1066,6 +1067,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/js/app/chat-photo.js`
 - `public/assets/js/app/chat-presence.js`
 - `public/assets/js/app/chat-privacy.js`
+- `public/assets/js/app/chat-quick.js`
 - `public/assets/js/app/chat-reply.js`
 - `public/assets/js/app/chat-safety.js`
 - `public/assets/js/app/chat-settings.js`
@@ -1173,6 +1175,7 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/post/createOrEdit/form/sections/photos.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/price-location.blade.php`
 - `resources/views/front/post/createOrEdit/form/sections/what.blade.php`
+- `resources/views/front/post/show/partials/chat-quick.blade.php`
 - `resources/views/front/post/show/partials/email-seller.blade.php`
 - `resources/views/front/search/partials/content.blade.php`
 - `resources/views/front/search/partials/posts/empty.blade.php`

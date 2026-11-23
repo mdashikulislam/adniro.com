@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'भुगतान से पहले सामान जाँच लें',
 	'safety_tip_never' => 'कभी अग्रिम राशि न भेजें और फ़ोन पर आए कोड किसी को न बताएँ',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'चैट',
+	'quick_about' => 'इस विज्ञापन के बारे में',
+	'quick_full' => 'पूरी चैट खोलें',
+	'quick_send' => 'संदेश भेजें',
+	'quick_sent_title' => 'संदेश भेज दिया गया',
+	'quick_sent_text' => ':name को यह तुरंत मिल जाएगा। जवाब आपकी चैट में आएगा।',
+	'quick_open_chat' => 'चैट खोलें',
+	'quick_keep' => 'देखना जारी रखें',
+	'quick_failed' => 'संदेश नहीं भेजा जा सका। फिर कोशिश करें।',
+
 	'js' => [
 		'you'             => 'आप',
 		'photo'           => 'फ़ोटो',

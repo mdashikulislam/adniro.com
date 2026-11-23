@@ -1,0 +1,438 @@
+/*
+ * adniro: "Chat with seller" as a pop-up on a listing's page (front/post/show/partials/chat-quick.blade.php,
+ * assets/js/app/chat-quick.js). A teal head with the seller, the listing, ready questions, the message box,
+ * and an amber foot with the promise that Adniro never asks for a code or a payment in a chat.
+ * White text sits on the deep teal only (5.47:1), as in the chat itself.
+ */
+.adn-quick {
+	--adn-quick-bg: var(--bs-body-bg);
+	--adn-quick-text: var(--bs-body-color);
+	--adn-quick-muted: #5c6470;
+	--adn-quick-surface: #f1f5f4;
+	--adn-quick-border: var(--bs-border-color);
+	--adn-quick-accent: var(--bs-primary, #0d9488);
+	--adn-quick-accent-strong: #0f766e;
+	--adn-quick-accent-text: #0f766e;
+	--adn-quick-accent-soft: #e6f6f4;
+	--adn-quick-danger: #c62f2f;
+	--adn-quick-warning-bg: #fff7e0;
+	--adn-quick-warning-text: #6b4e00;
+	--adn-quick-warning-border: #f0dc9c;
+}
+
+[data-bs-theme="dark"] .adn-quick {
+	--adn-quick-muted: #aab1b8;
+	--adn-quick-surface: #2b3035;
+	--adn-quick-accent-text: #2dd4bf;
+	--adn-quick-accent-soft: #17363a;
+	--adn-quick-danger: #f08a8a;
+	--adn-quick-warning-bg: #3a3115;
+	--adn-quick-warning-text: #f3dc9a;
+	--adn-quick-warning-border: #5c4c1d;
+}
+
+.adn-quick .modal-dialog {
+	max-width: 440px;
+}
+
+.adn-quick .modal-content {
+	border: 0;
+	border-radius: 22px;
+	color: var(--adn-quick-text);
+	background-color: var(--adn-quick-bg);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, .08), 0 28px 60px -20px rgba(15, 118, 110, .55);
+	overflow: hidden;
+}
+
+.adn-quick [hidden] {
+	display: none !important;
+}
+
+/* ---------- Head: who the message goes to ---------- */
+.adn-quick-head {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: .8rem;
+	padding: 1.1rem 1.1rem 1.6rem;
+	color: #fff;
+	background:
+		radial-gradient(120% 140% at 100% 0%, rgba(45, 212, 191, .55), transparent 55%),
+		linear-gradient(135deg, #0f766e, #115e59);
+}
+
+/* The body's rounded top edge rises over the head */
+.adn-quick-head::after {
+	content: "";
+	position: absolute;
+	inset: auto 0 -1px;
+	height: 18px;
+	border-radius: 18px 18px 0 0;
+	background-color: var(--adn-quick-bg);
+}
+
+.adn-quick-avatar {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	font-size: 1.1rem;
+	font-weight: 800;
+	color: var(--adn-quick-accent-strong);
+	background-color: #fff;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, .28);
+	overflow: hidden;
+}
+
+.adn-quick-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.adn-quick-who {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.25;
+}
+
+.adn-quick-eyebrow {
+	font-size: .6875rem;
+	font-weight: 700;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: #d5f0ec;
+}
+
+.adn-quick-who strong {
+	overflow: hidden;
+	font-size: 1.1rem;
+	font-weight: 800;
+	text-align: match-parent;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-quick-close {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	font-size: .9rem;
+	color: #fff;
+	background-color: rgba(255, 255, 255, .16);
+	transition: background-color .12s ease, transform .12s ease;
+}
+
+.adn-quick-close:hover {
+	background-color: rgba(255, 255, 255, .28);
+}
+
+.adn-quick-close:active {
+	transform: scale(.96);
+}
+
+.adn-quick-close:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+/* ---------- Body ---------- */
+.adn-quick-body {
+	display: flex;
+	flex-direction: column;
+	gap: .85rem;
+	padding: .2rem 1.1rem 1.1rem;
+}
+
+.adn-quick-listing {
+	display: flex;
+	align-items: center;
+	gap: .7rem;
+	padding: .55rem;
+	border: 1px solid var(--adn-quick-border);
+	border-radius: 14px;
+}
+
+.adn-quick-listing-photo {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	border-radius: 10px;
+	font-size: 1.2rem;
+	color: var(--adn-quick-muted);
+	background-color: var(--adn-quick-surface);
+	overflow: hidden;
+}
+
+.adn-quick-listing-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .08);
+	outline-offset: -1px;
+	border-radius: inherit;
+}
+
+.adn-quick-listing-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.3;
+}
+
+.adn-quick-listing-text span {
+	font-size: .6875rem;
+	font-weight: 600;
+	color: var(--adn-quick-muted);
+}
+
+.adn-quick-listing-text strong {
+	overflow: hidden;
+	font-size: .9rem;
+	font-weight: 700;
+	text-align: match-parent;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-quick-listing-text em {
+	font-size: .85rem;
+	font-style: normal;
+	font-weight: 800;
+	color: var(--adn-quick-accent-text);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Ready questions: one tap puts the words in the message box */
+.adn-quick-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .4rem;
+}
+
+.adn-quick-chips button {
+	min-height: 34px;
+	padding: .3rem .8rem;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: var(--adn-quick-accent-text);
+	background-color: var(--adn-quick-accent-soft);
+	transition: border-color .12s ease, transform .12s ease;
+}
+
+.adn-quick-chips button:hover {
+	border-color: var(--adn-quick-accent);
+}
+
+.adn-quick-chips button:active {
+	transform: scale(.96);
+}
+
+.adn-quick-input {
+	display: block;
+	width: 100%;
+	min-height: 96px;
+	padding: .7rem .85rem;
+	border: 1.5px solid transparent;
+	border-radius: 16px;
+	font-size: .9375rem;
+	line-height: 1.45;
+	color: var(--adn-quick-text);
+	background-color: var(--adn-quick-surface);
+	resize: none;
+	transition: border-color .12s ease, background-color .12s ease, box-shadow .12s ease;
+}
+
+.adn-quick-input::placeholder {
+	color: var(--adn-quick-muted);
+}
+
+.adn-quick-input:focus {
+	border-color: var(--adn-quick-accent);
+	background-color: var(--adn-quick-bg);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--adn-quick-accent) 18%, transparent);
+	outline: none;
+}
+
+.adn-quick-error {
+	margin: -.35rem 0 0;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: var(--adn-quick-danger);
+}
+
+.adn-quick-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+}
+
+.adn-quick-link {
+	padding: .4rem .2rem;
+	border: 0;
+	font-size: .85rem;
+	font-weight: 700;
+	color: var(--adn-quick-accent-text);
+	background: transparent;
+	text-decoration: none;
+}
+
+.adn-quick-link:hover {
+	color: var(--adn-quick-accent-text);
+	text-decoration: underline;
+}
+
+.adn-quick-send {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .5rem;
+	min-height: 46px;
+	padding: .5rem 1.25rem;
+	border: 0;
+	border-radius: 999px;
+	font-size: .9375rem;
+	font-weight: 700;
+	color: #fff;
+	background: linear-gradient(135deg, #0f766e, #115e59);
+	box-shadow: 0 10px 20px -10px rgba(15, 118, 110, .9), inset 0 1px 0 rgba(255, 255, 255, .22);
+	text-decoration: none;
+	white-space: nowrap;
+	transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+
+.adn-quick-send:hover {
+	color: #fff;
+	box-shadow: 0 14px 24px -10px rgba(15, 118, 110, .95), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+.adn-quick-send:active {
+	transform: scale(.96);
+}
+
+.adn-quick-send:disabled {
+	opacity: .45;
+	box-shadow: none;
+}
+
+.adn-quick-link:focus-visible,
+.adn-quick-send:focus-visible,
+.adn-quick-chips button:focus-visible {
+	outline: 2px solid var(--adn-quick-accent);
+	outline-offset: 2px;
+}
+
+.adn-quick.is-sending .adn-quick-send i {
+	animation: adnQuickFly .7s ease-in-out infinite alternate;
+}
+
+/* ---------- After the message has gone ---------- */
+.adn-quick-sent {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .35rem;
+	padding: .4rem 1.1rem 1.1rem;
+	text-align: center;
+}
+
+.adn-quick-sent:focus {
+	outline: none;
+}
+
+.adn-quick-sent-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	height: 60px;
+	margin-bottom: .35rem;
+	border-radius: 50%;
+	font-size: 1.7rem;
+	color: #fff;
+	background: linear-gradient(140deg, #14b8a6, #0f766e);
+	box-shadow: 0 0 0 8px var(--adn-quick-accent-soft);
+	animation: adnQuickPop .35s cubic-bezier(.2, .8, .2, 1);
+}
+
+.adn-quick-sent strong {
+	font-size: 1.15rem;
+	font-weight: 800;
+}
+
+.adn-quick-sent p {
+	max-width: 30ch;
+	margin: 0 0 .8rem;
+	font-size: .875rem;
+	color: var(--adn-quick-muted);
+	text-wrap: balance;
+}
+
+.adn-quick-sent .adn-quick-actions {
+	width: 100%;
+}
+
+/* ---------- Foot ---------- */
+.adn-quick-never {
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	margin: 0;
+	padding: .6rem 1.1rem;
+	border-top: 1px solid var(--adn-quick-warning-border);
+	font-size: .75rem;
+	font-weight: 700;
+	line-height: 1.35;
+	color: var(--adn-quick-warning-text);
+	background-color: var(--adn-quick-warning-bg);
+	text-wrap: pretty;
+}
+
+@keyframes adnQuickPop {
+	from {
+		opacity: 0;
+		transform: scale(.6);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes adnQuickFly {
+	to {
+		transform: translate(3px, -3px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-quick-sent-icon,
+	.adn-quick.is-sending .adn-quick-send i {
+		animation: none;
+	}
+
+	.adn-quick-close,
+	.adn-quick-chips button,
+	.adn-quick-input,
+	.adn-quick-send {
+		transition: none;
+	}
+}

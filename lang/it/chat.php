@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'Controlla l\'articolo prima di pagare',
 	'safety_tip_never' => 'Non inviare mai un acconto e non condividere i codici ricevuti sul telefono',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'Chatta',
+	'quick_about' => 'Su questo annuncio',
+	'quick_full' => 'Apri la chat completa',
+	'quick_send' => 'Invia messaggio',
+	'quick_sent_title' => 'Messaggio inviato',
+	'quick_sent_text' => ':name lo riceve subito. La risposta arriverà nelle tue chat.',
+	'quick_open_chat' => 'Apri la chat',
+	'quick_keep' => 'Continua a navigare',
+	'quick_failed' => 'Impossibile inviare il messaggio. Riprova.',
+
 	'js' => [
 		'you'             => 'Tu',
 		'photo'           => 'Foto',

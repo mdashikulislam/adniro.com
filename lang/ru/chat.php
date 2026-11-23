@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'Проверьте товар перед оплатой',
 	'safety_tip_never' => 'Никогда не отправляйте предоплату и не сообщайте коды из SMS',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'Чат',
+	'quick_about' => 'Об этом объявлении',
+	'quick_full' => 'Открыть весь чат',
+	'quick_send' => 'Отправить сообщение',
+	'quick_sent_title' => 'Сообщение отправлено',
+	'quick_sent_text' => ':name получит его сразу. Ответ появится в ваших чатах.',
+	'quick_open_chat' => 'Открыть чат',
+	'quick_keep' => 'Продолжить просмотр',
+	'quick_failed' => 'Не удалось отправить сообщение. Попробуйте ещё раз.',
+
 	'js' => [
 		'you'             => 'Вы',
 		'photo'           => 'Фото',

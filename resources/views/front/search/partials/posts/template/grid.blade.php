@@ -78,6 +78,14 @@
 							</a>
 						@endif
 						
+						{{-- adniro: chat with the seller: opens the listing with its chat pop-up (a guest signs in there).
+						     Not shown on my own listing, nor where there is nobody to chat with --}}
+						@if (!empty(chatStartUrl($post)))
+							<a href="{{ $postUrl }}#chat" class="listing-chat" aria-label="{{ trans('chat.chat_with_seller') }}" title="{{ trans('chat.chat_with_seller') }}">
+								<i class="bi bi-chat-dots-fill" aria-hidden="true"></i><span>{{ trans('chat.card_chat') }}</span>
+							</a>
+						@endif
+						
 						@if ($showPostInfo && !config('settings.listings_list.hide_location') && !empty(data_get($post, 'city.name')))
 							<a href="{!! $locationUrl !!}" class="listing-card-location">
 								<i class="bi bi-geo-alt-fill"></i> {{ data_get($post, 'city.name') }}

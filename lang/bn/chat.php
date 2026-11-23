@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'টাকা দেওয়ার আগে জিনিসটি দেখে নিন',
 	'safety_tip_never' => 'কখনো অগ্রিম টাকা পাঠাবেন না, ফোনে আসা কোড কাউকে দেবেন না',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'চ্যাট',
+	'quick_about' => 'এই বিজ্ঞাপন সম্পর্কে',
+	'quick_full' => 'পুরো চ্যাট খুলুন',
+	'quick_send' => 'বার্তা পাঠান',
+	'quick_sent_title' => 'বার্তা পাঠানো হয়েছে',
+	'quick_sent_text' => ':name এটি সঙ্গে সঙ্গে পাবেন। উত্তর আপনার চ্যাটে আসবে।',
+	'quick_open_chat' => 'চ্যাট খুলুন',
+	'quick_keep' => 'ব্রাউজ চালিয়ে যান',
+	'quick_failed' => 'বার্তা পাঠানো যায়নি। আবার চেষ্টা করুন।',
+
 	'js' => [
 		'you'             => 'আপনি',
 		'photo'           => 'ছবি',

@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'افحص السلعة قبل الدفع',
 	'safety_tip_never' => 'لا ترسل عربونًا أبدًا ولا تشارك الرموز المرسلة إلى هاتفك',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'محادثة',
+	'quick_about' => 'عن هذا الإعلان',
+	'quick_full' => 'فتح المحادثة كاملة',
+	'quick_send' => 'إرسال الرسالة',
+	'quick_sent_title' => 'تم إرسال الرسالة',
+	'quick_sent_text' => 'تصل إلى :name فورًا. ستجد الرد في محادثاتك.',
+	'quick_open_chat' => 'فتح المحادثة',
+	'quick_keep' => 'متابعة التصفح',
+	'quick_failed' => 'تعذّر إرسال الرسالة. حاول مرة أخرى.',
+
 	'js' => [
 		'you'             => 'أنت',
 		'photo'           => 'صورة',

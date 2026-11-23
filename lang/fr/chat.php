@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'Vérifiez l\'article avant de payer',
 	'safety_tip_never' => 'N\'envoyez jamais d\'acompte et ne partagez jamais les codes reçus sur votre téléphone',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'Discuter',
+	'quick_about' => 'À propos de cette annonce',
+	'quick_full' => 'Ouvrir la discussion complète',
+	'quick_send' => 'Envoyer le message',
+	'quick_sent_title' => 'Message envoyé',
+	'quick_sent_text' => ':name le reçoit tout de suite. La réponse arrivera dans vos discussions.',
+	'quick_open_chat' => 'Ouvrir la discussion',
+	'quick_keep' => 'Continuer à parcourir',
+	'quick_failed' => 'Le message n\'a pas pu être envoyé. Réessayez.',
+
 	'js' => [
 		'you'             => 'Vous',
 		'photo'           => 'Photo',

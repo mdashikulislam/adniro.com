@@ -34,6 +34,32 @@ Chat with seller button (C1)
   tokens    solid: bg accent-strong, text on-accent, radius pill, 44px high, sm/700
   a11y      a real link to /chat/new/{listing}; the label says "Chat with seller"
 
+Chat button on a listing card (C1)
+  where     on the card's photo, under the save button; not on my own listing, nor where there is nobody to
+            chat with (a listing posted without a member account)
+  look      a 34px round button, teal gradient (#14b8a6 to #0f766e), white chat icon, soft teal shadow; where
+            there is a mouse it opens into a pill with the word "Chat"; pressed scale .96
+  action    goes to the listing's page, which opens the chat pop-up (the address ends in #chat); a guest gets
+            the sign-in pop-up there
+  a11y      a real link named "Chat with seller"; white focus ring
+
+Chat pop-up on the listing's page (C1)
+  opens     only from a listing card's chat button; the page's own "Chat with seller" buttons go to the chat,
+            as before
+  head      deep teal gradient with a lighter glow in one corner: the seller's photo or initial in a white
+            ring, "CHAT WITH SELLER" (xs caps), the seller's name (18/800), a round close button; the white
+            body rises over it with a rounded edge
+  body      the listing (photo 52, "About this listing", title, price) · the four ready questions as
+            accent-soft pills (a tap puts the words in the box) · the message box (surface, radius 16, teal
+            ring on focus) · "Open full chat" link and the "Send message" pill (deep teal gradient)
+  foot      amber strip with a lock: "Adniro will never ask you for a code, a password or a payment in a chat."
+  states    empty (Send disabled), sending (the plane moves), error under the box (too fast, blocked, chat
+            off), sent: a teal check in a soft ring, "Message sent", who gets it, "Keep browsing" and
+            "Open chat"; closing it brings the message box back for next time
+  keys      Enter sends on a computer, Shift + Enter makes a new line; the box has the focus when it opens
+            (not on a phone, where the keyboard waits for a tap)
+  a11y      Bootstrap modal named by its title; errors are role="alert"; text keeps its own direction
+
 Email the seller button and dialog (C1)
   when      the listing was posted without a member account: there is nobody to chat with
   button    takes the place of "Chat with seller", same shape, envelope icon; a guest gets the sign-in pop-up

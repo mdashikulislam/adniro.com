@@ -166,6 +166,17 @@ return [
 	'safety_tip_check' => 'Check the item before you pay',
 	'safety_tip_never' => 'Never send a deposit or share codes sent to your phone',
 
+	// The chat button on a listing card and the chat pop-up on the listing's page
+	'card_chat' => 'Chat',
+	'quick_about' => 'About this listing',
+	'quick_full' => 'Open full chat',
+	'quick_send' => 'Send message',
+	'quick_sent_title' => 'Message sent',
+	'quick_sent_text' => ':name gets it right away. The answer will be in your chats.',
+	'quick_open_chat' => 'Open chat',
+	'quick_keep' => 'Keep browsing',
+	'quick_failed' => 'The message could not be sent. Try again.',
+
 	'js' => [
 		'you'             => 'You',
 		'photo'           => 'Photo',

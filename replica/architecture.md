@@ -360,6 +360,11 @@ Not done: A10 (the old attachment's direct link), which needs a change on the li
   photo in a new tab. What was sent is still delivered when the member leaves the chat before it has gone.
 - **Safety card.** The reminder at the top of a conversation is a full-width card: three habits side by
   side, a link to the safety tips, and the promise that Adniro never asks for a code or a payment in a chat.
+- **Chat from a listing card.** A card has a chat button (`chatStartUrl()` decides, as for the page's own
+  button). It goes to the listing's page with `#chat`, where a pop-up sends the first message
+  (`front/post/show/partials/chat-quick.blade.php`, `chat-quick.js`, `POST chat/listings/{post}`, the route
+  the chat page uses). The page's own "Chat with seller" buttons are unchanged: they go to the chat. A guest
+  gets the sign-in pop-up. The card's style is in `resources/css/front/custom.css`, built into `public/dist/front/`.
 - **Screen readers and keyboard.** The list of chats and the message log are no longer live regions (they
   are redrawn at every change, which read everything out again). One hidden status line says what is new:
   the message that arrived in the open chat, "New message from…" elsewhere, how many chats a search found.

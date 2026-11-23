@@ -193,6 +193,63 @@ class ChatPagesTest extends ChatTestCase
 		$this->assertSame('', genEmailContactBtn($this->listing, true));
 	}
 
+	public function test_a_listing_card_has_a_chat_button_that_opens_the_listing_with_its_chat_pop_up(): void
+	{
+		// Arrange
+		$card = '~<a href="[^"]+#chat" class="listing-chat" aria-label="Chat with seller"~';
+		$found = fn () => $this->get('/us/search?q=sofa')->assertOk()->assertSee('Grey corner sofa')->getContent();
+
+		// Act
+		$forGuest = $found();
+		$forMember = $this->actingAs($this->buyer)->get('/us/search?q=sofa')->getContent();
+		$forOwner = $this->actingAs($this->seller)->get('/us/search?q=sofa')->getContent();
+
+		// Assert: a guest signs in on the listing's page; nobody chats with themselves
+		$this->assertMatchesRegularExpression($card, $forGuest);
+		$this->assertMatchesRegularExpression($card, $forMember);
+		$this->assertDoesNotMatchRegularExpression($card, $forOwner);
+	}
+
+	public function test_a_listing_posted_without_an_account_has_no_chat_button_on_its_card(): void
+	{
+		// Arrange: nobody to chat with
+		$this->stockListing('Oak dining table', ['user_id' => null, 'email' => 'guest-seller@example.test']);
+
+		// Act
+		$html = $this->actingAs($this->buyer)->get('/us/search?q=oak')->assertOk()->assertSee('Oak dining table')->getContent();
+
+		// Assert
+		$this->assertStringNotContainsString('class="listing-chat"', $html);
+	}
+
+	public function test_the_listing_page_has_the_chat_pop_up_for_members_only(): void
+	{
+		// Arrange
+		$url = urlGen()->post($this->listing);
+
+		// Act
+		$forGuest = $this->get($url)->assertOk()->getContent();
+		$forMember = $this->actingAs($this->buyer)->get($url)->assertOk()->getContent();
+		$forOwner = $this->actingAs($this->seller)->get($url)->assertOk()->getContent();
+
+		// Assert: the member writes from the page; the first message goes to the chat's own route
+		$this->assertStringContainsString('id="adnChatQuick"', $forMember);
+		$this->assertStringContainsString('data-start-url="' . route('chat.start', ['post' => $this->listing->id]) . '"', $forMember);
+		// The page's own button is left as it was: a link to the chat
+		$this->assertStringContainsString('href="' . route('chat.new', ['post' => $this->listing->id]) . '" class="btn btn-primary adn-chat-start', $forMember);
+		$this->assertSame(4, substr_count($forMember, 'data-quick-chip'));
+		$this->assertStringContainsString('Adniro will never ask you for a code, a password or a payment in a chat.', $forMember);
+		$this->assertStringContainsString('assets/js/app/chat-quick.js', $forMember);
+		$this->assertStringContainsString('assets/css/chat-quick.css', $forMember);
+		// A guest gets the sign-in pop-up from the same address (#chat), so only the script
+		$this->assertStringNotContainsString('id="adnChatQuick"', $forGuest);
+		$this->assertStringContainsString('assets/js/app/chat-quick.js', $forGuest);
+		$this->assertStringContainsString('id="quickLogin"', $forGuest);
+		// The owner gets neither
+		$this->assertStringNotContainsString('id="adnChatQuick"', $forOwner);
+		$this->assertStringNotContainsString('chat-quick.js', $forOwner);
+	}
+
 	public function test_a_conversation_shows_a_safety_reminder_linking_to_the_tips_page(): void
 	{
 		// Arrange

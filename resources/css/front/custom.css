@@ -1114,6 +1114,76 @@
 	background-color: #c81e52;
 }
 
+/*
+ * adniro: chat with the seller, under the save button. A teal round button; where there is a mouse it opens
+ * into a pill with its word. It goes to the listing, which opens its chat pop-up (assets/js/app/chat-quick.js).
+ */
+.listing-card .listing-chat {
+	position: absolute;
+	top: 52px;
+	right: 10px;
+	z-index: 3;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 34px;
+	height: 34px;
+	padding: 0 9px;
+	border-radius: 999px;
+	color: #fff;
+	font-size: .8rem;
+	font-weight: 700;
+	line-height: 1;
+	text-decoration: none;
+	white-space: nowrap;
+	background: linear-gradient(140deg, #14b8a6, #0f766e);
+	box-shadow: 0 4px 12px rgba(15, 118, 110, .45), inset 0 1px 0 rgba(255, 255, 255, .28);
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.listing-card .listing-chat i {
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.listing-card .listing-chat span {
+	max-width: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: max-width .25s ease, margin .25s ease, opacity .2s ease;
+}
+
+@media (hover: hover) {
+	.listing-card .listing-chat:hover,
+	.listing-card .listing-chat:focus-visible {
+		color: #fff;
+		box-shadow: 0 8px 18px rgba(15, 118, 110, .5), inset 0 1px 0 rgba(255, 255, 255, .28);
+	}
+
+	.listing-card .listing-chat:hover span,
+	.listing-card .listing-chat:focus-visible span {
+		max-width: 7rem;
+		margin-left: .4rem;
+		opacity: 1;
+	}
+}
+
+.listing-card .listing-chat:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+.listing-card .listing-chat:active {
+	transform: scale(.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.listing-card .listing-chat,
+	.listing-card .listing-chat span {
+		transition: none;
+	}
+}
+
 /* Body */
 .listing-card-body {
 	display: flex;
