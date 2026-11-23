@@ -39,7 +39,7 @@ class PaginationSetting extends BaseSetting
 			'subscriptions_per_page'     => 10,
 			'threads_per_page'           => 20,
 			'threads_messages_per_page'  => 10,
-			'similar_posts_limit'        => 4,
+			'similar_posts_limit'        => 5, // adniro: a full row of "Similar Listings" (5 per row)
 			'categories_limit'           => 50,
 			'cities_limit'               => 50,
 			'auto_complete_cities_limit' => 25,

@@ -11214,3 +11214,25 @@ a.listing-step-link:hover {
 	.swal2-container.swal2-top-end { left: 12px; right: 12px; }
 	.swal2-container.swal2-top-end .swal2-popup.swal2-toast { width: auto !important; }
 }
+
+/*
+ * adniro: "Similar Listings" under a listing never ends on a card alone in its row. Five fill the row on wide
+ * screens; where the grid has fewer columns, the one that would be left over is not shown.
+ */
+@media (max-width: 767.98px) {
+	.similar-listings .row-cols-2 > .item-list:last-child:nth-child(2n+1):not(:first-child) {
+		display: none !important;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+	.similar-listings .row-cols-md-3 > .item-list:last-child:nth-child(3n+1):not(:first-child) {
+		display: none !important;
+	}
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+	.similar-listings .row-cols-lg-4 > .item-list:last-child:nth-child(4n+1):not(:first-child) {
+		display: none !important;
+	}
+}

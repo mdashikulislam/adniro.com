@@ -51,9 +51,10 @@ trait SimilarByCategory
 			$postsTable . '.created_at',
 			$postsTable . '.archived_at',
 		];
+		// adniro: the site's listing card shows an excerpt and, for a member's listing, the chat icon
+		$select[] = $postsTable . '.description';
+		$select[] = 'user_id';
 		if (isFromApi() && !doesRequestIsFromWebClient()) {
-			$select[] = $postsTable . '.description';
-			$select[] = 'user_id';
 			$select[] = 'contact_name';
 			$select[] = $postsTable . '.auth_field';
 			$select[] = $postsTable . '.phone';

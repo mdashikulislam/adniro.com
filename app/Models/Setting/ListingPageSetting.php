@@ -16,6 +16,8 @@
 
 namespace App\Models\Setting;
 
+use App\Helpers\Common\ListingGrid; // adniro
+
 /*
  * settings.listing_page.option
  */
@@ -31,6 +33,7 @@ class ListingPageSetting extends BaseSetting
 			'pictures_slider'              => 'swiper-horizontal',
 			'similar_listings'             => '1',
 			'similar_listings_in_carousel' => '1',
+			ListingGrid::SIMILAR_SETTING => (string)ListingGrid::SIMILAR_DEFAULT_COLUMNS, // adniro
 			'date_from_now'                => $value['elapsed_time_from_now'] ?? null, // from old saved value
 		];
 		
@@ -242,6 +245,8 @@ class ListingPageSetting extends BaseSetting
 			'newline' => true,
 			'tab'     => $tabName,
 		];
+		// adniro: listings per row in "Similar Listings" (used when it is not a carousel)
+		$fields[] = ListingGrid::similarField($tabName);
 		
 		$tabName = trans('admin.single_html_external_services');
 		if (self::getPanelTabsType() == 'vertical') {

@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (261)
+## Changed (263)
 
 Stock files we edited.
 
@@ -85,15 +85,17 @@ Stock files we edited.
 - `app/Models/Category.php` (no marker comment)
 - `app/Models/MenuItem.php`
 - `app/Models/Post.php`
-- `app/Models/Post/SimilarByCategory.php` (no marker comment)
-- `app/Models/Post/SimilarByLocation.php` (no marker comment)
+- `app/Models/Post/SimilarByCategory.php`
+- `app/Models/Post/SimilarByLocation.php`
 - `app/Models/Scopes/ReviewedScope.php`
 - `app/Models/Section/Home/LatestListingsSection.php`
 - `app/Models/Section/Home/PremiumListingsSection.php`
 - `app/Models/Setting/AppSetting.php` (no marker comment)
 - `app/Models/Setting/ListingFormSetting.php`
+- `app/Models/Setting/ListingPageSetting.php`
 - `app/Models/Setting/ListingsListSetting.php`
 - `app/Models/Setting/OtherSetting.php`
+- `app/Models/Setting/PaginationSetting.php`
 - `app/Models/Setting/SecuritySetting.php` (no marker comment)
 - `app/Models/Setting/StyleSetting.php` (no marker comment)
 - `app/Models/Traits/MetaTagTrait.php` (no marker comment)
@@ -660,7 +662,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (406)
+## Added (407)
 
 Files that are not part of LaraClassifier.
 
@@ -931,6 +933,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_23_001000_add_offers_and_seller_tools_to_chat.php`
 - `database/migrations/2026_11_24_000100_add_inbox_tools_and_privacy_to_chat.php`
 - `database/migrations/2026_11_24_000200_add_public_profile_to_account_menu.php`
+- `database/migrations/2026_11_24_000300_fill_the_similar_listings_row.php`
 
 ### database/seeders
 

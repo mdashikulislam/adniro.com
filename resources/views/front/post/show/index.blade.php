@@ -225,9 +225,15 @@
 			@php
 				$widgetType = (config('settings.listing_page.similar_listings_in_carousel') ? 'carousel' : 'normal');
 			@endphp
+			{{-- adniro: as many per row as "Similar Listings" is set to (5 when not set), so its cards are the
+			     size of the homepage's --}}
 			@include('front.search.partials.posts.widget.' . $widgetType, [
-				'widget'       => ($widgetSimilarPosts ?? null),
-				'firstSection' => false
+				'widget'         => ($widgetSimilarPosts ?? null),
+				'firstSection'   => false,
+				'sectionOptions' => [
+					'items_per_row' => \App\Helpers\Common\ListingGrid::similarColumns(),
+					'css_classes'   => 'similar-listings',
+				],
 			])
 		@endif
 		

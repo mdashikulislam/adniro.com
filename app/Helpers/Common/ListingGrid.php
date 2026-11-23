@@ -7,7 +7,8 @@ use Illuminate\Support\Number;
 /*
  * adniro: how many listings a grid shows per row, and how many the search page shows per page, from the
  * admin panel. The search page uses Settings > Listings List ("Grid View Columns", "Rows per page"); the
- * homepage's Latest and Premium listings sections each have their own "Items per row".
+ * homepage's Latest and Premium listings sections each have their own "Items per row", and so has "Similar
+ * Listings" under a listing (Settings > Listing Page).
  */
 
 final class ListingGrid
@@ -15,6 +16,8 @@ final class ListingGrid
 	public const MIN_COLUMNS = 2;
 	public const MAX_COLUMNS = 6;
 	public const HOMEPAGE_DEFAULT_COLUMNS = 4;
+	public const SIMILAR_DEFAULT_COLUMNS = 5;
+	public const SIMILAR_SETTING = 'similar_listings_per_row';
 	private const SEARCH_DEFAULT_COLUMNS = 3;
 	private const GRID_VIEW = 'grid-view';
 
@@ -81,6 +84,22 @@ final class ListingGrid
 			],
 			'tab'         => $tabName,
 		];
+	}
+
+	/** "Similar Listings" under a listing: its "Items per row" (5 when not set, the homepage's card size) */
+	public static function similarColumns(): int
+	{
+		return self::columns(config('settings.listing_page.' . self::SIMILAR_SETTING) ?: self::SIMILAR_DEFAULT_COLUMNS);
+	}
+
+	/** The "Items per row" field of "Similar Listings" (admin panel, Settings > Listing Page) */
+	public static function similarField(string $tabName): array
+	{
+		return array_merge(self::sectionField($tabName), [
+			'name'    => self::SIMILAR_SETTING,
+			'default' => self::SIMILAR_DEFAULT_COLUMNS,
+			'wrapper' => ['class' => 'col-md-6 similar-listings-field'],
+		]);
 	}
 
 	private static function toInt(mixed $value): ?int
