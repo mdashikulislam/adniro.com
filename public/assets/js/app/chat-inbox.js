@@ -12,6 +12,8 @@
 	var BADGE_MAX = 99;
 	var FILTER_UNREAD = 'unread';
 	var FILTER_ARCHIVED = 'archived';
+	// A small picture in front of a last line that is not plain text
+	var LINE_ICONS = {image: 'image', offer: 'tag', offer_accepted: 'check-circle', offer_declined: 'x-circle', unsent: 'slash-circle'};
 
 	/** @param {{T: Object, URLS: Object, LIMITS: Object, root: Element, els: Object, store: Object, kit: Object}} ctx */
 	window.AdnChatInbox = function (ctx) {
@@ -71,10 +73,23 @@
 				row.setAttribute('aria-current', 'true');
 			}
 
-			var avatar = el('span', 'adn-chat-avatar');
-			avatar.setAttribute('aria-hidden', 'true');
+			// The person, and on the corner of their picture the listing the chat is about
+			var face = el('span', 'adn-chat-row-face');
+			face.setAttribute('aria-hidden', 'true');
+			var avatar = el('span', 'adn-chat-avatar adn-chat-avatar-lg');
 			avatarInto(avatar, thread.other, false);
-			row.appendChild(avatar);
+			face.appendChild(avatar);
+			if (thread.post && thread.post.photo) {
+				var item = el('img', 'adn-chat-row-item');
+				item.src = thread.post.photo;
+				item.alt = '';
+				item.loading = 'lazy';
+				item.addEventListener('error', function () {
+					item.remove();
+				});
+				face.appendChild(item);
+			}
+			row.appendChild(face);
 
 			var text = el('span', 'adn-chat-row-text');
 			text.appendChild(ownDir(el('span', 'adn-chat-row-name', thread.other.name)));
@@ -82,10 +97,16 @@
 				text.appendChild(ownDir(el('span', 'adn-chat-row-listing', thread.post.title)));
 			}
 			if (thread.last) {
-				// "You: " is the page's own word; what follows is the member's, with its own direction
+				// My own last message starts with its tick (sent, or seen by the other person); "You: " is still
+				// said to screen readers. What follows is the member's text, with its own direction
 				var last = el('span', 'adn-chat-row-last');
 				if (thread.last.mine) {
-					last.appendChild(el('span', 'adn-chat-row-you', T.you + ': '));
+					var isSeen = thread.last.type !== 'unsent' && thread.last.id <= thread.read_up_to;
+					last.appendChild(el('span', 'visually-hidden', T.you + ': '));
+					last.appendChild(icon(isSeen ? 'check2-all' : 'check2', 'adn-chat-row-tick' + (isSeen ? ' is-seen' : '')));
+				}
+				if (LINE_ICONS[thread.last.type]) {
+					last.appendChild(icon(LINE_ICONS[thread.last.type], 'adn-chat-row-kind'));
 				}
 				last.appendChild(ownDir(el('span', 'adn-chat-row-snippet', ctx.kit.lineText(thread.last.type, thread.last.text))));
 				text.appendChild(last);

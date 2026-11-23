@@ -7,6 +7,7 @@
 	'use strict';
 
 	var ANNOUNCE_AFTER_MS = 60;
+	var AVATAR_TINTS = 6;
 	var URL_PATTERN = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g;
 
 	/** @param {Object<string, string>} T the chat texts (lang/<locale>/chat.php, "js") */
@@ -166,18 +167,39 @@
 			return sameDay(date, new Date()) ? timeFormat.format(date) : dayLabel(date);
 		}
 
+		/** The same soft colour for the same person every time, from their name: one of AVATAR_TINTS. */
+		function tintOf(name) {
+			var sum = 0;
+			for (var i = 0; i < name.length; i++) {
+				sum = (sum * 31 + name.charCodeAt(i)) % 9973;
+			}
+			return sum % AVATAR_TINTS;
+		}
+
+		/** A member's photo when they have one; if not (or if it does not load), their initial on their colour. */
 		function avatarInto(node, person, online) {
+			var name = person && person.name ? person.name.trim() : '';
+			var showInitial = function () {
+				node.textContent = name ? name.charAt(0).toUpperCase() : '?';
+				node.classList.remove('has-photo');
+				node.dataset.tint = tintOf(name);
+			};
+
 			node.textContent = '';
 			node.classList.toggle('is-online', !!online);
-			if (person && person.photo) {
-				var image = el('img');
-				image.src = person.photo;
-				image.alt = '';
-				image.loading = 'lazy';
-				node.appendChild(image);
+			if (!person || !person.photo) {
+				showInitial();
 				return;
 			}
-			node.textContent = person && person.name ? person.name.trim().charAt(0).toUpperCase() : '?';
+
+			var image = el('img');
+			image.src = person.photo;
+			image.alt = '';
+			image.loading = 'lazy';
+			image.addEventListener('error', showInitial);
+			node.classList.add('has-photo');
+			delete node.dataset.tint;
+			node.appendChild(image);
 		}
 
 		function linkified(text) {
