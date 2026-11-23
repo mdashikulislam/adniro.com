@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'أنت ترسل الرسائل بسرعة كبيرة. انتظر قليلاً ثم حاول مجدداً.',
 	'error_cannot_message'    => 'لا يمكنك إرسال رسائل في هذه المحادثة.',
 	'error_own_listing'       => 'هذا إعلانك أنت.',
-	'error_no_seller_account' => 'لا يمكن التواصل مع هذا البائع عبر المحادثة. استخدم رقم الهاتف الموجود في الإعلان.',
+	'error_no_seller_account' => 'لا يمكن التواصل مع هذا البائع عبر المحادثة. استخدم زر البريد الإلكتروني أو الهاتف في الإعلان.',
+	'error_empty_email'       => 'اكتب بضع كلمات للبائع (10 أحرف على الأقل).',
+	'error_email_seller_unavailable' => 'لا يمكن التواصل مع هذا البائع عبر البريد الإلكتروني.',
+	'error_email_seller_no_address'  => 'أضف بريداً إلكترونياً إلى حسابك أولاً ليتمكن البائع من الرد.',
 	'error_block_self'        => 'لا يمكنك حظر نفسك.',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} كتب :name :count رسالة بخصوص ":title".|[2,*] عدد الرسائل التي كتبها :name بخصوص ":title": :count.',
 	'digest_action'   => 'فتح محادثاتي',
 	'digest_safety'   => 'حافظ على سلامتك: قابل البائع في مكان عام، وافحص السلعة قبل الدفع، ولا ترسل عربوناً ولا تشارك رموزاً وصلتك على هاتفك.',
+	'digest_off'      => 'إيقاف هذه الرسائل',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'إعدادات المحادثات',
+	'emails_label' => 'أرسل لي بريداً عن الرسائل غير المقروءة',
+	'emails_hint' => 'بريد واحد عندما تنتظر رسالة 10 دقائق، وليس بريداً لكل رسالة.',
+	'emails_off_title' => 'إيقاف رسائل البريد عن الرسائل غير المقروءة؟',
+	'emails_off_text' => 'ستبقى رسائلك الجديدة بانتظارك في محادثاتك. يمكنك إعادة تفعيل البريد من هناك، في إعدادات المحادثات.',
+	'emails_off_confirm' => 'إيقاف الرسائل',
+	'emails_off_done_title' => 'تم إيقاف الرسائل',
+	'emails_off_done_text' => 'لن نرسل لك بريداً عن الرسائل غير المقروءة بعد الآن. يمكنك إعادة تفعيلها من إعدادات محادثاتك.',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'راسل البائع بالبريد',
+	'email_seller_intro' => 'هذا البائع لا يستخدم المحادثة. سنرسل له رسالتك عبر البريد الإلكتروني.',
+	'email_seller_share' => 'يُرسل اسمك وبريدك الإلكتروني مع الرسالة ليتمكن البائع من الرد عليك.',
+	'email_seller_label' => 'رسالتك',
+	'email_seller_send' => 'إرسال البريد',
+	'email_seller_sent' => 'تم إرسال رسالتك إلى البائع عبر البريد الإلكتروني.',
+	'email_seller_failed' => 'تعذّر إرسال رسالتك. حاول مرة أخرى لاحقاً.',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => 'هناك من يهتم بإعلانك ":title"',
+	'enquiry_greeting' => 'مرحباً،',
+	'enquiry_intro' => 'أرسل لك :name رسالة بخصوص إعلانك ":title" على :appName:',
+	'enquiry_reply' => 'ردّ على هذا البريد للإجابة على :name مباشرة.',
+	'enquiry_action' => 'عرض إعلانك',
 
 	'js' => [
 		'you'             => 'أنت',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count غير مقروءة',
 		'listing_gone'    => 'هذا الإعلان لم يعد متاحاً.',
 		'chars_left'      => 'المتبقي :count',
+		'emails_on'       => 'تم تفعيل البريد عن الرسائل غير المقروءة.',
+		'emails_off'      => 'تم إيقاف البريد عن الرسائل غير المقروءة.',
 	],
 ];

@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'আপনি খুব দ্রুত বার্তা পাঠাচ্ছেন। একটু অপেক্ষা করে আবার চেষ্টা করুন।',
 	'error_cannot_message'    => 'এই চ্যাটে আপনি বার্তা পাঠাতে পারবেন না।',
 	'error_own_listing'       => 'এটি আপনার নিজের বিজ্ঞাপন।',
-	'error_no_seller_account' => 'এই বিক্রেতাকে চ্যাটে পাওয়া যাবে না। বিজ্ঞাপনে দেওয়া ফোন নম্বর ব্যবহার করুন।',
+	'error_no_seller_account' => 'এই বিক্রেতাকে চ্যাটে পাওয়া যাবে না। বিজ্ঞাপনের ইমেইল বা ফোন বোতাম ব্যবহার করুন।',
+	'error_empty_email'       => 'বিক্রেতাকে কয়েকটি শব্দ লিখুন (কমপক্ষে ১০ অক্ষর)।',
+	'error_email_seller_unavailable' => 'এই বিক্রেতাকে ইমেইলে পাওয়া যাবে না।',
+	'error_email_seller_no_address'  => 'বিক্রেতা যাতে উত্তর দিতে পারেন, আগে আপনার অ্যাকাউন্টে একটি ইমেইল ঠিকানা যোগ করুন।',
 	'error_block_self'        => 'আপনি নিজেকে ব্লক করতে পারবেন না।',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name ":title" সম্পর্কে :count টি বার্তা লিখেছেন।|[2,*] :name ":title" সম্পর্কে :count টি বার্তা লিখেছেন।',
 	'digest_action'   => 'আমার চ্যাট খুলুন',
 	'digest_safety'   => 'নিরাপদ থাকুন: জনসমাগমের জায়গায় দেখা করুন, টাকা দেওয়ার আগে পণ্যটি যাচাই করুন, এবং কখনও অগ্রিম টাকা পাঠাবেন না বা ফোনে আসা কোড শেয়ার করবেন না।',
+	'digest_off'      => 'এই ইমেইলগুলো বন্ধ করুন',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'চ্যাট সেটিংস',
+	'emails_label' => 'না-পড়া বার্তার জন্য আমাকে ইমেইল করুন',
+	'emails_hint' => 'কোনো বার্তা ১০ মিনিট অপেক্ষা করলে একটি ইমেইল, প্রতি বার্তায় আলাদা নয়।',
+	'emails_off_title' => 'না-পড়া বার্তার ইমেইল বন্ধ করবেন?',
+	'emails_off_text' => 'নতুন বার্তা আপনার চ্যাটেই অপেক্ষা করবে। সেখানে চ্যাট সেটিংস থেকে ইমেইল আবার চালু করতে পারবেন।',
+	'emails_off_confirm' => 'ইমেইল বন্ধ করুন',
+	'emails_off_done_title' => 'ইমেইল বন্ধ হয়েছে',
+	'emails_off_done_text' => 'না-পড়া বার্তার জন্য আমরা আর ইমেইল পাঠাব না। চ্যাট সেটিংস থেকে আবার চালু করতে পারবেন।',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'বিক্রেতাকে ইমেইল করুন',
+	'email_seller_intro' => 'এই বিক্রেতা চ্যাট ব্যবহার করেন না। আমরা আপনার বার্তা তাঁকে ইমেইলে পাঠাই।',
+	'email_seller_share' => 'বিক্রেতা যাতে উত্তর দিতে পারেন, সে জন্য আপনার নাম ও ইমেইল ঠিকানা সঙ্গে পাঠানো হয়।',
+	'email_seller_label' => 'আপনার বার্তা',
+	'email_seller_send' => 'ইমেইল পাঠান',
+	'email_seller_sent' => 'আপনার বার্তা বিক্রেতাকে ইমেইলে পাঠানো হয়েছে।',
+	'email_seller_failed' => 'আপনার বার্তা পাঠানো যায়নি। পরে আবার চেষ্টা করুন।',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => '":title" বিজ্ঞাপনে কেউ আগ্রহী',
+	'enquiry_greeting' => 'হ্যালো,',
+	'enquiry_intro' => ':appName-এ আপনার ":title" বিজ্ঞাপন নিয়ে :name আপনাকে একটি বার্তা পাঠিয়েছেন:',
+	'enquiry_reply' => ':name-কে সরাসরি উত্তর দিতে এই ইমেইলের উত্তর দিন।',
+	'enquiry_action' => 'আপনার বিজ্ঞাপন দেখুন',
 
 	'js' => [
 		'you'             => 'আপনি',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count টি অপঠিত',
 		'listing_gone'    => 'এই বিজ্ঞাপনটি আর পাওয়া যায় না।',
 		'chars_left'      => ':count বাকি',
+		'emails_on'       => 'না-পড়া বার্তার ইমেইল চালু আছে।',
+		'emails_off'      => 'না-পড়া বার্তার ইমেইল বন্ধ আছে।',
 	],
 ];

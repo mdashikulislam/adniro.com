@@ -34,6 +34,15 @@ Chat with seller button (C1)
   tokens    solid: bg accent-strong, text on-accent, radius pill, 44px high, sm/700
   a11y      a real link to /chat/new/{listing}; the label says "Chat with seller"
 
+Email the seller button and dialog (C1)
+  when      the listing was posted without a member account: there is nobody to chat with
+  button    takes the place of "Chat with seller", same shape, envelope icon; a guest gets the sign-in pop-up
+  dialog    Bootstrap modal: one line saying the seller is not on chat, a message box (10 to 1000 characters),
+            a note that the member's name and email address go with it, Cancel + "Send email" (primary)
+  states    too short (said under the box, before anything is sent), sending (button disabled), sent
+            (the dialog closes, SweetAlert2 toast), error under the box
+  a11y      the box is described by the note; errors are role="alert"
+
 Inbox row (C2)
   one row per person, whatever the number of listings talked about
   parts     avatar 44 (photo or initials) + online dot · name (title) · the listing last talked about (sm) ·
@@ -46,6 +55,13 @@ Inbox row (C2)
 Inbox filter (C2)
   variants  All, Unread (segmented pills, the count on Unread)
   states    selected: bg accent-soft, text accent-strong, 700
+
+Chat settings (C2)
+  where     a gear (40px, muted) at the end of the inbox header, after the filters
+  content   a small menu with one switch: "Email me about unread messages" (sm/700) and one line of help (xs,
+            muted); the switch is accent-strong when on
+  action    saved as soon as the switch moves, with a toast ("…are on" / "…are off"); it goes back if saving fails
+  a11y      the gear is labelled "Chat settings"; the switch is a real checkbox with role="switch" inside its label
 
 Inbox empty (C2)
   content   chat icon in an accent-soft circle, "No chats yet", one line of help, "Browse listings" button

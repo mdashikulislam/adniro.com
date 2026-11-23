@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'Vous envoyez des messages très rapidement. Patientez un instant et réessayez.',
 	'error_cannot_message'    => 'Vous ne pouvez pas envoyer de messages dans cette discussion.',
 	'error_own_listing'       => 'C\'est votre propre annonce.',
-	'error_no_seller_account' => 'Ce vendeur n\'est pas joignable par discussion. Utilisez le numéro de téléphone de l\'annonce.',
+	'error_no_seller_account' => 'Ce vendeur n\'est pas joignable par discussion. Utilisez le bouton e-mail ou téléphone de l\'annonce.',
+	'error_empty_email'       => 'Écrivez quelques mots au vendeur (au moins 10 caractères).',
+	'error_email_seller_unavailable' => 'Ce vendeur n\'est pas joignable par e-mail.',
+	'error_email_seller_no_address'  => 'Ajoutez d\'abord une adresse e-mail à votre compte, pour que le vendeur puisse répondre.',
 	'error_block_self'        => 'Vous ne pouvez pas vous bloquer vous-même.',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name a écrit :count message à propos de ":title".|[2,*] :name a écrit :count messages à propos de ":title".',
 	'digest_action'   => 'Ouvrir mes discussions',
 	'digest_safety'   => 'Restez prudent : retrouvez-vous dans un lieu public, vérifiez l\'article avant de payer, et n\'envoyez jamais d\'acompte ni de codes reçus sur votre téléphone.',
+	'digest_off'      => 'Ne plus recevoir ces e-mails',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'Réglages des discussions',
+	'emails_label' => 'M\'envoyer un e-mail pour les messages non lus',
+	'emails_hint' => 'Un seul e-mail quand un message attend depuis 10 minutes, jamais un par message.',
+	'emails_off_title' => 'Arrêter les e-mails sur les messages non lus ?',
+	'emails_off_text' => 'Vos nouveaux messages vous attendent toujours dans vos discussions. Vous pourrez réactiver les e-mails là-bas, dans les réglages des discussions.',
+	'emails_off_confirm' => 'Arrêter les e-mails',
+	'emails_off_done_title' => 'E-mails arrêtés',
+	'emails_off_done_text' => 'Nous ne vous enverrons plus d\'e-mail pour les messages non lus. Vous pouvez les réactiver dans les réglages de vos discussions.',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'Écrire au vendeur par e-mail',
+	'email_seller_intro' => 'Ce vendeur n\'utilise pas les discussions. Nous lui envoyons votre message par e-mail.',
+	'email_seller_share' => 'Votre nom et votre adresse e-mail sont joints, pour que le vendeur puisse vous répondre.',
+	'email_seller_label' => 'Votre message',
+	'email_seller_send' => 'Envoyer l\'e-mail',
+	'email_seller_sent' => 'Votre message a été envoyé au vendeur par e-mail.',
+	'email_seller_failed' => 'Votre message n\'a pas pu être envoyé. Réessayez plus tard.',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => 'Quelqu\'un est intéressé par « :title »',
+	'enquiry_greeting' => 'Bonjour,',
+	'enquiry_intro' => ':name vous a envoyé un message au sujet de votre annonce « :title » sur :appName :',
+	'enquiry_reply' => 'Répondez à cet e-mail pour répondre directement à :name.',
+	'enquiry_action' => 'Voir votre annonce',
 
 	'js' => [
 		'you'             => 'Vous',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count non lu(s)',
 		'listing_gone'    => 'Cette annonce n\'est plus disponible.',
 		'chars_left'      => ':count restants',
+		'emails_on'       => 'Les e-mails sur les messages non lus sont activés.',
+		'emails_off'      => 'Les e-mails sur les messages non lus sont désactivés.',
 	],
 ];

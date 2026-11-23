@@ -32,10 +32,14 @@ class ChatBroadcaster
 		}
 	}
 
-	public static function messagesRead(ChatThread $thread, int $readerId, int $upToMessageId): void
+	/** $onlyToReader: across a block, only the reader's own tabs are told (their unread badge), not the other person. */
+	public static function messagesRead(ChatThread $thread, int $readerId, int $upToMessageId, bool $onlyToReader = false): void
 	{
 		foreach ($thread->participants as $participant) {
 			$userId = (int)$participant->user_id;
+			if ($onlyToReader && $userId !== $readerId) {
+				continue;
+			}
 			self::push(new ChatEvent(ChatEvent::READ, $userId, [
 				'thread_id'    => (int)$thread->id,
 				'reader_id'    => $readerId,

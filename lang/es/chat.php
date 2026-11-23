@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'Estás enviando mensajes muy rápido. Espera un momento e inténtalo de nuevo.',
 	'error_cannot_message'    => 'No puedes enviar mensajes en este chat.',
 	'error_own_listing'       => 'Este es tu propio anuncio.',
-	'error_no_seller_account' => 'No se puede contactar con este vendedor por chat. Usa el número de teléfono del anuncio.',
+	'error_no_seller_account' => 'No se puede contactar con este vendedor por chat. Usa el botón de correo o de teléfono del anuncio.',
+	'error_empty_email'       => 'Escribe unas palabras al vendedor (al menos 10 caracteres).',
+	'error_email_seller_unavailable' => 'No se puede contactar con este vendedor por correo.',
+	'error_email_seller_no_address'  => 'Añade primero un correo electrónico a tu cuenta, para que el vendedor pueda responder.',
 	'error_block_self'        => 'No puedes bloquearte a ti mismo.',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name ha escrito :count mensaje sobre ":title".|[2,*] :name ha escrito :count mensajes sobre ":title".',
 	'digest_action'   => 'Abrir mis chats',
 	'digest_safety'   => 'Mantente seguro: queda en un lugar público, revisa el artículo antes de pagar y nunca envíes un depósito ni compartas códigos enviados a tu teléfono.',
+	'digest_off'      => 'Dejar de recibir estos correos',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'Ajustes del chat',
+	'emails_label' => 'Avisarme por correo de los mensajes sin leer',
+	'emails_hint' => 'Un solo correo cuando un mensaje lleva 10 minutos esperando, nunca uno por mensaje.',
+	'emails_off_title' => '¿Dejar de recibir correos sobre mensajes sin leer?',
+	'emails_off_text' => 'Tus mensajes nuevos te siguen esperando en tus chats. Allí, en los ajustes del chat, puedes volver a activar los correos.',
+	'emails_off_confirm' => 'Dejar de recibir los correos',
+	'emails_off_done_title' => 'Correos desactivados',
+	'emails_off_done_text' => 'Ya no te enviaremos correos sobre mensajes sin leer. Puedes volver a activarlos en los ajustes de tus chats.',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'Enviar correo al vendedor',
+	'email_seller_intro' => 'Este vendedor no usa el chat. Le enviamos tu mensaje por correo electrónico.',
+	'email_seller_share' => 'Tu nombre y tu correo electrónico van con el mensaje, para que el vendedor pueda responderte.',
+	'email_seller_label' => 'Tu mensaje',
+	'email_seller_send' => 'Enviar correo',
+	'email_seller_sent' => 'Tu mensaje se ha enviado al vendedor por correo.',
+	'email_seller_failed' => 'No se pudo enviar tu mensaje. Inténtalo más tarde.',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => 'Alguien está interesado en «:title»',
+	'enquiry_greeting' => 'Hola:',
+	'enquiry_intro' => ':name te ha enviado un mensaje sobre tu anuncio «:title» en :appName:',
+	'enquiry_reply' => 'Responde a este correo para contestar directamente a :name.',
+	'enquiry_action' => 'Ver tu anuncio',
 
 	'js' => [
 		'you'             => 'Tú',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count sin leer',
 		'listing_gone'    => 'Este anuncio ya no está disponible.',
 		'chars_left'      => 'Quedan :count',
+		'emails_on'       => 'Los correos sobre mensajes sin leer están activados.',
+		'emails_off'      => 'Los correos sobre mensajes sin leer están desactivados.',
 	],
 ];

@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Chat;
 
+use App\Events\Chat\ChatEvent;
 use App\Models\Chat\UserBlock;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 
 /*
@@ -115,6 +117,26 @@ class ChatSecurityTest extends ChatTestCase
 
 		$this->actingAs($this->seller)->deleteJson('/chat/api/users/' . self::BUYER_ID . '/block')->assertOk();
 		$this->actingAs($this->buyer)->postJson($url, ['body' => 'Hello again'])->assertCreated();
+	}
+
+	public function test_a_blocked_person_never_learns_that_their_messages_were_read(): void
+	{
+		// Arrange: the buyer wrote twice, then the seller blocked them without opening the chat
+		$thread = $this->conversation(['Is this still available?']);
+		$this->actingAs($this->buyer)->postJson('/chat/api/threads/' . $thread->id . '/messages', ['body' => 'Hello?'])->assertCreated();
+		$lastId = (int)DB::table('threads_messages')->where('thread_id', $thread->id)->max('id');
+		UserBlock::query()->create(['blocker_id' => self::SELLER_ID, 'blocked_id' => self::BUYER_ID]);
+		Event::fake([ChatEvent::class]);
+
+		// Act: the seller opens the chat
+		$response = $this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/read', ['message_id' => $lastId]);
+
+		// Assert: the seller's badge is cleared, and nothing tells the buyer
+		$response->assertOk()->assertJsonPath('unread_total', 0);
+		$this->assertSame(0, $this->unreadOf($thread->id, self::SELLER_ID));
+		Event::assertNotDispatched(ChatEvent::class, fn (ChatEvent $event) => $event->userId === self::BUYER_ID);
+		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id)->assertJsonPath('thread.read_up_to', 0);
+		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id . '/messages?after=' . $lastId)->assertJsonPath('read_up_to', 0);
 	}
 
 	public function test_a_member_cannot_block_themselves(): void

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Chat;
 
 use App\Events\Chat\ChatEvent;
+use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatUnread;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -167,18 +168,20 @@ class ChatConversationTest extends ChatTestCase
 		$this->assertSame(1, DB::table('threads')->count());
 	}
 
-	public function test_a_message_is_stored_as_plain_text(): void
+	public function test_a_message_keeps_every_character_that_was_written(): void
 	{
 		// Arrange
 		$thread = $this->conversation();
+		$url = '/chat/api/threads/' . $thread->id . '/messages';
 
 		// Act
-		$response = $this->actingAs($this->buyer)->postJson('/chat/api/threads/' . $thread->id . '/messages', [
-			'body' => '<script>alert(1)</script><b>Hello</b> there',
-		]);
+		$price = $this->actingAs($this->buyer)->postJson($url, ['body' => '  Can you do <500 for both? I <3 this & that  ']);
+		$markup = $this->actingAs($this->buyer)->postJson($url, ['body' => '<script>alert(1)</script><b>Hello</b>']);
 
-		// Assert
-		$response->assertCreated()->assertJsonPath('message.body', 'alert(1)Hello there');
+		// Assert: nothing is cut. It is shown as text, never as HTML (the pages below prove the escaping)
+		$price->assertCreated()->assertJsonPath('message.body', 'Can you do <500 for both? I <3 this & that');
+		$markup->assertCreated()->assertJsonPath('message.body', '<script>alert(1)</script><b>Hello</b>');
+		$this->actingAs($this->seller)->get('/chat/' . $thread->id)->assertOk()->assertDontSee('<script>alert(1)</script>', false);
 	}
 
 	public function test_an_empty_or_too_long_message_is_refused(): void
@@ -275,7 +278,28 @@ class ChatConversationTest extends ChatTestCase
 		$response = $this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id . '/messages?after=' . $firstId);
 
 		// Assert
-		$response->assertOk()->assertJsonCount(2, 'messages')->assertJsonPath('messages.0.body', 'Two');
+		$response->assertOk()->assertJsonCount(2, 'messages')->assertJsonPath('messages.0.body', 'Two')->assertJsonPath('has_more', false);
+	}
+
+	public function test_a_long_absence_is_caught_up_in_parts_until_nothing_is_missed(): void
+	{
+		// Arrange: more missed messages than one answer carries
+		$thread = $this->conversation();
+		$firstId = (int)DB::table('threads_messages')->where('thread_id', $thread->id)->min('id');
+		$missed = ChatMessages::CATCH_UP_MAX + 5;
+		DB::table('threads_messages')->insert(array_map(fn (int $number) => [
+			'thread_id' => $thread->id, 'user_id' => self::SELLER_ID, 'type' => 'text', 'body' => 'Message ' . $number, 'created_at' => now(),
+		], range(1, $missed)));
+		$url = '/chat/api/threads/' . $thread->id . '/messages?after=';
+
+		// Act
+		$firstPart = $this->actingAs($this->buyer)->getJson($url . $firstId);
+		$secondPart = $this->actingAs($this->buyer)->getJson($url . $firstPart->json('messages.' . (ChatMessages::CATCH_UP_MAX - 1) . '.id'));
+
+		// Assert
+		$firstPart->assertOk()->assertJsonCount(ChatMessages::CATCH_UP_MAX, 'messages')->assertJsonPath('has_more', true);
+		$secondPart->assertOk()->assertJsonCount(5, 'messages')->assertJsonPath('has_more', false)
+			->assertJsonPath('messages.4.body', 'Message ' . $missed);
 	}
 
 	public function test_reading_clears_my_unread_count_and_tells_the_other_person(): void

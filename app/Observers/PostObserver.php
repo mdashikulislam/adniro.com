@@ -25,11 +25,11 @@ use App\Models\PostValue;
 use App\Models\SavedPost;
 use App\Models\Scopes\StrictActiveScope;
 use App\Models\Scopes\ValidPeriodScope;
-use App\Models\Thread;
 use App\Models\User;
 use App\Notifications\PostActivated;
 use App\Notifications\PostNotification;
 use App\Notifications\PostReviewed;
+use App\Services\Chat\ChatCleanup;
 use extras\plugins\reviews\app\Models\Review;
 use Illuminate\Support\Facades\Notification;
 use Throwable;
@@ -101,13 +101,9 @@ class PostObserver extends BaseObserver
 			}
 		}
 		
-		// Delete all Threads
-		$messages = Thread::where('post_id', $post->id);
-		if ($messages->count() > 0) {
-			foreach ($messages->cursor() as $message) {
-				$message->forceDelete();
-			}
-		}
+		// adniro: a conversation belongs to two people and can cover several listings, so deleting a listing
+		// no longer deletes it (with its messages, photos and reports): it only stops pointing at the listing
+		ChatCleanup::listingDeleted((int)$post->id);
 		
 		// Delete all Saved Posts
 		$savedPosts = SavedPost::where('post_id', $post->id);

@@ -33,6 +33,11 @@ class ChatPairMigrationTest extends ChatTestCase
 		$this->setRead($tableThread, self::SELLER_ID, null, 1);
 		$this->setRead($tableThread, self::BUYER_ID, $tableQuestion, 1);
 
+		// The seller had deleted the sofa conversation from their list, but not the table one
+		DB::table('threads_participants')->where('thread_id', $sofaThread)->where('user_id', self::SELLER_ID)->update(['deleted_at' => now()]);
+		// The other person had deleted their only conversation
+		DB::table('threads_participants')->where('thread_id', $otherThread)->where('user_id', self::OUTSIDER_ID)->update(['deleted_at' => now()]);
+
 		// Act
 		$migration->up();
 
@@ -51,6 +56,11 @@ class ChatPairMigrationTest extends ChatTestCase
 		$this->assertSame(2, DB::table('threads_participants')->where('thread_id', $sofaThread)->count());
 		$this->assertSame(1, $this->unreadOf($sofaThread, self::SELLER_ID));
 		$this->assertSame(1, $this->unreadOf($sofaThread, self::BUYER_ID));
+
+		// What a member had deleted stays hidden for them, unless one of the merged conversations was still in their list
+		$hidden = fn (int $threadId, int $userId) => DB::table('threads_participants')->where('thread_id', $threadId)->where('user_id', $userId)->value('deleted_at') !== null;
+		$this->assertFalse($hidden($sofaThread, self::SELLER_ID), 'The seller still had the table conversation: the merged one is in their list.');
+		$this->assertTrue($hidden($otherThread, self::OUTSIDER_ID), 'A conversation its member had deleted stays hidden for them.');
 
 		// And the pair cannot get a second conversation
 		$this->actingAs($this->buyer)->postJson('/chat/listings/' . $this->listing->id, ['body' => 'Hello again'])->assertJsonPath('thread.id', $sofaThread);

@@ -96,11 +96,20 @@ return new class extends Migration
 
 			$lastRead = $this->lastReadByUser([...$duplicateIds->all(), $pair->keep_id]);
 			DB::table('threads_messages')->whereIn('thread_id', $duplicateIds)->update(['thread_id' => $pair->keep_id]);
+			$this->keepVisibleForThoseWhoStillHadOne((int)$pair->keep_id, $duplicateIds->all());
 			DB::table('threads_participants')->whereIn('thread_id', $duplicateIds)->delete();
 			DB::table('threads')->whereIn('id', $duplicateIds)->delete();
 
 			$this->refreshConversation((int)$pair->keep_id, $lastRead);
 		}
+	}
+
+	/** A member who had hidden the kept conversation, but not one merged into it, goes on seeing it. */
+	private function keepVisibleForThoseWhoStillHadOne(int $keepId, array $duplicateIds): void
+	{
+		$userIds = DB::table('threads_participants')->whereIn('thread_id', $duplicateIds)->whereNull('deleted_at')->pluck('user_id');
+
+		DB::table('threads_participants')->where('thread_id', $keepId)->whereIn('user_id', $userIds)->update(['deleted_at' => null]);
 	}
 
 	/** @return array<int, int> the newest message each person had read in any of the conversations being merged */

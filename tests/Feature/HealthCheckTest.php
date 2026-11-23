@@ -52,4 +52,22 @@ class HealthCheckTest extends TestCase
 		// Assert
 		$this->assertMatchesRegularExpression('/\*\s+\*\s+\*\s+\*\s+\*.*health heartbeat/', $list);
 	}
+	
+	public function test_the_live_chat_server_is_watched_only_where_live_chat_is_on(): void
+	{
+		// Arrange: the scheduler is fine, and something answers where the live chat server should be
+		Cache::put(HealthController::SCHEDULER_HEARTBEAT, now()->subMinute()->getTimestamp(), 3600);
+		$server = stream_socket_server('tcp://127.0.0.1:0');
+		$port = (int)substr(strrchr(stream_socket_get_name($server, false), ':'), 1);
+		config(['broadcasting.default' => 'reverb', 'broadcasting.connections.reverb.options.host' => '127.0.0.1', 'broadcasting.connections.reverb.options.port' => $port]);
+		
+		// Act: up, then stopped
+		$up = $this->getJson('/health');
+		fclose($server);
+		$down = $this->getJson('/health');
+		
+		// Assert
+		$up->assertOk()->assertJsonPath('checks.live_chat', 'ok');
+		$down->assertStatus(503)->assertJsonPath('checks.live_chat', 'fail')->assertJsonPath('checks.database', 'ok');
+	}
 }

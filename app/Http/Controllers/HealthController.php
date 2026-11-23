@@ -10,6 +10,7 @@ use Throwable;
 
 /*
  * GET /health (adniro): for uptime monitors. 200 when every check passes, 503 otherwise.
+ * Checks: database, cache, storage, scheduler, and the live chat's socket server where live chat is on.
  * Only check names and ok/fail are shown; details go to the log.
  */
 
@@ -22,6 +23,9 @@ class HealthController extends Controller
 	public const SCHEDULER_MAX_SILENCE_SECONDS = 600;
 	
 	private const CACHE_PROBE = 'health:cache_probe';
+	
+	private const LIVE_CHAT_DRIVER = 'reverb';
+	private const LIVE_CHAT_TIMEOUT_SECONDS = 1;
 	
 	public function __invoke(): JsonResponse
 	{
@@ -41,6 +45,12 @@ class HealthController extends Controller
 			}),
 		];
 		
+		// Only where live chat is turned on. Without its socket server the chat still works (it checks for new
+		// messages by itself), but slower: worth an alert
+		if (config('broadcasting.default') === self::LIVE_CHAT_DRIVER) {
+			$checks['live_chat'] = $this->check('live_chat', fn () => $this->isLiveChatServerUp());
+		}
+		
 		$healthy = !in_array('fail', $checks, true);
 		
 		return response()
@@ -51,6 +61,22 @@ class HealthController extends Controller
 	public static function recordSchedulerHeartbeat(): void
 	{
 		Cache::put(self::SCHEDULER_HEARTBEAT, time(), 86400);
+	}
+	
+	/** The live chat's socket server (Laravel Reverb) accepts a connection where PHP hands it messages. */
+	private function isLiveChatServerUp(): bool
+	{
+		$host = (string)config('broadcasting.connections.reverb.options.host');
+		$port = (int)config('broadcasting.connections.reverb.options.port');
+		$connection = @fsockopen($host, $port, $errorCode, $errorMessage, self::LIVE_CHAT_TIMEOUT_SECONDS);
+		if ($connection === false) {
+			Log::warning('Health check: the live chat server does not answer', ['host' => $host, 'port' => $port, 'error' => $errorMessage]);
+			
+			return false;
+		}
+		fclose($connection);
+		
+		return true;
 	}
 	
 	private function check(string $name, callable $probe): string

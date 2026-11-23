@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\Front\FrontController;
 use App\Models\Post;
 use App\Services\Chat\ChatAccess;
 use App\Services\Chat\ChatConversations;
+use App\Services\Chat\ChatEmailChoice;
 use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatPhotos;
 use App\Services\Chat\ChatPresenter;
@@ -89,6 +90,7 @@ class ChatController extends FrontController
 			'open'          => null,
 			'draft'         => null,
 			'unread_total'  => ChatUnread::total($userId),
+			'emails'        => ChatEmailChoice::isOn($user),
 			'quick_replies' => array_values((array)trans('chat.quick_replies')),
 			'limits'        => [
 				'body_max'       => ChatMessages::BODY_MAX,
@@ -104,6 +106,7 @@ class ChatController extends FrontController
 				'read'     => route('chat.api.read', ['thread' => '__ID__']),
 				'block'    => route('chat.api.block', ['user' => '__ID__']),
 				'report'   => route('chat.api.report', ['thread' => '__ID__']),
+				'settings' => route('chat.api.settings'),
 				'browse'   => urlGen()->searchWithoutQuery(),
 			],
 			'text'          => (array)trans('chat.js') + ['too_fast' => trans('chat.error_too_fast')],

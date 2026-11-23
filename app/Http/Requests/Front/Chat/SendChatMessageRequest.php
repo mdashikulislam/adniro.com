@@ -8,8 +8,9 @@ use App\Services\Chat\ChatPhotos;
 use Illuminate\Foundation\Http\FormRequest;
 
 /*
- * A chat message (adniro): text, or one photo. Text is stored as plain text (tags removed) and escaped
- * again when shown. Who may send is checked by the controller (ChatAccess).
+ * A chat message (adniro): text, or one photo. Text is stored exactly as written ("Can you do <500?" keeps
+ * its "<500?") and is only ever shown as plain text, never as HTML: the chat writes it with textContent and
+ * emails escape it. Who may send is checked by the controller (ChatAccess).
  */
 class SendChatMessageRequest extends FormRequest
 {
@@ -24,8 +25,7 @@ class SendChatMessageRequest extends FormRequest
 			return;
 		}
 
-		$body = strip_tags(html_entity_decode(strip_tags((string)$this->input('body'))));
-		$this->merge(['body' => trim($body)]);
+		$this->merge(['body' => trim((string)$this->input('body'))]);
 	}
 
 	public function rules(): array

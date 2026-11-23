@@ -31,6 +31,23 @@
 								{{ trans('chat.filter_unread') }} <span class="adn-chat-filter-count" data-adn-chat-badge @if (empty($chatState['unread_total'])) hidden @endif>{{ $chatState['unread_total'] > 99 ? '99+' : $chatState['unread_total'] }}</span>
 							</button>
 						</div>
+						{{-- Chat settings: the unread-messages email, on or off (chat-settings.js) --}}
+						<div class="dropdown adn-chat-settings">
+							<button type="button" class="adn-chat-icon-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="{{ trans('chat.settings') }}">
+								<i class="bi bi-gear" aria-hidden="true"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end adn-chat-settings-menu">
+								<label class="adn-chat-switch">
+									<span class="adn-chat-switch-text">
+										<strong>{{ trans('chat.emails_label') }}</strong>
+										<span>{{ trans('chat.emails_hint') }}</span>
+									</span>
+									<span class="form-check form-switch m-0">
+										<input type="checkbox" class="form-check-input" role="switch" data-chat-emails @checked(!empty($chatState['emails']))>
+									</span>
+								</label>
+							</div>
+						</div>
 					</div>
 					<div class="adn-chat-list" data-chat-list aria-live="polite"></div>
 				</nav>
@@ -137,7 +154,7 @@
 @endsection
 
 @push('after_scripts_stack')
-	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-reply', 'chat-safety', 'chat-photo', 'chat'] as $chatScript)
+	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-reply', 'chat-safety', 'chat-settings', 'chat-photo', 'chat'] as $chatScript)
 		<script src="{{ url('assets/js/app/' . $chatScript . '.js') }}?v={{ @filemtime(public_path('assets/js/app/' . $chatScript . '.js')) }}" defer></script>
 	@endforeach
 @endpush

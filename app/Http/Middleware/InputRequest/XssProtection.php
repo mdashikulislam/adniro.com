@@ -72,13 +72,22 @@ trait XssProtection
 		// Get all fields values
 		$inputs = $request->all();
 		
+		// adniro: a chat message, or a message emailed to a seller, is plain text and keeps every character
+		// ("Can you do <500 for both?" lost everything after "<" here). Neither is ever shown as HTML: see
+		// SendChatMessageRequest and App\Notifications\ListingEnquiry.
+		$plainTextField = match (true) {
+			$request->is('chat/listings/*', 'chat/api/threads/*/messages') => 'body',
+			$request->is('chat/email-seller/*')                            => 'message',
+			default                                                        => null,
+		};
+		
 		// Apply one (or more) action(s) recursively to every field of the array
-		array_walk_recursive($inputs, function (&$value, $key) use ($request) {
+		array_walk_recursive($inputs, function (&$value, $key) use ($request, $plainTextField) {
 			if (!is_string($value)) return;
 			
 			// Sanitize input to prevent XSS attacks and remove malicious characters
 			// Except the: "description" field
-			if ($key != 'description') {
+			if ($key != 'description' && $key !== $plainTextField) {
 				$value = sanitizeInput($value);
 			}
 			

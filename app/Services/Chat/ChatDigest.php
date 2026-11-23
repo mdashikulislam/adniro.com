@@ -13,7 +13,8 @@ use Throwable;
 /*
  * The unread-messages email (adniro). A member who has left messages unread for ten minutes gets one email
  * listing those conversations; a conversation is not mentioned again until it has a newer message, and at
- * most once an hour. Muted conversations, blocked people and members without an email address are skipped.
+ * most once an hour. Muted or hidden conversations, blocked people, members without an email address and
+ * members who turned the email off (ChatEmailChoice) are skipped. It is written in the member's own language.
  */
 class ChatDigest
 {
@@ -42,6 +43,7 @@ class ChatDigest
 			->select($participants . '.*')
 			->join($threads, $threads . '.id', '=', $participants . '.thread_id')
 			->whereNull($threads . '.deleted_at')
+			->visible()
 			->where($participants . '.unread_count', '>', 0)
 			->where($threads . '.last_message_at', '<=', now()->subMinutes(self::UNREAD_AFTER_MINUTES))
 			->where(function ($query) use ($participants, $threads) {
@@ -57,6 +59,16 @@ class ChatDigest
 			->with(['thread.participants.user'])
 			->orderBy($participants . '.id')
 			->get();
+	}
+
+	/** The member's own language when the chat has texts in it, or the site's. The job runs without a visitor. */
+	private static function languageOf(User $user): string
+	{
+		$code = (string)$user->language_code;
+
+		return preg_match('/^[A-Za-z_-]{2,10}$/', $code) === 1 && is_file(lang_path($code . '/chat.php'))
+			? $code
+			: (string)config('app.locale');
 	}
 
 	/** @param Collection<int, ChatParticipant> $participants */
@@ -81,12 +93,13 @@ class ChatDigest
 		// Marked even when nothing is sent, so the same rows are not picked up every minute
 		ChatParticipant::query()->whereIn('id', $participants->pluck('id'))->update(['digest_sent_at' => now()]);
 
-		if ($user === null || empty($user->email) || empty($conversations)) {
+		if ($user === null || empty($user->email) || empty($conversations) || !ChatEmailChoice::isOn($user)) {
 			return false;
 		}
 
 		try {
-			$user->notify(new ChatUnreadDigest($conversations));
+			$notification = new ChatUnreadDigest($conversations, ChatEmailChoice::offUrl($userId));
+			$user->notify($notification->locale(self::languageOf($user)));
 		} catch (Throwable $e) {
 			Log::warning('Chat: unread digest failed', ['user' => $userId, 'error' => $e->getMessage()]);
 

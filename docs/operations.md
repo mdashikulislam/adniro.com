@@ -33,20 +33,30 @@ Everything here is free and runs on the same server; nothing is installed beside
 1. `.env`: `BROADCAST_DRIVER=reverb`, and three values you make up once (letters and digits):
    `REVERB_APP_ID`, `REVERB_APP_KEY`, `REVERB_APP_SECRET`. Also
    `REVERB_ALLOWED_ORIGINS=www.adniro.com,adniro.com` and `REVERB_CLIENT_HOST=www.adniro.com` (so the address
-   browsers connect to never comes from the request). Then `php artisan config:cache`.
+   browsers connect to never comes from the request). Nothing to run afterwards: this site does not cache its
+   config (see "Deploying"), so `.env` is read on the next request. Never run `php artisan config:cache` here.
 2. The socket server: `deploy/reverb/adniro-reverb.service` (the steps are at the top of the file).
 3. nginx: the two blocks in `deploy/reverb/nginx-reverb.conf`.
 4. Cloudflare: Network > WebSockets = On.
 5. Check: `systemctl status adniro-reverb`, then open a chat in two browsers; a message should appear at once
    and the "Reconnecting…" bar should never show.
 
-After every deploy: `systemctl restart adniro-reverb`. To turn live chat off again, set `BROADCAST_DRIVER=null`
-and `php artisan config:cache`; the chat falls back to checking by itself.
+After every deploy the socket server must restart, because it loads the code once: `deploy/deploy.sh` does it
+(`php artisan reverb:restart`; systemd starts it again). By hand: `systemctl restart adniro-reverb`.
+To turn live chat off again, set `BROADCAST_DRIVER=null` in `.env`; the chat falls back to checking by itself.
+
+`GET /health` includes `live_chat` once `BROADCAST_DRIVER=reverb`: it fails (503) when the socket server does
+not answer, so the uptime monitor alerts. The chat itself keeps working meanwhile, by checking every 10 seconds.
 
 It holds about 1,000 open chats with the server's current settings. Before that many people are online at once,
 install the free `ext-uv` PHP extension (`pecl install uv`) and restart the service.
 
 The unread-messages email is sent by the scheduler (`chat:unread-digest`, every minute): no extra setup.
+Members turn it off with the gear on the chat page or the link at the bottom of the email.
+
+Listings posted without a member account have no chat: they get "Email the seller" instead, a form for
+signed-in members that the site sends to the listing's address (at most 2 a day per member and listing, and
+10 a day to one listing from everybody).
 
 ## 3. Scheduler (cron)
 
@@ -60,7 +70,7 @@ After the new code is on the server:
 bash deploy/deploy.sh
 ```
 
-It puts the site in maintenance mode, installs Composer packages without dev tools, runs migrations (which also apply settings and page changes), caches routes, views and events, restarts the workers, and brings the site back up.
+It puts the site in maintenance mode, installs Composer packages without dev tools, runs migrations (which also apply settings and page changes), caches routes, views and events, restarts the workers and the live chat's socket server, and brings the site back up.
 
 Config is deliberately **not** cached: LaraClassifier reads several `.env` values at runtime with `env()`, and they would be lost.
 
@@ -68,7 +78,7 @@ If an admin changes the listing URL format (Admin > Settings > SEO > permalinks)
 
 ## 5. Health and monitoring
 
-- **Health check:** `GET /health` answers `200` with `{"status":"ok"}` when the database, cache, storage and scheduler all work, and `503` otherwise. Point an uptime monitor (UptimeRobot, Better Stack, Pingdom…) at it, checking every 1–5 minutes. "scheduler: fail" means the cron line is missing or not running.
+- **Health check:** `GET /health` answers `200` with `{"status":"ok"}` when the database, cache, storage and scheduler all work (and the live chat's socket server, where live chat is on), and `503` otherwise. Point an uptime monitor (UptimeRobot, Better Stack, Pingdom…) at it, checking every 1–5 minutes. "scheduler: fail" means the cron line is missing or not running.
 - **Logs:** `storage/logs/laravel-YYYY-MM-DD.log`, kept 14 days, plus `worker-default.log` and `worker-ai.log`.
 - **Error tracking (optional):** for alerts on every error, add Sentry or a similar service: `composer require sentry/sentry-laravel`, then set `SENTRY_LARAVEL_DSN` in `.env`. Not installed by default because it needs an account.
 

@@ -33,4 +33,10 @@ php artisan storage:link 2>/dev/null || true
 # Workers pick up the new code after their current job
 php artisan queue:restart
 
+# The live chat's socket server loads the code once, at start. This asks it to stop; systemd
+# (deploy/reverb/adniro-reverb.service) starts it again with the new code. Open chats reconnect by themselves.
+if grep -q '^BROADCAST_DRIVER=reverb' .env; then
+	php artisan reverb:restart
+fi
+
 echo "Deployed. Check: curl -s https://$(grep -E '^APP_URL=' .env | sed -E 's#^APP_URL=https?://##')/health"

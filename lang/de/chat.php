@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'Du sendest sehr schnell Nachrichten. Warte einen Moment und versuch es erneut.',
 	'error_cannot_message'    => 'In diesem Chat kannst du keine Nachrichten senden.',
 	'error_own_listing'       => 'Das ist deine eigene Anzeige.',
-	'error_no_seller_account' => 'Dieser Verkäufer ist per Chat nicht erreichbar. Nutze die Telefonnummer in der Anzeige.',
+	'error_no_seller_account' => 'Dieser Verkäufer ist per Chat nicht erreichbar. Nutze die E-Mail- oder Telefon-Schaltfläche in der Anzeige.',
+	'error_empty_email'       => 'Schreibe dem Verkäufer ein paar Worte (mindestens 10 Zeichen).',
+	'error_email_seller_unavailable' => 'Dieser Verkäufer ist per E-Mail nicht erreichbar.',
+	'error_email_seller_no_address'  => 'Füge deinem Konto zuerst eine E-Mail-Adresse hinzu, damit der Verkäufer antworten kann.',
 	'error_block_self'        => 'Du kannst dich nicht selbst blockieren.',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name hat :count Nachricht zu ":title" geschrieben.|[2,*] :name hat :count Nachrichten zu ":title" geschrieben.',
 	'digest_action'   => 'Meine Chats öffnen',
 	'digest_safety'   => 'Bleib sicher: Triff dich an einem öffentlichen Ort, prüfe den Artikel, bevor du zahlst, und sende nie eine Anzahlung oder Codes, die an dein Handy geschickt wurden.',
+	'digest_off'      => 'Diese E-Mails abbestellen',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'Chat-Einstellungen',
+	'emails_label' => 'E-Mail bei ungelesenen Nachrichten',
+	'emails_hint' => 'Eine E-Mail, wenn eine Nachricht 10 Minuten wartet, nie eine pro Nachricht.',
+	'emails_off_title' => 'E-Mails zu ungelesenen Nachrichten abbestellen?',
+	'emails_off_text' => 'Neue Nachrichten warten weiterhin in deinen Chats auf dich. Dort kannst du die E-Mails in den Chat-Einstellungen wieder einschalten.',
+	'emails_off_confirm' => 'E-Mails abbestellen',
+	'emails_off_done_title' => 'E-Mails abbestellt',
+	'emails_off_done_text' => 'Wir schicken dir keine E-Mails mehr zu ungelesenen Nachrichten. In deinen Chat-Einstellungen kannst du sie wieder einschalten.',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'E-Mail an Verkäufer',
+	'email_seller_intro' => 'Dieser Verkäufer nutzt den Chat nicht. Wir senden ihm deine Nachricht per E-Mail.',
+	'email_seller_share' => 'Dein Name und deine E-Mail-Adresse werden mitgeschickt, damit der Verkäufer dir antworten kann.',
+	'email_seller_label' => 'Deine Nachricht',
+	'email_seller_send' => 'E-Mail senden',
+	'email_seller_sent' => 'Deine Nachricht wurde per E-Mail an den Verkäufer gesendet.',
+	'email_seller_failed' => 'Deine Nachricht konnte nicht gesendet werden. Versuche es später noch einmal.',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => 'Jemand interessiert sich für „:title“',
+	'enquiry_greeting' => 'Hallo,',
+	'enquiry_intro' => ':name hat dir auf :appName eine Nachricht zu deiner Anzeige „:title“ geschickt:',
+	'enquiry_reply' => 'Antworte auf diese E-Mail, um :name direkt zu antworten.',
+	'enquiry_action' => 'Deine Anzeige ansehen',
 
 	'js' => [
 		'you'             => 'Du',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count ungelesen',
 		'listing_gone'    => 'Diese Anzeige ist nicht mehr verfügbar.',
 		'chars_left'      => 'Noch :count',
+		'emails_on'       => 'E-Mails zu ungelesenen Nachrichten sind eingeschaltet.',
+		'emails_off'      => 'E-Mails zu ungelesenen Nachrichten sind ausgeschaltet.',
 	],
 ];

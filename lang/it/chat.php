@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'Stai inviando messaggi molto velocemente. Aspetta un attimo e riprova.',
 	'error_cannot_message'    => 'Non puoi inviare messaggi in questa chat.',
 	'error_own_listing'       => 'Questo è il tuo annuncio.',
-	'error_no_seller_account' => 'Questo venditore non è raggiungibile in chat. Usa il numero di telefono dell\'annuncio.',
+	'error_no_seller_account' => 'Questo venditore non è raggiungibile in chat. Usa il pulsante e-mail o telefono dell\'annuncio.',
+	'error_empty_email'       => 'Scrivi qualche parola al venditore (almeno 10 caratteri).',
+	'error_email_seller_unavailable' => 'Questo venditore non è raggiungibile via e-mail.',
+	'error_email_seller_no_address'  => 'Aggiungi prima un indirizzo e-mail al tuo account, così il venditore può rispondere.',
 	'error_block_self'        => 'Non puoi bloccare te stesso.',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name ha scritto :count messaggio su ":title".|[2,*] :name ha scritto :count messaggi su ":title".',
 	'digest_action'   => 'Apri le mie chat',
 	'digest_safety'   => 'Resta al sicuro: incontrati in un luogo pubblico, controlla l\'articolo prima di pagare e non inviare mai caparre né condividere codici ricevuti sul telefono.',
+	'digest_off'      => 'Non ricevere più queste e-mail',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'Impostazioni chat',
+	'emails_label' => 'Avvisami via e-mail dei messaggi non letti',
+	'emails_hint' => 'Una sola e-mail quando un messaggio aspetta da 10 minuti, mai una per messaggio.',
+	'emails_off_title' => 'Interrompere le e-mail sui messaggi non letti?',
+	'emails_off_text' => 'I nuovi messaggi ti aspettano comunque nelle tue chat. Lì, nelle impostazioni della chat, puoi riattivare le e-mail.',
+	'emails_off_confirm' => 'Interrompi le e-mail',
+	'emails_off_done_title' => 'E-mail interrotte',
+	'emails_off_done_text' => 'Non ti invieremo più e-mail sui messaggi non letti. Puoi riattivarle nelle impostazioni delle tue chat.',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'Scrivi un\'e-mail al venditore',
+	'email_seller_intro' => 'Questo venditore non usa la chat. Gli inviamo il tuo messaggio via e-mail.',
+	'email_seller_share' => 'Il tuo nome e il tuo indirizzo e-mail vengono inviati insieme, così il venditore può risponderti.',
+	'email_seller_label' => 'Il tuo messaggio',
+	'email_seller_send' => 'Invia e-mail',
+	'email_seller_sent' => 'Il tuo messaggio è stato inviato al venditore via e-mail.',
+	'email_seller_failed' => 'Non è stato possibile inviare il messaggio. Riprova più tardi.',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => 'Qualcuno è interessato a «:title»',
+	'enquiry_greeting' => 'Ciao,',
+	'enquiry_intro' => ':name ti ha inviato un messaggio sul tuo annuncio «:title» su :appName:',
+	'enquiry_reply' => 'Rispondi a questa e-mail per rispondere direttamente a :name.',
+	'enquiry_action' => 'Vedi il tuo annuncio',
 
 	'js' => [
 		'you'             => 'Tu',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count non lette',
 		'listing_gone'    => 'Questo annuncio non è più disponibile.',
 		'chars_left'      => 'Ne restano :count',
+		'emails_on'       => 'Le e-mail sui messaggi non letti sono attive.',
+		'emails_off'      => 'Le e-mail sui messaggi non letti sono disattivate.',
 	],
 ];

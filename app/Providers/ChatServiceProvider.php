@@ -24,6 +24,11 @@ class ChatServiceProvider extends ServiceProvider
 	private const SEND_LIMITS = ['member' => [20, 300], 'new' => [8, 60]];
 	private const START_LIMITS = ['member' => [5, 30], 'new' => [2, 10]];
 	private const REPORTS_PER_HOUR = 5;
+	/** "Email the seller" (listings without a member account): a real email each time, so far fewer than chat. */
+	private const EMAIL_SELLER_LIMITS = ['member' => [3, 10], 'new' => [2, 3]];
+	private const EMAILS_PER_LISTING_PER_DAY = 2;
+	/** From all members together: several accounts cannot be used to flood one seller's inbox. */
+	private const EMAILS_TO_ONE_LISTING_PER_DAY = 10;
 
 	public function boot(): void
 	{
@@ -54,6 +59,13 @@ class ChatServiceProvider extends ServiceProvider
 	{
 		RateLimiter::for('chat-send', fn (Request $request) => $this->limits($request, self::SEND_LIMITS, 'send'));
 		RateLimiter::for('chat-start', fn (Request $request) => $this->limits($request, self::START_LIMITS, 'start'));
+		RateLimiter::for('chat-email-seller', fn (Request $request) => array_merge(
+			$this->limits($request, self::EMAIL_SELLER_LIMITS, 'email-seller'),
+			[
+				Limit::perDay(self::EMAILS_PER_LISTING_PER_DAY)->by('chat-email-seller:' . $request->user()?->id . ':' . $request->route('post')),
+				Limit::perDay(self::EMAILS_TO_ONE_LISTING_PER_DAY)->by('chat-email-seller:listing:' . $request->route('post')),
+			],
+		));
 		RateLimiter::for('chat-report', function (Request $request) {
 			return Limit::perHour(self::REPORTS_PER_HOUR)->by('chat-report:' . $request->user()?->id);
 		});

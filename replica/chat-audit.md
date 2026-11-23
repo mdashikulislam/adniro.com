@@ -19,6 +19,10 @@ Sizes: **S** under an hour · **M** a few hours · **L** a day or more. Everythi
 
 These are bugs or risks, not extras.
 
+**Status (2026-11-23): A1 to A9 are fixed on local, on branch `chat`, each with tests.** A10 is not: it changes
+the live server and waits for approval. One more case of A3 was found while testing by hand and fixed with it:
+the new email form also lost everything after a "<".
+
 | # | problem | what happens | fix | size |
 | --- | --- | --- | --- | --- |
 | A1 | **Deleting a listing erases the whole conversation** | `PostObserver` deletes every conversation whose current listing is the one deleted, with all its messages, photos and reports. Since two people now share one conversation, a seller deleting one sold item wipes everything the two ever said. A scammer can erase the evidence, and the report against them, by deleting the listing. | Never delete conversations with a listing; just detach the listing (the chat already shows "No longer available"). | M |

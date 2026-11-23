@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'You are sending messages very quickly. Wait a moment and try again.',
 	'error_cannot_message'    => 'You can\'t send messages in this chat.',
 	'error_own_listing'       => 'This is your own listing.',
-	'error_no_seller_account' => 'This seller can\'t be reached by chat. Use the phone number on the listing.',
+	'error_no_seller_account' => 'This seller can\'t be reached by chat. Use the email or phone button on the listing.',
+	'error_empty_email'       => 'Write a few words to the seller (at least 10 characters).',
+	'error_email_seller_unavailable' => 'This seller can\'t be reached by email.',
+	'error_email_seller_no_address'  => 'Add an email address to your account first, so the seller can reply.',
 	'error_block_self'        => 'You can\'t block yourself.',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name wrote :count message about ":title".|[2,*] :name wrote :count messages about ":title".',
 	'digest_action'   => 'Open my chats',
 	'digest_safety'   => 'Stay safe: meet in a public place, check the item before you pay, and never send a deposit or share codes sent to your phone.',
+	'digest_off'      => 'Stop these emails',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'Chat settings',
+	'emails_label' => 'Email me about unread messages',
+	'emails_hint' => 'One email when a message has waited 10 minutes, never one per message.',
+	'emails_off_title' => 'Stop emails about unread messages?',
+	'emails_off_text' => 'New messages still wait for you in your chats. You can turn the emails back on there, in the chat settings.',
+	'emails_off_confirm' => 'Stop the emails',
+	'emails_off_done_title' => 'Emails stopped',
+	'emails_off_done_text' => 'We won\'t email you about unread messages any more. You can turn the emails back on in your chat settings.',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'Email the seller',
+	'email_seller_intro' => 'This seller is not on chat. We send your message to them by email.',
+	'email_seller_share' => 'Your name and email address go with it, so the seller can reply to you.',
+	'email_seller_label' => 'Your message',
+	'email_seller_send' => 'Send email',
+	'email_seller_sent' => 'Your message was emailed to the seller.',
+	'email_seller_failed' => 'Your message could not be sent. Try again later.',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => 'Someone is interested in ":title"',
+	'enquiry_greeting' => 'Hello,',
+	'enquiry_intro' => ':name sent you a message about your listing ":title" on :appName:',
+	'enquiry_reply' => 'Reply to this email to answer :name directly.',
+	'enquiry_action' => 'View your listing',
 
 	'js' => [
 		'you'             => 'You',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count unread',
 		'listing_gone'    => 'This listing is no longer available.',
 		'chars_left'      => ':count left',
+		'emails_on'       => 'Emails about unread messages are on.',
+		'emails_off'      => 'Emails about unread messages are off.',
 	],
 ];

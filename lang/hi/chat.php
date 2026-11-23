@@ -52,7 +52,10 @@ return [
 	'error_too_fast'          => 'आप बहुत तेज़ी से संदेश भेज रहे हैं। थोड़ा रुकें और फिर कोशिश करें।',
 	'error_cannot_message'    => 'आप इस चैट में संदेश नहीं भेज सकते।',
 	'error_own_listing'       => 'यह आपका अपना विज्ञापन है।',
-	'error_no_seller_account' => 'इस विक्रेता से चैट पर संपर्क नहीं हो सकता। विज्ञापन में दिया फ़ोन नंबर इस्तेमाल करें।',
+	'error_no_seller_account' => 'इस विक्रेता से चैट पर संपर्क नहीं हो सकता। विज्ञापन में दिया ईमेल या फ़ोन बटन इस्तेमाल करें।',
+	'error_empty_email'       => 'विक्रेता को कुछ शब्द लिखें (कम से कम 10 अक्षर)।',
+	'error_email_seller_unavailable' => 'इस विक्रेता से ईमेल पर संपर्क नहीं हो सकता।',
+	'error_email_seller_no_address'  => 'पहले अपने खाते में ईमेल पता जोड़ें, ताकि विक्रेता जवाब दे सके।',
 	'error_block_self'        => 'आप खुद को ब्लॉक नहीं कर सकते।',
 
 	// Email to the admins about a reported chat
@@ -69,6 +72,33 @@ return [
 	'digest_line'     => '{1} :name ने ":title" के बारे में :count संदेश लिखा है।|[2,*] :name ने ":title" के बारे में :count संदेश लिखे हैं।',
 	'digest_action'   => 'मेरी चैट खोलें',
 	'digest_safety'   => 'सुरक्षित रहें: किसी सार्वजनिक जगह पर मिलें, पैसे देने से पहले सामान जाँच लें, और कभी एडवांस न भेजें और न ही फ़ोन पर आए कोड किसी को बताएँ।',
+	'digest_off'      => 'ये ईमेल बंद करें',
+
+	// The unread-messages email, on or off: the switch on the chat page and the page behind the email's link
+	'settings' => 'चैट सेटिंग',
+	'emails_label' => 'अपठित संदेशों के बारे में मुझे ईमेल करें',
+	'emails_hint' => 'जब कोई संदेश 10 मिनट से इंतज़ार में हो तब एक ईमेल, हर संदेश पर नहीं।',
+	'emails_off_title' => 'अपठित संदेशों के ईमेल बंद करें?',
+	'emails_off_text' => 'नए संदेश आपकी चैट में आपका इंतज़ार करते रहेंगे। वहीं चैट सेटिंग में आप ईमेल फिर चालू कर सकते हैं।',
+	'emails_off_confirm' => 'ईमेल बंद करें',
+	'emails_off_done_title' => 'ईमेल बंद हो गए',
+	'emails_off_done_text' => 'अब हम अपठित संदेशों के बारे में आपको ईमेल नहीं भेजेंगे। आप इन्हें चैट सेटिंग में फिर चालू कर सकते हैं।',
+
+	// "Email the seller": a listing posted without a member account cannot be chatted with
+	'email_seller' => 'विक्रेता को ईमेल करें',
+	'email_seller_intro' => 'यह विक्रेता चैट इस्तेमाल नहीं करता। हम आपका संदेश उन्हें ईमेल से भेजते हैं।',
+	'email_seller_share' => 'आपका नाम और ईमेल पता साथ जाता है, ताकि विक्रेता आपको जवाब दे सके।',
+	'email_seller_label' => 'आपका संदेश',
+	'email_seller_send' => 'ईमेल भेजें',
+	'email_seller_sent' => 'आपका संदेश विक्रेता को ईमेल से भेज दिया गया।',
+	'email_seller_failed' => 'आपका संदेश नहीं भेजा जा सका। बाद में फिर कोशिश करें।',
+
+	// The email a seller without an account gets
+	'enquiry_subject' => '":title" में किसी की रुचि है',
+	'enquiry_greeting' => 'नमस्ते,',
+	'enquiry_intro' => ':name ने :appName पर आपके विज्ञापन ":title" के बारे में आपको संदेश भेजा है:',
+	'enquiry_reply' => ':name को सीधे जवाब देने के लिए इस ईमेल का जवाब दें।',
+	'enquiry_action' => 'अपना विज्ञापन देखें',
 
 	'js' => [
 		'you'             => 'आप',
@@ -121,5 +151,7 @@ return [
 		'unread_count'    => ':count अपठित',
 		'listing_gone'    => 'यह विज्ञापन अब उपलब्ध नहीं है।',
 		'chars_left'      => ':count बचे',
+		'emails_on'       => 'अपठित संदेशों के ईमेल चालू हैं।',
+		'emails_off'      => 'अपठित संदेशों के ईमेल बंद हैं।',
 	],
 ];

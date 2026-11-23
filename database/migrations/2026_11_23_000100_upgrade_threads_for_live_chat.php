@@ -116,8 +116,9 @@ return new class extends Migration
 				continue;
 			}
 
+			// A conversation a member had deleted from their Messenger list stays hidden for them ("deleted_at"
+			// on their row); it comes back with the next message
 			DB::table('threads')->where('id', $thread->id)->update(['buyer_id' => $buyerId]);
-			DB::table('threads_participants')->where('thread_id', $thread->id)->update(['deleted_at' => null]);
 		}
 	}
 
@@ -139,9 +140,18 @@ return new class extends Migration
 				->pluck('id');
 
 			DB::table('threads_messages')->whereIn('thread_id', $duplicateIds)->update(['thread_id' => $group->keep_id]);
+			$this->keepVisibleForThoseWhoStillHadOne((int)$group->keep_id, $duplicateIds->all());
 			DB::table('threads_participants')->whereIn('thread_id', $duplicateIds)->delete();
 			DB::table('threads')->whereIn('id', $duplicateIds)->delete();
 		}
+	}
+
+	/** A member who had hidden the kept conversation, but not one merged into it, goes on seeing it. */
+	private function keepVisibleForThoseWhoStillHadOne(int $keepId, array $duplicateIds): void
+	{
+		$userIds = DB::table('threads_participants')->whereIn('thread_id', $duplicateIds)->whereNull('deleted_at')->pluck('user_id');
+
+		DB::table('threads_participants')->where('thread_id', $keepId)->whereIn('user_id', $userIds)->update(['deleted_at' => null]);
 	}
 
 	private function fillLastMessages(): void
@@ -178,6 +188,8 @@ return new class extends Migration
 			DB::table('threads_participants')->where('id', $participant->id)->update([
 				'last_read_message_id' => $lastReadId,
 				'unread_count'         => $unread,
+				// Messages left unread in the old Messenger are not emailed about when the chat goes live
+				'digest_sent_at'       => $unread > 0 ? now() : null,
 			]);
 		}
 	}

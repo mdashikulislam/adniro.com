@@ -20,6 +20,7 @@ class ChatUnread
 			return (int)ChatParticipant::query()
 				->where('user_id', $userId)
 				->where('unread_count', '>', 0)
+				->visible()
 				->whereHas('thread')
 				->sum('unread_count');
 		});

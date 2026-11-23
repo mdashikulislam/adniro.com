@@ -198,6 +198,47 @@
 			})[0] || null;
 		}
 
+		/** Saved messages are in the order the server saved them; the ones still being sent come last. */
+		function isInOrder() {
+			var lastId = 0;
+			var unsavedSeen = false;
+			return store.open.messages.every(function (message) {
+				if (!message.id) {
+					unsavedSeen = true;
+					return true;
+				}
+				if (unsavedSeen || message.id < lastId) {
+					return false;
+				}
+				lastId = message.id;
+				return true;
+			});
+		}
+
+		/**
+		 * After a reconnect a live message can arrive before the older ones that were missed. Puts the log
+		 * back in order and draws it again; returns whether it had to.
+		 */
+		function keepInOrder() {
+			if (isInOrder()) {
+				return false;
+			}
+			var all = store.open.messages;
+			var saved = all.filter(function (message) {
+				return !!message.id;
+			}).sort(function (a, b) {
+				return a.id - b.id;
+			});
+			store.open.messages = saved.concat(all.filter(function (message) {
+				return !message.id;
+			}));
+
+			var top = els.log.scrollTop;
+			renderLog();
+			els.log.scrollTop = top;
+			return true;
+		}
+
 		/** Adds a message from the server, or completes the one this tab is still sending. */
 		function upsertMessage(message) {
 			var existing = findMessage(message);
@@ -206,13 +247,17 @@
 				// A photo this tab sent keeps showing its local copy: no reload, no flicker
 				var image = wasSending && existing.image ? existing.image : message.image;
 				Object.assign(existing, message, {image: image, state: 'sent', error: null});
-				redrawMessage(existing);
+				if (!keepInOrder()) {
+					redrawMessage(existing);
+				}
 				return false;
 			}
 
 			var stick = isNearBottom() || message.user_id === ME;
 			store.open.messages.push(message);
-			appendMessage(message, true);
+			if (!keepInOrder()) {
+				appendMessage(message, true);
+			}
 			if (stick) {
 				scrollToBottom();
 			} else {

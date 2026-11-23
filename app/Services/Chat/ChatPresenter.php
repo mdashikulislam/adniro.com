@@ -45,7 +45,7 @@ class ChatPresenter
 			// Addresses are relative: this is also pushed to the other person, who may be on another host name
 			'url'           => route('chat.show', ['thread' => $thread->id], false),
 			'other'         => self::person($other?->user, $otherId),
-			'post'          => self::post($thread->post),
+			'post'          => self::post($thread->post) ?? self::deletedListing($thread->subject),
 			'last'          => $last === null ? null : [
 				'id'   => (int)$last->id,
 				'mine' => (int)$last->user_id === $viewerId,
@@ -141,6 +141,16 @@ class ChatPresenter
 			'url'       => $isAvailable ? urlGen()->post($post) : null,
 			'available' => $isAvailable,
 		];
+	}
+
+	/** The card of a listing that has been deleted: the conversation still remembers its title. */
+	private static function deletedListing(?string $title): ?array
+	{
+		if (empty($title)) {
+			return null;
+		}
+
+		return ['id' => 0, 'title' => $title, 'price' => '', 'photo' => null, 'url' => null, 'available' => false];
 	}
 
 	private static function oneLine(string $text): string

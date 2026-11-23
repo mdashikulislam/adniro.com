@@ -45,8 +45,7 @@ class ChatMessageController extends Controller
 		$chatThread = ChatAccess::threadFor($thread, $userId);
 
 		if ($request->filled('after')) {
-			return response()->json([
-				'messages'   => ChatMessages::after($chatThread, (int)$request->query('after')),
+			return response()->json(ChatMessages::after($chatThread, (int)$request->query('after')) + [
 				'read_up_to' => (int)($chatThread->otherParticipant($userId)?->last_read_message_id ?? 0),
 			]);
 		}

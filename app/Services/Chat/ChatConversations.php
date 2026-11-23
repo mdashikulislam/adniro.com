@@ -97,7 +97,8 @@ class ChatConversations
 	}
 
 	/**
-	 * A page of the member's inbox, newest conversation first. Conversations without a message are not listed.
+	 * A page of the member's inbox, newest conversation first. Conversations without a message, and the ones
+	 * the member removed from their list, are not listed.
 	 *
 	 * @return array{threads: array<int, array>, next_cursor: ?string}
 	 */
@@ -106,7 +107,7 @@ class ChatConversations
 		$page = ChatThread::query()
 			->whereNotNull('last_message_id')
 			->whereHas('participants', function ($participants) use ($userId, $filter) {
-				$participants->where('user_id', $userId);
+				$participants->where('user_id', $userId)->visible();
 				if ($filter === self::FILTER_UNREAD) {
 					$participants->where('unread_count', '>', 0);
 				}

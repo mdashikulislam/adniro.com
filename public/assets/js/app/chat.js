@@ -9,7 +9,8 @@
  * Everything written to the page goes through textContent: message text is never treated as HTML.
  *
  * Parts, loaded before this file: chat-kit.js (helpers), chat-inbox.js (the list), chat-log.js (the messages),
- * chat-reply.js (replying to one message), chat-safety.js (block and report), chat-photo.js (shrinking photos).
+ * chat-reply.js (replying to one message), chat-safety.js (block and report), chat-settings.js (the email
+ * switch), chat-photo.js (shrinking photos).
  */
 (function (window, document) {
 	'use strict';
@@ -137,6 +138,8 @@
 	var fitToKeyboard = log.fitToKeyboard;
 	var releasePhotos = log.releasePhotos;
 	var reply = window.AdnChatReply(ctx);
+
+	window.AdnChatSettings(ctx);
 
 	window.AdnChatSafety(ctx, function (open, thread) {
 		open.thread = thread;
@@ -331,8 +334,9 @@
 			online: false,
 			loadingOlder: false,
 			readSent: 0,
-			// The newest message received from the server. A message this tab sends does not move it, so
-			// one the other person sent just before is still asked for
+			// How far this tab has caught up with the server: moved only by the messages loaded with the
+			// conversation and by catch-up answers. A message this tab sends, or one that arrives live, does
+			// not move it, so nothing that came in between is ever skipped (they are asked for again, once)
 			syncedId: 0,
 			starting: null
 		};
@@ -581,6 +585,9 @@
 				hideTyping();
 				markRead();
 			}
+			if (data.has_more) {
+				catchUp(); // a long absence: the answer comes in parts
+			}
 		}).catch(function () {
 			// the next check tries again
 		});
@@ -593,8 +600,8 @@
 			return;
 		}
 		open.thread = Object.assign({}, detail.thread, {read_up_to: Math.max(detail.thread.read_up_to, open.thread.read_up_to)});
+		// syncedId is not moved here: a live message can overtake older ones still to be caught up
 		upsertMessage(detail.message);
-		open.syncedId = Math.max(open.syncedId, detail.message.id);
 		if (detail.message.user_id !== ME) {
 			hideTyping();
 			markRead();

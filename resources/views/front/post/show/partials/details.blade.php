@@ -90,13 +90,18 @@
 							<i class="fa-regular fa-pen-to-square"></i> {{ t('Edit') }}
 						</a>
 					@else
-						{{-- adniro: live chat replaces the contact form --}}
+						{{-- adniro: live chat replaces the contact form; a listing without a member account is emailed --}}
 						@php
 							$chatStartUrl = chatStartUrl($post);
+							$emailSellerUrl = empty($chatStartUrl) ? emailSellerUrl($post) : null;
 						@endphp
 						@if (!empty($chatStartUrl))
 							<a href="{{ $chatStartUrl }}" @if (str_starts_with($chatStartUrl, '#')) data-bs-toggle="modal" @endif class="listing-action-btn">
 								<i class="bi bi-chat-dots"></i> {{ trans('chat.chat_with_seller') }}
+							</a>
+						@elseif (!empty($emailSellerUrl))
+							<a href="{{ $emailSellerUrl }}" data-bs-toggle="modal" class="listing-action-btn">
+								<i class="bi bi-envelope"></i> {{ trans('chat.email_seller') }}
 							</a>
 						@endif
 					@endif

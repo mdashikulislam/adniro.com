@@ -3,7 +3,8 @@
 # Install (as root):
 #   cp deploy/reverb/adniro-reverb.service /etc/systemd/system/
 #   systemctl daemon-reload && systemctl enable --now adniro-reverb
-# After each deploy:  systemctl restart adniro-reverb   (it loads the PHP code once, at start)
+# After each deploy:  nothing to do: deploy/deploy.sh asks it to restart (it loads the PHP code once, at start).
+#                     By hand: systemctl restart adniro-reverb
 # Logs:               journalctl -u adniro-reverb -n 50
 #
 # It listens on 127.0.0.1:8080 only (config/reverb.php); nginx passes wss://<site>/app on to it

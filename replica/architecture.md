@@ -258,11 +258,37 @@ Steps 0 to 3 are built and tested on local. What differs from the plan above, an
 - **Reports** are saved and emailed to the site's contact address with the last six messages. An admin page for
   them is still step 4.
 - **Listings posted without an account** (guest posting) have no "Chat with seller": there is no member to talk
-  to. The phone and WhatsApp buttons stay.
-- **Scripts:** the page's code is six small files (`chat-kit`, `chat-inbox`, `chat-log`, `chat-safety`,
-  `chat-photo`, `chat`), none over 800 lines, plus `chat-live` on every page for signed-in members.
+  to. They get "Email the seller" instead (see round 1 below). The phone and WhatsApp buttons stay.
+- **Scripts:** the page's code is small files (`chat-kit`, `chat-inbox`, `chat-log`, `chat-reply`, `chat-safety`,
+  `chat-settings`, `chat-photo`, `chat`), none over 800 lines, plus `chat-live` on every page for signed-in
+  members and `email-seller` on listings without a member account.
 - **Going live with sockets** is three steps on the server, written down in `docs/operations.md` ("Live chat")
   with the files in `deploy/reverb/`. Until they are done the chat works with the 10-second check.
+
+**Round 1 of the audit (`replica/chat-audit.md`, section A), fixed on local:**
+
+- **Deleting a listing keeps the conversation.** It only stops pointing at the listing (`ChatCleanup`); the
+  pinned card shows the listing's title as no longer available.
+- **Deleting a member** removes their messages, as before, and now counts the other person's conversations
+  again (last message, unread count, badge).
+- **Messages keep every character.** The site-wide input cleaning cut everything after a "<"; chat messages and
+  the email form are exempt from it, and are only ever shown as text.
+- **Across a block "seen" does not move**, and the blocked person is not told that their messages were read.
+- **Order and catch-up:** the log is kept in the order the server saved the messages, and a long absence is
+  caught up in parts (`has_more`) until nothing is missed.
+- **A conversation hidden by a member** (`threads_participants.deleted_at`, set by the old Messenger's delete)
+  stays out of their list, badge and email until a new message arrives. The upgrade no longer un-hides it, and
+  marks messages that were already unread as notified, so going live emails nobody about old messages.
+- **The unread email** can be turned off: a gear on the chat page, and a signed link in the email that asks
+  before it turns anything off (`users.chat_emails`, migration `2026_11_23_000600`). It is written in the
+  member's own language.
+- **"Email the seller"** for listings without a member account: a pop-up for signed-in members; the site emails
+  the listing's address with the member's address to reply to (`EmailSellerController`, `ListingEnquiry`).
+  Nothing is stored. At most 2 a day per member and listing.
+- **Server:** the deploy script restarts the socket server, `/health` watches it where live chat is on, and the
+  notes no longer tell anyone to cache the config.
+
+Not done: A10 (the old attachment's direct link), which needs a change on the live server.
 
 Design: `replica/design/` (tokens, 27 colour pairs with 0 failing AA, and the component specs).
 

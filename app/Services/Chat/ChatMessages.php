@@ -18,7 +18,7 @@ class ChatMessages
 {
 	public const PAGE_SIZE = 30;
 	public const BODY_MAX = 2000;
-	private const CATCH_UP_MAX = 100;
+	public const CATCH_UP_MAX = 100;
 
 	/**
 	 * Saves a text or a photo from one participant and pushes it to both. With the same client_uuid it
@@ -78,29 +78,43 @@ class ChatMessages
 		];
 	}
 
-	/** Messages newer than the one the browser already has (the fallback check when the live connection is down). */
+	/**
+	 * Messages newer than the one the browser already has (after a reconnect, and the fallback check while the
+	 * live connection is down), oldest first. "has_more" tells the browser to ask again for the rest.
+	 *
+	 * @return array{messages: array<int, array>, has_more: bool}
+	 */
 	public static function after(ChatThread $thread, int $afterId): array
 	{
-		return ChatMessage::query()
+		$rows = ChatMessage::query()
 			->where('thread_id', $thread->id)
 			->where('id', '>', $afterId)
 			->orderBy('id')
-			->limit(self::CATCH_UP_MAX)
-			->get()
-			->pipe(fn ($rows) => ChatPresenter::messages($rows));
+			->limit(self::CATCH_UP_MAX + 1)
+			->get();
+
+		return [
+			'messages' => ChatPresenter::messages($rows->take(self::CATCH_UP_MAX)->values()),
+			'has_more' => $rows->count() > self::CATCH_UP_MAX,
+		];
 	}
 
 	/**
 	 * Marks the conversation read for this member up to a message. "Read" only moves forward.
-	 * Returns the message it is now read up to.
+	 * Returns the message it is now read up to, as the other person sees it.
+	 *
+	 * Across a block nobody learns what the other has read: the member's own unread count is cleared, but
+	 * "seen" stays where it was, so a blocked person's messages never turn "seen" when the chat is opened.
 	 */
 	public static function markRead(ChatThread $thread, int $userId, int $messageId): int
 	{
 		$upTo = min($messageId, (int)$thread->last_message_id);
+		$otherId = (int)($thread->otherParticipant($userId)?->user_id ?? 0);
+		$isSeenHidden = $otherId > 0 && ChatAccess::isBlockedBetween($userId, $otherId);
 
 		// The row is locked while it is recounted, so a message arriving at the same moment is added after
 		// the recount, never lost under it
-		[$readUpTo, $changed] = DB::transaction(function () use ($thread, $userId, $upTo) {
+		[$readUpTo, $changed] = DB::transaction(function () use ($thread, $userId, $upTo, $isSeenHidden) {
 			$participant = ChatParticipant::query()
 				->where('thread_id', $thread->id)
 				->where('user_id', $userId)
@@ -108,7 +122,14 @@ class ChatMessages
 				->firstOrFail();
 
 			$alreadyReadUpTo = (int)$participant->last_read_message_id;
-			if ($upTo <= $alreadyReadUpTo && (int)$participant->unread_count === 0) {
+			$hasUnread = (int)$participant->unread_count > 0;
+			if ($isSeenHidden) {
+				// No message can arrive across a block, so everything there is has now been looked at
+				$participant->update(['unread_count' => 0]);
+
+				return [$alreadyReadUpTo, $hasUnread];
+			}
+			if ($upTo <= $alreadyReadUpTo && !$hasUnread) {
 				return [$alreadyReadUpTo, false];
 			}
 			$readUpTo = max($upTo, $alreadyReadUpTo);
@@ -126,7 +147,7 @@ class ChatMessages
 
 		if ($changed) {
 			ChatUnread::forget($userId);
-			ChatBroadcaster::messagesRead($thread, $userId, $readUpTo);
+			ChatBroadcaster::messagesRead($thread, $userId, $readUpTo, $isSeenHidden);
 		}
 
 		return $readUpTo;

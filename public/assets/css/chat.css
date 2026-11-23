@@ -71,6 +71,7 @@
 
 .adn-chat-title {
 	margin: 0;
+	margin-inline-end: auto; /* the filters and the settings button stay together at the end */
 	font-size: 1.25rem;
 	font-weight: 800;
 	line-height: 1.3;
@@ -120,6 +121,72 @@
 .adn-chat-listing:focus-visible {
 	outline: 2px solid var(--adn-chat-accent);
 	outline-offset: 2px;
+}
+
+/* ---------- Settings (the gear in the inbox header): the unread-messages email, on or off ---------- */
+.adn-chat-inbox-head {
+	gap: .35rem;
+}
+
+.adn-chat-settings .adn-chat-icon-btn {
+	width: 40px;
+	height: 40px;
+	font-size: 1.05rem;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-settings-menu {
+	width: min(310px, calc(100vw - 2rem));
+	padding: .25rem;
+	border-radius: var(--adn-chat-radius-md);
+}
+
+.adn-chat-switch {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	margin: 0;
+	padding: .6rem .75rem;
+	cursor: pointer;
+}
+
+.adn-chat-switch-text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.35;
+}
+
+.adn-chat-switch-text strong {
+	font-size: .875rem;
+	font-weight: 700;
+	color: var(--adn-chat-text);
+}
+
+.adn-chat-switch-text span {
+	font-size: .75rem;
+	color: var(--adn-chat-muted);
+	text-wrap: pretty;
+}
+
+.adn-chat-switch .form-check-input {
+	float: none;
+	width: 2.6em;
+	height: 1.4em;
+	margin: 0;
+	cursor: pointer;
+}
+
+.adn-chat-switch .form-check-input:checked {
+	border-color: var(--adn-chat-accent-strong);
+	background-color: var(--adn-chat-accent-strong);
+}
+
+.adn-chat-switch .form-check-input:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+	box-shadow: none;
 }
 
 /* ---------- Inbox rows ---------- */

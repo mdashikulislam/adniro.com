@@ -1701,8 +1701,28 @@ function chatStartUrl($post): ?string
 }
 
 /**
+ * adniro: where "Email the seller" goes, for a listing posted without a member account, which cannot be chatted
+ * with: the email form's pop-up for a signed-in member, the sign-in pop-up for a guest, and nowhere (null) when
+ * the listing has a member account (it has "Chat with seller"), is not public, or has no email address.
+ *
+ * @param $post
+ * @return string|null
+ */
+function emailSellerUrl($post): ?string
+{
+	$post = is_array($post) ? Arr::toObject($post) : $post;
+	
+	if (empty($post) || (int)data_get($post, 'user_id') !== 0 || empty(data_get($post, 'email')) || !isVerifiedPost($post)) {
+		return null;
+	}
+	
+	return auth()->check() ? '#adnEmailSeller' : '#quickLogin';
+}
+
+/**
  * Generate the "Chat with seller" button
- * adniro: the Messenger's contact form is replaced by live chat
+ * adniro: the Messenger's contact form is replaced by live chat; a listing without a member account gets
+ * "Email the seller" instead
  *
  * @param null $post
  * @param bool $btnBlock
@@ -1712,20 +1732,26 @@ function chatStartUrl($post): ?string
 function genEmailContactBtn($post = null, bool $btnBlock = false, bool $iconOnly = false): string
 {
 	$btnLink = chatStartUrl($post);
+	$label = e(trans('chat.chat_with_seller'));
+	$icon = 'bi-chat-dots';
+	if ($btnLink === null) {
+		$btnLink = emailSellerUrl($post);
+		$label = e(trans('chat.email_seller'));
+		$icon = 'bi-envelope';
+	}
 	if ($btnLink === null) {
 		return '';
 	}
 	
-	$label = e(trans('chat.chat_with_seller'));
 	$modalAttr = str_starts_with($btnLink, '#') ? ' data-bs-toggle="modal"' : '';
 	
 	if ($iconOnly) {
 		$out = '<a href="' . e($btnLink) . '"' . $modalAttr . ' class="' . linkClass() . '">';
-		$out .= '<i class="bi bi-chat-dots" data-bs-toggle="tooltip" title="' . $label . '"></i>';
+		$out .= '<i class="bi ' . $icon . '" data-bs-toggle="tooltip" title="' . $label . '"></i>';
 	} else {
 		$btnClass = $btnBlock ? ' btn-block' : '';
 		$out = '<a href="' . e($btnLink) . '"' . $modalAttr . ' class="btn btn-primary adn-chat-start' . $btnClass . '">';
-		$out .= '<i class="bi bi-chat-dots"></i> ' . $label;
+		$out .= '<i class="bi ' . $icon . '"></i> ' . $label;
 	}
 	
 	return $out . '</a>';

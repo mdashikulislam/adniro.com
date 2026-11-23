@@ -240,6 +240,8 @@
 	</div>
 	
 	@includeWhen(!auth()->check(), 'auth.login.partials.modal')
+	{{-- adniro: the email form for a listing posted without a member account (no chat) --}}
+	@includeWhen(emailSellerUrl($post) === '#adnEmailSeller', 'front.post.show.partials.email-seller')
 @endsection
 @php
 	if (!session()->has('emailVerificationSent') && !session()->has('phoneVerificationSent')) {

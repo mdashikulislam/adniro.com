@@ -37,6 +37,7 @@ use App\Services\Auth\App\Notifications\AccountSuspended;
 use App\Services\Auth\App\Notifications\NewUserRegistered;
 use App\Services\Auth\App\Notifications\TwoFactorSetup;
 use App\Services\Auth\Traits\Custom\Verification\Metadata;
+use App\Services\Chat\ChatCleanup;
 use extras\plugins\reviews\app\Models\Review;
 use Illuminate\Support\Facades\Notification;
 use Throwable;
@@ -212,6 +213,9 @@ class UserObserver extends BaseObserver
 			}
 		}
 		
+		// adniro: the member's conversations, noted before their rows are deleted (see below)
+		$chatThreadIds = ChatCleanup::threadIdsOf((int)$user->id);
+		
 		// Delete all user's Messages
 		$messages = ThreadMessage::where('user_id', $user->id);
 		if ($messages->count() > 0) {
@@ -227,6 +231,10 @@ class UserObserver extends BaseObserver
 				$participant->forceDelete();
 			}
 		}
+		
+		// adniro: the other person keeps their side of each conversation, counted again without this member's
+		// messages, so no unread badge or "last message" is left pointing at something deleted
+		ChatCleanup::memberDeleted((int)$user->id, $chatThreadIds);
 		
 		// Delete all user's Saved Posts
 		$savedPosts = SavedPost::where('user_id', $user->id);

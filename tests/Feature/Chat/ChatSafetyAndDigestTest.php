@@ -5,6 +5,7 @@ namespace Tests\Feature\Chat;
 use App\Models\Chat\UserBlock;
 use App\Notifications\ChatReported;
 use App\Notifications\ChatUnreadDigest;
+use App\Services\Chat\ChatEmailChoice;
 use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatSafety;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -140,5 +141,69 @@ class ChatSafetyAndDigestTest extends ChatTestCase
 
 		// Assert
 		Notification::assertSentToTimes($this->seller, ChatUnreadDigest::class, 2);
+	}
+
+	public function test_the_email_is_written_in_the_members_language_and_carries_a_link_to_stop_it(): void
+	{
+		// Arrange: the seller reads the site in French
+		Notification::fake();
+		DB::table('users')->where('id', self::SELLER_ID)->update(['language_code' => 'fr']);
+		$thread = $this->conversation(['Is this still available?']);
+		DB::table('threads')->where('id', $thread->id)->update(['last_message_at' => now()->subMinutes(11)]);
+
+		// Act
+		$this->artisan('chat:unread-digest')->assertSuccessful();
+
+		// Assert
+		Notification::assertSentTo($this->seller, ChatUnreadDigest::class, function (ChatUnreadDigest $mail, array $channels, $notifiable, ?string $locale) {
+			$lines = implode(' ', $mail->toMail($this->seller)->outroLines);
+
+			return $locale === 'fr' && str_contains($lines, ChatEmailChoice::offUrl(self::SELLER_ID)) && str_contains($lines, 'Stop these emails');
+		});
+	}
+
+	public function test_a_member_who_turned_the_email_off_gets_none(): void
+	{
+		// Arrange
+		Notification::fake();
+		$thread = $this->conversation(['Is this still available?']);
+		DB::table('threads')->where('id', $thread->id)->update(['last_message_at' => now()->subMinutes(11)]);
+
+		// Act: the seller turns the switch off on the chat page
+		$this->actingAs($this->seller)->putJson('/chat/api/settings', ['emails' => false])->assertOk()->assertJsonPath('emails', false);
+		$this->artisan('chat:unread-digest')->assertSuccessful();
+
+		// Assert
+		Notification::assertNothingSent();
+		$this->actingAs($this->seller->fresh())->get('/chat')->assertOk()->assertSee('"emails":false', false);
+		$this->actingAs($this->seller)->putJson('/chat/api/settings', ['emails' => true])->assertOk()->assertJsonPath('emails', true);
+		$this->assertTrue(ChatEmailChoice::isOn($this->seller->fresh()));
+	}
+
+	public function test_the_link_in_the_email_stops_it_without_signing_in_but_only_after_a_confirmation(): void
+	{
+		// Arrange
+		$offUrl = ChatEmailChoice::offUrl(self::SELLER_ID);
+
+		// Act & Assert: opening the link only asks (mail scanners open every link)
+		$this->get($offUrl)->assertOk()->assertSee('Stop the emails');
+		$this->assertTrue(ChatEmailChoice::isOn($this->seller->fresh()));
+
+		// Act & Assert: confirming turns the email off, for this member only
+		$this->post($offUrl)->assertOk()->assertSee('Emails stopped');
+		$this->assertFalse(ChatEmailChoice::isOn($this->seller->fresh()));
+		$this->assertTrue(ChatEmailChoice::isOn($this->buyer->fresh()));
+	}
+
+	public function test_a_link_made_for_one_member_cannot_stop_another_members_emails(): void
+	{
+		// Arrange: the seller's link, pointed at the buyer
+		$forged = str_replace('/off/' . self::SELLER_ID, '/off/' . self::BUYER_ID, ChatEmailChoice::offUrl(self::SELLER_ID));
+
+		// Act & Assert
+		$this->get($forged)->assertForbidden();
+		$this->post($forged)->assertForbidden();
+		$this->post('/chat/emails/off/' . self::BUYER_ID)->assertForbidden();
+		$this->assertTrue(ChatEmailChoice::isOn($this->buyer->fresh()));
 	}
 }

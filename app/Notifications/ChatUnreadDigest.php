@@ -16,8 +16,11 @@ class ChatUnreadDigest extends BaseNotification
 	private const NAME_LIMIT = 40;
 	private const TITLE_LIMIT = 60;
 
-	/** @param array<int, array{name: ?string, title: ?string, count: int}> $conversations */
-	public function __construct(protected array $conversations)
+	/**
+	 * @param array<int, array{name: ?string, title: ?string, count: int}> $conversations
+	 * @param string $offUrl the address that turns this email off for the member (ChatEmailChoice)
+	 */
+	public function __construct(protected array $conversations, protected string $offUrl)
 	{
 	}
 
@@ -51,6 +54,7 @@ class ChatUnreadDigest extends BaseNotification
 		return $mail
 			->action(trans('chat.digest_action'), route('chat.index'))
 			->line(e(trans('chat.digest_safety')))
+			->line('<a href="' . e($this->offUrl) . '">' . e(trans('chat.digest_off')) . '</a>')
 			->salutation(trans('mail.footer_salutation', ['appName' => config('app.name')]));
 	}
 }
