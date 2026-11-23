@@ -33,7 +33,7 @@
 	--adn-chat-fast: 120ms;
 	--adn-chat-base: 200ms;
 	--adn-chat-ease: cubic-bezier(.2, .8, .2, 1);
-	--adn-chat-inbox-width: 360px;
+	--adn-chat-inbox-width: 400px;
 	--adn-chat-head-height: 60px;
 }
 

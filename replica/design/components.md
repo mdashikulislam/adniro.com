@@ -16,7 +16,7 @@ Screens: **C1** listing page · **C2** inbox · **C3** conversation · **C4** ne
 
 ```
 Chat shell (C2, C3, C4)
-  desktop ≥992   one panel in the page container: inbox 360px | conversation fills the rest
+  desktop ≥992   one panel in the page container: inbox 400px | conversation fills the rest
                  height: the screen minus the header, never taller than 820px; radius panel, shadow panel
   phones <992    C2 is the inbox as a normal page (header and app bar stay)
                  C3/C4 are full screen: position fixed, 100dvh, the site header, footer and app bar hidden,
