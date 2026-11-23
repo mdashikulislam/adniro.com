@@ -4097,6 +4097,26 @@ body.page-listing main {
 	background-color: var(--bs-tertiary-bg);
 }
 
+/* adniro: a seller without a photo: their initial on the site's teal, in place of the grey placeholder */
+.seller-avatar-initial {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	border: 2px solid var(--bs-body-bg);
+	border-radius: 50%;
+	font-size: 1.45rem;
+	font-weight: 800;
+	line-height: 1;
+	color: #0f766e;
+	background: linear-gradient(140deg, rgba(var(--bs-primary-rgb), .2), rgba(var(--bs-primary-rgb), .08)), var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .seller-avatar-initial {
+	color: #5eead4;
+}
+
 .seller-info {
 	display: flex;
 	flex-direction: column;

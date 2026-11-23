@@ -49,8 +49,14 @@
 					$trustListings = \App\Services\SellerService::liveListingsCount($trustSeller);
 				@endphp
 				<div class="seller-profile">
+					{{-- adniro: the seller's photo; without one, their initial on the site's teal (the grey placeholder
+					     did not match the card) --}}
 					<div class="seller-avatar">
-						<img src="{{ data_get($post, 'user_photo_url') }}" alt="{{ data_get($post, 'contact_name') }}">
+						@if (!empty(data_get($trustSeller, 'photo_url')))
+							<img src="{{ data_get($post, 'user_photo_url') }}" alt="{{ data_get($post, 'contact_name') }}">
+						@else
+							<span class="seller-avatar-initial" aria-hidden="true">{{ mb_strtoupper(mb_substr(trim((string)data_get($post, 'contact_name')), 0, 1)) ?: '?' }}</span>
+						@endif
 					</div>
 					<div class="seller-info">
 						<span class="seller-label">{{ t('Posted by') }}</span>
@@ -67,12 +73,12 @@
 							@else
 								{{ data_get($post, 'contact_name') }}
 							@endif
+							{{-- adniro: "verified" is an icon right after the name (as in the chat), not a line of its own --}}
+							@if (data_get($trustSeller, 'is_verified'))
+								<i class="bi bi-patch-check-fill text-primary ms-1 seller-verified" role="img"
+								   aria-label="{{ t('verified_seller') }}" title="{{ t('verified_seller') }}: {{ t('verified_seller_hint') }}"></i>
+							@endif
 						</span>
-						@if (data_get($trustSeller, 'is_verified'))
-							<span class="seller-verified badge rounded-pill text-bg-success-subtle text-success-emphasis mt-1" title="{{ t('verified_seller_hint') }}">
-								<i class="bi bi-patch-check-fill"></i> {{ t('verified_seller') }}
-							</span>
-						@endif
 						@if (config('plugins.reviews.installed'))
 							@if (view()->exists('reviews::ratings-user'))
 								@include('reviews::ratings-user')

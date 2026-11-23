@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\SellerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Feature\Concerns\SeedsStockData;
 use Tests\TestCase;
 
 /*
@@ -15,7 +16,7 @@ use Tests\TestCase;
 
 class SellerTrustTest extends TestCase
 {
-	use RefreshDatabase;
+	use RefreshDatabase, SeedsStockData;
 	
 	public function test_a_seller_with_a_verified_email_is_verified(): void
 	{
@@ -26,6 +27,27 @@ class SellerTrustTest extends TestCase
 		// Act & Assert
 		$this->assertTrue(SellerService::findByUserId($verified->id)['is_verified']);
 		$this->assertFalse(SellerService::findByUserId($unverified->id)['is_verified']);
+	}
+	
+	public function test_the_listing_page_marks_a_verified_seller_with_an_icon_after_their_name(): void
+	{
+		// Arrange
+		$this->seedStockData();
+		$seller = $this->stockMember(71);
+		$post = $this->stockListing('Grey corner sofa', ['user_id' => $seller->id]);
+		$icon = '~<span class="seller-name">\s*<a [^>]+>[^<]+</a>\s*<i class="bi bi-patch-check-fill text-primary ms-1 seller-verified" role="img"\s+aria-label="Verified seller"[^>]*></i>\s*</span>~s';
+
+		// Act
+		$verified = $this->get(urlGen()->post($post))->assertOk()->getContent();
+		DB::table('users')->where('id', $seller->id)->update(['email_verified_at' => null]);
+		$unverified = $this->get(urlGen()->post($post) . '?again=1')->assertOk()->getContent();
+
+		// Assert: an icon inside the name, no "Verified seller" line of its own; nothing for an unconfirmed email
+		$this->assertMatchesRegularExpression($icon, $verified);
+		$this->assertStringNotContainsString('seller-verified badge', $verified);
+		$this->assertStringNotContainsString('seller-verified', $unverified);
+		// Without a photo the seller's initial stands in for the grey placeholder
+		$this->assertMatchesRegularExpression('~<div class="seller-avatar">\s*<span class="seller-avatar-initial" aria-hidden="true">[A-Z]</span>~', $verified);
 	}
 	
 	public function test_only_listings_the_public_can_see_are_counted(): void
