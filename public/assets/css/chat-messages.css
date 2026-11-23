@@ -627,7 +627,7 @@ div.adn-chat-ref .adn-chat-ref-text span {
 .adn-chat-hint {
 	position: absolute;
 	inset-inline-start: 14px;
-	bottom: -16px;
+	bottom: -21px;
 	display: none;
 	font-size: .6875rem;
 	line-height: 1.2;
@@ -711,7 +711,11 @@ div.adn-chat-ref .adn-chat-ref-text span {
 
 	/* Room under the message box for the new-line hint and the character counter */
 	.adn-chat-composer {
-		padding: .6rem .75rem 1.25rem;
+		padding: .6rem .75rem 2rem;
+	}
+
+	.adn-chat-count {
+		bottom: -20px;
 	}
 }
 
