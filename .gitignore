@@ -25,3 +25,6 @@ php.ini
 .user.ini
 /storage/backups
 public/robots.txt
+
+# adniro: photos sent in the live chat are private; never in the repository
+/storage/app/private/chat/
