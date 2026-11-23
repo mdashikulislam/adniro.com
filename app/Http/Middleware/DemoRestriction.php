@@ -18,7 +18,6 @@ namespace App\Http\Middleware;
 
 use App\Http\Controllers\Api\ContactController as ApiContactController;
 use App\Http\Controllers\Api\PostController as ApiPostController;
-use App\Http\Controllers\Api\ThreadController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Web\Admin\ActionController;
 use App\Http\Controllers\Web\Admin\BackupController;
@@ -159,7 +158,6 @@ class DemoRestriction
 			ApiContactController::class . '@sendReport',
 			ApiContactController::class . '@submitForm',
 			ApiContactController::class . '@submitReport',
-			// ThreadController::class . '@store',
 			
 			// web
 			ContactController::class . '@postForm',

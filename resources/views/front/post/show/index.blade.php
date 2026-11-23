@@ -253,9 +253,7 @@
 	@if (config('settings.listing_page.show_security_tips') == '1')
 		@include('front.post.show.partials.security-tips')
 	@endif
-	@if (auth()->check() || config('settings.listing_page.guest_can_contact_authors') == '1')
-		@include('front.account.messenger.modal.create')
-	@endif
+	{{-- adniro: the contact form pop-up is gone; "Chat with seller" opens the live chat --}}
 @endsection
 
 @section('before_scripts')

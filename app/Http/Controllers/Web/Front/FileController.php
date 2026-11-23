@@ -21,6 +21,7 @@ use App\Helpers\Common\Files\Storage\StorageDisk;
 use App\Http\Controllers\Controller;
 use App\Models\ThreadMessage;
 use App\Models\ThreadParticipant;
+use App\Services\Chat\ChatPhotos;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Routing\Controllers\Middleware;
 use Throwable;
@@ -32,6 +33,7 @@ class FileController extends Controller
 	
 	public function __construct()
 	{
+		self::$diskName = null; // adniro: never carried over from an earlier request in the same process
 		$tmpDiskName = request()->input('disk');
 		if (!empty($tmpDiskName) && is_string($tmpDiskName)) {
 			$allowedNames = ['private', 'public'];
@@ -85,16 +87,24 @@ class FileController extends Controller
 	}
 	
 	/**
-	 * adniro: conversation attachments (".../applications/...") are private to the conversation's participants.
-	 * Every other file on the disk (listing photos, logos...) stays public.
+	 * adniro: files sent in a conversation are private to its participants: the old Messenger's attachments
+	 * (".../applications/...") open here for them only, chat photos never do. Every other file on the disk
+	 * (listing photos, logos...) stays public.
 	 */
 	private function canOpenFile(string $filePath): bool
 	{
-		$filePath = ltrim(str_replace('\\', '/', $filePath), '/');
-		if (str_contains($filePath, '..')) {
+		// The path as the disk will read it: no "." or empty parts ("./chat/1/a.jpg" is "chat/1/a.jpg"), and never ".."
+		$segments = array_filter(explode('/', str_replace('\\', '/', $filePath)), fn ($segment) => $segment !== '' && $segment !== '.');
+		if (in_array('..', $segments, true)) {
 			return false;
 		}
-		if (!preg_match('#(^|/)applications/#i', $filePath)) {
+		$filePath = implode('/', $segments);
+		
+		// Chat photos open only through the chat's own route (ChatFileController)
+		if (ChatPhotos::isChatPath($filePath)) {
+			return false;
+		}
+		if (!in_array('applications', array_map('strtolower', $segments), true)) {
 			return true;
 		}
 		

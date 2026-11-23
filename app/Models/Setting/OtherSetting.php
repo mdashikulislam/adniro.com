@@ -30,7 +30,6 @@ class OtherSetting extends BaseSetting
 			'account_closure_enabled'     => '1',
 			'cookie_consent_enabled'      => '0',
 			'show_tips_messages'          => '1',
-			'timer_new_messages_checking' => 60000,
 			'wysiwyg_editor'              => 'tinymce',
 			
 			'carousel_slide_by_page'        => '0',
@@ -170,25 +169,7 @@ class OtherSetting extends BaseSetting
 			],
 		];
 		
-		$fields[] = [
-			'name'  => 'separator_3',
-			'type'  => 'custom_html',
-			'value' => trans('admin.other_html_messenger'),
-		];
-		$fields[] = [
-			'name'       => 'timer_new_messages_checking',
-			'label'      => trans('admin.Timer for New Messages Checking'),
-			'type'       => 'number',
-			'attributes' => [
-				'min'      => 0,
-				'step'     => 2000,
-				'required' => true,
-			],
-			'hint'       => trans('admin.timer_new_messages_checking_hint'),
-			'wrapper'    => [
-				'class' => 'col-md-6',
-			],
-		];
+		// adniro: the "timer for new messages checking" option is gone; the chat's unread badge is live
 		
 		$fields[] = [
 			'name'  => 'separator_4',

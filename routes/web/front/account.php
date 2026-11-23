@@ -16,7 +16,6 @@
 
 use App\Http\Controllers\Web\Front\Account\ClosingController;
 use App\Http\Controllers\Web\Front\Account\LinkedAccountsController;
-use App\Http\Controllers\Web\Front\Account\MessagesController;
 use App\Http\Controllers\Web\Front\Account\FollowsController;
 use App\Http\Controllers\Web\Front\Account\OverviewController;
 use App\Http\Controllers\Web\Front\Account\PostsController;
@@ -174,26 +173,9 @@ Route::middleware($accountMiddlewares)
 			});
 	});
 
-// Messenger
-// Contact Post's Author
-Route::post('messages/posts/{id}', [MessagesController::class, 'store'])->middleware('throttle:10,1'); // adniro: send limit
-
-// Messenger Chat
+// adniro: the Messenger is replaced by live chat (routes/web/front/chat.php); its old links go there
 Route::middleware($accountMiddlewares)
 	->group(function ($router) {
-		Route::controller(MessagesController::class)
-			->prefix('messages')
-			->group(function ($router) {
-				$router->pattern('id', '[0-9]+');
-				
-				Route::post('check-new', 'checkNew')->name('account.messages.checkNew');
-				Route::get('/', 'index')->name('account.messages');
-				Route::post('/', 'store')->middleware('throttle:10,1')->name('account.messages.store'); // adniro: send limit
-				Route::get('{id}', 'show')->name('account.messages.show');
-				Route::put('{id}', 'update')->middleware('throttle:30,1')->name('account.messages.update'); // adniro: send limit
-				Route::get('{id}/actions', 'actions')->name('account.messages.actions');
-				Route::post('actions', 'actions')->name('account.messages.actions.bulk');
-				Route::get('{id}/delete', 'destroy')->name('account.messages.delete');
-				Route::post('delete', 'destroy')->name('account.messages.delete.bulk');
-			});
+		Route::redirect('messages', '/chat', 301)->name('account.messages');
+		Route::redirect('messages/{id}', '/chat/{id}', 301)->where('id', '[0-9]+')->name('account.messages.show');
 	});

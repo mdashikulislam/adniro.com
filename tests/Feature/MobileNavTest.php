@@ -8,7 +8,7 @@ use Tests\Feature\Concerns\SeedsStockData;
 use Tests\TestCase;
 
 /*
- * The phone header controls and the bottom app bar (adniro): Home, Search, Sell, Saved and Account,
+ * The phone header controls and the bottom app bar (adniro): Home, Search, Post ad, Chats and Account,
  * with the current page marked, guests sent to sign in, and no app bar on the listing form.
  */
 
@@ -83,7 +83,7 @@ class MobileNavTest extends TestCase
 		$this->assertStringNotContainsString('#quickLogin', $appbar);
 	}
 
-	public function test_a_member_goes_to_saved_listings_and_the_account(): void
+	public function test_a_member_goes_to_chats_and_the_account(): void
 	{
 		// Arrange
 		$member = $this->stockMember(self::MEMBER_ID);
@@ -91,12 +91,27 @@ class MobileNavTest extends TestCase
 		// Act
 		$appbar = $this->appbar($this->actingAs($member)->get('/')->assertOk()->getContent());
 
-		// Assert
-		$this->assertStringContainsString('href="' . route('account.savedListings') . '"', $appbar);
+		// Assert: Saved listings moved to the account menu
+		$this->assertStringContainsString('href="' . route('chat.index') . '"', $appbar);
 		$this->assertStringContainsString('href="' . route('account.overview') . '"', $appbar);
+		$this->assertStringNotContainsString(route('account.savedListings'), $appbar);
 	}
 
-	public function test_the_saved_listings_page_marks_saved_only(): void
+	public function test_the_chats_page_marks_chats_only(): void
+	{
+		// Arrange
+		$member = $this->stockMember(self::MEMBER_ID);
+
+		// Act
+		$appbar = $this->appbar($this->actingAs($member)->get(route('chat.index'))->assertOk()->getContent());
+
+		// Assert
+		$this->assertSame(1, substr_count($appbar, 'is-active'));
+		$this->assertStringContainsString('bi-chat-dots-fill', $appbar);
+		$this->assertStringNotContainsString('bi-person-fill', $appbar);
+	}
+
+	public function test_the_saved_listings_page_marks_the_account(): void
 	{
 		// Arrange
 		$member = $this->stockMember(self::MEMBER_ID);
@@ -106,8 +121,7 @@ class MobileNavTest extends TestCase
 
 		// Assert
 		$this->assertSame(1, substr_count($appbar, 'is-active'));
-		$this->assertStringContainsString('bi-heart-fill', $appbar);
-		$this->assertStringNotContainsString('bi-person-fill', $appbar);
+		$this->assertStringContainsString('bi-person-fill', $appbar);
 	}
 
 	public function test_the_search_page_marks_search(): void

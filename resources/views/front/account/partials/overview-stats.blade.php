@@ -35,7 +35,7 @@
 			'tone'      => 'violet',
 			'countItem' => \App\Helpers\Common\Num::short($countThreads),
 			'label'     => trans_choice('global.count_mails', getPlural($countThreads), [], config('app.locale')),
-			'url'       => url(urlGen()->getAccountBasePath() . '/messages'),
+			'url'       => route('chat.index'), // adniro: live chat
 		],
 		'pendingApprovalPosts' => [
 			'icon'      => 'bi bi-hourglass-split',

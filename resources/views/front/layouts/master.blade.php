@@ -186,11 +186,13 @@
 
 @includeWhen($showAppbar, 'front.layouts.partials.mobile-nav')
 
+{{-- adniro: live chat: the unread badge and the live connection, for signed-in members --}}
+@include('front.layouts.partials.chat-live')
+
 @include('front.common.js.init')
 
 <script>
 	var countryCode = '{{ config('country.code', 0)  }}';
-	var timerNewMessagesChecking = {{ (int)config('settings.other.timer_new_messages_checking', 0)  }};
 	
 	{{-- Theme Preference (light/dark/system) --}}
 	var isSettingsAppDarkModeEnabled = {{ isSettingsAppDarkModeEnabled() ? 'true' : 'false' }};

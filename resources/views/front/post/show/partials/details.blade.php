@@ -90,15 +90,13 @@
 							<i class="fa-regular fa-pen-to-square"></i> {{ t('Edit') }}
 						</a>
 					@else
+						{{-- adniro: live chat replaces the contact form --}}
 						@php
-							$emailBtn = genEmailContactBtn($post, false, true);
+							$chatStartUrl = chatStartUrl($post);
 						@endphp
-						@if (!empty($emailBtn) && str_contains($emailBtn, '<a '))
-							@php
-								$msgLink = str_contains($emailBtn, '#quickLogin') ? '#quickLogin' : '#contactUser';
-							@endphp
-							<a href="{{ $msgLink }}" data-bs-toggle="modal" class="listing-action-btn">
-								<i class="bi bi-chat-dots"></i> {{ t('Send a message') }}
+						@if (!empty($chatStartUrl))
+							<a href="{{ $chatStartUrl }}" @if (str_starts_with($chatStartUrl, '#')) data-bs-toggle="modal" @endif class="listing-action-btn">
+								<i class="bi bi-chat-dots"></i> {{ trans('chat.chat_with_seller') }}
 							</a>
 						@endif
 					@endif

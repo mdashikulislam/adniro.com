@@ -1,0 +1,1079 @@
+/*
+ * adniro: live chat (front/chat/index.blade.php, assets/js/app/chat.js). Design: replica/design/components.md.
+ * Desktop: one panel, inbox | conversation. Phones: the inbox is a normal page, an open conversation is full screen.
+ *
+ * White text never sits on the site teal at body size (3.74:1): bubbles, the send button and teal text use the
+ * deeper --adn-chat-accent-strong (5.47:1). The site teal stays for icons, rings and dots.
+ */
+
+/* ---------- Tokens (replica/design/tokens.json) ---------- */
+.adn-chat-page {
+	--adn-chat-bg: var(--bs-body-bg);
+	--adn-chat-surface: #f1f5f4;
+	--adn-chat-border: var(--bs-border-color);
+	--adn-chat-text: var(--bs-body-color);
+	--adn-chat-muted: #5c6470;
+	--adn-chat-accent: var(--bs-primary, #0d9488);
+	--adn-chat-accent-strong: #0f766e;
+	--adn-chat-accent-text: #0f766e;
+	--adn-chat-accent-soft: #e6f6f4;
+	--adn-chat-on-accent: #fff;
+	--adn-chat-on-accent-muted: #d5f0ec;
+	--adn-chat-danger: #c62f2f;
+	--adn-chat-success: #1f7a4d;
+	--adn-chat-warning-bg: #fff7e0;
+	--adn-chat-warning-text: #6b4e00;
+	--adn-chat-radius-sm: 8px;
+	--adn-chat-radius-md: 12px;
+	--adn-chat-radius-bubble: 18px;
+	--adn-chat-radius-panel: 20px;
+	--adn-chat-shadow-panel: 0 1px 2px rgba(15, 23, 42, .05), 0 12px 32px -16px rgba(15, 23, 42, .22);
+	--adn-chat-fast: 120ms;
+	--adn-chat-base: 200ms;
+	--adn-chat-ease: cubic-bezier(.2, .8, .2, 1);
+	--adn-chat-inbox-width: 360px;
+	--adn-chat-head-height: 60px;
+}
+
+[data-bs-theme="dark"] .adn-chat-page {
+	--adn-chat-surface: #2b3035;
+	--adn-chat-muted: #aab1b8;
+	--adn-chat-accent-text: #2dd4bf;
+	--adn-chat-accent-soft: #17363a;
+	--adn-chat-danger: #f08a8a;
+	--adn-chat-success: #5fd39a;
+	--adn-chat-warning-bg: #3a3115;
+	--adn-chat-warning-text: #f3dc9a;
+}
+
+/* ---------- Shell ---------- */
+.adn-chat-main {
+	padding-block: 1rem 1.5rem;
+}
+
+.adn-chat {
+	color: var(--adn-chat-text);
+}
+
+.adn-chat [hidden] {
+	display: none !important;
+}
+
+.adn-chat-inbox-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+	padding: 1rem 1rem .75rem;
+}
+
+.adn-chat-title {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 800;
+	line-height: 1.3;
+}
+
+.adn-chat-filters {
+	display: inline-flex;
+	gap: .25rem;
+	padding: .2rem;
+	border-radius: 999px;
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-filter {
+	display: inline-flex;
+	align-items: center;
+	gap: .35rem;
+	min-height: 32px;
+	padding: .2rem .8rem;
+	border: 0;
+	border-radius: 999px;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: var(--adn-chat-muted);
+	background: transparent;
+	transition: background-color var(--adn-chat-fast) ease, color var(--adn-chat-fast) ease;
+}
+
+.adn-chat-filter.is-on {
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-bg);
+	box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
+	font-weight: 700;
+}
+
+.adn-chat-filter-count {
+	font-variant-numeric: tabular-nums;
+}
+
+.adn-chat-filter:focus-visible,
+.adn-chat-row:focus-visible,
+.adn-chat-icon-btn:focus-visible,
+.adn-chat-back:focus-visible,
+.adn-chat-send:focus-visible,
+.adn-chat-quick button:focus-visible,
+.adn-chat-new:focus-visible,
+.adn-chat-listing:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- Inbox rows ---------- */
+.adn-chat-list {
+	padding: 0 .5rem .75rem;
+}
+
+.adn-chat-row {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: .75rem;
+	padding: .65rem .6rem;
+	border-radius: var(--adn-chat-radius-md);
+	color: inherit;
+	text-decoration: none;
+	transition: background-color var(--adn-chat-fast) ease;
+}
+
+.adn-chat-row:hover {
+	color: inherit;
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-row.is-active {
+	background-color: var(--adn-chat-accent-soft);
+}
+
+.adn-chat-row.is-active::before {
+	content: "";
+	position: absolute;
+	inset-block: 10px;
+	inset-inline-start: 0;
+	width: 3px;
+	border-radius: 999px;
+	background-color: var(--adn-chat-accent);
+}
+
+.adn-chat-avatar {
+	position: relative;
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	font-size: .95rem;
+	font-weight: 700;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-accent-soft);
+}
+
+.adn-chat-avatar-sm {
+	width: 36px;
+	height: 36px;
+	font-size: .85rem;
+}
+
+.adn-chat-avatar img {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .08);
+	outline-offset: -1px;
+}
+
+.adn-chat-avatar.is-online::after {
+	content: "";
+	position: absolute;
+	inset-inline-end: 0;
+	bottom: 0;
+	width: 11px;
+	height: 11px;
+	border: 2px solid var(--adn-chat-bg);
+	border-radius: 50%;
+	background-color: var(--adn-chat-success);
+}
+
+.adn-chat-row-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.35;
+}
+
+.adn-chat-row-name {
+	overflow: hidden;
+	font-size: .95rem;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-chat-row-listing,
+.adn-chat-row-last {
+	overflow: hidden;
+	font-size: .8125rem;
+	color: var(--adn-chat-muted);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-chat-row-listing {
+	color: var(--adn-chat-accent-text);
+}
+
+.adn-chat-row.is-unread .adn-chat-row-name,
+.adn-chat-row.is-unread .adn-chat-row-last {
+	font-weight: 700;
+	color: var(--adn-chat-text);
+}
+
+.adn-chat-row-meta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: .3rem;
+	font-size: .6875rem;
+	font-weight: 500;
+	color: var(--adn-chat-muted);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.adn-chat-row-unread {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 .35rem;
+	border-radius: 999px;
+	font-size: .6875rem;
+	font-weight: 700;
+	color: var(--adn-chat-on-accent);
+	background-color: var(--adn-chat-accent-strong);
+}
+
+.adn-chat-more {
+	display: block;
+	width: 100%;
+	margin-top: .5rem;
+	padding: .6rem;
+	border: 0;
+	border-radius: var(--adn-chat-radius-md);
+	font-size: .875rem;
+	font-weight: 600;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-surface);
+}
+
+/* ---------- Empty, loading and error states ---------- */
+.adn-chat-empty,
+.adn-chat-pick {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: .4rem;
+	padding: 2.5rem 1.25rem;
+	text-align: center;
+	color: var(--adn-chat-muted);
+	font-size: .875rem;
+	text-wrap: balance;
+}
+
+.adn-chat-empty strong,
+.adn-chat-pick strong {
+	font-size: 1rem;
+	color: var(--adn-chat-text);
+}
+
+.adn-chat-empty .btn {
+	margin-top: .6rem;
+	border-radius: 999px;
+	font-weight: 700;
+}
+
+.adn-chat-empty-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	margin-bottom: .4rem;
+	border-radius: 50%;
+	font-size: 1.6rem;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-accent-soft);
+}
+
+.adn-chat-skeleton {
+	height: 58px;
+	margin: .35rem .1rem;
+	border-radius: var(--adn-chat-radius-md);
+	background: linear-gradient(90deg, var(--adn-chat-surface) 25%, var(--adn-chat-bg) 50%, var(--adn-chat-surface) 75%) 0 0 / 200% 100%;
+	animation: adnChatShimmer 1.4s linear infinite;
+}
+
+/* ---------- Conversation ---------- */
+.adn-chat-conv {
+	display: none;
+	flex-direction: column;
+	min-width: 0;
+	background-color: var(--adn-chat-bg);
+}
+
+.adn-chat-open {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.adn-chat-head {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: .6rem;
+	height: var(--adn-chat-head-height);
+	padding: 0 .5rem 0 .75rem;
+	border-bottom: 1px solid var(--adn-chat-border);
+}
+
+.adn-chat-back,
+.adn-chat-icon-btn {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	font-size: 1.2rem;
+	color: var(--adn-chat-text);
+	background: transparent;
+	text-decoration: none;
+	transition: background-color var(--adn-chat-fast) ease;
+}
+
+.adn-chat-back {
+	margin-inline-start: -.5rem;
+}
+
+[dir="rtl"] .adn-chat-back i,
+[dir="rtl"] .adn-chat-listing-go,
+[dir="rtl"] .adn-chat-send i {
+	transform: scaleX(-1);
+}
+
+.adn-chat-back:hover,
+.adn-chat-icon-btn:hover {
+	color: var(--adn-chat-text);
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-head-text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.25;
+}
+
+.adn-chat-head-name {
+	overflow: hidden;
+	font-size: 1rem;
+	font-weight: 700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-chat-head-status {
+	min-height: 14px;
+	font-size: .6875rem;
+	font-weight: 500;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-head-status.is-online {
+	color: var(--adn-chat-success);
+}
+
+.adn-chat-head-status.is-typing {
+	color: var(--adn-chat-accent-text);
+}
+
+.adn-chat-menu .dropdown-item {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	min-height: 40px;
+	font-size: .9rem;
+}
+
+.adn-chat-offline {
+	flex: 0 0 auto;
+	padding: .3rem .75rem;
+	font-size: .75rem;
+	font-weight: 600;
+	text-align: center;
+	color: var(--adn-chat-warning-text);
+	background-color: var(--adn-chat-warning-bg);
+}
+
+/* Pinned listing */
+.adn-chat-listing {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: .75rem;
+	padding: .6rem .75rem;
+	border-bottom: 1px solid var(--adn-chat-border);
+	color: inherit;
+	text-decoration: none;
+	transition: background-color var(--adn-chat-fast) ease;
+}
+
+a.adn-chat-listing[href]:hover {
+	color: inherit;
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-listing-photo {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	overflow: hidden;
+	border-radius: var(--adn-chat-radius-sm);
+	color: var(--adn-chat-muted);
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-listing-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .08);
+	outline-offset: -1px;
+	border-radius: inherit;
+}
+
+.adn-chat-listing-text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+	font-size: .8125rem;
+	line-height: 1.35;
+}
+
+.adn-chat-listing-text strong {
+	overflow: hidden;
+	font-weight: 700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-chat-listing-text span {
+	font-weight: 600;
+	color: var(--adn-chat-accent-text);
+}
+
+.adn-chat-listing.is-gone {
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-listing.is-gone .adn-chat-listing-text span {
+	font-weight: 500;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-listing.is-gone .adn-chat-listing-go {
+	display: none;
+}
+
+.adn-chat-listing-go {
+	color: var(--adn-chat-muted);
+}
+
+/* ---------- Message log ---------- */
+.adn-chat-log-wrap {
+	position: relative;
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.adn-chat-log {
+	flex: 1 1 auto;
+	padding: .75rem .75rem .5rem;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+.adn-chat-log:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: -2px;
+}
+
+.adn-chat-older {
+	padding: .25rem 0 .5rem;
+	text-align: center;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-safety {
+	display: flex;
+	align-items: flex-start;
+	gap: .5rem;
+	max-width: 520px;
+	margin: 0 auto .75rem;
+	padding: .55rem .7rem;
+	border-radius: var(--adn-chat-radius-md);
+	font-size: .8125rem;
+	line-height: 1.4;
+	color: var(--adn-chat-warning-text);
+	background-color: var(--adn-chat-warning-bg);
+	text-wrap: pretty;
+}
+
+.adn-chat-safety i {
+	margin-top: .1rem;
+	font-size: 1rem;
+}
+
+.adn-chat-safety a {
+	color: inherit;
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+.adn-chat-day {
+	display: flex;
+	justify-content: center;
+	margin: .75rem 0 .6rem;
+}
+
+.adn-chat-day span {
+	padding: .15rem .65rem;
+	border-radius: 999px;
+	font-size: .6875rem;
+	font-weight: 600;
+	color: var(--adn-chat-muted);
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-msg {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-top: 12px;
+}
+
+.adn-chat-msg.is-follow {
+	margin-top: 4px;
+}
+
+.adn-chat-msg.is-mine {
+	align-items: flex-end;
+}
+
+.adn-chat-msg.is-new {
+	animation: adnChatRise var(--adn-chat-base) var(--adn-chat-ease);
+}
+
+.adn-chat-bubble {
+	position: relative;
+	max-width: 78%;
+	padding: .45rem .7rem .35rem;
+	border-radius: var(--adn-chat-radius-bubble);
+	border-end-start-radius: 6px;
+	font-size: .9375rem;
+	line-height: 1.4;
+	color: var(--adn-chat-text);
+	background-color: var(--adn-chat-surface);
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+}
+
+.adn-chat-msg.is-mine .adn-chat-bubble {
+	border-end-start-radius: var(--adn-chat-radius-bubble);
+	border-end-end-radius: 6px;
+	color: var(--adn-chat-on-accent);
+	background-color: var(--adn-chat-accent-strong);
+}
+
+.adn-chat-bubble a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.adn-chat-meta {
+	display: inline-flex;
+	align-items: center;
+	gap: .2rem;
+	float: inline-end;
+	margin: .45rem 0 0 .6rem;
+	font-size: .6875rem;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--adn-chat-muted);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+[dir="rtl"] .adn-chat-meta {
+	margin: .45rem .6rem 0 0;
+}
+
+.adn-chat-msg.is-mine .adn-chat-meta {
+	color: var(--adn-chat-on-accent-muted);
+}
+
+.adn-chat-tick {
+	font-size: .9rem;
+	line-height: 1;
+}
+
+.adn-chat-msg.is-seen .adn-chat-tick {
+	color: var(--adn-chat-on-accent);
+}
+
+.adn-chat-msg.is-sending .adn-chat-bubble {
+	opacity: .7;
+}
+
+/* Photo messages: the image fills the bubble, the time sits on a dark scrim */
+.adn-chat-bubble.is-photo {
+	padding: 0;
+	overflow: hidden;
+	line-height: 0;
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-bubble.is-photo img {
+	display: block;
+	width: 100%;
+	max-width: 260px;
+	height: auto;
+	max-height: 320px;
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .08);
+	outline-offset: -1px;
+	border-radius: inherit;
+}
+
+.adn-chat-bubble.is-photo .adn-chat-meta {
+	position: absolute;
+	inset-inline-end: 6px;
+	bottom: 6px;
+	float: none;
+	margin: 0;
+	padding: .2rem .4rem;
+	border-radius: 999px;
+	color: #fff;
+	background-color: rgba(0, 0, 0, .55);
+}
+
+.adn-chat-bubble.is-photo .adn-chat-tick {
+	color: #fff;
+}
+
+.adn-chat-note {
+	max-width: 78%;
+	margin: .2rem .2rem 0;
+	font-size: .6875rem;
+	line-height: 1.35;
+	color: var(--adn-chat-warning-text);
+}
+
+.adn-chat-fail {
+	margin: .2rem .2rem 0;
+	padding: 0;
+	border: 0;
+	font-size: .75rem;
+	font-weight: 600;
+	color: var(--adn-chat-danger);
+	background: transparent;
+	text-decoration: underline;
+}
+
+/* Typing: three dots that rise in turn */
+.adn-chat-typing {
+	display: inline-flex;
+	gap: 4px;
+	margin-top: 12px;
+	padding: .7rem .8rem;
+	border-radius: var(--adn-chat-radius-bubble);
+	border-end-start-radius: 6px;
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-typing span {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background-color: var(--adn-chat-muted);
+	animation: adnChatTyping 1.2s ease-in-out infinite;
+}
+
+.adn-chat-typing span:nth-child(2) {
+	animation-delay: .15s;
+}
+
+.adn-chat-typing span:nth-child(3) {
+	animation-delay: .3s;
+}
+
+.adn-chat-new {
+	position: absolute;
+	left: 50%;
+	bottom: 10px;
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	min-height: 36px;
+	padding: .3rem .9rem;
+	border: 0;
+	border-radius: 999px;
+	font-size: .8125rem;
+	font-weight: 700;
+	color: var(--adn-chat-on-accent);
+	background-color: var(--adn-chat-accent-strong);
+	box-shadow: 0 6px 18px -6px rgba(15, 23, 42, .45);
+	transform: translateX(-50%);
+}
+
+/* ---------- Quick replies ---------- */
+.adn-chat-quick {
+	display: flex;
+	flex: 0 0 auto;
+	gap: .5rem;
+	padding: .5rem .75rem .1rem;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.adn-chat-quick::-webkit-scrollbar {
+	display: none;
+}
+
+.adn-chat-quick button {
+	flex: 0 0 auto;
+	min-height: 40px;
+	padding: .3rem .9rem;
+	border: 1px solid var(--adn-chat-accent);
+	border-radius: 999px;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-bg);
+	white-space: nowrap;
+	transition: background-color var(--adn-chat-fast) ease;
+}
+
+.adn-chat-quick button:hover,
+.adn-chat-quick button:active {
+	background-color: var(--adn-chat-accent-soft);
+}
+
+/* ---------- Composer ---------- */
+.adn-chat-photo-preview {
+	position: relative;
+	flex: 0 0 auto;
+	width: 64px;
+	height: 64px;
+	margin: .5rem .75rem 0;
+}
+
+.adn-chat-photo-preview img {
+	width: 64px;
+	height: 64px;
+	border-radius: var(--adn-chat-radius-md);
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .1);
+	outline-offset: -1px;
+}
+
+.adn-chat-photo-remove {
+	position: absolute;
+	top: -8px;
+	inset-inline-end: -8px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 2px solid var(--adn-chat-bg);
+	border-radius: 50%;
+	font-size: .6rem;
+	color: #fff;
+	background-color: #343a40;
+}
+
+/* A 40px hit area around the 24px button */
+.adn-chat-photo-remove::before {
+	content: "";
+	position: absolute;
+	inset: -10px;
+}
+
+.adn-chat-error {
+	flex: 0 0 auto;
+	margin: .4rem .75rem 0;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: var(--adn-chat-danger);
+}
+
+.adn-chat-composer {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: flex-end;
+	gap: .35rem;
+	padding: .5rem .5rem calc(.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.adn-chat-input-wrap {
+	position: relative;
+	display: flex;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.adn-chat-input {
+	width: 100%;
+	min-height: 44px;
+	max-height: 132px;
+	padding: .6rem .9rem;
+	border: 1px solid transparent;
+	border-radius: 22px;
+	font-size: 1rem; /* 16px: iPhones zoom the page on smaller text boxes */
+	line-height: 1.35;
+	color: var(--adn-chat-text);
+	background-color: var(--adn-chat-surface);
+	resize: none;
+	transition: border-color var(--adn-chat-fast) ease, box-shadow var(--adn-chat-fast) ease;
+}
+
+.adn-chat-input::placeholder {
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-input:focus {
+	border-color: var(--adn-chat-accent);
+	outline: 0;
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--adn-chat-accent) 30%, transparent);
+}
+
+.adn-chat-count {
+	position: absolute;
+	inset-inline-end: 12px;
+	bottom: -15px;
+	font-size: .6875rem;
+	color: var(--adn-chat-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.adn-chat-send {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	font-size: 1.05rem;
+	color: var(--adn-chat-on-accent);
+	background-color: var(--adn-chat-accent-strong);
+	transition: transform var(--adn-chat-fast) ease, background-color var(--adn-chat-fast) ease;
+}
+
+.adn-chat-send:active:not(:disabled) {
+	transform: scale(.94);
+}
+
+.adn-chat-send:disabled {
+	color: var(--adn-chat-muted);
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-blocked {
+	flex: 0 0 auto;
+	margin: 0;
+	padding: .9rem .75rem calc(.9rem + env(safe-area-inset-bottom, 0px));
+	border-top: 1px solid var(--adn-chat-border);
+	font-size: .875rem;
+	text-align: center;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-blocked button {
+	padding: 0;
+	border: 0;
+	font-weight: 700;
+	color: var(--adn-chat-accent-text);
+	background: transparent;
+	text-decoration: underline;
+}
+
+/* ---------- Report dialog ---------- */
+.adn-chat-report-reasons {
+	display: flex;
+	flex-direction: column;
+	gap: .4rem;
+	margin: 0;
+}
+
+.adn-chat-report-reason {
+	display: flex;
+	align-items: center;
+	gap: .65rem;
+	min-height: 44px;
+	padding: .4rem .75rem;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 12px;
+	font-size: .9rem;
+	cursor: pointer;
+}
+
+.adn-chat-report-reason:has(input:checked) {
+	border-color: var(--bs-primary);
+	background-color: color-mix(in srgb, var(--bs-primary) 8%, transparent);
+}
+
+.adn-chat-report-reason input {
+	margin: 0;
+}
+
+/* ---------- Phones: an open conversation is the whole screen ---------- */
+@media (max-width: 991.98px) {
+	.adn-chat-main {
+		padding-block: 0 1rem;
+	}
+
+	.adn-chat-main > .container {
+		padding-inline: 0;
+	}
+
+	.adn-chat-inbox-head {
+		padding-top: .75rem;
+	}
+
+	/* A short inbox still fills the screen: the footer starts below it */
+	.adn-chat-inbox {
+		min-height: calc(100dvh - 200px);
+	}
+
+	body.is-chat-open {
+		overflow: hidden;
+	}
+
+	body.is-chat-open .adn-chat-conv {
+		position: fixed;
+		inset: 0;
+		z-index: 1040;
+		display: flex;
+		height: 100vh;
+		height: 100dvh;
+	}
+
+	body.is-chat-open .adn-appbar,
+	body.is-chat-open .adn-chat-pick {
+		display: none;
+	}
+}
+
+/* ---------- Desktop: inbox | conversation in one panel ---------- */
+@media (min-width: 992px) {
+	.adn-chat {
+		display: grid;
+		grid-template-columns: var(--adn-chat-inbox-width) minmax(0, 1fr);
+		height: clamp(480px, calc(100dvh - 190px), 820px);
+		overflow: hidden;
+		border: 1px solid var(--adn-chat-border);
+		border-radius: var(--adn-chat-radius-panel);
+		background-color: var(--adn-chat-bg);
+		box-shadow: var(--adn-chat-shadow-panel);
+	}
+
+	.adn-chat-inbox {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		border-inline-end: 1px solid var(--adn-chat-border);
+	}
+
+	.adn-chat-list {
+		flex: 1 1 auto;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.adn-chat-conv {
+		display: flex;
+		min-height: 0;
+	}
+
+	.adn-chat-pick {
+		flex: 1 1 auto;
+	}
+
+	.adn-chat-back {
+		display: none;
+	}
+
+	.adn-chat-bubble,
+	.adn-chat-note {
+		max-width: 62%;
+	}
+
+	.adn-chat-composer {
+		padding: .6rem .75rem .75rem;
+	}
+}
+
+/* ---------- Motion ---------- */
+@keyframes adnChatRise {
+	from { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes adnChatTyping {
+	0%, 60%, 100% { transform: none; opacity: .5; }
+	30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes adnChatShimmer {
+	to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-chat-msg.is-new,
+	.adn-chat-typing span,
+	.adn-chat-skeleton {
+		animation: none;
+	}
+
+	.adn-chat-filter,
+	.adn-chat-row,
+	.adn-chat-send,
+	.adn-chat-input,
+	.adn-chat-icon-btn,
+	.adn-chat-back {
+		transition: none;
+	}
+}

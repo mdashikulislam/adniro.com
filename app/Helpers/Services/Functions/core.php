@@ -1679,7 +1679,30 @@ function doesGuestHaveAbilityToCreateListings($authUser = null): bool
 }
 
 /**
- * Generate the Email Form button
+ * adniro: where "Chat with seller" goes for this listing: the chat for a signed-in member, the sign-in pop-up
+ * for a guest, and nowhere (null) for the owner, or when the listing is not public or has no member account.
+ *
+ * @param $post
+ * @return string|null
+ */
+function chatStartUrl($post): ?string
+{
+	$post = is_array($post) ? Arr::toObject($post) : $post;
+	$sellerId = (int)data_get($post, 'user_id');
+	
+	if (empty($post) || $sellerId === 0 || !isVerifiedPost($post)) {
+		return null;
+	}
+	if (!auth()->check()) {
+		return '#quickLogin';
+	}
+	
+	return ((int)auth()->id() === $sellerId) ? null : route('chat.new', ['post' => data_get($post, 'id')]);
+}
+
+/**
+ * Generate the "Chat with seller" button
+ * adniro: the Messenger's contact form is replaced by live chat
  *
  * @param null $post
  * @param bool $btnBlock
@@ -1688,51 +1711,24 @@ function doesGuestHaveAbilityToCreateListings($authUser = null): bool
  */
 function genEmailContactBtn($post = null, bool $btnBlock = false, bool $iconOnly = false): string
 {
-	$post = is_array($post) ? Arr::toObject($post) : $post;
-	
-	$out = '';
-	
-	if (!isVerifiedPost($post)) {
-		return $out;
+	$btnLink = chatStartUrl($post);
+	if ($btnLink === null) {
+		return '';
 	}
 	
-	$smsNotificationCanBeSent = (
-		isPhoneAsAuthFieldEnabled()
-		&& config('settings.sms.messenger_notifications') == '1'
-		&& $post->auth_field == 'phone'
-		&& !empty($post->phone)
-	);
-	if (empty($post->email) && !$smsNotificationCanBeSent) {
-		if ($iconOnly) {
-			$out = '<i class="fa-regular fa-envelope" style="color: #dadada"></i>';
-		}
-		
-		return $out;
-	}
-	
-	$btnLink = '#contactUser';
-	$btnClass = '';
-	if (!auth()->check()) {
-		if (config('settings.listing_page.guest_can_contact_authors') != '1') {
-			$btnLink = '#quickLogin';
-		}
-	}
+	$label = e(trans('chat.chat_with_seller'));
+	$modalAttr = str_starts_with($btnLink, '#') ? ' data-bs-toggle="modal"' : '';
 	
 	if ($iconOnly) {
-		$out .= '<a href="' . $btnLink . '" data-bs-toggle="modal" class="' . linkClass() . '">';
-		$out .= '<i class="fa-regular fa-envelope" data-bs-toggle="tooltip" title="' . t('Send a message') . '"></i>';
+		$out = '<a href="' . e($btnLink) . '"' . $modalAttr . ' class="' . linkClass() . '">';
+		$out .= '<i class="bi bi-chat-dots" data-bs-toggle="tooltip" title="' . $label . '"></i>';
 	} else {
-		if ($btnBlock) {
-			$btnClass = $btnClass . ' btn-block';
-		}
-		
-		$out .= '<a href="' . $btnLink . '" data-bs-toggle="modal" class="btn btn-secondary' . $btnClass . '">';
-		$out .= '<i class="fa-regular fa-envelope"></i> ';
-		$out .= t('Send a message');
+		$btnClass = $btnBlock ? ' btn-block' : '';
+		$out = '<a href="' . e($btnLink) . '"' . $modalAttr . ' class="btn btn-primary adn-chat-start' . $btnClass . '">';
+		$out .= '<i class="bi bi-chat-dots"></i> ' . $label;
 	}
-	$out .= '</a>';
 	
-	return $out;
+	return $out . '</a>';
 }
 
 /**

@@ -66,6 +66,7 @@ return [
 	'cdn',
 	'cgi',
 	'chat',
+	'chats',
 	'chef',
 	'client',
 	'clients',

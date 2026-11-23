@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Services\Chat;
+
+use App\Events\Chat\ChatEvent;
+use App\Models\Chat\ChatMessage;
+use App\Models\Chat\ChatThread;
+use Illuminate\Support\Facades\Log;
+use Throwable;
+
+/*
+ * Pushes chat changes to the people in a conversation (adniro), each on their own private channel, so every
+ * open tab of theirs updates: the conversation, the inbox and the unread badge.
+ *
+ * A message is saved before it is pushed. If the live server cannot be reached the push is dropped and
+ * logged; the browser's fallback check picks the message up.
+ */
+class ChatBroadcaster
+{
+	public static function messageSent(ChatThread $thread, ChatMessage $message): void
+	{
+		$thread->load(ChatPresenter::THREAD_RELATIONS);
+		$payload = ChatPresenter::message($message);
+
+		foreach ($thread->participants as $participant) {
+			$userId = (int)$participant->user_id;
+			self::push(new ChatEvent(ChatEvent::MESSAGE, $userId, [
+				'message'      => $payload,
+				'thread'       => ChatPresenter::thread($thread, $userId),
+				'unread_total' => ChatUnread::total($userId),
+			]));
+		}
+	}
+
+	public static function messagesRead(ChatThread $thread, int $readerId, int $upToMessageId): void
+	{
+		foreach ($thread->participants as $participant) {
+			$userId = (int)$participant->user_id;
+			self::push(new ChatEvent(ChatEvent::READ, $userId, [
+				'thread_id'    => (int)$thread->id,
+				'reader_id'    => $readerId,
+				'message_id'   => $upToMessageId,
+				'unread_total' => ChatUnread::total($userId),
+			]));
+		}
+	}
+
+	private static function push(ChatEvent $event): void
+	{
+		try {
+			broadcast($event);
+		} catch (Throwable $e) {
+			Log::warning('Chat: live push failed', ['event' => $event->name, 'user' => $event->userId, 'error' => $e->getMessage()]);
+		}
+	}
+}

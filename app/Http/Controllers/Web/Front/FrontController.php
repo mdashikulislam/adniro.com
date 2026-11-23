@@ -169,14 +169,14 @@ class FrontController extends Controller
 				'isActive'   => (request()->segment(2) == 'saved-posts'),
 			],
 			[
-				'name'             => t('messenger'),
-				'url'              => url(urlGen()->getAccountBasePath() . '/messages'),
-				'icon'             => 'bi bi-chat-text',
+				// adniro: live chat
+				'name'             => trans('chat.chats'),
+				'url'              => route('chat.index'),
+				'icon'             => 'bi bi-chat-dots',
 				'group'            => t('my_listings'),
-				'countVar'         => 0,
-				'countCustomClass' => ' count-threads-with-new-messages',
+				'countVar'         => 'threads.unread',
 				'inDropdown'       => true,
-				'isActive'         => (request()->segment(2) == 'messages'),
+				'isActive'         => request()->routeIs('chat.*'),
 			],
 			[
 				'name'       => t('saved_searches'),

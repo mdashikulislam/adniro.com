@@ -18,6 +18,7 @@ namespace App\Observers;
 
 use App\Helpers\Common\Files\Storage\StorageDisk;
 use App\Models\ThreadMessage;
+use App\Services\Chat\ChatPhotos;
 
 class ThreadMessageObserver extends BaseObserver
 {
@@ -31,6 +32,13 @@ class ThreadMessageObserver extends BaseObserver
 	{
 		// Storage Disk Init.
 		$disk = StorageDisk::getDisk();
+		
+		// adniro: a chat photo is on the private disk
+		if (ChatPhotos::isChatPath($message->file_path)) {
+			ChatPhotos::delete($message->file_path);
+			
+			return;
+		}
 		
 		// Delete the message's file
 		if (!empty($message->file_path)) {

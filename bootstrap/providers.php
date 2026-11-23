@@ -10,6 +10,7 @@ return [
 	App\Providers\MacroServiceProvider::class,
 	App\Providers\ExtensionServiceProvider::class,
 	App\Providers\AiServiceProvider::class, // adniro:ai
+	App\Providers\ChatServiceProvider::class, // adniro: live chat
 
 	Larapen\TextToImage\TextToImageServiceProvider::class,
 	Larapen\LaravelMetaTags\MetaTagsServiceProvider::class,

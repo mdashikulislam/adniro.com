@@ -791,12 +791,9 @@ class MenuItem extends BaseModel
 				}
 				
 				if (!isFromAdminPanel()) {
-					if ($this->route_name == 'account.messages') {
-						$xhrClass = 'count-threads-with-new-messages';
-						$class = 'badge rounded-pill text-bg-danger';
-						$class = "$class $xhrClass";
-						$badgeHtml = '<span class="' . $class . '">0</span>';
-						$value = "{$value} {$badgeHtml}";
+					// adniro: the chat's unread badge (kept live by assets/js/app/chat-live.js)
+					if (in_array($this->route_name, ['chat.index', 'account.messages'])) {
+						$value = "{$value} " . \App\Services\Chat\ChatUnread::badgeHtml('badge rounded-pill text-bg-danger');
 					}
 				}
 				

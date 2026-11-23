@@ -74,17 +74,7 @@ onDocumentReady((event) => {
 		}
 	});
 	
-	/* INBOX MESSAGE */
-	/* Check 'assets/js/app/messenger.js' */
-	
-	/* Check New Messages */
-	/* 60000 = 60 seconds (Timer) */
-	if (typeof timerNewMessagesChecking !== 'undefined') {
-		checkNewMessages();
-		if (timerNewMessagesChecking > 0) {
-			setInterval(() => checkNewMessages(), timerNewMessagesChecking);
-		}
-	}
+	/* adniro: the 60-second "any new messages?" check is gone; the unread badge is live (assets/js/app/chat-live.js) */
 	
 	/* Data loading-mask pre-configuration */
 	$.busyLoadSetup({
@@ -130,66 +120,6 @@ function setCountryPhoneCode(countryCode, countries) {
 	if (phoneCountryEl) {
 		phoneCountryEl.innerHTML = countries[countryCode]['phone'];
 	}
-}
-
-/**
- * Check Threads with New Messages
- */
-function checkNewMessages() {
-	const countThreadWithNewMessageEl = $('.count-threads-with-new-messages');
-	if (countThreadWithNewMessageEl.length <= 0) {
-		return;
-	}
-	
-	const firstEl = countThreadWithNewMessageEl.get(0);
-	const $firstEl = $(firstEl);
-	
-	let oldValue = $firstEl.html();
-	if (typeof oldValue === 'undefined') {
-		return;
-	}
-	
-	/* Make ajax call */
-	const ajax = $.ajax({
-		method: 'POST',
-		url: siteUrl + '/account/messages/check-new',
-		data: {
-			'languageCode': languageCode,
-			'oldValue': oldValue,
-			'_token': $('input[name=_token]').val()
-		}
-	});
-	ajax.done(function (data) {
-		if (typeof data.logged === 'undefined') {
-			return;
-		}
-		
-		/* Guest Users - Need to Log In */
-		if (data.logged === 0 || data.logged === '0' || data.logged === '') {
-			return;
-		}
-		
-		const counterBoxesEl = $('.count-threads-with-new-messages');
-		if (!counterBoxesEl.length) {
-			return;
-		}
-		
-		/* Logged Users - Notification */
-		if (data.countThreadsWithNewMessages > 0) {
-			if (data.countThreadsWithNewMessages >= data.countLimit) {
-				counterBoxesEl.html(data.countLimit + '+');
-			} else {
-				counterBoxesEl.html(data.countThreadsWithNewMessages);
-			}
-			if (data.countThreadsWithNewMessages === 0) {
-				counterBoxesEl.hide();
-			} else {
-				counterBoxesEl.show();
-			}
-		} else {
-			counterBoxesEl.html('0').hide();
-		}
-	});
 }
 
 /**

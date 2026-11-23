@@ -318,6 +318,36 @@
 	transition: background-color .2s ease, color .2s ease, transform .15s ease;
 }
 
+/* The Chats tab's unread count (live: assets/js/app/chat-live.js). White on the deeper teal: 5.47:1 */
+.adn-appbar-icon {
+	position: relative;
+}
+
+.adn-appbar-badge {
+	position: absolute;
+	top: -2px;
+	inset-inline-start: calc(50% + 4px);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 4px;
+	border: 2px solid var(--adn-bar-surface);
+	border-radius: 999px;
+	box-sizing: content-box;
+	font-size: .6875rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	background-color: #0f766e;
+	font-variant-numeric: tabular-nums;
+}
+
+.adn-appbar-badge[hidden] {
+	display: none;
+}
+
 .adn-appbar-label {
 	max-width: 100%;
 	overflow: hidden;

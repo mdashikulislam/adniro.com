@@ -40,8 +40,6 @@ use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\SubAdmin1Controller;
 use App\Http\Controllers\Api\SubAdmin2Controller;
-use App\Http\Controllers\Api\ThreadController;
-use App\Http\Controllers\Api\ThreadMessageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserTypeController;
 use Illuminate\Support\Facades\Route;
@@ -372,36 +370,7 @@ Route::prefix('payments')
 		Route::post('/', 'store')->name('api.payments.store');
 	});
 
-// threads
-Route::prefix('threads')
-	->group(function ($router) {
-		Route::post('/', [ThreadController::class, 'store'])->name('api.threads.store');
-		
-		Route::middleware(['auth:sanctum'])
-			->group(function ($router) {
-				Route::controller(ThreadController::class)
-					->group(function ($router) {
-						$router->pattern('id', '[0-9]+');
-						$router->pattern('ids', '[0-9,]+');
-						
-						Route::get('/', 'index')->name('api.threads.index');
-						Route::get('{id}', 'show')->name('api.threads.show');
-						Route::put('{id}', 'update')->name('api.threads.update');
-						Route::delete('{ids}', 'destroy')->name('api.threads.destroy');
-						
-						Route::post('bulkUpdate/{ids?}', 'bulkUpdate')->name('api.threads.bulkUpdate'); // Bulk Update
-					});
-				
-				// threadMessages
-				Route::controller(ThreadMessageController::class)
-					->group(function ($router) {
-						$router->pattern('id', '[0-9]+');
-						$router->pattern('threadId', '[0-9]+');
-						Route::get('{threadId}/messages', 'index')->name('api.threadMessages.index');
-						Route::get('{threadId}/messages/{id}', 'show')->name('api.threadMessages.show');
-					});
-			});
-	});
+// threads: removed with the Messenger (adniro). Chat is on the website only: routes/web/front/chat.php
 
 // pages
 Route::prefix('pages')

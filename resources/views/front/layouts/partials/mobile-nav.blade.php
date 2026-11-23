@@ -1,7 +1,8 @@
 {{--
 	adniro: the phone app bar, fixed at the bottom of the screen below 768px (public/assets/css/mobile-nav.css).
-	Home, Search, Sell (raised, in the middle), Saved and Account. Not on the listing form, which has its own
-	bottom bar. Guests are sent to sign in for Saved and Account.
+	Home, Search, Post ad (raised, in the middle), Chats (with the unread badge) and Account. Saved listings are
+	in the account menu. Not on the listing form, which has its own bottom bar. Guests are sent to sign in for
+	Chats and Account.
 --}}
 @php
 	$mobileNavSignedIn = auth()->check();
@@ -29,18 +30,19 @@
 		],
 		'sell',
 		[
-			'url'    => $mobileNavSignedIn ? route('account.savedListings') : $mobileNavLogin,
-			'icon'   => 'heart',
-			'filled' => 'heart-fill',
-			'label'  => trans('mobile_nav.saved'),
-			'active' => request()->routeIs('account.savedListings*'),
+			'url'    => $mobileNavSignedIn ? route('chat.index') : $mobileNavLogin,
+			'icon'   => 'chat-dots',
+			'filled' => 'chat-dots-fill',
+			'label'  => trans('chat.chats'),
+			'active' => request()->routeIs('chat.*'),
+			'badge'  => $mobileNavSignedIn,
 		],
 		[
 			'url'    => $mobileNavSignedIn ? route('account.overview') : $mobileNavLogin,
 			'icon'   => 'person',
 			'filled' => 'person-fill',
 			'label'  => trans('mobile_nav.account'),
-			'active' => request()->routeIs('account.*', 'auth.*') && !request()->routeIs('account.savedListings*'),
+			'active' => request()->routeIs('account.*', 'auth.*'),
 		],
 	];
 @endphp
@@ -72,6 +74,9 @@
 				<a href="{{ $item['url'] }}" @class(['adn-appbar-link', 'is-active' => $item['active']]) @if ($item['active']) aria-current="page" @endif>
 					<span class="adn-appbar-icon" aria-hidden="true">
 						<i class="bi bi-{{ $item['active'] ? $item['filled'] : $item['icon'] }}"></i>
+						@if (!empty($item['badge']))
+							{!! \App\Services\Chat\ChatUnread::badgeHtml('adn-appbar-badge') !!}
+						@endif
 					</span>
 					<span class="adn-appbar-label">{{ $item['label'] }}</span>
 				</a>

@@ -57,6 +57,9 @@ class Kernel
 		// AI listing assistant: expired drafts and temporary uploads older than 48 hours (adniro:ai)
 		$schedule->command('ai:listing-assistant-purge')->timezone($tz)->hourly()->withoutOverlapping();
 		
+		// Live chat: one "you have unread messages" email, instead of one email per message (adniro)
+		$schedule->command('chat:unread-digest')->timezone($tz)->everyMinute()->withoutOverlapping();
+		
 		// Backups
 		setBackupConfig();
 		$disableNotifications = (config('settings.backup.disable_notifications')) ? ' --disable-notifications' : '';

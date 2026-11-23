@@ -63,6 +63,9 @@ if (!$isDomainmappingAvailable) {
 // favicon.ico, app icons and manifest (adniro)
 require __DIR__ . '/front/site-icons.php';
 
+// adniro: live chat
+require __DIR__ . '/front/chat.php';
+
 // Impersonate (As admin user, login as another user)
 Route::middleware(['auth'])
 	->group(function ($router) {

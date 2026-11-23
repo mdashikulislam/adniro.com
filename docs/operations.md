@@ -24,6 +24,30 @@ Emails, thumbnails and AI checks run in the background once the queue is on Redi
 
 Two workers run: one for emails, SMS, general jobs and thumbnails (`mail,sms,default,thumbs`), and one for AI checks (`ai`), so a slow AI call never delays an email. `deploy.sh` restarts them after each deploy.
 
+## 2b. Live chat (Laravel Reverb)
+
+The chat works without this step: it then checks for new messages every 10 seconds while a chat is open.
+With it, messages, typing, "seen" and the unread badge are instant, and the 10-second check stops.
+Everything here is free and runs on the same server; nothing is installed besides the Composer package.
+
+1. `.env`: `BROADCAST_DRIVER=reverb`, and three values you make up once (letters and digits):
+   `REVERB_APP_ID`, `REVERB_APP_KEY`, `REVERB_APP_SECRET`. Also
+   `REVERB_ALLOWED_ORIGINS=www.adniro.com,adniro.com` and `REVERB_CLIENT_HOST=www.adniro.com` (so the address
+   browsers connect to never comes from the request). Then `php artisan config:cache`.
+2. The socket server: `deploy/reverb/adniro-reverb.service` (the steps are at the top of the file).
+3. nginx: the two blocks in `deploy/reverb/nginx-reverb.conf`.
+4. Cloudflare: Network > WebSockets = On.
+5. Check: `systemctl status adniro-reverb`, then open a chat in two browsers; a message should appear at once
+   and the "Reconnecting…" bar should never show.
+
+After every deploy: `systemctl restart adniro-reverb`. To turn live chat off again, set `BROADCAST_DRIVER=null`
+and `php artisan config:cache`; the chat falls back to checking by itself.
+
+It holds about 1,000 open chats with the server's current settings. Before that many people are online at once,
+install the free `ext-uv` PHP extension (`pecl install uv`) and restart the service.
+
+The unread-messages email is sent by the scheduler (`chat:unread-digest`, every minute): no extra setup.
+
 ## 3. Scheduler (cron)
 
 Add the line in `deploy/crontab` with `crontab -e` as the web user. It runs backups, the AI moderation sweep, the draft purge and other housekeeping every minute.

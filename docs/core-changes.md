@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (253)
+## Changed (254)
 
 Stock files we edited.
 
@@ -29,7 +29,7 @@ Stock files we edited.
 - `app/Helpers/Common/Functions/helpers.php` (no marker comment)
 - `app/Helpers/Common/Functions/referrer.php` (no marker comment)
 - `app/Helpers/Services/Functions/admin.php`
-- `app/Helpers/Services/Functions/core.php` (no marker comment)
+- `app/Helpers/Services/Functions/core.php`
 - `app/Helpers/Services/Localization/Country.php` (no marker comment)
 - `app/Helpers/Services/Localization/Language.php` (no marker comment)
 - `app/Helpers/Services/Search/PostQueries.php` (no marker comment)
@@ -49,7 +49,7 @@ Stock files we edited.
 - `app/Http/Controllers/Web/Auth/RegisterController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/Browsing/Location/ModalController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/FileController.php`
-- `app/Http/Controllers/Web/Front/FrontController.php` (no marker comment)
+- `app/Http/Controllers/Web/Front/FrontController.php`
 - `app/Http/Controllers/Web/Front/HomeController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/Locale/LocaleController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/Post/CreateOrEdit/MultiSteps/Edit/PostController.php`
@@ -116,6 +116,7 @@ Stock files we edited.
 - `app/Services/Post/Show/DetailedTrait.php`
 - `app/Services/Post/ShowTrait.php`
 - `app/Services/Section/SectionDataTrait.php`
+- `app/Services/ThreadService.php` (no marker comment)
 
 ### bootstrap/app.php
 
@@ -263,14 +264,14 @@ Stock files we edited.
 - `resources/views/errors/500.blade.php`
 - `resources/views/errors/master.blade.php`
 - `resources/views/front/account/closing.blade.php` (no marker comment)
-- `resources/views/front/account/messenger/index.blade.php`
-- `resources/views/front/account/messenger/modal/create.blade.php`
-- `resources/views/front/account/messenger/show.blade.php`
-- `resources/views/front/account/messenger/threads/thread.blade.php`
+- `resources/views/front/account/messenger/index.blade.php` (no marker comment)
+- `resources/views/front/account/messenger/modal/create.blade.php` (no marker comment)
+- `resources/views/front/account/messenger/show.blade.php` (no marker comment)
+- `resources/views/front/account/messenger/threads/thread.blade.php` (no marker comment)
 - `resources/views/front/account/overview.blade.php` (no marker comment)
 - `resources/views/front/account/partials/header.blade.php` (no marker comment)
 - `resources/views/front/account/partials/linked-accounts.blade.php` (no marker comment)
-- `resources/views/front/account/partials/overview-stats.blade.php` (no marker comment)
+- `resources/views/front/account/partials/overview-stats.blade.php`
 - `resources/views/front/account/partials/preferences.blade.php` (no marker comment)
 - `resources/views/front/account/partials/profile-details.blade.php` (no marker comment)
 - `resources/views/front/account/partials/profile-photo.blade.php` (no marker comment)
@@ -308,7 +309,7 @@ Stock files we edited.
 - `resources/views/front/post/createOrEdit/singleStep/edit.blade.php`
 - `resources/views/front/post/createOrEdit/singleStep/finish.blade.php`
 - `resources/views/front/post/show/index.blade.php`
-- `resources/views/front/post/show/partials/details.blade.php` (no marker comment)
+- `resources/views/front/post/show/partials/details.blade.php`
 - `resources/views/front/post/show/partials/details/fields-values.blade.php` (no marker comment)
 - `resources/views/front/post/show/partials/pictures-slider/bootstrap-carousel.blade.php` (no marker comment)
 - `resources/views/front/post/show/partials/pictures-slider/bxslider-horizontal.blade.php`

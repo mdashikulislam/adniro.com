@@ -24,7 +24,8 @@ use App\Models\Scopes\ReviewedScope;
 use App\Models\Scopes\StrictActiveScope;
 use App\Models\Scopes\ValidPeriodScope;
 use App\Models\Scopes\VerifiedScope;
-use App\Models\Thread;
+use App\Models\Chat\ChatThread;
+use App\Services\Chat\ChatUnread;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -89,19 +90,10 @@ trait Stats
 			->where('user_id', $userId)
 			->count();
 		
-		// threads (all)
-		$threads['all'] = Thread::query()
-			->withoutAppends()
-			->whereHas('post', fn ($query) => $query->inCountry()->has('country')->unarchived())
-			->forUser($userId)
-			->count();
-		
-		// threads (withNewMessage)
-		$threads['withNewMessage'] = Thread::query()
-			->withoutAppends()
-			->whereHas('post', fn ($query) => $query->inCountry()->has('country')->unarchived())
-			->forUserWithNewMessages($userId)
-			->count();
+		// threads (adniro: the live chat's conversations, and its stored unread count)
+		$threads['all'] = ChatThread::query()->forUser((int)$userId)->whereNotNull('last_message_id')->count();
+		$threads['unread'] = ChatUnread::total((int)$userId);
+		$threads['withNewMessage'] = $threads['unread'];
 		
 		// transactions (promotion)
 		$promotion = Payment::query()

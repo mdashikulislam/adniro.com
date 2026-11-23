@@ -1,0 +1,240 @@
+<?php
+
+namespace Tests\Feature\Chat;
+
+use App\Events\Chat\ChatEvent;
+use App\Services\Chat\ChatUnread;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
+
+/*
+ * Starting a conversation, sending, the inbox, history and read receipts (adniro).
+ */
+class ChatConversationTest extends ChatTestCase
+{
+	public function test_the_first_message_about_a_listing_starts_one_conversation_with_the_seller(): void
+	{
+		// Act
+		$response = $this->actingAs($this->buyer)->postJson('/chat/listings/' . $this->listing->id, ['body' => 'Is this still available?']);
+
+		// Assert
+		$response->assertCreated()
+			->assertJsonPath('message.body', 'Is this still available?')
+			->assertJsonPath('thread.other.id', self::SELLER_ID)
+			->assertJsonPath('thread.post.title', 'Grey corner sofa')
+			->assertJsonPath('thread.is_buyer', true);
+		$threadId = $response->json('thread.id');
+		$this->assertSame([self::SELLER_ID, self::BUYER_ID], DB::table('threads_participants')->where('thread_id', $threadId)->orderBy('user_id')->pluck('user_id')->all());
+		$this->assertSame(1, $this->unreadOf($threadId, self::SELLER_ID));
+		$this->assertSame(0, $this->unreadOf($threadId, self::BUYER_ID));
+	}
+
+	public function test_a_second_first_message_reuses_the_same_conversation(): void
+	{
+		// Arrange
+		$url = '/chat/listings/' . $this->listing->id;
+
+		// Act
+		$first = $this->actingAs($this->buyer)->postJson($url, ['body' => 'Is this still available?'])->json('thread.id');
+		$second = $this->actingAs($this->buyer)->postJson($url, ['body' => 'Where can we meet?'])->json('thread.id');
+
+		// Assert
+		$this->assertSame($first, $second);
+		$this->assertSame(1, DB::table('threads')->where('post_id', $this->listing->id)->count());
+		$this->assertSame(2, DB::table('threads_messages')->where('thread_id', $first)->count());
+	}
+
+	public function test_the_same_tap_sent_twice_is_saved_once(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		$payload = ['body' => 'Could I see it tomorrow?', 'client_uuid' => (string)Str::uuid()];
+		$url = '/chat/api/threads/' . $thread->id . '/messages';
+
+		// Act
+		$first = $this->actingAs($this->buyer)->postJson($url, $payload);
+		$second = $this->actingAs($this->buyer)->postJson($url, $payload);
+
+		// Assert
+		$first->assertCreated();
+		$second->assertOk();
+		$this->assertSame($first->json('message.id'), $second->json('message.id'));
+		$this->assertSame(1, DB::table('threads_messages')->where('client_uuid', $payload['client_uuid'])->count());
+		$this->assertSame(2, $this->unreadOf($thread->id, self::SELLER_ID));
+	}
+
+	public function test_sending_does_not_mark_the_other_persons_messages_as_read(): void
+	{
+		// Arrange: the seller has not opened the buyer's message
+		$thread = $this->conversation(['Is this still available?']);
+		$firstId = (int)DB::table('threads_messages')->where('thread_id', $thread->id)->value('id');
+
+		// Act: the seller writes without having read it (another tab, or the page had not caught up yet)
+		$this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/messages', ['body' => 'Hello'])->assertCreated();
+
+		// Assert: still unread for the seller, and not "seen" for the buyer
+		$this->assertSame(1, $this->unreadOf($thread->id, self::SELLER_ID));
+		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id)->assertJsonPath('thread.read_up_to', 0);
+		$this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/read', ['message_id' => $firstId])->assertJsonPath('read_up_to', $firstId);
+		$this->assertSame(0, $this->unreadOf($thread->id, self::SELLER_ID));
+	}
+
+	public function test_a_deleted_conversation_comes_back_when_the_buyer_writes_again(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		DB::table('threads')->where('id', $thread->id)->update(['deleted_at' => now()]);
+
+		// Act
+		$response = $this->actingAs($this->buyer)->postJson('/chat/listings/' . $this->listing->id, ['body' => 'Hello again']);
+
+		// Assert
+		$response->assertCreated()->assertJsonPath('thread.id', $thread->id);
+		$this->assertNull(DB::table('threads')->where('id', $thread->id)->value('deleted_at'));
+		$this->assertSame(1, DB::table('threads')->count());
+	}
+
+	public function test_a_message_is_stored_as_plain_text(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+
+		// Act
+		$response = $this->actingAs($this->buyer)->postJson('/chat/api/threads/' . $thread->id . '/messages', [
+			'body' => '<script>alert(1)</script><b>Hello</b> there',
+		]);
+
+		// Assert
+		$response->assertCreated()->assertJsonPath('message.body', 'alert(1)Hello there');
+	}
+
+	public function test_an_empty_or_too_long_message_is_refused(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		$url = '/chat/api/threads/' . $thread->id . '/messages';
+
+		// Act & Assert
+		$this->actingAs($this->buyer)->postJson($url, ['body' => '   '])->assertStatus(422);
+		$this->actingAs($this->buyer)->postJson($url, ['body' => str_repeat('a', 2001)])->assertStatus(422);
+	}
+
+	public function test_a_new_message_is_pushed_to_both_people(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		Event::fake([ChatEvent::class]);
+
+		// Act
+		$this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/messages', ['body' => 'Yes, it is.'])->assertCreated();
+
+		// Assert
+		foreach ([self::SELLER_ID, self::BUYER_ID] as $userId) {
+			Event::assertDispatched(ChatEvent::class, function (ChatEvent $event) use ($userId) {
+				return $event->name === ChatEvent::MESSAGE
+					&& $event->userId === $userId
+					&& $event->broadcastOn()[0]->name === 'private-chat.user.' . $userId
+					&& $event->payload['message']['body'] === 'Yes, it is.';
+			});
+		}
+	}
+
+	public function test_the_inbox_lists_my_conversations_newest_first_with_unread_counts(): void
+	{
+		// Arrange
+		$older = $this->conversation(['Is this still available?']);
+		$otherListing = $this->stockListing('Oak dining table', ['user_id' => self::SELLER_ID]);
+		$this->actingAs($this->buyer)->postJson('/chat/listings/' . $otherListing->id, ['body' => 'What is your best price?']);
+		DB::table('threads')->where('id', $older->id)->update(['last_message_at' => now()->subHour()]);
+
+		// Act
+		$response = $this->actingAs($this->seller)->getJson('/chat/api/threads');
+
+		// Assert
+		$response->assertOk()->assertJsonCount(2, 'threads')
+			->assertJsonPath('threads.0.post.title', 'Oak dining table')
+			->assertJsonPath('threads.0.unread', 1)
+			->assertJsonPath('threads.0.last.text', 'What is your best price?')
+			->assertJsonPath('threads.0.last.mine', false)
+			->assertJsonPath('threads.1.post.title', 'Grey corner sofa');
+		$this->assertSame(2, ChatUnread::total(self::SELLER_ID));
+		$this->actingAs($this->seller)->getJson('/chat/api/unread')->assertJsonPath('unread_total', 2);
+	}
+
+	public function test_the_unread_filter_only_lists_conversations_with_unread_messages(): void
+	{
+		// Arrange
+		$thread = $this->conversation(['Is this still available?', 'Yes, it is.']);
+
+		// Act
+		$forSeller = $this->actingAs($this->seller)->getJson('/chat/api/threads?filter=unread');
+		$forBuyer = $this->actingAs($this->buyer)->getJson('/chat/api/threads?filter=unread');
+
+		// Assert: the seller has read (they replied), the buyer has one waiting
+		$forSeller->assertJsonCount(0, 'threads');
+		$forBuyer->assertJsonCount(1, 'threads')->assertJsonPath('threads.0.id', $thread->id);
+	}
+
+	public function test_history_comes_in_pages_oldest_first(): void
+	{
+		// Arrange
+		$thread = $this->conversation(array_map(fn ($number) => 'Message ' . $number, range(1, 35)));
+		$url = '/chat/api/threads/' . $thread->id . '/messages';
+
+		// Act
+		$latest = $this->actingAs($this->buyer)->getJson($url);
+		$older = $this->actingAs($this->buyer)->getJson($url . '?before=' . $latest->json('messages.0.id'));
+
+		// Assert
+		$latest->assertOk()->assertJsonCount(30, 'messages')->assertJsonPath('has_more', true)
+			->assertJsonPath('messages.0.body', 'Message 6')->assertJsonPath('messages.29.body', 'Message 35');
+		$older->assertOk()->assertJsonCount(5, 'messages')->assertJsonPath('has_more', false)
+			->assertJsonPath('messages.0.body', 'Message 1');
+	}
+
+	public function test_missed_messages_are_returned_after_the_last_one_the_browser_has(): void
+	{
+		// Arrange
+		$thread = $this->conversation(['One', 'Two', 'Three']);
+		$firstId = (int)DB::table('threads_messages')->where('thread_id', $thread->id)->min('id');
+
+		// Act
+		$response = $this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id . '/messages?after=' . $firstId);
+
+		// Assert
+		$response->assertOk()->assertJsonCount(2, 'messages')->assertJsonPath('messages.0.body', 'Two');
+	}
+
+	public function test_reading_clears_my_unread_count_and_tells_the_other_person(): void
+	{
+		// Arrange
+		$thread = $this->conversation(['Is this still available?', 'Yes, it is.', 'Great.']);
+		$lastId = (int)DB::table('threads_messages')->where('thread_id', $thread->id)->max('id');
+		Event::fake([ChatEvent::class]);
+
+		// Act
+		$response = $this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/read', ['message_id' => $lastId]);
+
+		// Assert
+		$response->assertOk()->assertJsonPath('read_up_to', $lastId)->assertJsonPath('unread_total', 0);
+		$this->assertSame(0, $this->unreadOf($thread->id, self::SELLER_ID));
+		Event::assertDispatched(ChatEvent::class, fn (ChatEvent $event) => $event->name === ChatEvent::READ
+			&& $event->userId === self::BUYER_ID && $event->payload['message_id'] === $lastId && $event->payload['reader_id'] === self::SELLER_ID);
+		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id)->assertJsonPath('thread.read_up_to', $lastId);
+	}
+
+	public function test_read_only_moves_forward(): void
+	{
+		// Arrange
+		$thread = $this->conversation(['One', 'Two', 'Three']);
+		$ids = DB::table('threads_messages')->where('thread_id', $thread->id)->orderBy('id')->pluck('id')->all();
+		$this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/read', ['message_id' => $ids[2]]);
+
+		// Act
+		$response = $this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/read', ['message_id' => $ids[0]]);
+
+		// Assert
+		$response->assertOk()->assertJsonPath('read_up_to', $ids[2]);
+	}
+}

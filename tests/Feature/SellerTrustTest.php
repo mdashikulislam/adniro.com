@@ -59,41 +59,6 @@ class SellerTrustTest extends TestCase
 		$this->assertSame(1, SellerService::liveListingsCount(SellerService::findByUserId($seller->id)));
 	}
 	
-	public function test_conversations_show_a_safety_reminder_linking_to_the_tips_page(): void
-	{
-		// Arrange
-		DB::table('pages')->insert([
-			'name' => json_encode(['en' => 'Safety']), 'slug' => 'anti-scam', 'title' => json_encode(['en' => 'Safety']),
-			'content' => json_encode(['en' => 'Stay safe']), 'type' => 'tips', 'active' => 1,
-		]);
-		
-		// Act
-		$html = view('front.account.messenger.partials.safety-banner')->render();
-		
-		// Assert
-		$this->assertStringContainsString('Stay safe:', $html);
-		$this->assertStringContainsString('anti-scam', $html);
-		foreach (['resources/views/front/account/messenger/show.blade.php', 'resources/views/front/account/messenger/modal/create.blade.php'] as $view) {
-			$this->assertStringContainsString("@include('front.account.messenger.partials.safety-banner')", file_get_contents(base_path($view)), $view);
-		}
-	}
-	
-	public function test_a_conversation_starts_with_the_listing_it_is_about(): void
-	{
-		// Arrange
-		$this->user(7, ['email_verified_at' => now()]);
-		$this->listing(['title' => 'Grey corner sofa']);
-		$postId = (int)DB::table('posts')->value('id');
-		
-		// Act
-		$html = view('front.account.messenger.partials.listing-card', ['thread' => ['post_id' => $postId]])->render();
-		
-		// Assert
-		$this->assertStringContainsString('chat-listing-card', $html);
-		$this->assertStringContainsString('Grey corner sofa', $html);
-		$this->assertStringContainsString('View listing', $html);
-	}
-	
 	private function user(int $id, array $attributes = []): User
 	{
 		return User::query()->forceCreate(array_merge([

@@ -1,0 +1,30 @@
+# adniro: the live chat's socket server (Laravel Reverb), kept running by systemd.
+#
+# Install (as root):
+#   cp deploy/reverb/adniro-reverb.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now adniro-reverb
+# After each deploy:  systemctl restart adniro-reverb   (it loads the PHP code once, at start)
+# Logs:               journalctl -u adniro-reverb -n 50
+#
+# It listens on 127.0.0.1:8080 only (config/reverb.php); nginx passes wss://<site>/app on to it
+# (deploy/reverb/nginx-reverb.conf). LimitNOFILE is the number of open connections it may hold.
+
+[Unit]
+Description=Adniro live chat (Laravel Reverb)
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/adniro.com
+ExecStart=/usr/bin/php artisan reverb:start --host=127.0.0.1 --port=8080
+Restart=always
+RestartSec=3
+LimitNOFILE=10000
+# Never more than a small share of the machine: pages come first
+MemoryMax=512M
+CPUQuota=100%
+
+[Install]
+WantedBy=multi-user.target
