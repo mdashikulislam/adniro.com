@@ -5,7 +5,9 @@ use App\Http\Controllers\Web\Front\Chat\ChatDeleteController;
 use App\Http\Controllers\Web\Front\Chat\ChatEmailController;
 use App\Http\Controllers\Web\Front\Chat\ChatFileController;
 use App\Http\Controllers\Web\Front\Chat\ChatMessageController;
+use App\Http\Controllers\Web\Front\Chat\ChatOfferController;
 use App\Http\Controllers\Web\Front\Chat\ChatSafetyController;
+use App\Http\Controllers\Web\Front\Chat\ChatToolsController;
 use App\Http\Controllers\Web\Front\Chat\EmailSellerController;
 use App\Services\Chat\ChatEmailChoice;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +30,11 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 		Route::post('listings/{post}', [ChatMessageController::class, 'start'])
 			->middleware(['throttle:chat-start', 'throttle:chat-send'])
 			->name('chat.start');
+
+		// An offer on a listing: a price proposed to its seller, or the seller's own price for a buyer
+		Route::post('listings/{post}/offers', [ChatOfferController::class, 'make'])
+			->middleware(['throttle:chat-offer', 'throttle:chat-send'])
+			->name('chat.offer');
 
 		// A listing posted without a member account has nobody to chat with: the message is emailed
 		Route::post('email-seller/{post}', EmailSellerController::class)
@@ -52,6 +59,10 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 			Route::delete('threads/{thread}/messages/{message}', [ChatDeleteController::class, 'message'])
 				->middleware('throttle:30,1')
 				->name('chat.api.unsend');
+			// Accept or decline an offer
+			Route::post('threads/{thread}/offers/{message}', [ChatOfferController::class, 'answer'])
+				->middleware('throttle:chat-send')
+				->name('chat.api.offer.answer');
 			Route::post('threads/{thread}/read', [ChatMessageController::class, 'read'])
 				->middleware('throttle:60,1')
 				->name('chat.api.read');
@@ -59,6 +70,13 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 			Route::put('settings', [ChatEmailController::class, 'update'])
 				->middleware('throttle:30,1')
 				->name('chat.api.settings');
+			// My away message and saved replies; take my listing offline from the chat about it
+			Route::put('tools', [ChatToolsController::class, 'update'])
+				->middleware('throttle:30,1')
+				->name('chat.api.tools');
+			Route::post('listings/{post}/sold', [ChatToolsController::class, 'sold'])
+				->middleware('throttle:10,1')
+				->name('chat.api.sold');
 
 			Route::post('users/{user}/block', [ChatSafetyController::class, 'block'])
 				->middleware('throttle:30,1')

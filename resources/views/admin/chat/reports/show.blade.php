@@ -103,8 +103,16 @@
 							@if ($message->isImage())
 								<img src="{{ urlGen()->adminUrl('chat-reports/' . $report->id . '/photos/' . $message->id) }}" alt="{{ trans('chat.js.photo') }}"
 								     loading="lazy" style="max-width: 220px; max-height: 220px; border-radius: 8px;">
+							@elseif ($message->isOffer() || $message->isOfferAnswer())
+								<div><strong>{{ trans($message->isOffer() ? 'chat_admin.offer_line' : 'chat_admin.offer_answer_line', [
+									'amount' => \App\Services\Chat\ChatOffers::amountOf($message),
+									'status' => trans('chat_admin.offer_status_' . $message->offer_status),
+								]) }}</strong></div>
 							@else
 								<div style="white-space: pre-wrap; overflow-wrap: anywhere;">{{ $message->body }}</div>
+							@endif
+							@if ($message->is_auto)
+								<div class="small text-muted mt-1">{{ trans('chat_admin.automatic_reply') }}</div>
 							@endif
 							@if ($message->isUnsent())
 								<div class="small text-warning mt-1">{{ trans('chat_admin.taken_back', ['when' => $message->unsent_at]) }}</div>

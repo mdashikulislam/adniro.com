@@ -196,8 +196,16 @@ class ChatPagesTest extends ChatTestCase
 		// The chat icon in the header, always in view, and what the new-message pop-up needs
 		$this->assertMatchesRegularExpression('/<a href="[^"]*\/chat" class="adn-head-chat"[^>]*>\s*<i class="bi bi-chat-dots"[^>]*><\/i><span class="adn-head-chat-badge" data-adn-chat-badge>1<\/span>/', $html);
 		$this->assertStringContainsString('adn-head-chat is-compact d-none d-md-inline-flex d-xl-none', $html);
-		$this->assertSame(['photo' => 'Photo', 'dismiss' => 'Dismiss'], $live['text']);
+		$this->assertSame([
+			'photo'          => 'Photo',
+			'dismiss'        => 'Dismiss',
+			'offer'          => 'Offer: :amount',
+			'offer_accepted' => 'Offer accepted: :amount',
+			'offer_declined' => 'Offer declined: :amount',
+		], $live['text']);
 		$this->assertStringContainsString('assets/css/chat-live.css', $html);
+		// The sound and the browser notification, after the live connection they listen to
+		$this->assertMatchesRegularExpression('~assets/js/app/chat-live\.js.*assets/js/app/chat-alerts\.js~s', $html);
 		$this->assertStringNotContainsString('timerNewMessagesChecking', $html);
 	}
 

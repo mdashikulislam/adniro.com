@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'प्रति सदस्य एक ईमेल, हर संदेश पर नहीं। हर सदस्य इसे अपने लिए बंद भी कर सकता है।',
 	'setting_unread_email_delay_minutes_label' => 'अपठित संदेशों के ईमेल से पहले मिनट',
 	'setting_unread_email_delay_minutes_hint' => 'ईमेल भेजने से पहले संदेश कितनी देर अपठित रहता है।',
+	'setting_offers_enabled_label' => 'ऑफ़र',
+	'setting_offers_enabled_hint' => 'सदस्य किसी विज्ञापन की चैट में कीमत का प्रस्ताव रख सकते हैं, और ऑफ़र स्वीकार या अस्वीकार कर सकते हैं।',
+	'offer_line' => 'ऑफ़र: :amount (:status)',
+	'offer_answer_line' => ':amount के ऑफ़र का जवाब: :status',
+	'offer_status_pending' => 'खुला',
+	'offer_status_accepted' => 'स्वीकृत',
+	'offer_status_declined' => 'अस्वीकृत',
+	'offer_status_replaced' => 'बदला गया',
+	'automatic_reply' => 'स्वचालित जवाब (अनुपस्थिति संदेश)',
 ];

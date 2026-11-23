@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'Eine E-Mail pro Mitglied, nie eine pro Nachricht. Jedes Mitglied kann sie auch für sich selbst ausschalten.',
 	'setting_unread_email_delay_minutes_label' => 'Minuten bis zur E-Mail über ungelesene Nachrichten',
 	'setting_unread_email_delay_minutes_hint' => 'Wie lange eine Nachricht ungelesen wartet, bevor die E-Mail gesendet wird.',
+	'setting_offers_enabled_label' => 'Angebote',
+	'setting_offers_enabled_hint' => 'Mitglieder können im Chat zu einer Anzeige einen Preis vorschlagen und ein Angebot annehmen oder ablehnen.',
+	'offer_line' => 'Angebot: :amount (:status)',
+	'offer_answer_line' => 'Antwort auf das Angebot von :amount: :status',
+	'offer_status_pending' => 'offen',
+	'offer_status_accepted' => 'angenommen',
+	'offer_status_declined' => 'abgelehnt',
+	'offer_status_replaced' => 'ersetzt',
+	'automatic_reply' => 'Automatische Antwort (Abwesenheitsnachricht)',
 ];

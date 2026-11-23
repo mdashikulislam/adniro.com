@@ -3,11 +3,13 @@
  *
  * - Keeps the unread count up to date: on every badge ([data-adn-chat-badge]: the header's chat icon, the
  *   account menu, the phone app bar) and in front of the page title, so it shows on the browser tab.
- * - Shows a small pop-up when a message arrives while the member is on another page.
+ * - Shows a small pop-up when a message arrives while the member is on another page (the sound and the browser
+ *   notification are in chat-alerts.js).
  * - When a live server is configured (Laravel Reverb), loads the two socket libraries after the page has
  *   finished, opens one connection, listens on the member's own private channel and passes what arrives on as
  *   window events for the chat page: adn:chat:message, adn:chat:read, adn:chat:unsent, adn:chat:state.
- * - A tab hidden for five minutes closes its connection; it reconnects when it is shown again.
+ * - A tab hidden for five minutes closes its connection and reconnects when it is shown again, unless the
+ *   member turned browser notifications on: they asked to hear from a tab left in the background.
  * Without a live server nothing is loaded and nothing is polled here: the chat page checks by itself.
  */
 (function (window, document) {
@@ -36,6 +38,21 @@
 			badge.hidden = count === 0;
 		});
 		document.title = count > 0 ? '(' + label + ') ' + pageTitle : pageTitle;
+	}
+
+	/** One line for a message: its text, or what it is (a photo, an offer, the answer to an offer). */
+	function preview(message) {
+		var text = config.text;
+		if (message.type === 'image') {
+			return text.photo;
+		}
+		if (message.type === 'offer') {
+			return text.offer.replace(':amount', message.offer.amount);
+		}
+		if (message.type === 'offer_answer') {
+			return (message.offer.status === 'accepted' ? text.offer_accepted : text.offer_declined).replace(':amount', message.offer.amount);
+		}
+		return message.body;
 	}
 
 	/* ---------- A pop-up when a message arrives on another page ---------- */
@@ -87,7 +104,7 @@
 		var name = document.createElement('strong');
 		name.textContent = detail.thread.other.name;
 		var body = document.createElement('span');
-		body.textContent = detail.message.type === 'image' ? config.text.photo : detail.message.body;
+		body.textContent = preview(detail.message);
 		text.appendChild(name);
 		text.appendChild(body);
 		link.appendChild(text);
@@ -134,7 +151,7 @@
 		window.dispatchEvent(new CustomEvent('adn:chat:' + name, {detail: detail}));
 	}
 
-	var api = {connected: false, setUnread: setUnread, join: null};
+	var api = {connected: false, setUnread: setUnread, preview: preview, join: null};
 	window.AdnChatLive = api;
 	setUnread(config.unread_total);
 
@@ -245,6 +262,9 @@
 		document.addEventListener('visibilitychange', function () {
 			window.clearTimeout(idleTimer);
 			if (document.hidden) {
+				if (window.AdnChatAlerts && window.AdnChatAlerts.staysConnected()) {
+					return;
+				}
 				idleTimer = window.setTimeout(function () {
 					pusher.disconnect();
 				}, IDLE_DISCONNECT_MS);

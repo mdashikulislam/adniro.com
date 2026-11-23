@@ -39,6 +39,12 @@ class ChatDeleteController extends Controller
 			return response()->json(['message' => trans('chat.error_unsend_late')], 422);
 		}
 
-		return response()->json(['message' => ChatPresenter::message(ChatMessages::unsend($chatThread, $chatMessage))]);
+		$chatMessage = ChatMessages::unsend($chatThread, $chatMessage);
+		if (!$chatMessage->isUnsent()) {
+			// An offer that was answered at the same moment: the answer stands
+			return response()->json(['message' => trans('chat.error_unsend_late')], 422);
+		}
+
+		return response()->json(['message' => ChatPresenter::message($chatMessage)]);
 	}
 }

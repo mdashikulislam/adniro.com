@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'Un e-mail par membre, jamais un par message. Chaque membre peut aussi le désactiver pour lui-même.',
 	'setting_unread_email_delay_minutes_label' => 'Minutes avant l\'e-mail des messages non lus',
 	'setting_unread_email_delay_minutes_hint' => 'Durée pendant laquelle un message attend sans être lu avant l\'envoi de l\'e-mail.',
+	'setting_offers_enabled_label' => 'Offres',
+	'setting_offers_enabled_hint' => 'Les membres peuvent proposer un prix dans une discussion sur une annonce, et accepter ou refuser une offre.',
+	'offer_line' => 'Offre : :amount (:status)',
+	'offer_answer_line' => 'Réponse à l\'offre de :amount : :status',
+	'offer_status_pending' => 'ouverte',
+	'offer_status_accepted' => 'acceptée',
+	'offer_status_declined' => 'refusée',
+	'offer_status_replaced' => 'remplacée',
+	'automatic_reply' => 'Réponse automatique (message d\'absence)',
 ];

@@ -12,6 +12,7 @@ class ChatSettings
 	public const DEFAULTS = [
 		'enabled'                    => '1',
 		'photos_enabled'             => '1',
+		'offers_enabled'             => '1',
 		'unread_email_enabled'       => '1',
 		'unread_email_delay_minutes' => '10',
 		'messages_per_minute'        => '20',
@@ -30,6 +31,12 @@ class ChatSettings
 	public static function photosEnabled(): bool
 	{
 		return self::value('photos_enabled') === '1';
+	}
+
+	/** "Make an offer" in a conversation about a listing. */
+	public static function offersEnabled(): bool
+	{
+		return self::value('offers_enabled') === '1';
 	}
 
 	public static function unreadEmailEnabled(): bool

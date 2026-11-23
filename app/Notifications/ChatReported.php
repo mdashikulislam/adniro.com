@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Chat\ChatMessage;
 use App\Models\Chat\ThreadReport;
+use App\Services\Chat\ChatOffers;
 use App\Notifications\Concerns\PlainMailText;
 use Illuminate\Notifications\Messages\MailMessage;
 
@@ -60,7 +61,12 @@ class ChatReported extends BaseNotification
 			->get()
 			->reverse();
 		foreach ($messages as $message) {
-			$text = $message->isImage() ? '[' . trans('chat.js.photo') . ']' : self::plainMailText($message->body, self::MESSAGE_LIMIT);
+			$text = match (true) {
+				$message->isImage()       => '[' . trans('chat.js.photo') . ']',
+				$message->isOffer()       => '[' . trans('chat.js.offer_line', ['amount' => ChatOffers::amountOf($message)]) . ']',
+				$message->isOfferAnswer() => '[' . trans('chat.js.offer_' . $message->offer_status . '_line', ['amount' => ChatOffers::amountOf($message)]) . ']',
+				default                   => self::plainMailText($message->body, self::MESSAGE_LIMIT),
+			};
 			$mail->line(e(($names[(int)$message->user_id] ?? '#' . $message->user_id) . ': ' . $text));
 		}
 

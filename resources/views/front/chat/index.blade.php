@@ -12,7 +12,7 @@
 @section('body_class', ' adn-chat-page' . ($chatIsOpen ? ' is-chat-open' : ''))
 
 @push('after_styles_stack')
-	@foreach (['chat', 'chat-messages', 'chat-marks'] as $chatStyle)
+	@foreach (['chat', 'chat-messages', 'chat-marks', 'chat-offers'] as $chatStyle)
 		<link href="{{ url('assets/css/' . $chatStyle . '.css') }}?v={{ @filemtime(public_path('assets/css/' . $chatStyle . '.css')) }}" rel="stylesheet">
 	@endforeach
 @endpush
@@ -31,7 +31,7 @@
 								{{ trans('chat.filter_unread') }} <span class="adn-chat-filter-count" data-adn-chat-badge @if (empty($chatState['unread_total'])) hidden @endif>{{ $chatState['unread_total'] > 99 ? '99+' : $chatState['unread_total'] }}</span>
 							</button>
 						</div>
-						{{-- Chat settings: the unread-messages email, on or off (chat-settings.js) --}}
+						{{-- Chat settings: the unread email, the sound, browser notifications (chat-settings.js), my tools --}}
 						<div class="dropdown adn-chat-settings">
 							<button type="button" class="adn-chat-icon-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="{{ trans('chat.settings') }}">
 								<i class="bi bi-gear" aria-hidden="true"></i>
@@ -46,9 +46,35 @@
 										<input type="checkbox" class="form-check-input" role="switch" data-chat-emails @checked(!empty($chatState['emails']))>
 									</span>
 								</label>
+								{{-- These two are kept in this browser: a sound or a notification belongs to a device --}}
+								<label class="adn-chat-switch">
+									<span class="adn-chat-switch-text">
+										<strong>{{ trans('chat.sound_label') }}</strong>
+										<span>{{ trans('chat.sound_hint') }}</span>
+									</span>
+									<span class="form-check form-switch m-0">
+										<input type="checkbox" class="form-check-input" role="switch" data-chat-sound>
+									</span>
+								</label>
+								<label class="adn-chat-switch" data-chat-desktop-row>
+									<span class="adn-chat-switch-text">
+										<strong>{{ trans('chat.desktop_label') }}</strong>
+										<span>{{ trans('chat.desktop_hint') }}</span>
+									</span>
+									<span class="form-check form-switch m-0">
+										<input type="checkbox" class="form-check-input" role="switch" data-chat-desktop>
+									</span>
+								</label>
+								<button type="button" class="adn-chat-settings-link" data-chat-tools-open>
+									<i class="bi bi-lightning-charge" aria-hidden="true"></i> {{ trans('chat.tools_title') }}
+								</button>
 							</div>
 						</div>
 					</div>
+					{{-- A reminder while the away message is on: it answers for the member --}}
+					<button type="button" class="adn-chat-away-chip" data-chat-away-chip data-chat-tools-open hidden>
+						<i class="bi bi-moon-stars" aria-hidden="true"></i> {{ trans('chat.away_on_badge') }}
+					</button>
 					<div class="adn-chat-list" data-chat-list aria-live="polite"></div>
 				</nav>
 
@@ -76,6 +102,7 @@
 								</button>
 								<ul class="dropdown-menu dropdown-menu-end adn-chat-menu">
 									<li><a class="dropdown-item" href="#" data-chat-view-listing><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> {{ trans('chat.view_listing') }}</a></li>
+									<li><button type="button" class="dropdown-item" data-chat-sold><i class="bi bi-bag-check" aria-hidden="true"></i> {{ trans('chat.mark_sold') }}</button></li>
 									<li><button type="button" class="dropdown-item" data-chat-block><i class="bi bi-slash-circle" aria-hidden="true"></i> <span data-chat-block-label>{{ trans('chat.block') }}</span></button></li>
 									<li><button type="button" class="dropdown-item" data-chat-delete-chat><i class="bi bi-trash3" aria-hidden="true"></i> {{ trans('chat.delete_chat') }}</button></li>
 									<li><button type="button" class="dropdown-item text-danger" data-chat-report><i class="bi bi-flag" aria-hidden="true"></i> {{ trans('chat.report') }}</button></li>
@@ -131,6 +158,13 @@
 							<button type="button" class="adn-chat-icon-btn" data-chat-photo-btn aria-label="{{ trans('chat.add_photo') }}">
 								<i class="bi bi-image" aria-hidden="true"></i>
 							</button>
+							{{-- More to send: an offer on the listing, a saved reply (chat-tools.js fills the menu) --}}
+							<div class="dropup adn-chat-plus" data-chat-more>
+								<button type="button" class="adn-chat-icon-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ trans('chat.more_actions') }}">
+									<i class="bi bi-plus-lg" aria-hidden="true"></i>
+								</button>
+								<div class="dropdown-menu adn-chat-plus-menu" data-chat-more-menu></div>
+							</div>
 							<label class="visually-hidden" for="adnChatInput">{{ trans('chat.message_label') }}</label>
 							<div class="adn-chat-input-wrap">
 								<textarea id="adnChatInput" class="adn-chat-input" rows="1" maxlength="{{ $chatState['limits']['body_max'] }}" placeholder="{{ trans('chat.message_placeholder') }}" data-chat-input autocomplete="off" aria-describedby="adnChatHint"></textarea>
@@ -150,12 +184,13 @@
 	</div>
 
 	@include('front.chat.partials.report-dialog')
+	@include('front.chat.partials.tools-dialog')
 
 	<script type="application/json" id="adnChatState">{!! json_encode($chatState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
 @endsection
 
 @push('after_scripts_stack')
-	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-presence', 'chat-reply', 'chat-safety', 'chat-delete', 'chat-drafts', 'chat-guard', 'chat-settings', 'chat-photo', 'chat'] as $chatScript)
+	@foreach (['chat-kit', 'chat-inbox', 'chat-log', 'chat-presence', 'chat-reply', 'chat-safety', 'chat-delete', 'chat-drafts', 'chat-guard', 'chat-settings', 'chat-photo', 'chat-offers', 'chat-tools', 'chat'] as $chatScript)
 		<script src="{{ url('assets/js/app/' . $chatScript . '.js') }}?v={{ @filemtime(public_path('assets/js/app/' . $chatScript . '.js')) }}" defer></script>
 	@endforeach
 @endpush

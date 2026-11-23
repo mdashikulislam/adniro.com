@@ -8,10 +8,12 @@ use App\Services\Chat\ChatAccess;
 use App\Services\Chat\ChatConversations;
 use App\Services\Chat\ChatEmailChoice;
 use App\Services\Chat\ChatMessages;
+use App\Services\Chat\ChatOffers;
 use App\Services\Chat\ChatPhotos;
 use App\Services\Chat\ChatPresenter;
 use App\Services\Chat\ChatSafety;
 use App\Services\Chat\ChatSettings;
+use App\Services\Chat\ChatTools;
 use App\Services\Chat\ChatUnread;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -48,7 +50,7 @@ class ChatController extends FrontController
 	{
 		$user = $request->user();
 		$userId = (int)$user->id;
-		$listing = Post::query()->unarchived()->with(['picture', 'user'])->findOrFail($post);
+		$listing = Post::query()->unarchived()->with(['picture', 'category', 'currency', 'user'])->findOrFail($post);
 
 		$existing = empty($listing->user_id) ? null : ChatConversations::between($userId, (int)$listing->user_id);
 		$reason = ChatConversations::cannotStartReason($listing, $user);
@@ -94,11 +96,19 @@ class ChatController extends FrontController
 			'unread_total'  => ChatUnread::total($userId),
 			'emails'        => ChatEmailChoice::isOn($user),
 			'quick_replies' => array_values((array)trans('chat.quick_replies')),
+			// For the owner of the listing a conversation is about, when a question waits for an answer
+			'seller_quick_replies' => array_values((array)trans('chat.seller_quick_replies')),
+			// The member's away message and saved replies
+			'tools'         => ChatTools::of($userId),
 			'safety'        => ChatSafety::browserPatterns(),
 			// Turned off in Admin > Settings > Chat: conversations can be read, nothing can be sent
 			'paused'        => !ChatSettings::isEnabled(),
 			'limits'        => [
 				'photos'         => ChatSettings::photosEnabled(),
+				'offers'         => ChatOffers::isEnabled(),
+				'offer_max'      => ChatOffers::AMOUNT_MAX,
+				'tools_text_max' => ChatTools::TEXT_MAX,
+				'saved_replies'  => ChatTools::SAVED_REPLIES_MAX,
 				'unsend_minutes' => ChatSettings::unsendMinutes(),
 				'body_max'       => ChatMessages::BODY_MAX,
 				'photo_max_kb'   => ChatPhotos::MAX_UPLOAD_KB,
@@ -116,9 +126,19 @@ class ChatController extends FrontController
 				'settings' => route('chat.api.settings'),
 				'hide'     => route('chat.api.hide', ['thread' => '__ID__']),
 				'unsend'   => route('chat.api.unsend', ['thread' => '__ID__', 'message' => '__MESSAGE__']),
+				'offer'    => route('chat.offer', ['post' => '__ID__']),
+				'offer_answer' => route('chat.api.offer.answer', ['thread' => '__ID__', 'message' => '__MESSAGE__']),
+				'tools'    => route('chat.api.tools'),
+				'sold'     => route('chat.api.sold', ['post' => '__ID__']),
 				'browse'   => urlGen()->searchWithoutQuery(),
 			],
-			'text'          => (array)trans('chat.js') + ['too_fast' => trans('chat.error_too_fast')],
+			'text'          => (array)trans('chat.js') + [
+				'too_fast'      => trans('chat.error_too_fast'),
+				'offer_title'   => trans('chat.make_offer'),
+				'offer_invalid' => trans('chat.error_offer_amount'),
+				'sold_confirm'  => trans('chat.mark_sold'),
+				'saved_replies' => trans('chat.saved_replies'),
+			],
 		], $state);
 
 		MetaTag::set('title', trans('chat.page_title'));

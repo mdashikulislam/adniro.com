@@ -105,7 +105,7 @@
 					return item.id === id && !item.unsent;
 				})[0] : null;
 				if (message) {
-					markUnsent({id: id, thread_id: open.thread.id, unsent: true, body: '', image: null, reply_to: null, caution: false});
+					markUnsent({id: id, thread_id: open.thread.id, unsent: true, body: '', image: null, reply_to: null, caution: false, offer: null, auto: false});
 				}
 			});
 		}

@@ -26,6 +26,11 @@
 		}
 
 		function quoteOf(message) {
+			if (message.offer) {
+				// An offer is quoted by its amount; an answer says which answer it was
+				var kind = message.type === 'offer' ? 'offer' : 'offer_' + message.offer.status;
+				return {id: message.id, user_id: message.user_id, type: kind, text: message.offer.amount};
+			}
 			var text = String(message.body || '').replace(/\s+/g, ' ').trim();
 			return {
 				id: message.id,
@@ -46,7 +51,7 @@
 			var quote = quoteOf(message);
 			store.open.replyTo = quote;
 			els.replyingName.textContent = nameOf(quote.user_id);
-			els.replyingBody.textContent = quote.type === 'image' ? T.photo : quote.text;
+			els.replyingBody.textContent = ctx.kit.lineText(quote.type, quote.text);
 			els.replying.setAttribute('aria-label', fill(T.replying_to, {name: nameOf(quote.user_id)}));
 			els.replying.hidden = false;
 			els.input.focus();

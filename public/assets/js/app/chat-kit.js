@@ -189,6 +189,21 @@
 			}
 		}
 
+		/**
+		 * The words for a one-line summary of a message (an inbox row, a quote): the server names what it is,
+		 * and for an offer gives the amount as the text.
+		 */
+		function lineText(type, text) {
+			var lines = {
+				unsent: T.message_deleted,
+				image: T.photo,
+				offer: T.offer_line,
+				offer_accepted: T.offer_accepted_line,
+				offer_declined: T.offer_declined_line
+			};
+			return lines[type] ? fill(lines[type], {amount: text}) : text;
+		}
+
 		function timeOf(date) {
 			return timeFormat.format(date);
 		}
@@ -208,6 +223,7 @@
 			timeOf: timeOf,
 			avatarInto: avatarInto,
 			listingInto: listingInto,
+			lineText: lineText,
 			linkified: linkified
 		};
 	};

@@ -18,14 +18,24 @@ class ChatMessage extends Model
 
 	public const TYPE_TEXT = 'text';
 	public const TYPE_IMAGE = 'image';
+	/** A price proposed for the listing the message is about ("offer_amount", "offer_status"). */
+	public const TYPE_OFFER = 'offer';
+	/** The other person's answer to an offer: "reply_to_id" is the offer, "offer_status" the answer. */
+	public const TYPE_OFFER_ANSWER = 'offer_answer';
+
+	public const OFFER_PENDING = 'pending';
+	public const OFFER_ACCEPTED = 'accepted';
+	public const OFFER_DECLINED = 'declined';
+	/** A newer offer was made on the same listing in this conversation. */
+	public const OFFER_REPLACED = 'replaced';
 
 	protected $table = 'threads_messages';
 
-	protected $fillable = ['thread_id', 'post_id', 'reply_to_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid', 'unsent_at'];
+	protected $fillable = ['thread_id', 'post_id', 'reply_to_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid', 'unsent_at', 'offer_amount', 'offer_currency', 'offer_status', 'is_auto'];
 
 	protected function casts(): array
 	{
-		return ['unsent_at' => 'datetime'];
+		return ['unsent_at' => 'datetime', 'is_auto' => 'boolean'];
 	}
 
 	public function thread(): BelongsTo
@@ -59,5 +69,15 @@ class ChatMessage extends Model
 	public function isImage(): bool
 	{
 		return $this->type === self::TYPE_IMAGE;
+	}
+
+	public function isOffer(): bool
+	{
+		return $this->type === self::TYPE_OFFER;
+	}
+
+	public function isOfferAnswer(): bool
+	{
+		return $this->type === self::TYPE_OFFER_ANSWER;
 	}
 }

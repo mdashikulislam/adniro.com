@@ -201,6 +201,49 @@ Report dialog (C5)
 Block confirm
   content   SweetAlert2 confirm (the site's one dialog style): "Block {name}?" + what it does
 
+Offer card (round 3)
+  where     in the message log, under the listing it is about; the same card for both people (never a teal bubble)
+  content   label "OFFER" / "YOUR OFFER" (xs/700, caps, accent-text) with a tag icon, the amount (24/800,
+            tabular numbers), then one of: Decline + Accept (the person it was made to), "Waiting for an answer"
+            (its sender), "Accepted" (success), "Declined", "Replaced by a newer offer"
+  tokens    bg, 1.5px accent outline, soft shadow; closed offers: 1px border, amount struck through and muted
+  buttons   pills 40px high; Accept is accent-strong with white text; pressed scale .96; never break a word
+  states    open, accepted, declined, replaced, taken back ("Message deleted"); buttons disabled while saving
+  a11y      real buttons; Accept asks first (SweetAlert2): "Accept {amount}?" and what it means
+
+Offer answer (round 3)
+  content   one line with an icon: "Offer accepted: {amount}" (success, accent-soft bubble) and the note
+            "Agree where to meet. Pay only when you have seen the item."; or "Offer declined: {amount}" (plain)
+
+Make an offer dialog (round 3)
+  content   SweetAlert2: "Make an offer", the listing's title and price, one field "Your price ({currency})"
+            (decimal keyboard), Cancel + Send offer
+  rules     "1 200,50", "1.200,50" and "1,200.50" are read as the same amount; anything else shows
+            "Enter an amount, for example 120 or 120.50."
+
+"+" menu beside the message box (round 3)
+  content   dropup: "Make an offer" (when the listing allows it), "Saved replies" header, the member's saved
+            replies (two lines each at most), "Edit saved replies"
+  action    a saved reply goes into the message box, to be changed or sent
+
+Saved replies and away message dialog (round 3)
+  content   Bootstrap modal: away message (switch + text, 300) with what it does; saved replies (up to five,
+            300 each, add and remove); Cancel + Save
+  states    saving, saved (toast), error under the fields ("Write your away message, or turn it off.")
+
+Away reminder (round 3)
+  content   pill above the list of chats while the away message is on: moon icon, "Away message on"
+            (warning-bg, warning-text); opens the dialog
+
+Automatic reply mark (round 3)
+  content   small "Automatic reply" line with a robot icon at the top of the bubble of an away message
+
+Chat settings (round 3 additions)
+  content   under the email switch: "Sound for new messages" and "Browser notifications" (kept in the browser),
+            then the link "Saved replies and away message"
+  rules     the notifications switch asks the browser the first time; refused: a toast says where to allow it;
+            not shown where a page cannot show notifications (Android)
+
 Chat icon in the header (G)
   where     signed-in members only: in the menu bar from 1200px, beside the account button from 768px;
             phones use the app bar's Chats tab

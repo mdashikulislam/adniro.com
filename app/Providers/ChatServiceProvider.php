@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Events\Chat\ChatEvent;
+use App\Models\Post;
 use App\Models\User;
 use App\Services\Chat\ChatAccess;
+use App\Services\Chat\ChatConversations;
 use App\Services\Chat\ChatSettings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -25,6 +27,8 @@ class ChatServiceProvider extends ServiceProvider
 	private const NEW_ACCOUNT_SHARE = ['minute' => 0.4, 'day' => 0.2];
 	/** [per minute, per day] for an established member and for an account's first day. */
 	private const START_LIMITS = ['member' => [5, 30], 'new' => [2, 10]];
+	/** Offers: a few a minute is bargaining, more is pestering. Each one also counts as a message sent. */
+	private const OFFER_LIMITS = ['member' => [6, 40], 'new' => [3, 10]];
 	private const REPORTS_PER_HOUR = 5;
 	/** "Email the seller" (listings without a member account): a real email each time, so far fewer than chat. */
 	private const EMAIL_SELLER_LIMITS = ['member' => [3, 10], 'new' => [2, 3]];
@@ -61,6 +65,12 @@ class ChatServiceProvider extends ServiceProvider
 	{
 		RateLimiter::for('chat-send', fn (Request $request) => $this->limits($request, $this->sendLimits(), 'send'));
 		RateLimiter::for('chat-start', fn (Request $request) => $this->limits($request, self::START_LIMITS, 'start'));
+		RateLimiter::for('chat-offer', function (Request $request) {
+			$limits = $this->limits($request, self::OFFER_LIMITS, 'offer');
+
+			// An offer to someone the member has no conversation with also counts as starting one
+			return $this->opensConversation($request) ? array_merge($limits, $this->limits($request, self::START_LIMITS, 'start')) : $limits;
+		});
 		RateLimiter::for('chat-email-seller', fn (Request $request) => array_merge(
 			$this->limits($request, self::EMAIL_SELLER_LIMITS, 'email-seller'),
 			[
@@ -71,6 +81,15 @@ class ChatServiceProvider extends ServiceProvider
 		RateLimiter::for('chat-report', function (Request $request) {
 			return Limit::perHour(self::REPORTS_PER_HOUR)->by('chat-report:' . $request->user()?->id);
 		});
+	}
+
+	/** Whether the offer being made goes to a listing's owner the member has not talked to yet. */
+	private function opensConversation(Request $request): bool
+	{
+		$userId = (int)$request->user()?->id;
+		$ownerId = (int)Post::query()->withoutGlobalScopes()->whereKey((int)$request->route('post'))->value('user_id');
+
+		return $userId > 0 && $ownerId > 0 && $ownerId !== $userId && ChatConversations::between($userId, $ownerId) === null;
 	}
 
 	/** @return array{member: array{0: int, 1: int}, new: array{0: int, 1: int}} [per minute, per day] */

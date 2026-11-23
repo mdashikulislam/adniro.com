@@ -44,6 +44,16 @@ Ordered by how much users would notice.
 Two limits, on purpose: the quick replies stay in the language files (an admin text box would lose their
 translations), and the warning before sending (B5) still knows English "pay outside" words only (section C).
 
+**Round 3 is built on local as well, with tests: B2 (sound and browser notifications), B7 (offers) and B10
+(seller tools).** Three limits, on purpose:
+- **B2 has no phone push.** A sound and a browser notification need the site open in a tab. A notification on a
+  phone whose browser is closed needs a service worker and push subscriptions, which went out with the phone
+  app; it stays a later item. Android browsers are not offered the notification switch: a page cannot show one
+  there.
+- **An accepted offer changes nothing on the listing.** No price change, no reservation, no payment: it is an
+  agreement between two people, shown to both.
+- **"Mark as sold" takes the listing offline**, the way My listings does: the site has no separate "sold" state.
+
 | # | missing | why it matters | seen on | size |
 | --- | --- | --- | --- | --- |
 | B1 | **Delete a conversation (for me) and delete my own message** | A message sent to the wrong person stays for good; an inbox can never be cleaned. | Vinted and Kleinanzeigen: delete for yourself only (verified) | M |

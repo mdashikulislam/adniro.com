@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'One email per member, never one per message. Each member can also turn it off for themselves.',
 	'setting_unread_email_delay_minutes_label' => 'Minutes before the unread email',
 	'setting_unread_email_delay_minutes_hint' => 'How long a message waits unread before the email is sent.',
+	'setting_offers_enabled_label' => 'Offers',
+	'setting_offers_enabled_hint' => 'Members can propose a price in a chat about a listing, and accept or decline one.',
+	'offer_line' => 'Offer: :amount (:status)',
+	'offer_answer_line' => 'Answer to the offer of :amount: :status',
+	'offer_status_pending' => 'open',
+	'offer_status_accepted' => 'accepted',
+	'offer_status_declined' => 'declined',
+	'offer_status_replaced' => 'replaced',
+	'automatic_reply' => 'Automatic reply (away message)',
 ];

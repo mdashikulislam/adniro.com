@@ -51,6 +51,7 @@ class ChatCleanup
 		// Rows the member had hidden are not covered by the site's own clean-up
 		DB::table((new ChatParticipant())->getTable())->where('user_id', $userId)->delete();
 		ChatUnread::forget($userId);
+		ChatTools::forget($userId);
 
 		ChatThread::withTrashed()
 			->whereKey($threadIds)

@@ -1,0 +1,340 @@
+/*
+ * adniro: live chat, offers and the member's tools (assets/js/app/chat-offers.js, chat-tools.js):
+ * the offer card and its answer, the "automatic reply" mark, the "+" menu beside the message box, the chat
+ * settings' link, the "away" reminder and the dialog for saved replies and the away message.
+ * Colours and sizes are the tokens of assets/css/chat.css.
+ */
+
+/* ---------- An offer: a card, the same for both people, so it never reads as ordinary talk ---------- */
+.adn-chat-msg .adn-chat-bubble.is-offer,
+.adn-chat-msg.is-mine .adn-chat-bubble.is-offer {
+	min-width: 232px;
+	padding: .7rem .85rem .5rem;
+	color: var(--adn-chat-text);
+	background-color: var(--adn-chat-bg);
+	box-shadow: inset 0 0 0 1.5px var(--adn-chat-accent), 0 4px 14px -8px rgba(15, 23, 42, .25);
+	white-space: normal;
+}
+
+.adn-chat-msg .adn-chat-bubble.is-offer .adn-chat-meta,
+.adn-chat-msg.is-seen .adn-chat-bubble.is-offer .adn-chat-tick {
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-offer {
+	display: flex;
+	flex-direction: column;
+	gap: .2rem;
+}
+
+.adn-chat-offer-label {
+	display: inline-flex;
+	align-items: center;
+	gap: .35rem;
+	font-size: .6875rem;
+	font-weight: 700;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	color: var(--adn-chat-accent-text);
+}
+
+.adn-chat-offer-amount {
+	font-size: 1.5rem;
+	font-weight: 800;
+	line-height: 1.15;
+	letter-spacing: -.01em;
+	font-variant-numeric: tabular-nums;
+}
+
+.adn-chat-offer-status {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	font-size: .8125rem;
+	line-height: 1.35;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-offer-note {
+	font-size: .75rem;
+	line-height: 1.4;
+	color: var(--adn-chat-muted);
+	text-wrap: pretty;
+}
+
+/* Accept and Decline, for the person the offer was made to */
+.adn-chat-offer-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	margin-top: .5rem;
+}
+
+.adn-chat-offer-btn {
+	flex: 1 1 auto;
+	min-height: 40px;
+	padding: 0 .9rem;
+	white-space: nowrap;
+	border: 1.5px solid var(--adn-chat-border);
+	border-radius: 999px;
+	font-size: .875rem;
+	font-weight: 700;
+	color: var(--adn-chat-text);
+	background-color: transparent;
+	transition-property: transform, background-color, opacity;
+	transition-duration: var(--adn-chat-fast);
+	transition-timing-function: ease-out;
+}
+
+.adn-chat-offer-btn:hover {
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-offer-btn.is-accept {
+	border-color: var(--adn-chat-accent-strong);
+	color: var(--adn-chat-on-accent);
+	background-color: var(--adn-chat-accent-strong);
+}
+
+.adn-chat-offer-btn.is-accept:hover {
+	opacity: .92;
+}
+
+.adn-chat-offer-btn:active:not(:disabled) {
+	transform: scale(.96);
+}
+
+.adn-chat-offer-btn:disabled {
+	opacity: .55;
+}
+
+.adn-chat-offer-btn:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+/* Closed offers: the outline goes quiet; a price that was not agreed is struck through */
+.adn-chat-msg .adn-chat-bubble.is-offer.is-offer-declined,
+.adn-chat-msg .adn-chat-bubble.is-offer.is-offer-replaced {
+	box-shadow: inset 0 0 0 1px var(--adn-chat-border);
+}
+
+.adn-chat-bubble.is-offer-declined .adn-chat-offer-label,
+.adn-chat-bubble.is-offer-replaced .adn-chat-offer-label {
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-bubble.is-offer-declined .adn-chat-offer-amount,
+.adn-chat-bubble.is-offer-replaced .adn-chat-offer-amount {
+	font-weight: 700;
+	text-decoration: line-through;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-bubble.is-offer-accepted .adn-chat-offer-status {
+	font-weight: 600;
+	color: var(--adn-chat-success);
+}
+
+/* The answer to an offer: one line, green when accepted */
+.adn-chat-msg .adn-chat-bubble.is-offer.is-offer-answer {
+	min-width: 0;
+	padding: .55rem .8rem .4rem;
+	box-shadow: inset 0 0 0 1px var(--adn-chat-border);
+}
+
+.adn-chat-bubble.is-offer-answer .adn-chat-offer-status {
+	font-size: .9375rem;
+	color: var(--adn-chat-text);
+}
+
+.adn-chat-msg .adn-chat-bubble.is-offer.is-offer-answer.is-offer-accepted {
+	background-color: var(--adn-chat-accent-soft);
+	box-shadow: inset 0 0 0 1px var(--adn-chat-accent);
+}
+
+.adn-chat-bubble.is-offer-answer.is-offer-accepted .adn-chat-offer-status {
+	color: var(--adn-chat-success);
+}
+
+/* ---------- "Automatic reply": the member's away message answered for them ---------- */
+.adn-chat-auto {
+	display: flex;
+	align-items: center;
+	gap: .3rem;
+	margin-bottom: .15rem;
+	font-size: .6875rem;
+	font-weight: 700;
+	letter-spacing: .02em;
+	opacity: .8;
+}
+
+/* ---------- The "+" menu beside the message box ---------- */
+.adn-chat-plus-menu {
+	width: min(300px, calc(100vw - 1.5rem));
+	max-height: min(60vh, 420px);
+	padding: .35rem;
+	overflow-y: auto;
+	border-radius: var(--adn-chat-radius-md);
+}
+
+.adn-chat-plus-menu .dropdown-item {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	min-height: 40px;
+	padding: .5rem .65rem;
+	border-radius: var(--adn-chat-radius-sm);
+	font-size: .875rem;
+	white-space: normal;
+}
+
+.adn-chat-plus-menu .dropdown-header {
+	padding: .55rem .65rem .2rem;
+	font-size: .6875rem;
+	font-weight: 700;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-saved-item span {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	overflow-wrap: anywhere;
+}
+
+.adn-chat-plus-empty {
+	margin: 0;
+	padding: .15rem .65rem .45rem;
+	font-size: .8125rem;
+	color: var(--adn-chat-muted);
+}
+
+/* ---------- Chat settings: the link to the tools, under the switches ---------- */
+.adn-chat-settings-link {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	width: 100%;
+	margin-top: .25rem;
+	padding: .7rem .75rem;
+	border: 0;
+	border-top: 1px solid var(--adn-chat-border);
+	border-radius: 0 0 var(--adn-chat-radius-sm) var(--adn-chat-radius-sm);
+	font-size: .875rem;
+	font-weight: 600;
+	text-align: start;
+	color: var(--adn-chat-text);
+	background-color: transparent;
+	transition: background-color var(--adn-chat-fast) ease;
+}
+
+.adn-chat-settings-link:hover {
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-settings-link:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: -2px;
+}
+
+.adn-chat-settings-link i {
+	color: var(--adn-chat-accent-text);
+}
+
+/* ---------- "Away message on": a reminder above the list of chats ---------- */
+.adn-chat-away-chip {
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+	width: fit-content;
+	min-height: 32px;
+	margin: 0 .85rem .55rem;
+	padding: .3rem .75rem;
+	border: 0;
+	border-radius: 999px;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: var(--adn-chat-warning-text);
+	background-color: var(--adn-chat-warning-bg);
+}
+
+.adn-chat-away-chip:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- The dialog: away message and saved replies ---------- */
+.adn-chat-tools-part + .adn-chat-tools-part {
+	margin-top: 1.25rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--adn-chat-border);
+}
+
+.adn-chat-tools-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+}
+
+.adn-chat-tools-title {
+	margin: 0;
+	font-size: .9375rem;
+	font-weight: 700;
+	color: var(--adn-chat-text);
+}
+
+.adn-chat-tools-hint {
+	margin: .2rem 0 .65rem;
+	font-size: .8125rem;
+	line-height: 1.45;
+	color: var(--adn-chat-muted);
+	text-wrap: pretty;
+}
+
+.adn-chat-tools .form-check-input {
+	float: none;
+	width: 2.6em;
+	height: 1.4em;
+	margin: 0;
+	cursor: pointer;
+}
+
+.adn-chat-tools .form-check-input:checked {
+	border-color: var(--adn-chat-accent-strong);
+	background-color: var(--adn-chat-accent-strong);
+}
+
+.adn-chat-saved-row {
+	display: flex;
+	align-items: flex-start;
+	gap: .25rem;
+	margin-bottom: .5rem;
+}
+
+.adn-chat-saved-row .adn-chat-icon-btn {
+	width: 40px;
+	height: 40px;
+	font-size: .95rem;
+	color: var(--adn-chat-muted);
+}
+
+.adn-chat-saved-row .adn-chat-icon-btn:hover {
+	color: var(--adn-chat-danger);
+}
+
+.adn-chat-tools textarea {
+	font-size: .9375rem;
+	resize: vertical;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-chat-offer-btn {
+		transition: none;
+	}
+}

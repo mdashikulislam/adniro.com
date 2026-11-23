@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'بريد واحد لكل عضو، وليس بريداً لكل رسالة. يستطيع كل عضو إيقافه لنفسه أيضاً.',
 	'setting_unread_email_delay_minutes_label' => 'الدقائق قبل بريد الرسائل غير المقروءة',
 	'setting_unread_email_delay_minutes_hint' => 'المدة التي تنتظرها الرسالة غير مقروءة قبل إرسال البريد.',
+	'setting_offers_enabled_label' => 'العروض',
+	'setting_offers_enabled_hint' => 'يمكن للأعضاء اقتراح سعر في محادثة حول إعلان، وقبول عرض أو رفضه.',
+	'offer_line' => 'عرض: :amount (:status)',
+	'offer_answer_line' => 'الرد على عرض :amount: :status',
+	'offer_status_pending' => 'مفتوح',
+	'offer_status_accepted' => 'مقبول',
+	'offer_status_declined' => 'مرفوض',
+	'offer_status_replaced' => 'مستبدل',
+	'automatic_reply' => 'رد تلقائي (رسالة الغياب)',
 ];

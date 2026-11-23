@@ -5,7 +5,7 @@ namespace App\Models\Setting;
 use App\Services\Chat\ChatSettings;
 
 /*
- * settings.chat.option (adniro): Admin > Settings > Chat. The live chat on or off, photos, the unread-messages
+ * settings.chat.option (adniro): Admin > Settings > Chat. The live chat on or off, photos, offers, the unread-messages
  * email, the send limits and how long a message can be taken back.
  * Values are read through App\Services\Chat\ChatSettings, which keeps each one inside a safe range.
  */
@@ -26,7 +26,7 @@ class ChatSetting extends BaseSetting
 	{
 		$fields = [];
 		
-		foreach (['enabled', 'photos_enabled'] as $name) {
+		foreach (['enabled', 'photos_enabled', 'offers_enabled'] as $name) {
 			$fields[] = self::switchField($name, 'col-md-12 mt-3');
 		}
 		$fields[] = self::numberField('messages_per_minute', 1);

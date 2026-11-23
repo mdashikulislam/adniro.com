@@ -26,6 +26,8 @@ class ChatMessages
 	 * returns the message already saved, so a double tap or a retry never sends twice.
 	 * $about is the listing the message was sent from ("Chat with seller"): it is shown on the message.
 	 * $replyTo is the earlier message of this conversation it answers: a short quote of it is shown.
+	 * $special holds the extra columns of a message that is not plain text or a photo: an offer or its answer
+	 * (ChatOffers), or an away message sent for a member (ChatTools).
 	 */
 	public static function send(
 		ChatThread $thread,
@@ -35,6 +37,7 @@ class ChatMessages
 		?string $clientUuid = null,
 		?Post $about = null,
 		?ChatMessage $replyTo = null,
+		array $special = [],
 	): ChatMessage {
 		$existing = self::findByClientUuid((int)$thread->id, $clientUuid);
 		if ($existing !== null) {
@@ -44,7 +47,7 @@ class ChatMessages
 		$photoPath = $photo !== null ? ChatPhotos::store($photo, (int)$thread->id) : null;
 
 		try {
-			$message = DB::transaction(fn () => self::save($thread, $senderId, $body, $photoPath, $clientUuid, $about, $replyTo));
+			$message = DB::transaction(fn () => self::save($thread, $senderId, $body, $photoPath, $clientUuid, $about, $replyTo, $special));
 		} catch (UniqueConstraintViolationException) {
 			ChatPhotos::delete($photoPath);
 
@@ -53,6 +56,7 @@ class ChatMessages
 
 		ChatUnread::forget(...$thread->participants->pluck('user_id')->map(fn ($id) => (int)$id)->all());
 		ChatBroadcaster::messageSent($thread, $message);
+		ChatTools::answerWhileAway($thread, $message);
 
 		return $message;
 	}
@@ -127,6 +131,9 @@ class ChatMessages
 	 * The sender takes a message back. Both people then see "Message deleted" in its place, at once. The row
 	 * and its text stay in the database: a reported conversation can still be read by the admins, so taking a
 	 * message back never removes evidence. The caller has checked that it is the sender's and still in time.
+	 *
+	 * An offer is only taken back while it is open: if the other person answers it at the same moment, the
+	 * answer stands and the message comes back as it is, not unsent.
 	 */
 	public static function unsend(ChatThread $thread, ChatMessage $message): ChatMessage
 	{
@@ -134,8 +141,15 @@ class ChatMessages
 			return $message;
 		}
 
-		DB::transaction(function () use ($thread, $message) {
-			$message->update(['unsent_at' => now()]);
+		$isTakenBack = DB::transaction(function () use ($thread, $message) {
+			$changed = ChatMessage::query()
+				->whereKey($message->id)
+				->whereNull('unsent_at')
+				->when($message->isOffer(), fn ($query) => $query->where('offer_status', ChatMessage::OFFER_PENDING))
+				->update(['unsent_at' => now()]);
+			if ($changed === 0) {
+				return false;
+			}
 
 			// Not read yet (and not deleted with the conversation): it no longer counts as unread
 			ChatParticipant::query()
@@ -145,7 +159,14 @@ class ChatMessages
 				->where(fn ($query) => $query->whereNull('last_read_message_id')->orWhere('last_read_message_id', '<', $message->id))
 				->where(fn ($query) => $query->whereNull('cleared_message_id')->orWhere('cleared_message_id', '<', $message->id))
 				->decrement('unread_count');
+
+			return true;
 		});
+
+		$message->refresh();
+		if (!$isTakenBack) {
+			return $message;
+		}
 
 		ChatUnread::forget(...$thread->participants->pluck('user_id')->map(fn ($id) => (int)$id)->all());
 		ChatBroadcaster::messageUnsent($thread->load('participants'), $message);
@@ -160,6 +181,9 @@ class ChatMessages
 
 		return (int)$message->user_id === $userId
 			&& !$message->isUnsent()
+			// An offer can be withdrawn until it is answered; an answer stands
+			&& !$message->isOfferAnswer()
+			&& (!$message->isOffer() || $message->offer_status === ChatMessage::OFFER_PENDING)
 			&& $minutes > 0
 			&& $message->created_at !== null
 			&& $message->created_at->gte(now()->subMinutes($minutes));
@@ -249,8 +273,9 @@ class ChatMessages
 		?string $clientUuid,
 		?Post $about,
 		?ChatMessage $replyTo,
+		array $special,
 	): ChatMessage {
-		$message = ChatMessage::query()->create([
+		$message = ChatMessage::query()->create($special + [
 			'thread_id'   => $thread->id,
 			'post_id'     => $about?->id,
 			// Only a message of this same conversation can be quoted

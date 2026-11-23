@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'প্রতি সদস্যকে একটি ইমেইল, প্রতি বার্তায় নয়। প্রত্যেক সদস্য নিজেও এটি বন্ধ করতে পারেন।',
 	'setting_unread_email_delay_minutes_label' => 'না-পড়া বার্তার ইমেইলের আগে মিনিট',
 	'setting_unread_email_delay_minutes_hint' => 'ইমেইল পাঠানোর আগে একটি বার্তা কতক্ষণ না-পড়া অবস্থায় অপেক্ষা করবে।',
+	'setting_offers_enabled_label' => 'অফার',
+	'setting_offers_enabled_hint' => 'সদস্যরা কোনো বিজ্ঞাপন নিয়ে চ্যাটে দাম প্রস্তাব করতে পারেন এবং অফার গ্রহণ বা প্রত্যাখ্যান করতে পারেন।',
+	'offer_line' => 'অফার: :amount (:status)',
+	'offer_answer_line' => ':amount অফারের উত্তর: :status',
+	'offer_status_pending' => 'খোলা',
+	'offer_status_accepted' => 'গৃহীত',
+	'offer_status_declined' => 'প্রত্যাখ্যাত',
+	'offer_status_replaced' => 'প্রতিস্থাপিত',
+	'automatic_reply' => 'স্বয়ংক্রিয় উত্তর (অনুপস্থিতির বার্তা)',
 ];

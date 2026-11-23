@@ -24,8 +24,14 @@ class ChatLive
 			'user_id'      => $userId,
 			'unread_total' => ChatUnread::total($userId),
 			'unread_url'   => route('chat.api.unread'),
-			// For the pop-up shown when a message arrives on another page
-			'text'         => ['photo' => trans('chat.js.photo'), 'dismiss' => trans('chat.dismiss')],
+			// For the pop-up and the browser notification shown when a message arrives
+			'text'         => [
+				'photo'          => trans('chat.js.photo'),
+				'dismiss'        => trans('chat.dismiss'),
+				'offer'          => trans('chat.js.offer_line'),
+				'offer_accepted' => trans('chat.js.offer_accepted_line'),
+				'offer_declined' => trans('chat.js.offer_declined_line'),
+			],
 			'live'         => self::isEnabled() ? self::connection() : null,
 		];
 	}

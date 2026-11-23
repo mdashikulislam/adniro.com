@@ -11,7 +11,8 @@
  * Parts, loaded before this file: chat-kit.js (helpers), chat-inbox.js (the list), chat-log.js (the messages),
  * chat-presence.js (online and typing), chat-reply.js (replying to one message), chat-safety.js (block and
  * report), chat-delete.js (taking a message back, deleting a chat), chat-drafts.js (text not sent yet),
- * chat-guard.js (a question before a risky message), chat-settings.js (the email switch), chat-photo.js.
+ * chat-guard.js (a question before a risky message), chat-settings.js (emails, sound, notifications),
+ * chat-photo.js, chat-offers.js (offers), chat-tools.js (quick and saved replies, away message, mark as sold).
  */
 (function (window, document) {
 	'use strict';
@@ -115,7 +116,11 @@
 		kit.listingInto(els, post, store.open && (store.open.about || store.open.draft) ? T.asking_about : T.last_enquiry);
 	};
 
-	var ctx = {T: T, URLS: URLS, ME: ME, LIMITS: boot.limits, els: els, store: store, kit: kit};
+	var ctx = {
+		T: T, URLS: URLS, ME: ME, LIMITS: boot.limits, root: root, els: els, store: store, kit: kit,
+		TOOLS: boot.tools,
+		QUICK: {buyer: boot.quick_replies, seller: boot.seller_quick_replies}
+	};
 
 	var inbox = window.AdnChatInbox(ctx);
 	var renderInbox = inbox.render;
@@ -161,27 +166,6 @@
 	});
 
 	/* ---------- Conversation: header, listing, composer ---------- */
-	function renderQuickReplies() {
-		var open = store.open;
-		var hasWritten = open.messages.some(function (message) {
-			return message.user_id === ME;
-		});
-		// Offered when the chat was opened from a listing and nothing has been written about it yet
-		var canAsk = open.canSend && ((open.draft && !hasWritten) || !!open.about);
-
-		els.quick.hidden = !canAsk;
-		els.quick.textContent = '';
-		if (!canAsk) {
-			return;
-		}
-		boot.quick_replies.forEach(function (text) {
-			var button = el('button', '', text);
-			button.type = 'button';
-			button.dataset.chatQuick = text;
-			els.quick.appendChild(button);
-		});
-	}
-
 	function renderComposer() {
 		var open = store.open;
 		var thread = open.thread;
@@ -206,7 +190,7 @@
 		els.report.parentNode.hidden = !thread;
 		els.deleteChat.parentNode.hidden = !thread;
 		els.blockLabel.textContent = thread && thread.blocked_by_me ? els.block.dataset.unblockLabel : els.block.dataset.blockLabel;
-		renderQuickReplies();
+		tools.refresh();
 	}
 
 	function showError(message) {
@@ -283,6 +267,7 @@
 			starting: null
 		};
 		var open = store.open;
+		root.dataset.openThread = open.thread ? open.thread.id : ''; // chat-alerts.js: no alert for what is on screen
 		// Already read on the server: nothing to tell it until a newer message arrives
 		open.readSent = open.thread && open.thread.unread > 0 ? 0 : lastIdFromOther();
 		open.syncedId = lastServerId();
@@ -319,6 +304,7 @@
 		leavePresence();
 		hideTyping();
 		store.open = null;
+		root.dataset.openThread = '';
 		body.classList.remove('is-chat-open');
 		els.open.hidden = true;
 		els.pick.hidden = false;
@@ -363,6 +349,29 @@
 	}
 
 	/* ---------- Sending ---------- */
+	/**
+	 * The server saved something sent from here (a message, an offer, the answer to one): the conversation is
+	 * now what it answered with. $changesListing: it was sent about another listing than the one shown.
+	 */
+	function adopt(open, data, changesListing) {
+		var started = !open.thread;
+		open.thread = data.thread;
+		open.draft = null;
+		root.dataset.openThread = data.thread.id;
+		upsertMessage(data.message);
+		upsertThread(data.thread);
+		if (started || changesListing) {
+			window.history.replaceState({thread: data.thread.id}, '', data.thread.url);
+			renderListing(data.thread.post);
+			renderComposer();
+		} else {
+			tools.renderQuick();
+		}
+		if (started) {
+			joinPresence();
+		}
+	}
+
 	function deliver(local) {
 		var open = store.open;
 		local.state = 'sending';
@@ -392,21 +401,8 @@
 
 		var url = local.via || (open.thread ? urlFor(URLS.messages, open.thread.id) : open.draft.start_url);
 		var sending = request('POST', url, form).then(function (data) {
-			if (store.open !== open) {
-				return;
-			}
-			var started = !open.thread;
-			open.thread = data.thread;
-			open.draft = null;
-			upsertMessage(data.message);
-			upsertThread(data.thread);
-			if (started || local.via) {
-				window.history.replaceState({thread: data.thread.id}, '', data.thread.url);
-				renderListing(data.thread.post);
-				renderComposer();
-			}
-			if (started) {
-				joinPresence();
+			if (store.open === open) {
+				adopt(open, data, !!local.via);
 			}
 		}).catch(function (error) {
 			local.state = 'failed';
@@ -449,7 +445,7 @@
 		open.messages.push(local);
 		appendMessage(local, true);
 		scrollToBottom();
-		els.quick.hidden = true;
+		tools.renderQuick();
 		deliver(local);
 	}
 
@@ -534,6 +530,7 @@
 			if (added) {
 				hideTyping();
 				markRead();
+				tools.renderQuick();
 			}
 			if (data.has_more) {
 				catchUp(); // a long absence: the answer comes in parts
@@ -552,6 +549,7 @@
 		open.thread = Object.assign({}, detail.thread, {read_up_to: Math.max(detail.thread.read_up_to, open.thread.read_up_to)});
 		// syncedId is not moved here: a live message can overtake older ones still to be caught up
 		upsertMessage(detail.message);
+		tools.renderQuick();
 		if (detail.message.user_id !== ME) {
 			hideTyping();
 			markRead();
@@ -674,13 +672,6 @@
 	});
 	els.photoRemove.addEventListener('click', clearPhoto);
 
-	els.quick.addEventListener('click', function (event) {
-		var button = event.target.closest('[data-chat-quick]');
-		if (button) {
-			sendMessage(button.dataset.chatQuick, null);
-		}
-	});
-
 	els.messages.addEventListener('click', function (event) {
 		var retry = event.target.closest('[data-chat-retry]');
 		if (!retry || !store.open) {
@@ -727,6 +718,25 @@
 	window.setInterval(fallbackTick, CATCH_UP_MS);
 
 	/* ---------- Start ---------- */
+	ctx.offers = window.AdnChatOffers(ctx, {
+		log: log,
+		adopt: adopt,
+		reload: function (threadId) {
+			openThread(threadId, false);
+		}
+	});
+	var tools = window.AdnChatTools(ctx, {
+		offers: ctx.offers,
+		inbox: inbox,
+		send: function (text) {
+			sendMessage(text, null);
+		},
+		listingChanged: function (post) {
+			renderListing(post);
+			renderComposer();
+			renderLog(); // offers on it can no longer be accepted
+		}
+	});
 	var deleting = window.AdnChatDelete(ctx, {
 		log: log,
 		inbox: inbox,

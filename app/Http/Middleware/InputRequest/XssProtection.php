@@ -81,13 +81,16 @@ trait XssProtection
 			default                                                        => null,
 		};
 		
+		// adniro: a member's away message and saved replies are sent later as chat messages: plain text as well
+		$isAllPlainText = $request->is('chat/api/tools');
+		
 		// Apply one (or more) action(s) recursively to every field of the array
-		array_walk_recursive($inputs, function (&$value, $key) use ($request, $plainTextField) {
+		array_walk_recursive($inputs, function (&$value, $key) use ($request, $plainTextField, $isAllPlainText) {
 			if (!is_string($value)) return;
 			
 			// Sanitize input to prevent XSS attacks and remove malicious characters
 			// Except the: "description" field
-			if ($key != 'description' && $key !== $plainTextField) {
+			if ($key != 'description' && $key !== $plainTextField && !$isAllPlainText) {
 				$value = sanitizeInput($value);
 			}
 			

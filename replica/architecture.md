@@ -311,5 +311,30 @@ Not done: A10 (the old attachment's direct link), which needs a change on the li
 - **Drafts** are kept per conversation in the browser (30 days), and **a "New messages" line** shows where the
   unread ones begin when a chat is opened.
 
+**Round 3 of the audit (B2, B7, B10), built on local:**
+
+- **Offers.** An offer is a message (`threads_messages.type = offer`, `offer_amount`, `offer_currency`,
+  `offer_status`), about a listing and in that listing's currency; its answer is a message too
+  (`offer_answer`, `reply_to_id` = the offer). So both arrive like any message: unread badge, alerts, email.
+  Anyone but the owner offers to the owner (`POST chat/listings/{post}/offers`, which also starts the
+  conversation); the owner answers a buyer with their own price in that conversation (`thread` in the request).
+  The other person accepts or declines (`POST chat/api/threads/{thread}/offers/{message}`), once: the status
+  changes with one conditional update. A newer offer on the same listing replaces the open ones. The browser
+  works out the new state of an older card from the message that caused it, with the server's own rule, so no
+  extra event exists. An open offer can be taken back; an answered one, and an answer, cannot. No offers on
+  free listings or job categories. Nothing is paid or reserved. `ChatOffers`, `ChatOfferController`, limiter
+  `chat-offer`. Admin > Settings > Chat has an "Offers" switch.
+- **Seller tools.** One row per member in `chat_preferences`: up to five saved replies and an away message
+  (`ChatTools`, `PUT chat/api/tools`). A saved reply is put in the message box from the "+" menu. The away
+  message is sent for the member as a message marked `is_auto`, once per conversation every twelve hours
+  (`threads_participants.away_replied_at`, claimed with one conditional update); it never answers another
+  automatic reply. The owner of the listing a conversation is about gets quick replies while a question
+  waits, and "Mark as sold" (`POST chat/api/listings/{post}/sold`, the site's own "take offline").
+- **Alerts** (`chat-alerts.js`, on every page): a short sound (made in the browser, no file) and, once the
+  member turns it on and the browser allows it, a browser notification when the site is in another tab or
+  behind another window. Not for the conversation on screen. With several tabs open one of them alerts (they
+  agree through localStorage). Both choices are kept in the browser. A tab of a member with notifications on
+  no longer disconnects after five minutes in the background.
+
 Design: `replica/design/` (tokens, 27 colour pairs with 0 failing AA, and the component specs).
 

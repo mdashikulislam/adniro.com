@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'Одно письмо на участника, а не на каждое сообщение. Каждый участник может отключить его сам.',
 	'setting_unread_email_delay_minutes_label' => 'Минут до письма о непрочитанных',
 	'setting_unread_email_delay_minutes_hint' => 'Сколько сообщение ждёт непрочитанным до отправки письма.',
+	'setting_offers_enabled_label' => 'Предложения цены',
+	'setting_offers_enabled_hint' => 'Участники могут предложить цену в чате по объявлению, а также принять или отклонить предложение.',
+	'offer_line' => 'Предложение: :amount (:status)',
+	'offer_answer_line' => 'Ответ на предложение :amount: :status',
+	'offer_status_pending' => 'открыто',
+	'offer_status_accepted' => 'принято',
+	'offer_status_declined' => 'отклонено',
+	'offer_status_replaced' => 'заменено',
+	'automatic_reply' => 'Автоответ (сообщение об отсутствии)',
 ];

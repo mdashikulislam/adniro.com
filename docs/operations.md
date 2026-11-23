@@ -55,8 +55,8 @@ The unread-messages email is sent by the scheduler (`chat:unread-digest`, every 
 Members turn it off with the gear on the chat page or the link at the bottom of the email.
 
 **Admin > Settings > Chat** turns the chat on or off (off: nothing can be sent, "Chat with seller" is hidden,
-conversations can still be read), and sets photos, the send limits, how long a message can be taken back, and
-the unread email and its delay. **Admin > Users > Chat reports** lists the conversations members reported: open
+conversations can still be read), and sets photos, offers ("Make an offer" in a chat about a listing), the send
+limits, how long a message can be taken back, and the unread email and its delay. **Admin > Users > Chat reports** lists the conversations members reported: open
 one to read it, act on the member from their account, then close the report. A report is also emailed to the
 site's contact address, with a link.
 

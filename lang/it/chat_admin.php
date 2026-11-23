@@ -49,4 +49,13 @@ return [
 	'setting_unread_email_enabled_hint' => 'Un\'e-mail per membro, mai una per messaggio. Ogni membro può anche disattivarla per sé.',
 	'setting_unread_email_delay_minutes_label' => 'Minuti prima dell\'e-mail dei messaggi non letti',
 	'setting_unread_email_delay_minutes_hint' => 'Per quanto tempo un messaggio resta non letto prima dell\'invio dell\'e-mail.',
+	'setting_offers_enabled_label' => 'Offerte',
+	'setting_offers_enabled_hint' => 'I membri possono proporre un prezzo in una chat su un annuncio e accettare o rifiutare un\'offerta.',
+	'offer_line' => 'Offerta: :amount (:status)',
+	'offer_answer_line' => 'Risposta all\'offerta di :amount: :status',
+	'offer_status_pending' => 'aperta',
+	'offer_status_accepted' => 'accettata',
+	'offer_status_declined' => 'rifiutata',
+	'offer_status_replaced' => 'sostituita',
+	'automatic_reply' => 'Risposta automatica (messaggio di assenza)',
 ];

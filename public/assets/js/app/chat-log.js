@@ -9,7 +9,7 @@
 	var MINUTE_MS = 60000;
 	var NEW_LINE_GAP_PX = 12;
 
-	/** @param {{T: Object, ME: number, LIMITS: Object, els: Object, store: Object, kit: Object}} ctx */
+	/** @param {{T: Object, ME: number, LIMITS: Object, els: Object, store: Object, kit: Object, offers: Object}} ctx */
 	window.AdnChatLog = function (ctx) {
 		var T = ctx.T;
 		var ME = ctx.ME;
@@ -69,15 +69,16 @@
 			node.type = 'button';
 			node.dataset.chatQuote = quote.id;
 			node.appendChild(el('strong', '', quote.user_id === ME ? T.you : store.open.other.name));
-			var quoted = quote.type === 'unsent' ? T.message_deleted : (quote.type === 'image' ? T.photo : quote.text);
-			node.appendChild(el('span', '', quoted));
+			node.appendChild(el('span', '', ctx.kit.lineText(quote.type, quote.text)));
 			return node;
 		}
 
 		/** The sender can take a message back for a while after sending it (Admin > Settings > Chat). */
 		function canUnsend(message) {
 			var age = Date.now() - new Date(message.at).getTime();
-			return message.user_id === ME && !!message.id && !message.unsent && age < ctx.LIMITS.unsend_minutes * MINUTE_MS;
+			// An offer can be withdrawn until it is answered; the answer to one stands
+			var isClosed = !!message.offer && (message.type !== 'offer' || message.offer.status !== 'pending');
+			return message.user_id === ME && !!message.id && !message.unsent && !isClosed && age < ctx.LIMITS.unsend_minutes * MINUTE_MS;
 		}
 
 		/** A small round button beside a bubble: Reply, or Delete on my own recent messages. */
@@ -116,6 +117,10 @@
 				bubble.classList.add('is-unsent');
 				bubble.appendChild(icon('slash-circle'));
 				bubble.appendChild(el('span', '', T.message_deleted));
+			} else if (message.offer && ctx.offers) {
+				bubble.classList.add('is-offer', 'is-offer-' + message.offer.status);
+				bubble.classList.toggle('is-offer-answer', message.type === 'offer_answer');
+				bubble.appendChild(ctx.offers.node(message)); // chat-offers.js
 			} else if (message.type === 'image' && message.image) {
 				bubble.classList.add('is-photo');
 				var link = el('a');
@@ -129,6 +134,13 @@
 				link.appendChild(image);
 				bubble.appendChild(link);
 			} else {
+				if (message.auto) {
+					// Sent for a member who is away: their away message
+					var auto = el('span', 'adn-chat-auto');
+					auto.appendChild(icon('robot'));
+					auto.appendChild(el('span', '', T.auto_reply));
+					bubble.appendChild(auto);
+				}
 				bubble.appendChild(linkified(message.body));
 			}
 
@@ -311,6 +323,7 @@
 				if (!keepInOrder()) {
 					redrawMessage(existing);
 				}
+				ctx.offers.applied(existing);
 				return false;
 			}
 
@@ -319,6 +332,7 @@
 			if (!keepInOrder()) {
 				appendMessage(message, true);
 			}
+			ctx.offers.applied(message);
 			if (stick) {
 				scrollToBottom();
 			} else {

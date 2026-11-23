@@ -18,7 +18,7 @@ class ChatPresenter
 	private const TYPE_UNSENT = 'unsent';
 
 	/** Relations a conversation needs before it is presented. */
-	public const THREAD_RELATIONS = ['participants.user', 'post.picture', 'lastMessage'];
+	public const THREAD_RELATIONS = ['participants.user', 'post.picture', 'post.category', 'post.currency', 'lastMessage'];
 
 	/** @param iterable<ChatThread> $threads */
 	public static function threads(iterable $threads, int $viewerId): array
@@ -66,7 +66,7 @@ class ChatPresenter
 	 */
 	public static function messages($messages, int $clearedUpTo = 0): array
 	{
-		$messages->loadMissing(['post.picture', 'replyTo']);
+		$messages->loadMissing(['post.picture', 'post.category', 'post.currency', 'replyTo']);
 
 		return $messages->map(fn (ChatMessage $message) => self::message($message, $clearedUpTo))->values()->all();
 	}
@@ -75,12 +75,17 @@ class ChatPresenter
 	{
 		$isUnsent = $message->isUnsent();
 		$isImage = !$isUnsent && $message->isImage() && !empty($message->file_path);
+		$isOffer = !$isUnsent && ($message->isOffer() || $message->isOfferAnswer());
 
 		return [
 			'id'          => (int)$message->id,
 			'thread_id'   => (int)$message->thread_id,
 			'user_id'     => (int)$message->user_id,
-			'type'        => $isImage ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
+			'type'        => match (true) {
+				$isImage => ChatMessage::TYPE_IMAGE,
+				$isOffer => (string)$message->type,
+				default  => ChatMessage::TYPE_TEXT,
+			},
 			// A message taken back by its sender leaves no text, photo or quote behind: only its place
 			'unsent'      => $isUnsent,
 			'body'        => $isUnsent ? '' : (string)$message->body,
@@ -88,8 +93,15 @@ class ChatPresenter
 				'url'   => route('chat.file', ['message' => $message->id], false),
 				'thumb' => route('chat.file', ['message' => $message->id, 'size' => 'thumb'], false),
 			],
+			// An offer's price and whether it is still open; null for every other message
+			'offer'       => $isOffer ? ChatOffers::present($message) : null,
+			// Sent by the site for a member who is away (their away message)
+			'auto'        => !$isUnsent && (bool)$message->is_auto,
 			'post'        => empty($message->post_id) ? null : self::post($message->post),
-			'reply_to'    => $isUnsent || (int)$message->reply_to_id <= $clearedUpTo ? null : self::quote($message->replyTo),
+			// An answer to an offer names the offer itself ("offer"), it does not quote it
+			'reply_to'    => $isUnsent || $message->isOfferAnswer() || (int)$message->reply_to_id <= $clearedUpTo
+				? null
+				: self::quote($message->replyTo),
 			'client_uuid' => $message->client_uuid,
 			'at'          => $message->created_at?->toIso8601String(),
 			'caution'     => !$isUnsent && ChatSafety::needsCaution($message->body),
@@ -107,7 +119,7 @@ class ChatPresenter
 			'id'      => (int)$message->id,
 			'user_id' => (int)$message->user_id,
 			'type'    => self::lineType($message),
-			'text'    => $message->isUnsent() ? '' : Str::limit(self::oneLine((string)$message->body), self::SNIPPET_LENGTH),
+			'text'    => self::lineText($message),
 		];
 	}
 
@@ -122,19 +134,37 @@ class ChatPresenter
 			'id'   => (int)$last->id,
 			'mine' => (int)$last->user_id === $viewerId,
 			'type' => self::lineType($last),
-			'text' => $last->isUnsent() ? '' : Str::limit(self::oneLine((string)$last->body), self::SNIPPET_LENGTH),
+			'text' => self::lineText($last),
 			'at'   => $last->created_at?->toIso8601String(),
 		];
 	}
 
-	/** "text", "image", or "unsent" for a message its sender took back. */
+	/**
+	 * What a one-line summary of the message is made from: "text", "image", "offer", "offer_accepted",
+	 * "offer_declined", or "unsent" for a message its sender took back. The browser writes the words.
+	 */
 	private static function lineType(ChatMessage $message): string
 	{
+		return match (true) {
+			$message->isUnsent()      => self::TYPE_UNSENT,
+			$message->isImage()       => ChatMessage::TYPE_IMAGE,
+			$message->isOffer()       => ChatMessage::TYPE_OFFER,
+			$message->isOfferAnswer() => ChatMessage::TYPE_OFFER . '_' . $message->offer_status,
+			default                   => ChatMessage::TYPE_TEXT,
+		};
+	}
+
+	/** The start of the text, or the amount of an offer. Nothing for a message that was taken back. */
+	private static function lineText(ChatMessage $message): string
+	{
 		if ($message->isUnsent()) {
-			return self::TYPE_UNSENT;
+			return '';
+		}
+		if ($message->isOffer() || $message->isOfferAnswer()) {
+			return ChatOffers::amountOf($message);
 		}
 
-		return $message->isImage() ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT;
+		return Str::limit(self::oneLine((string)$message->body), self::SNIPPET_LENGTH);
 	}
 
 	public static function person(?User $user, int $fallbackId = 0): array
@@ -157,7 +187,8 @@ class ChatPresenter
 			return null;
 		}
 
-		$isAvailable = empty($post->archived_at) && empty($post->deleted_at) && isVerifiedPost($post);
+		$isAvailable = self::isAvailable($post);
+		$canOffer = ChatOffers::canBeMadeOn($post);
 
 		return [
 			'id'        => (int)$post->id,
@@ -166,7 +197,17 @@ class ChatPresenter
 			'photo'     => data_get($post, 'picture.file_url_small'),
 			'url'       => $isAvailable ? urlGen()->post($post) : null,
 			'available' => $isAvailable,
+			// Whose listing it is: its owner gets the seller's tools, the other person can make an offer
+			'owner_id'  => (int)$post->user_id,
+			'can_offer' => $canOffer,
+			'currency'  => $canOffer ? ChatOffers::symbolOf($post->currency_code) : '',
 		];
+	}
+
+	/** Public: not archived, not deleted, and approved. */
+	public static function isAvailable(Post $post): bool
+	{
+		return empty($post->archived_at) && empty($post->deleted_at) && isVerifiedPost($post);
 	}
 
 	/** The card of a listing that has been deleted: the conversation still remembers its title. */
@@ -176,7 +217,10 @@ class ChatPresenter
 			return null;
 		}
 
-		return ['id' => 0, 'title' => $title, 'price' => '', 'photo' => null, 'url' => null, 'available' => false];
+		return [
+			'id' => 0, 'title' => $title, 'price' => '', 'photo' => null, 'url' => null, 'available' => false,
+			'owner_id' => 0, 'can_offer' => false, 'currency' => '',
+		];
 	}
 
 	private static function oneLine(string $text): string
