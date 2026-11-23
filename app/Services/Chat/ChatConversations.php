@@ -10,7 +10,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /*
- * Chat conversations (adniro): one per listing and buyer, found or created, and a member's inbox.
+ * Chat conversations (adniro): one per two people, found or created, and a member's inbox.
  */
 class ChatConversations
 {
@@ -33,30 +33,38 @@ class ChatConversations
 		return null;
 	}
 
-	public static function find(int $postId, int $buyerId): ?ChatThread
+	/** The conversation between two members, if they have one. */
+	public static function between(int $userId, int $otherUserId): ?ChatThread
 	{
-		return ChatThread::query()->where('post_id', $postId)->where('buyer_id', $buyerId)->first();
+		[$low, $high] = self::pair($userId, $otherUserId);
+
+		return ChatThread::query()->where('user_low_id', $low)->where('user_high_id', $high)->first();
 	}
 
 	/**
-	 * The buyer's conversation about this listing, created on their first message. Two first messages at the
-	 * same moment cannot make two conversations: the (listing, buyer) pair is unique in the database.
+	 * The conversation between the buyer and the listing's seller, created on their first message. There is one
+	 * per two people, whatever the listing: the pair is unique in the database, so two first messages at the
+	 * same moment cannot make two.
 	 */
 	public static function findOrCreate(Post $post, User $buyer): ChatThread
 	{
-		$existing = self::findIncludingDeleted((int)$post->id, (int)$buyer->id);
+		[$low, $high] = self::pair((int)$buyer->id, (int)$post->user_id);
+
+		$existing = self::findIncludingDeleted($low, $high);
 		if ($existing !== null) {
 			return $existing;
 		}
 
 		try {
-			return DB::transaction(function () use ($post, $buyer) {
+			return DB::transaction(function () use ($post, $buyer, $low, $high) {
 				$thread = ChatThread::query()->create([
-					'post_id'  => $post->id,
-					'buyer_id' => $buyer->id,
-					'subject'  => $post->title,
+					'post_id'      => $post->id,
+					'buyer_id'     => $buyer->id,
+					'user_low_id'  => $low,
+					'user_high_id' => $high,
+					'subject'      => $post->title,
 				]);
-				foreach ([(int)$buyer->id, (int)$post->user_id] as $userId) {
+				foreach ([$low, $high] as $userId) {
 					ChatParticipant::query()->create(['thread_id' => $thread->id, 'user_id' => $userId]);
 				}
 
@@ -64,14 +72,14 @@ class ChatConversations
 			});
 		} catch (UniqueConstraintViolationException $e) {
 			// Created by another request a moment ago
-			return self::findIncludingDeleted((int)$post->id, (int)$buyer->id) ?? throw $e;
+			return self::findIncludingDeleted($low, $high) ?? throw $e;
 		}
 	}
 
-	/** The pair's conversation, brought back if it had been deleted: there is only ever one per listing and buyer. */
-	private static function findIncludingDeleted(int $postId, int $buyerId): ?ChatThread
+	/** The pair's conversation, brought back if it had been deleted: there is only ever one per two people. */
+	private static function findIncludingDeleted(int $low, int $high): ?ChatThread
 	{
-		$thread = ChatThread::withTrashed()->where('post_id', $postId)->where('buyer_id', $buyerId)->first();
+		$thread = ChatThread::withTrashed()->where('user_low_id', $low)->where('user_high_id', $high)->first();
 		if ($thread === null) {
 			return null;
 		}
@@ -80,6 +88,12 @@ class ChatConversations
 		}
 
 		return $thread->load('participants');
+	}
+
+	/** @return array{0: int, 1: int} the two member ids, lower first */
+	private static function pair(int $userId, int $otherUserId): array
+	{
+		return [min($userId, $otherUserId), max($userId, $otherUserId)];
 	}
 
 	/**

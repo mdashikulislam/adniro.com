@@ -48,7 +48,8 @@ abstract class ChatTestCase extends TestCase
 				// As the open chat does: what is on screen is marked read before a reply is written
 				ChatMessages::markRead($thread, $senderId, (int)$thread->last_message_id);
 			}
-			ChatMessages::send($thread, $senderId, $body);
+			// The first message is sent from the listing ("Chat with seller")
+			ChatMessages::send($thread, $senderId, $body, null, null, $index === 0 ? $this->listing : null);
 		}
 
 		return $thread->fresh('participants');

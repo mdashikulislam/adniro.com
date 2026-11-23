@@ -14,6 +14,7 @@
 		var els = ctx.els;
 		var store = ctx.store;
 		var el = ctx.kit.el;
+		var icon = ctx.kit.icon;
 		var sameDay = ctx.kit.sameDay;
 		var dayLabel = ctx.kit.dayLabel;
 		var timeOf = ctx.kit.timeOf;
@@ -32,10 +33,39 @@
 			return tick;
 		}
 
+		/** The listing a message is about, shown above it: one conversation can cover several listings. */
+		function listingRef(post) {
+			var ref = el(post.available && post.url ? 'a' : 'div', 'adn-chat-ref');
+			if (post.available && post.url) {
+				ref.href = post.url;
+			}
+
+			var photo = el('span', 'adn-chat-ref-photo');
+			photo.setAttribute('aria-hidden', 'true');
+			if (post.photo) {
+				var image = el('img');
+				image.src = post.photo;
+				image.alt = '';
+				image.loading = 'lazy';
+				photo.appendChild(image);
+			} else {
+				photo.appendChild(icon('image'));
+			}
+			ref.appendChild(photo);
+
+			var text = el('span', 'adn-chat-ref-text');
+			text.appendChild(el('strong', '', post.title));
+			text.appendChild(el('span', '', post.available ? post.price : T.unavailable));
+			ref.appendChild(text);
+
+			return ref;
+		}
+
 		function messageNode(message, previous) {
 			var mine = message.user_id === ME;
 			var date = new Date(message.at);
-			var follows = previous && previous.user_id === message.user_id && sameDay(new Date(previous.at), date);
+			// A message that brings a new listing starts a new group, however close it follows
+			var follows = !message.post && previous && previous.user_id === message.user_id && sameDay(new Date(previous.at), date);
 
 			var node = el('div', 'adn-chat-msg');
 			node.dataset.key = message.client_uuid || ('m' + message.id);
@@ -44,7 +74,11 @@
 			node.classList.toggle('is-sending', message.state === 'sending');
 			node.classList.toggle('is-seen', mine && isSeen(message));
 
-			var bubble = el('div', 'adn-chat-bubble');
+			if (message.post) {
+			node.appendChild(listingRef(message.post));
+		}
+
+		var bubble = el('div', 'adn-chat-bubble');
 			bubble.appendChild(el('span', 'visually-hidden', (mine ? T.you : store.open.other.name) + ': '));
 			if (message.type === 'image' && message.image) {
 				bubble.classList.add('is-photo');

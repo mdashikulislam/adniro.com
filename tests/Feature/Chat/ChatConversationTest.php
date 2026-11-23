@@ -23,7 +23,7 @@ class ChatConversationTest extends ChatTestCase
 			->assertJsonPath('message.body', 'Is this still available?')
 			->assertJsonPath('thread.other.id', self::SELLER_ID)
 			->assertJsonPath('thread.post.title', 'Grey corner sofa')
-			->assertJsonPath('thread.is_buyer', true);
+			->assertJsonPath('message.post.title', 'Grey corner sofa');
 		$threadId = $response->json('thread.id');
 		$this->assertSame([self::SELLER_ID, self::BUYER_ID], DB::table('threads_participants')->where('thread_id', $threadId)->orderBy('user_id')->pluck('user_id')->all());
 		$this->assertSame(1, $this->unreadOf($threadId, self::SELLER_ID));
@@ -43,6 +43,43 @@ class ChatConversationTest extends ChatTestCase
 		$this->assertSame($first, $second);
 		$this->assertSame(1, DB::table('threads')->where('post_id', $this->listing->id)->count());
 		$this->assertSame(2, DB::table('threads_messages')->where('thread_id', $first)->count());
+	}
+
+	public function test_two_people_keep_one_conversation_whatever_the_listing(): void
+	{
+		// Arrange: the seller has a second listing
+		$thread = $this->conversation(['Is this still available?', 'Yes, it is.']);
+		$table = $this->stockListing('Oak dining table', ['user_id' => self::SELLER_ID]);
+
+		// Act: "Chat with seller" on the second listing, then a normal reply
+		$fromListing = $this->actingAs($this->buyer)->postJson('/chat/listings/' . $table->id, ['body' => 'And is the table still for sale?']);
+		$reply = $this->actingAs($this->seller)->postJson('/chat/api/threads/' . $thread->id . '/messages', ['body' => 'It is.']);
+
+		// Assert: the same conversation, now about the table; only the message sent from the listing carries it
+		$fromListing->assertCreated()
+			->assertJsonPath('thread.id', $thread->id)
+			->assertJsonPath('thread.post.title', 'Oak dining table')
+			->assertJsonPath('message.post.title', 'Oak dining table');
+		$reply->assertCreated()->assertJsonPath('message.post', null)->assertJsonPath('thread.post.title', 'Oak dining table');
+		$this->assertSame(1, DB::table('threads')->count());
+		$this->actingAs($this->seller)->getJson('/chat/api/threads')->assertJsonCount(1, 'threads');
+
+		$history = $this->actingAs($this->seller)->getJson('/chat/api/threads/' . $thread->id . '/messages')->json('messages');
+		$this->assertSame(['Grey corner sofa', null, 'Oak dining table', null], array_map(fn ($message) => $message['post']['title'] ?? null, $history));
+	}
+
+	public function test_the_seller_writing_about_the_buyers_listing_uses_the_same_conversation(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		$bike = $this->stockListing('Road bike', ['user_id' => self::BUYER_ID]);
+
+		// Act
+		$response = $this->actingAs($this->seller)->postJson('/chat/listings/' . $bike->id, ['body' => 'Is the bike still available?']);
+
+		// Assert
+		$response->assertCreated()->assertJsonPath('thread.id', $thread->id)->assertJsonPath('thread.post.title', 'Road bike');
+		$this->assertSame(1, DB::table('threads')->count());
 	}
 
 	public function test_the_same_tap_sent_twice_is_saved_once(): void
@@ -145,7 +182,7 @@ class ChatConversationTest extends ChatTestCase
 		// Arrange
 		$older = $this->conversation(['Is this still available?']);
 		$otherListing = $this->stockListing('Oak dining table', ['user_id' => self::SELLER_ID]);
-		$this->actingAs($this->buyer)->postJson('/chat/listings/' . $otherListing->id, ['body' => 'What is your best price?']);
+		$this->actingAs($this->outsider)->postJson('/chat/listings/' . $otherListing->id, ['body' => 'What is your best price?']);
 		DB::table('threads')->where('id', $older->id)->update(['last_message_at' => now()->subHour()]);
 
 		// Act

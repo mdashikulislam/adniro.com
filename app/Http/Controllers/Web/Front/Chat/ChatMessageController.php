@@ -55,7 +55,7 @@ class ChatMessageController extends Controller
 		return response()->json(ChatMessages::history($chatThread, $before));
 	}
 
-	/** The first message about a listing: finds or creates the buyer's conversation, then sends. */
+	/** A message sent from a listing: finds or creates the conversation with its seller, then sends. */
 	public function start(SendChatMessageRequest $request, int $post): JsonResponse
 	{
 		$user = $request->user();
@@ -66,7 +66,7 @@ class ChatMessageController extends Controller
 			return response()->json(['message' => $reason], 403);
 		}
 
-		return $this->sendIn(ChatConversations::findOrCreate($listing, $user), $request);
+		return $this->sendIn(ChatConversations::findOrCreate($listing, $user), $request, $listing);
 	}
 
 	public function send(SendChatMessageRequest $request, int $thread): JsonResponse
@@ -99,7 +99,7 @@ class ChatMessageController extends Controller
 		return response()->json(['unread_total' => ChatUnread::total((int)$request->user()->id)]);
 	}
 
-	private function sendIn(ChatThread $chatThread, SendChatMessageRequest $request): JsonResponse
+	private function sendIn(ChatThread $chatThread, SendChatMessageRequest $request, ?Post $about = null): JsonResponse
 	{
 		$userId = (int)$request->user()->id;
 		$message = ChatMessages::send(
@@ -108,6 +108,7 @@ class ChatMessageController extends Controller
 			$request->input('body'),
 			$request->file('photo'),
 			$request->input('client_uuid'),
+			$about,
 		);
 
 		$chatThread->load(ChatPresenter::THREAD_RELATIONS);

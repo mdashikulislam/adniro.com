@@ -43,7 +43,6 @@ class ChatPresenter
 		return [
 			'id'            => (int)$thread->id,
 			'url'           => route('chat.show', ['thread' => $thread->id]),
-			'is_buyer'      => (int)$thread->buyer_id === $viewerId,
 			'other'         => self::person($other?->user, $otherId),
 			'post'          => self::post($thread->post),
 			'last'          => $last === null ? null : [
@@ -62,6 +61,18 @@ class ChatPresenter
 		];
 	}
 
+	/**
+	 * Several messages, with the listings they are about loaded in one query.
+	 *
+	 * @param \Illuminate\Support\Collection<int, ChatMessage> $messages
+	 */
+	public static function messages($messages): array
+	{
+		$messages->loadMissing('post.picture');
+
+		return $messages->map(fn (ChatMessage $message) => self::message($message))->values()->all();
+	}
+
 	public static function message(ChatMessage $message): array
 	{
 		$isImage = $message->isImage() && !empty($message->file_path);
@@ -76,6 +87,7 @@ class ChatPresenter
 				'url'   => route('chat.file', ['message' => $message->id]),
 				'thumb' => route('chat.file', ['message' => $message->id, 'size' => 'thumb']),
 			],
+			'post'        => empty($message->post_id) ? null : self::post($message->post),
 			'client_uuid' => $message->client_uuid,
 			'at'          => $message->created_at?->toIso8601String(),
 			'caution'     => ChatSafety::needsCaution($message->body),

@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /*
- * A live chat conversation (adniro): one per listing and buyer, on the Messenger's "threads" table.
+ * A live chat conversation (adniro), on the Messenger's "threads" table: one per two people ("user_low_id" and
+ * "user_high_id", the pair in a fixed order), whatever the number of listings they talk about. "post_id" is the
+ * listing they last talked about.
  * A lean model for the chat: none of App\Models\Thread's appended attributes or observers.
  */
 class ChatThread extends Model
@@ -20,7 +22,7 @@ class ChatThread extends Model
 
 	protected $table = 'threads';
 
-	protected $fillable = ['post_id', 'buyer_id', 'subject', 'last_message_id', 'last_message_at'];
+	protected $fillable = ['post_id', 'buyer_id', 'user_low_id', 'user_high_id', 'subject', 'last_message_id', 'last_message_at'];
 
 	protected function casts(): array
 	{

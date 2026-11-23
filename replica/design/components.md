@@ -35,7 +35,8 @@ Chat with seller button (C1)
   a11y      a real link to /chat/new/{listing}; the label says "Chat with seller"
 
 Inbox row (C2)
-  parts     avatar 44 (photo or initials) + online dot · name (title) · listing title (sm, muted) ·
+  one row per person, whatever the number of listings talked about
+  parts     avatar 44 (photo or initials) + online dot · name (title) · the listing last talked about (sm) ·
             last message (sm, one line, "You: " prefix for my own, "Photo" for a photo) · time (xs) ·
             unread count (pill, accent-strong)
   states    default, hover (surface), active conversation (accent-soft + 3px accent bar at the start edge),
@@ -66,6 +67,14 @@ Pinned listing card (C3, C4)
 Safety note (C3, C4)
   content   shield icon, the existing safety line and "Safety tips" link, shown once at the top of the log
   tokens    bg warning-bg, text warning-text, radius md, sm
+
+Listing reference (C3)
+  when      a message was sent from a listing ("Chat with seller"): two people have one conversation, so this
+            says which listing the message is about
+  content   above the bubble, on the sender's side: photo 40 (radius sm) · title (sm/700, one line) ·
+            price (sm, accent-strong); a link to the listing, or plain and muted when it is gone
+  tokens    bg bg, border border, radius md; starts a new group (12px above)
+  a11y      a link named by the listing's title
 
 Scam hint (C3)
   when      a message from the other person has a link, an email, a phone number or "pay outside" wording

@@ -654,6 +654,79 @@ a.adn-chat-listing[href]:hover {
 	opacity: .7;
 }
 
+/* The listing a message is about, above its bubble: one conversation can cover several listings */
+.adn-chat-ref {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	max-width: min(78%, 320px);
+	margin-bottom: 4px;
+	padding: .4rem .6rem .4rem .4rem;
+	border: 1px solid var(--adn-chat-border);
+	border-radius: var(--adn-chat-radius-md);
+	color: inherit;
+	background-color: var(--adn-chat-bg);
+	text-decoration: none;
+	transition: background-color var(--adn-chat-fast) ease;
+}
+
+a.adn-chat-ref:hover {
+	color: inherit;
+	background-color: var(--adn-chat-surface);
+}
+
+a.adn-chat-ref:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+.adn-chat-ref-photo {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	overflow: hidden;
+	border-radius: var(--adn-chat-radius-sm);
+	color: var(--adn-chat-muted);
+	background-color: var(--adn-chat-surface);
+}
+
+.adn-chat-ref-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .08);
+	outline-offset: -1px;
+	border-radius: inherit;
+}
+
+.adn-chat-ref-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	font-size: .8125rem;
+	line-height: 1.3;
+}
+
+.adn-chat-ref-text strong {
+	overflow: hidden;
+	font-weight: 700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-chat-ref-text span {
+	font-weight: 600;
+	color: var(--adn-chat-accent-text);
+}
+
+div.adn-chat-ref .adn-chat-ref-text span {
+	font-weight: 500;
+	color: var(--adn-chat-muted);
+}
+
 /* Photo messages: the image fills the bubble, the time sits on a dark scrim */
 .adn-chat-bubble.is-photo {
 	padding: 0;
@@ -1070,6 +1143,7 @@ a.adn-chat-listing[href]:hover {
 
 	.adn-chat-filter,
 	.adn-chat-row,
+	.adn-chat-ref,
 	.adn-chat-send,
 	.adn-chat-input,
 	.adn-chat-icon-btn,

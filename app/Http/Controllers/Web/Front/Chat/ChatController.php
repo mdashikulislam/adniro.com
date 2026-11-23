@@ -16,8 +16,8 @@ use Illuminate\Http\Request;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
 
 /*
- * The chat pages (adniro): the inbox, an open conversation, and a new conversation about a listing (nothing is
- * saved until the first message). One view; the page's first data is in it, so it needs no extra request.
+ * The chat pages (adniro): the inbox, an open conversation, and "Chat with seller" from a listing.
+ * One view; the page's first data is in it, so it needs no extra request.
  */
 class ChatController extends FrontController
 {
@@ -36,29 +36,43 @@ class ChatController extends FrontController
 		]);
 	}
 
+	/**
+	 * "Chat with seller" on a listing. The two people have one conversation, whatever the listing: if it exists
+	 * it opens, with this listing ready to be the subject of the next message; if not, nothing is saved until
+	 * the first message.
+	 */
 	public function draft(Request $request, int $post): View|RedirectResponse
 	{
 		$user = $request->user();
+		$userId = (int)$user->id;
 		$listing = Post::query()->unarchived()->with(['picture', 'user'])->findOrFail($post);
 
-		$existing = ChatConversations::find((int)$listing->id, (int)$user->id);
-		if ($existing !== null) {
-			return redirect()->route('chat.show', ['thread' => $existing->id]);
-		}
-
+		$existing = empty($listing->user_id) ? null : ChatConversations::between($userId, (int)$listing->user_id);
 		$reason = ChatConversations::cannotStartReason($listing, $user);
-		if ($reason !== null) {
+		if ($reason !== null && $existing === null) {
 			flash($reason)->error();
 
 			return redirect()->to(urlGen()->post($listing));
 		}
 
+		$about = [
+			'post'      => ChatPresenter::post($listing),
+			'other'     => ChatPresenter::person($listing->user, (int)$listing->user_id),
+			'start_url' => route('chat.start', ['post' => $listing->id]),
+		];
+		if ($existing === null) {
+			return $this->page($request, ['draft' => $about]);
+		}
+
+		// Already talking about this listing, or no longer allowed to write: just the conversation
+		if ($reason !== null || (int)$existing->post_id === (int)$listing->id) {
+			return redirect()->route('chat.show', ['thread' => $existing->id]);
+		}
+
+		$chatThread = ChatAccess::threadFor((int)$existing->id, $userId)->load(ChatPresenter::THREAD_RELATIONS);
+
 		return $this->page($request, [
-			'draft' => [
-				'post'      => ChatPresenter::post($listing),
-				'other'     => ChatPresenter::person($listing->user, (int)$listing->user_id),
-				'start_url' => route('chat.start', ['post' => $listing->id]),
-			],
+			'open' => ['thread' => ChatPresenter::thread($chatThread, $userId), 'about' => $about] + ChatMessages::history($chatThread),
 		]);
 	}
 

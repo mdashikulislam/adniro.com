@@ -5,6 +5,7 @@ namespace App\Services\Chat;
 use App\Models\Chat\ChatMessage;
 use App\Models\Chat\ChatParticipant;
 use App\Models\Chat\ChatThread;
+use App\Models\Post;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -22,9 +23,16 @@ class ChatMessages
 	/**
 	 * Saves a text or a photo from one participant and pushes it to both. With the same client_uuid it
 	 * returns the message already saved, so a double tap or a retry never sends twice.
+	 * $about is the listing the message was sent from ("Chat with seller"): it is shown on the message.
 	 */
-	public static function send(ChatThread $thread, int $senderId, ?string $body, ?UploadedFile $photo = null, ?string $clientUuid = null): ChatMessage
-	{
+	public static function send(
+		ChatThread $thread,
+		int $senderId,
+		?string $body,
+		?UploadedFile $photo = null,
+		?string $clientUuid = null,
+		?Post $about = null,
+	): ChatMessage {
 		$existing = self::findByClientUuid((int)$thread->id, $clientUuid);
 		if ($existing !== null) {
 			return $existing;
@@ -33,7 +41,7 @@ class ChatMessages
 		$photoPath = $photo !== null ? ChatPhotos::store($photo, (int)$thread->id) : null;
 
 		try {
-			$message = DB::transaction(fn () => self::save($thread, $senderId, $body, $photoPath, $clientUuid));
+			$message = DB::transaction(fn () => self::save($thread, $senderId, $body, $photoPath, $clientUuid, $about));
 		} catch (UniqueConstraintViolationException) {
 			ChatPhotos::delete($photoPath);
 
@@ -63,7 +71,7 @@ class ChatMessages
 		$hasMore = $rows->count() > self::PAGE_SIZE;
 
 		return [
-			'messages' => $rows->take(self::PAGE_SIZE)->reverse()->map(fn (ChatMessage $message) => ChatPresenter::message($message))->values()->all(),
+			'messages' => ChatPresenter::messages($rows->take(self::PAGE_SIZE)->reverse()->values()),
 			'has_more' => $hasMore,
 		];
 	}
@@ -77,8 +85,7 @@ class ChatMessages
 			->orderBy('id')
 			->limit(self::CATCH_UP_MAX)
 			->get()
-			->map(fn (ChatMessage $message) => ChatPresenter::message($message))
-			->all();
+			->pipe(fn ($rows) => ChatPresenter::messages($rows));
 	}
 
 	/**
@@ -123,10 +130,11 @@ class ChatMessages
 		return $readUpTo;
 	}
 
-	private static function save(ChatThread $thread, int $senderId, ?string $body, ?string $photoPath, ?string $clientUuid): ChatMessage
+	private static function save(ChatThread $thread, int $senderId, ?string $body, ?string $photoPath, ?string $clientUuid, ?Post $about): ChatMessage
 	{
 		$message = ChatMessage::query()->create([
 			'thread_id'   => $thread->id,
+			'post_id'     => $about?->id,
 			'user_id'     => $senderId,
 			'type'        => $photoPath !== null ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
 			'body'        => $body,
@@ -134,7 +142,11 @@ class ChatMessages
 			'client_uuid' => $clientUuid,
 		]);
 
-		$thread->update(['last_message_id' => $message->id, 'last_message_at' => $message->created_at]);
+		// A message sent from a listing makes that listing the one the conversation is about
+		$thread->update(array_merge(
+			['last_message_id' => $message->id, 'last_message_at' => $message->created_at],
+			$about === null ? [] : ['post_id' => $about->id, 'subject' => $about->title],
+		));
 
 		// Everyone else has one more to read. The sender's own read state is not touched: sending is not
 		// reading, and they may not have seen the other person's latest messages yet.

@@ -178,7 +178,8 @@
 		var hasWritten = open.messages.some(function (message) {
 			return message.user_id === ME;
 		});
-		var canAsk = open.canSend && !hasWritten && !open.hasMore && (open.draft || (open.thread && open.thread.is_buyer));
+		// Offered when the chat was opened from a listing and nothing has been written about it yet
+		var canAsk = open.canSend && ((open.draft && !hasWritten) || !!open.about);
 
 		els.quick.hidden = !canAsk;
 		els.quick.textContent = '';
@@ -318,6 +319,8 @@
 		store.open = {
 			thread: data.thread || null,
 			draft: data.draft || null,
+			// Opened from another listing of the same person: the next message is about that listing
+			about: data.about || null,
 			other: data.thread ? data.thread.other : data.draft.other,
 			messages: (data.messages || []).slice(),
 			hasMore: !!data.has_more,
@@ -339,7 +342,7 @@
 		els.open.hidden = false;
 		els.name.textContent = open.other.name;
 		avatarInto(els.avatar, open.other, false);
-		renderListing(data.thread ? data.thread.post : data.draft.post);
+		renderListing(open.about ? open.about.post : (data.thread ? data.thread.post : data.draft.post));
 		hideTyping();
 		showError('');
 		clearPhoto();
@@ -430,7 +433,8 @@
 			form.append('body', local.body);
 		}
 
-		var sending = request('POST', open.thread ? urlFor(URLS.messages, open.thread.id) : open.draft.start_url, form).then(function (data) {
+		var url = local.via || (open.thread ? urlFor(URLS.messages, open.thread.id) : open.draft.start_url);
+		var sending = request('POST', url, form).then(function (data) {
 			if (store.open !== open) {
 				return;
 			}
@@ -439,9 +443,12 @@
 			open.draft = null;
 			upsertMessage(data.message);
 			upsertThread(data.thread);
-			if (started) {
+			if (started || local.via) {
 				window.history.replaceState({thread: data.thread.id}, '', data.thread.url);
+				renderListing(data.thread.post);
 				renderComposer();
+			}
+			if (started) {
 				joinPresence();
 			}
 		}).catch(function (error) {
@@ -464,8 +471,13 @@
 		if (!open || !open.canSend) {
 			return;
 		}
+		// The listing this message is sent from: the first one of a new conversation, or of a new subject
+		var firstOfDraft = open.draft && !open.thread && !open.starting ? open.draft : null;
+		var topic = open.about || firstOfDraft;
 		var local = {
 			id: null,
+			post: topic ? topic.post : null,
+			via: open.about ? open.about.start_url : null,
 			client_uuid: uuid(),
 			user_id: ME,
 			type: photo ? 'image' : 'text',
@@ -475,6 +487,7 @@
 			at: new Date().toISOString(),
 			state: 'sending'
 		};
+		open.about = null;
 		open.messages.push(local);
 		appendMessage(local, true);
 		scrollToBottom();

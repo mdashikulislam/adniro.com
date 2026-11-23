@@ -90,6 +90,26 @@ class ChatPagesTest extends ChatTestCase
 		$this->actingAs($this->buyer)->get('/chat/new/' . $this->listing->id)->assertRedirect('/chat/' . $thread->id);
 	}
 
+	public function test_chat_with_seller_on_another_listing_opens_the_same_conversation_about_that_listing(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		$table = $this->stockListing('Oak dining table', ['user_id' => self::SELLER_ID]);
+
+		// Act
+		$response = $this->actingAs($this->buyer)->get('/chat/new/' . $table->id);
+
+		// Assert: the existing conversation, with the new listing ready for the next message; nothing saved yet
+		$response->assertOk();
+		$state = $this->chatState($response->getContent());
+		$this->assertSame($thread->id, $state['open']['thread']['id']);
+		$this->assertSame('Oak dining table', $state['open']['about']['post']['title']);
+		$this->assertStringEndsWith('/chat/listings/' . $table->id, $state['open']['about']['start_url']);
+		$this->assertCount(1, $state['open']['messages']);
+		$this->assertSame(1, DB::table('threads')->count());
+		$this->assertSame($this->listing->id, (int)DB::table('threads')->value('post_id'));
+	}
+
 	public function test_a_listing_that_is_gone_is_shown_as_no_longer_available(): void
 	{
 		// Arrange

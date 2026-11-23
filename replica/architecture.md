@@ -231,6 +231,14 @@ Step 2 is the only one that changes the server: one systemd service and one ngin
 
 ## As built (branch `chat`, 2026-11-23)
 
+**Changed after the owner tried it: one conversation per two people, not per listing and buyer.** A seller with
+several listings appeared several times in the same person's inbox. Now two people have one conversation;
+"Chat with seller" on another listing opens it with that listing ready, and the message sent from a listing
+carries a small card of it (`threads_messages.post_id`). `threads.post_id` is the listing they last talked
+about (the pinned card and the inbox line). The pair is `threads.user_low_id` + `user_high_id`, unique; the
+old unique (post_id, buyer_id) is dropped. Migration `2026_11_23_000400` merges existing conversations of the
+same two people into the oldest. Where the plan above says "one conversation per (listing, buyer)", read this.
+
 Steps 0 to 3 are built and tested on local. What differs from the plan above, and why:
 
 - **Photos open through a signed-in route, not a signed link.** `/chat/files/{message}` checks the session and

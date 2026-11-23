@@ -2,6 +2,7 @@
 
 namespace App\Models\Chat;
 
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,11 +21,17 @@ class ChatMessage extends Model
 
 	protected $table = 'threads_messages';
 
-	protected $fillable = ['thread_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid'];
+	protected $fillable = ['thread_id', 'post_id', 'user_id', 'type', 'body', 'file_path', 'client_uuid'];
 
 	public function thread(): BelongsTo
 	{
 		return $this->belongsTo(ChatThread::class, 'thread_id');
+	}
+
+	/** The listing this message is about: set on the first message sent from that listing's "Chat with seller". */
+	public function post(): BelongsTo
+	{
+		return $this->belongsTo(Post::class, 'post_id')->withoutGlobalScopes();
 	}
 
 	public function user(): BelongsTo
