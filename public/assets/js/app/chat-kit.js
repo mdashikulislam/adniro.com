@@ -161,7 +161,7 @@
 		}
 
 		/** Fills the pinned listing card; a listing that is gone is shown as no longer available. */
-		function listingInto(els, post) {
+		function listingInto(els, post, label) {
 			els.listing.hidden = !post;
 			if (!post) {
 				return;
@@ -174,6 +174,7 @@
 				els.listing.removeAttribute('href');
 			}
 			els.viewListing.parentNode.hidden = !(post.available && post.url);
+			els.listingLabel.textContent = label;
 			els.listingTitle.textContent = post.title;
 			els.listingPrice.textContent = post.available ? post.price : T.unavailable;
 

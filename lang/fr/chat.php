@@ -91,6 +91,8 @@ return [
 		'pick_title'      => 'Choisissez une discussion',
 		'pick_text'       => 'Vos conversations avec les acheteurs et les vendeurs sont à gauche.',
 		'unavailable'     => 'Plus disponible',
+		'last_enquiry'    => 'Dernière demande',
+		'asking_about'    => 'Votre demande concerne',
 		'caution'         => 'Soyez prudent : ne payez pas d\'avance et ne partagez pas de codes en dehors d\'Adniro.',
 		'blocked_by_me'   => 'Vous avez bloqué cette personne.',
 		'cannot_send'     => 'Vous ne pouvez pas répondre à cette discussion.',

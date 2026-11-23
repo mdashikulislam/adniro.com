@@ -51,6 +51,9 @@ class ChatPagesTest extends ChatTestCase
 		$this->assertSame('Grey corner sofa', $state['open']['thread']['post']['title']);
 		$this->assertTrue($state['open']['thread']['post']['available']);
 		$this->assertArrayNotHasKey('email', $state['open']['thread']['other']);
+		// The pinned listing says why it is there
+		$response->assertSee('data-chat-listing-label', false);
+		$this->assertSame(['Last enquiry', 'Asking about'], [$state['text']['last_enquiry'], $state['text']['asking_about']]);
 	}
 
 	public function test_text_in_the_page_data_cannot_break_out_of_it(): void

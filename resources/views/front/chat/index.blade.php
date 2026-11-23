@@ -68,6 +68,8 @@
 						<a class="adn-chat-listing" data-chat-listing>
 							<span class="adn-chat-listing-photo" data-chat-listing-photo aria-hidden="true"><i class="bi bi-image"></i></span>
 							<span class="adn-chat-listing-text">
+								{{-- "Last enquiry", or "Asking about" before the first message about this listing --}}
+								<span class="adn-chat-listing-label" data-chat-listing-label></span>
 								<strong data-chat-listing-title></strong>
 								<span data-chat-listing-price></span>
 							</span>

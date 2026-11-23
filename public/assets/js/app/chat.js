@@ -57,6 +57,7 @@
 		offline: $('[data-chat-offline]'),
 		listing: $('[data-chat-listing]'),
 		listingPhoto: $('[data-chat-listing-photo]'),
+		listingLabel: $('[data-chat-listing-label]'),
 		listingTitle: $('[data-chat-listing-title]'),
 		listingPrice: $('[data-chat-listing-price]'),
 		log: $('[data-chat-log]'),
@@ -104,8 +105,9 @@
 	var live = kit.live;
 	var toast = kit.toast;
 	var avatarInto = kit.avatarInto;
+	// The bar says why the listing is there: the last one asked about, or the one about to be asked about
 	var renderListing = function (post) {
-		kit.listingInto(els, post);
+		kit.listingInto(els, post, store.open && (store.open.about || store.open.draft) ? T.asking_about : T.last_enquiry);
 	};
 
 	var ctx = {T: T, URLS: URLS, ME: ME, els: els, store: store, kit: kit};

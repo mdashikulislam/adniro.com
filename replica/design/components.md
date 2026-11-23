@@ -59,7 +59,8 @@ Conversation header (C3, C4)
   a11y      the menu is a Bootstrap dropdown (keyboard: arrows, Esc); status changes are aria-live="polite"
 
 Pinned listing card (C3, C4)
-  parts     photo 44 (radius sm) · title (sm/700, one line) · price (sm, accent-strong) · chevron
+  parts     photo 44 (radius sm) · label (xs/600, muted): "Last enquiry", or "Asking about" before the first
+            message about this listing · title (sm/700, one line) · price (sm, accent-strong) · chevron
   states    default, hover (surface), listing no longer available (muted, "No longer available", not a link)
   tokens    bg bg, border-bottom border, 12px padding
   a11y      one link, "View listing: {title}"

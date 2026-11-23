@@ -91,6 +91,8 @@ return [
 		'pick_title'      => 'Scegli una chat per iniziare',
 		'pick_text'       => 'Le tue conversazioni con acquirenti e venditori sono a sinistra.',
 		'unavailable'     => 'Non più disponibile',
+		'last_enquiry'    => 'Ultima richiesta',
+		'asking_about'    => 'Richiesta su',
 		'caution'         => 'Attenzione: non pagare in anticipo e non condividere codici fuori da Adniro.',
 		'blocked_by_me'   => 'Hai bloccato questa persona.',
 		'cannot_send'     => 'Non puoi rispondere a questa chat.',
