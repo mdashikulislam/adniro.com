@@ -111,7 +111,12 @@
 							<span class="adn-chat-avatar adn-chat-avatar-sm" data-chat-avatar aria-hidden="true"></span>
 							<div class="adn-chat-head-text">
 								{{-- Focus moves here when a chat is opened on a phone, or one that cannot be written in --}}
-								<h2 class="adn-chat-head-name adn-chat-own-dir" data-chat-name tabindex="-1" dir="auto"></h2>
+								<span class="adn-chat-head-title">
+									<h2 class="adn-chat-head-name adn-chat-own-dir" data-chat-name tabindex="-1" dir="auto"></h2>
+									{{-- A confirmed email address: the site's "verified" rule (App\Services\SellerService) --}}
+									<i class="bi bi-patch-check-fill adn-chat-verified" data-chat-verified role="img"
+									   aria-label="{{ trans('chat.js.verified') }}" title="{{ trans('chat.js.verified') }}: {{ trans('chat.js.verified_hint') }}" hidden></i>
+								</span>
 								<span class="adn-chat-head-status" data-chat-status></span>
 							</div>
 							<div class="dropdown">

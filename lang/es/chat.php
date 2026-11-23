@@ -299,5 +299,7 @@ return [
 		'photo_number' => 'Foto :number',
 		'viewer_count' => ':number de :total',
 		'error_photos_many' => 'Puedes enviar hasta :max fotos a la vez.',
+		'verified' => 'Verificado',
+		'verified_hint' => 'Confirmó su dirección de correo.',
 	],
 ];

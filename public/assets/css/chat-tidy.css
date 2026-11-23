@@ -250,3 +250,35 @@ h2.adn-chat-head-name {
 		transition: none;
 	}
 }
+
+/* ---------- "Verified" beside a member's name (a confirmed email address) ---------- */
+.adn-chat-verified {
+	flex: 0 0 auto;
+	font-size: .9rem;
+	line-height: 1;
+	color: var(--adn-chat-accent);
+}
+
+/* In a row: the name is cut short if it must, the mark never is */
+.adn-chat-row-title {
+	display: flex;
+	align-items: center;
+	gap: .3rem;
+	min-width: 0;
+}
+
+.adn-chat-row-title .adn-chat-row-name {
+	min-width: 0;
+}
+
+/* In the open conversation's head */
+.adn-chat-head-title {
+	display: flex;
+	align-items: center;
+	gap: .35rem;
+	min-width: 0;
+}
+
+.adn-chat-head-title .adn-chat-verified {
+	font-size: 1rem;
+}

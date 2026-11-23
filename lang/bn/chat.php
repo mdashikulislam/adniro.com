@@ -299,5 +299,7 @@ return [
 		'photo_number' => 'ছবি :number',
 		'viewer_count' => ':total-এর মধ্যে :number',
 		'error_photos_many' => 'একবারে সর্বোচ্চ :maxটি ছবি পাঠাতে পারবেন।',
+		'verified' => 'যাচাইকৃত',
+		'verified_hint' => 'ইমেইল ঠিকানা নিশ্চিত করেছেন।',
 	],
 ];

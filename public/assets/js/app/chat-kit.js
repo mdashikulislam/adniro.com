@@ -37,6 +37,15 @@
 			return node;
 		}
 
+		/** The "verified" mark beside a member's name: the same check-badge as on their profile. */
+		function verifiedBadge() {
+			var badge = el('i', 'bi bi-patch-check-fill adn-chat-verified');
+			badge.setAttribute('role', 'img');
+			badge.setAttribute('aria-label', T.verified);
+			badge.title = T.verified + ': ' + T.verified_hint;
+			return badge;
+		}
+
 		/**
 		 * Text a member wrote (a name, a title, a message), kept apart from the page's own direction: an Arabic
 		 * name on an English page, or the reverse, does not reorder the words and punctuation around it.
@@ -250,6 +259,7 @@
 			urlFor: urlFor,
 			el: el,
 			bdi: bdi,
+			verifiedBadge: verifiedBadge,
 			ownDir: ownDir,
 			announce: announce,
 			icon: icon,

@@ -76,6 +76,9 @@ Inbox row (C2)
             unread count (pill, accent-strong)
   states    default, hover (surface), active conversation (accent-soft + 3px accent bar at the start edge),
             unread (name and last message bold), blocked (muted, "Blocked" tag)
+  verified  a teal check-badge icon right after the name, no text, when the member confirmed their email
+            (the site's own rule, as on the listing page); also after the name in the conversation's head;
+            spoken "Verified", hover says why
   a11y      one link per row; the unread count has a spoken label ("3 unread messages")
 
 Inbox filter (C2)

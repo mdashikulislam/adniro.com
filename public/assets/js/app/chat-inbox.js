@@ -77,7 +77,13 @@
 			row.appendChild(avatar);
 
 			var text = el('span', 'adn-chat-row-text');
-			text.appendChild(ownDir(el('span', 'adn-chat-row-name', thread.other.name)));
+			// The name, cut short if it must, and the "verified" mark after it, never cut
+			var title = el('span', 'adn-chat-row-title');
+			title.appendChild(ownDir(el('span', 'adn-chat-row-name', thread.other.name)));
+			if (thread.other.verified) {
+				title.appendChild(ctx.kit.verifiedBadge());
+			}
+			text.appendChild(title);
 			if (thread.post) {
 				text.appendChild(ownDir(el('span', 'adn-chat-row-listing', thread.post.title)));
 			}

@@ -143,7 +143,7 @@ class ChatPrivacyTest extends ChatTestCase
 
 		// Assert: latest first, only who I blocked, and nothing but a name and a photo
 		$list->assertOk()->assertJsonCount(2, 'blocked')
-			->assertJsonPath('blocked.0', ['id' => self::OUTSIDER_ID, 'name' => 'Member ' . self::OUTSIDER_ID, 'photo' => null])
+			->assertJsonPath('blocked.0', ['id' => self::OUTSIDER_ID, 'name' => 'Member ' . self::OUTSIDER_ID, 'photo' => null, 'verified' => true])
 			->assertJsonPath('blocked.1.id', self::SELLER_ID);
 		$this->assertStringNotContainsString('@example.test', $list->getContent());
 

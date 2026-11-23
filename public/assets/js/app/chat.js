@@ -52,6 +52,7 @@
 		back: $('[data-chat-back]'),
 		avatar: $('[data-chat-avatar]'),
 		name: $('[data-chat-name]'),
+		verified: $('[data-chat-verified]'),
 		status: $('[data-chat-status]'),
 		viewListing: $('[data-chat-view-listing]'),
 		block: $('[data-chat-block]'),
@@ -277,6 +278,7 @@
 		els.pick.hidden = true;
 		els.open.hidden = false;
 		els.name.textContent = open.other.name;
+		els.verified.hidden = !open.other.verified;
 		avatarInto(els.avatar, open.other, false);
 		renderListing(open.about ? open.about.post : (data.thread ? data.thread.post : data.draft.post));
 		hideTyping();

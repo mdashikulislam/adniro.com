@@ -299,5 +299,7 @@ return [
 		'photo_number' => 'الصورة :number',
 		'viewer_count' => ':number من :total',
 		'error_photos_many' => 'يمكنك إرسال :max صور كحد أقصى في المرة الواحدة.',
+		'verified' => 'موثّق',
+		'verified_hint' => 'أكّد عنوان بريده الإلكتروني.',
 	],
 ];

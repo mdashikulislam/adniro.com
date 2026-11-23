@@ -299,5 +299,7 @@ return [
 		'photo_number' => 'Фото :number',
 		'viewer_count' => ':number из :total',
 		'error_photos_many' => 'За раз можно отправить не больше :max фото.',
+		'verified' => 'Проверен',
+		'verified_hint' => 'Подтвердил(а) адрес электронной почты.',
 	],
 ];

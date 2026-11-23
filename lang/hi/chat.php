@@ -299,5 +299,7 @@ return [
 		'photo_number' => 'फ़ोटो :number',
 		'viewer_count' => ':total में से :number',
 		'error_photos_many' => 'आप एक बार में ज़्यादा से ज़्यादा :max फ़ोटो भेज सकते हैं।',
+		'verified' => 'सत्यापित',
+		'verified_hint' => 'अपना ईमेल पता पुष्टि किया है।',
 	],
 ];

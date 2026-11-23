@@ -6,6 +6,7 @@ use App\Models\Chat\ChatMessage;
 use App\Models\Chat\ChatThread;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\SellerService;
 use Illuminate\Support\Str;
 
 /*
@@ -184,13 +185,15 @@ class ChatPresenter
 	public static function person(?User $user, int $fallbackId = 0): array
 	{
 		if ($user === null) {
-			return ['id' => $fallbackId, 'name' => trans('chat.deleted_member'), 'photo' => null];
+			return ['id' => $fallbackId, 'name' => trans('chat.deleted_member'), 'photo' => null, 'verified' => false];
 		}
 
 		return [
-			'id'    => (int)$user->id,
-			'name'  => (string)$user->name,
-			'photo' => empty($user->photo_path) ? null : (string)$user->photo_url,
+			'id'       => (int)$user->id,
+			'name'     => (string)$user->name,
+			'photo'    => empty($user->photo_path) ? null : (string)$user->photo_url,
+			// The site's own "verified" rule, as on the listing page and the profile (a confirmed email address)
+			'verified' => SellerService::isVerifiedSeller($user),
 		];
 	}
 

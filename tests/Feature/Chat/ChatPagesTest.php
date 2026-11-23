@@ -97,6 +97,12 @@ class ChatPagesTest extends ChatTestCase
 		$this->assertSame('Grey corner sofa', $state['open']['thread']['post']['title']);
 		$this->assertTrue($state['open']['thread']['post']['available']);
 		$this->assertArrayNotHasKey('email', $state['open']['thread']['other']);
+		// The site's "verified" rule (a confirmed email address), as on the listing page
+		$this->assertTrue($state['open']['thread']['other']['verified']);
+		\DB::table('users')->where('id', self::SELLER_ID)->update(['email_verified_at' => null]);
+		$again = $this->chatState($this->actingAs($this->buyer)->get('/chat/' . $thread->id)->getContent());
+		$this->assertFalse($again['open']['thread']['other']['verified']);
+		$this->assertNotEmpty($again['text']['verified']);
 		// The pinned listing has a label only before the first message about it ("Asking about")
 		$response->assertSee('data-chat-listing-label', false);
 		$this->assertSame('Asking about', $state['text']['asking_about']);
