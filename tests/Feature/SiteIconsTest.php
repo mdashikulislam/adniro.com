@@ -82,40 +82,7 @@ class SiteIconsTest extends TestCase
 			'display'     => 'standalone',
 			'theme_color' => '#0d9488',
 		]);
-		$this->assertSame(['192x192', '512x512', '192x192', '512x512'], array_column($response->json('icons'), 'sizes'));
-		$this->assertSame(['any', 'any', 'maskable', 'maskable'], array_column($response->json('icons'), 'purpose'));
-	}
-
-	public function test_the_manifest_describes_the_installed_app_and_its_shortcuts(): void
-	{
-		// Act
-		$manifest = $this->get('/manifest.json')->assertOk()->json();
-
-		// Assert
-		$this->assertSame('/', $manifest['id']);
-		$this->assertSame('/', $manifest['scope']);
-		$this->assertNotEmpty($manifest['description']);
-		$this->assertSame(
-			[trans('app_install.shortcut_post'), trans('app_install.shortcut_saved')],
-			array_column($manifest['shortcuts'], 'name')
-		);
-		$this->assertSame([url('posts/create'), url('account/saved-posts')], array_column($manifest['shortcuts'], 'url'));
-	}
-
-	public function test_a_maskable_icon_keeps_the_logo_inside_the_safe_area_on_a_solid_background(): void
-	{
-		// Act
-		$response = $this->get('/icon-maskable-192.png');
-
-		// Assert: the full square is painted (no transparent corners for Android to fill), the logo in the middle
-		$response->assertOk()->assertHeader('Content-Type', 'image/png');
-		$image = imagecreatefromstring($response->getContent());
-		$this->assertSame([192, 192], [imagesx($image), imagesy($image)]);
-		$corner = imagecolorsforindex($image, imagecolorat($image, 2, 2));
-		$centre = imagecolorsforindex($image, imagecolorat($image, 96, 96));
-		$this->assertSame([255, 255, 255, 0], [$corner['red'], $corner['green'], $corner['blue'], $corner['alpha']]);
-		$this->assertSame([13, 148, 136], [$centre['red'], $centre['green'], $centre['blue']]);
-		$this->get('/icon-maskable-64.png')->assertNotFound();
+		$this->assertSame(['192x192', '512x512'], array_column($response->json('icons'), 'sizes'));
 	}
 
 	public function test_without_a_favicon_the_icons_are_not_found(): void

@@ -241,15 +241,7 @@
 					
 					{{-- Languages Dropdown/Modal Link --}}
 					@include('front.layouts.partials.navs.languages')
-
-					{{-- adniro: "Install app" (phones), shown by public/assets/js/app/app-install.js --}}
-					<li class="nav-item adn-nav-install d-md-none" data-adn-install-entry hidden>
-						<button type="button" class="btn btn-outline-primary" data-adn-install>
-							<i class="bi bi-download" aria-hidden="true"></i>
-							<span data-adn-install-label>{{ trans('app_install.install') }}</span>
-						</button>
-					</li>
-
+					
 				</ul>
 			</div>
 		

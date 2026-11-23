@@ -298,23 +298,6 @@
 				</div>
 			@endif
 			
-			{{-- adniro: "Get the app" (phones), shown by public/assets/js/app/app-install.js --}}
-			@php
-				$footerAppName = (string)config('settings.app.name', config('app.name'));
-				$footerAppIcon = !empty(config('settings.app.favicon')) ? url('icon-192.png') : config('settings.app.logo_dark_url');
-			@endphp
-			<section class="adn-install-foot d-md-none" data-adn-install-entry hidden aria-labelledby="adnInstallFootTitle">
-				<img class="adn-install-icon" src="{{ $footerAppIcon }}" alt="" width="44" height="44" loading="lazy">
-				<div class="adn-install-foot-text">
-					<strong id="adnInstallFootTitle">{{ trans('app_install.title', ['name' => $footerAppName]) }}</strong>
-					<span>{{ trans('app_install.footer_text', ['name' => $footerAppName]) }}</span>
-				</div>
-				<button type="button" class="adn-install-foot-go" data-adn-install>
-					<i class="bi bi-download" aria-hidden="true"></i>
-					<span data-adn-install-label>{{ trans('app_install.install') }}</span>
-				</button>
-			</section>
-
 			{{-- Copyright Info --}}
 			<div class="row">
 				<div class="col-12">

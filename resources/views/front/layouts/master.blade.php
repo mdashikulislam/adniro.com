@@ -27,7 +27,6 @@
 	@endif
 	<link rel="manifest" href="{{ url('manifest.json') }}">
 	<meta name="theme-color" content="{{ \App\Http\Controllers\Web\Front\SiteIconController::themeColor() }}">
-	@include('front.layouts.partials.app-install-head') {{-- adniro: iPhone app tags, installed app start screen --}}
 	<title>{!! MetaTag::get('title') !!}</title>
 	{!! MetaTag::tag('description') !!}{!! MetaTag::tag('keywords') !!}
 	@if (empty($hideCanonical))
@@ -94,9 +93,8 @@
 	
 	{{-- Custom CSS (adniro: built from resources/css/front/custom.css, minified and versioned) --}}
 	<link href="{{ url(mix('dist/front/custom.css')) }}" rel="stylesheet">
-	{{-- adniro: phone header controls and the bottom app bar, "Get the app" --}}
+	{{-- adniro: phone header controls and the bottom app bar --}}
 	<link href="{{ url('assets/css/mobile-nav.css') }}?v={{ @filemtime(public_path('assets/css/mobile-nav.css')) }}" rel="stylesheet">
-	<link href="{{ url('assets/css/app-install.css') }}?v={{ @filemtime(public_path('assets/css/app-install.css')) }}" rel="stylesheet">
 	
     @yield('after_styles')
 	@stack('after_styles_stack')
@@ -187,7 +185,6 @@
 @show
 
 @includeWhen($showAppbar, 'front.layouts.partials.mobile-nav')
-@include('front.layouts.partials.app-install') {{-- adniro: "Get the app" card and guide (phones) --}}
 
 @include('front.common.js.init')
 

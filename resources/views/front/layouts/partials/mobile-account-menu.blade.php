@@ -33,7 +33,6 @@
 					<span>{{ $item['name'] }}</span>
 				</a>
 			@endforeach
-			@include('front.layouts.partials.app-install-menu-item')
 			@if ($hasLogOut)
 				<div class="dropdown-divider"></div>
 				<a href="{{ $logOutUrl }}" class="dropdown-item adn-account-menu-item adn-account-menu-logout">
@@ -50,7 +49,6 @@
 				<span class="adn-account-menu-icon" aria-hidden="true"><i class="bi bi-person-plus"></i></span>
 				<span>{{ trans('auth.create_account') }}</span>
 			</a>
-			@include('front.layouts.partials.app-install-menu-item')
 		@endif
 	</div>
 </div>

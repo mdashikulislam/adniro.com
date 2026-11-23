@@ -63,9 +63,6 @@ if (!$isDomainmappingAvailable) {
 // favicon.ico, app icons and manifest (adniro)
 require __DIR__ . '/front/site-icons.php';
 
-// The installable app's offline page (adniro)
-require __DIR__ . '/front/web-app.php';
-
 // Impersonate (As admin user, login as another user)
 Route::middleware(['auth'])
 	->group(function ($router) {
