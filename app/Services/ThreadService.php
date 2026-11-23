@@ -240,12 +240,8 @@ class ThreadService extends BaseService
 			$sender->last_read = now();
 			$sender->save();
 			
-			// Recipients
-			if ($request->has('recipients')) {
-				$thread->addParticipant($request->input('recipients'));
-			} else {
-				$thread->addParticipant($post->user->id);
-			}
+			// Recipients (adniro: the seller only, never ids from the request)
+			$thread->addParticipant($post->user->id);
 		} else {
 			// Guest (Non Logged User)
 			// Update the filename
@@ -320,6 +316,15 @@ class ThreadService extends BaseService
 			return apiResponse()->notFound(t('thread_not_found', ['id' => $id]));
 		}
 		
+		// adniro: only the people in a conversation can reply to it
+		$isParticipant = ThreadParticipant::query()
+			->where('thread_id', $thread->id)
+			->where('user_id', $authUser->getAuthIdentifier())
+			->exists();
+		if (!$isParticipant) {
+			return apiResponse()->notFound(t('thread_not_found', ['id' => $id]));
+		}
+		
 		// Re-activate the Thread for all participants
 		$thread->deleted_by = null;
 		$thread->save();
@@ -379,12 +384,8 @@ class ThreadService extends BaseService
 		$participant->last_read = now();
 		$participant->save();
 		
-		// Recipients
-		if ($request->has('recipients')) {
-			$thread->addParticipant($request->input('recipients'));
-		} else {
-			$thread->addParticipant($thread->post->user->id);
-		}
+		// Recipients (adniro: the seller only, never ids from the request)
+		$thread->addParticipant($thread->post->user->id);
 		
 		// Remove input file to prevent Laravel Queue serialization issue
 		if (isset($messageArray['file_path'])) {

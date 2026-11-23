@@ -176,7 +176,7 @@ Route::middleware($accountMiddlewares)
 
 // Messenger
 // Contact Post's Author
-Route::post('messages/posts/{id}', [MessagesController::class, 'store']);
+Route::post('messages/posts/{id}', [MessagesController::class, 'store'])->middleware('throttle:10,1'); // adniro: send limit
 
 // Messenger Chat
 Route::middleware($accountMiddlewares)
@@ -188,9 +188,9 @@ Route::middleware($accountMiddlewares)
 				
 				Route::post('check-new', 'checkNew')->name('account.messages.checkNew');
 				Route::get('/', 'index')->name('account.messages');
-				Route::post('/', 'store')->name('account.messages.store');
+				Route::post('/', 'store')->middleware('throttle:10,1')->name('account.messages.store'); // adniro: send limit
 				Route::get('{id}', 'show')->name('account.messages.show');
-				Route::put('{id}', 'update')->name('account.messages.update');
+				Route::put('{id}', 'update')->middleware('throttle:30,1')->name('account.messages.update'); // adniro: send limit
 				Route::get('{id}/actions', 'actions')->name('account.messages.actions');
 				Route::post('actions', 'actions')->name('account.messages.actions.bulk');
 				Route::get('{id}/delete', 'destroy')->name('account.messages.delete');

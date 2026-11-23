@@ -48,7 +48,7 @@ Stock files we edited.
 - `app/Http/Controllers/Web/Admin/UserController.php`
 - `app/Http/Controllers/Web/Auth/RegisterController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/Browsing/Location/ModalController.php` (no marker comment)
-- `app/Http/Controllers/Web/Front/FileController.php` (no marker comment)
+- `app/Http/Controllers/Web/Front/FileController.php`
 - `app/Http/Controllers/Web/Front/FrontController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/HomeController.php` (no marker comment)
 - `app/Http/Controllers/Web/Front/Locale/LocaleController.php` (no marker comment)
@@ -379,7 +379,7 @@ Stock files we edited.
 - `routes/web/admin.php`
 - `routes/web/auth.php` (no marker comment)
 - `routes/web/front.php`
-- `routes/web/front/account.php` (no marker comment)
+- `routes/web/front/account.php`
 
 ### webpack.mix.combine.js
 
@@ -603,7 +603,7 @@ Stock files removed from this site. An upgrade may bring them back.
 
 - `public/robots.txt`
 
-## Added (289)
+## Added (272)
 
 Files that are not part of LaraClassifier.
 
@@ -644,7 +644,6 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Front/Post/ListingForm/PriceHintController.php`
 - `app/Http/Controllers/Web/Front/RecentlyViewedController.php`
 - `app/Http/Controllers/Web/Front/SiteIconController.php`
-- `app/Http/Controllers/Web/Front/WebAppController.php`
 - `app/Http/Controllers/WebhookController.php`
 - `app/Http/Middleware/CustomCacheHeaderMiddleware.php`
 - `app/Http/Middleware/GuestPageCache.php`
@@ -844,70 +843,60 @@ Files that are not part of LaraClassifier.
 ### lang/ar
 
 - `lang/ar/ai.php`
-- `lang/ar/app_install.php`
 - `lang/ar/listing_form.php`
 - `lang/ar/mobile_nav.php`
 
 ### lang/bn
 
 - `lang/bn/ai.php`
-- `lang/bn/app_install.php`
 - `lang/bn/listing_form.php`
 - `lang/bn/mobile_nav.php`
 
 ### lang/de
 
 - `lang/de/ai.php`
-- `lang/de/app_install.php`
 - `lang/de/listing_form.php`
 - `lang/de/mobile_nav.php`
 
 ### lang/en
 
 - `lang/en/ai.php`
-- `lang/en/app_install.php`
 - `lang/en/listing_form.php`
 - `lang/en/mobile_nav.php`
 
 ### lang/es
 
 - `lang/es/ai.php`
-- `lang/es/app_install.php`
 - `lang/es/listing_form.php`
 - `lang/es/mobile_nav.php`
 
 ### lang/fr
 
 - `lang/fr/ai.php`
-- `lang/fr/app_install.php`
 - `lang/fr/listing_form.php`
 - `lang/fr/mobile_nav.php`
 
 ### lang/hi
 
 - `lang/hi/ai.php`
-- `lang/hi/app_install.php`
 - `lang/hi/listing_form.php`
 - `lang/hi/mobile_nav.php`
 
 ### lang/it
 
 - `lang/it/ai.php`
-- `lang/it/app_install.php`
 - `lang/it/listing_form.php`
 - `lang/it/mobile_nav.php`
 
 ### lang/ru
 
 - `lang/ru/ai.php`
-- `lang/ru/app_install.php`
 - `lang/ru/listing_form.php`
 - `lang/ru/mobile_nav.php`
 
 ### public/assets
 
 - `public/assets/css/ai-formbox.css`
-- `public/assets/css/app-install.css`
 - `public/assets/css/listing-form-ai.css`
 - `public/assets/css/listing-form-panel.css`
 - `public/assets/css/listing-form-preview.css`
@@ -915,7 +904,6 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/messenger.css`
 - `public/assets/css/mobile-nav.css`
 - `public/assets/js/app/ai.formbox.js`
-- `public/assets/js/app/app-install.js`
 - `public/assets/js/app/consent.js`
 - `public/assets/js/app/guest-cache.js`
 - `public/assets/js/app/listing-form/ai-field-tools.js`
@@ -972,9 +960,6 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/common/consent/banner.blade.php`
 - `resources/views/front/common/consent/tracking.blade.php`
 - `resources/views/front/common/json-ld.blade.php`
-- `resources/views/front/layouts/partials/app-install-head.blade.php`
-- `resources/views/front/layouts/partials/app-install-menu-item.blade.php`
-- `resources/views/front/layouts/partials/app-install.blade.php`
 - `resources/views/front/layouts/partials/mobile-account-menu.blade.php`
 - `resources/views/front/layouts/partials/mobile-nav.blade.php`
 - `resources/views/front/post/assistant/form-box.blade.php`
@@ -1001,7 +986,6 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/sections/home/recently-viewed.blade.php`
 - `resources/views/front/user/partials/follow-script.blade.php`
 - `resources/views/front/user/profile.blade.php`
-- `resources/views/front/web-app/offline.blade.php`
 - `resources/views/helpers/forms/fields/turnstile.blade.php`
 - `resources/views/vendor/mail/html/themes/adniro.css`
 
@@ -1011,5 +995,4 @@ Files that are not part of LaraClassifier.
 - `routes/web/front/listing-assistant.php`
 - `routes/web/front/listing-form.php`
 - `routes/web/front/site-icons.php`
-- `routes/web/front/web-app.php`
 

@@ -19,6 +19,8 @@ namespace App\Http\Controllers\Web\Front;
 use App\Helpers\Common\Files\Response\FileContentResponseCreator;
 use App\Helpers\Common\Files\Storage\StorageDisk;
 use App\Http\Controllers\Controller;
+use App\Models\ThreadMessage;
+use App\Models\ThreadParticipant;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Routing\Controllers\Middleware;
 use Throwable;
@@ -66,6 +68,9 @@ class FileController extends Controller
 		$filePath = request()->input('path');
 		$filePath = preg_replace('|\?.*|ui', '', $filePath);
 		
+		// adniro: files sent in a conversation open only for the people in it
+		abort_unless($this->canOpenFile((string)$filePath), 403);
+		
 		try {
 			$out = $response::create($this->disk, $filePath);
 		} catch (Throwable $e) {
@@ -77,6 +82,31 @@ class FileController extends Controller
 		}
 		
 		return $out;
+	}
+	
+	/**
+	 * adniro: conversation attachments (".../applications/...") are private to the conversation's participants.
+	 * Every other file on the disk (listing photos, logos...) stays public.
+	 */
+	private function canOpenFile(string $filePath): bool
+	{
+		$filePath = ltrim(str_replace('\\', '/', $filePath), '/');
+		if (str_contains($filePath, '..')) {
+			return false;
+		}
+		if (!preg_match('#(^|/)applications/#i', $filePath)) {
+			return true;
+		}
+		
+		$userId = auth()->id();
+		if (empty($userId)) {
+			return false;
+		}
+		
+		return ThreadMessage::query()
+			->where('file_path', $filePath)
+			->whereIn('thread_id', ThreadParticipant::query()->where('user_id', $userId)->select('thread_id'))
+			->exists();
 	}
 	
 	/**
