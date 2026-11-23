@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (259)
+## Changed (261)
 
 Stock files we edited.
 
@@ -183,6 +183,7 @@ Stock files we edited.
 
 ### database/seeders
 
+- `database/seeders/MenuItemSeeder.php`
 - `database/seeders/SectionSeeder.php` (no marker comment)
 
 ### lang/ar
@@ -302,6 +303,7 @@ Stock files we edited.
 - `resources/views/front/layouts/partials/modal/languages.blade.php` (no marker comment)
 - `resources/views/front/layouts/partials/modal/location.blade.php` (no marker comment)
 - `resources/views/front/layouts/partials/navs/menus/footer.blade.php` (no marker comment)
+- `resources/views/front/layouts/partials/navs/menus/header.blade.php`
 - `resources/views/front/pages/cms.blade.php` (no marker comment)
 - `resources/views/front/pages/contact.blade.php` (no marker comment)
 - `resources/views/front/post/createOrEdit/multiSteps/create/finish.blade.php`
@@ -658,7 +660,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (403)
+## Added (405)
 
 Files that are not part of LaraClassifier.
 
@@ -699,6 +701,7 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Admin/ModerationQueueController.php`
 - `app/Http/Controllers/Web/Front/Account/FollowsController.php`
 - `app/Http/Controllers/Web/Front/Account/ProfileCoverController.php`
+- `app/Http/Controllers/Web/Front/Account/PublicProfileController.php`
 - `app/Http/Controllers/Web/Front/Blog/BlogController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatDeleteController.php`
@@ -926,6 +929,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_23_000900_let_admins_close_chat_reports.php`
 - `database/migrations/2026_11_23_001000_add_offers_and_seller_tools_to_chat.php`
 - `database/migrations/2026_11_24_000100_add_inbox_tools_and_privacy_to_chat.php`
+- `database/migrations/2026_11_24_000200_add_public_profile_to_account_menu.php`
 
 ### database/seeders
 

@@ -10,4 +10,5 @@ return [
 	'account' => 'অ্যাকাউন্ট',
 	'sign_in' => 'সাইন ইন',
 	'choose_country' => 'দেশ বেছে নিন',
+	'public_profile' => 'পাবলিক প্রোফাইল দেখুন',
 ];

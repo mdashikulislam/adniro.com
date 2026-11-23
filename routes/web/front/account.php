@@ -22,6 +22,7 @@ use App\Http\Controllers\Web\Front\Account\PostsController;
 use App\Http\Controllers\Web\Front\Account\PreferencesController;
 use App\Http\Controllers\Web\Front\Account\ProfileController;
 use App\Http\Controllers\Web\Front\Account\ProfileCoverController;
+use App\Http\Controllers\Web\Front\Account\PublicProfileController;
 use App\Http\Controllers\Web\Front\Account\SavedPostsController;
 use App\Http\Controllers\Web\Front\Account\SavedSearchesController;
 use App\Http\Controllers\Web\Front\Account\SecurityController;
@@ -37,6 +38,8 @@ Route::middleware($accountMiddlewares)
 		
 		// Users
 		Route::get('overview', [OverviewController::class, 'index'])->name('account.overview');
+		// adniro: "View public profile" in the account menu: takes the member to their own public profile
+		Route::get('public-profile', PublicProfileController::class)->name('account.public-profile');
 		
 		Route::controller(ProfileController::class)
 			->prefix('profile')

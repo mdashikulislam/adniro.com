@@ -319,6 +319,34 @@ class MenuItemSeeder extends Seeder
 					'conditions'       => $conditionsForUser,
 					'description'      => 'Only for logged-in users',
 					'children'         => [
+						// adniro: the member's own public profile, in a new tab (also added on existing sites by
+						// the migration 2026_11_24_000200_add_public_profile_to_account_menu)
+						[
+							'type'             => 'link',
+							'icon'             => 'bi-person-badge',
+							'label'            => [
+								'en' => "View public profile",
+								'fr' => "Voir le profil public",
+								'es' => "Ver perfil público",
+								'de' => "Öffentliches Profil ansehen",
+								'it' => "Vedi profilo pubblico",
+								'ru' => "Открыть публичный профиль",
+								'ar' => "عرض الملف العام",
+								'bn' => "পাবলিক প্রোফাইল দেখুন",
+								'hi' => "सार्वजनिक प्रोफ़ाइल देखें",
+							],
+							'url_type'         => 'route',
+							'route_name'       => 'account.public-profile',
+							'route_parameters' => null,
+							'url'              => null,
+							'target'           => '_blank',
+							'nofollow'         => 0,
+							'btn_class'        => null,
+							'btn_outline'      => 0,
+							'css_class'        => null,
+							'conditions'       => $conditionsForUser,
+							'children'         => [],
+						],
 						[
 							'type'             => 'link',
 							'icon'             => 'fa-solid fa-list',

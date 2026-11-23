@@ -10,4 +10,5 @@ return [
 	'account' => 'Konto',
 	'sign_in' => 'Anmelden',
 	'choose_country' => 'Land wählen',
+	'public_profile' => 'Öffentliches Profil ansehen',
 ];

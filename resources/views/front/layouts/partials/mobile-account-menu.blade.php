@@ -27,6 +27,11 @@
 					@endif
 				</span>
 			</div>
+			{{-- adniro: the member's own public profile, in a new tab --}}
+			<a href="{{ route('account.public-profile') }}" target="_blank" rel="noopener" class="dropdown-item adn-account-menu-item">
+				<span class="adn-account-menu-icon" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+				<span>{{ trans('mobile_nav.public_profile') }} <i class="bi bi-arrow-up-right small" aria-hidden="true"></i></span>
+			</a>
 			@foreach ($accountLinks as $item)
 				<a href="{{ $item['url'] }}" @class(['dropdown-item', 'adn-account-menu-item', 'active' => !empty($item['isActive'])])>
 					<span class="adn-account-menu-icon" aria-hidden="true"><i class="{{ $item['icon'] }}"></i></span>

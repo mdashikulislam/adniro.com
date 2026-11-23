@@ -10,4 +10,5 @@ return [
 	'account' => 'Cuenta',
 	'sign_in' => 'Iniciar sesión',
 	'choose_country' => 'Elegir un país',
+	'public_profile' => 'Ver perfil público',
 ];

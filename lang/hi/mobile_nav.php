@@ -10,4 +10,5 @@ return [
 	'account' => 'खाता',
 	'sign_in' => 'साइन इन',
 	'choose_country' => 'देश चुनें',
+	'public_profile' => 'सार्वजनिक प्रोफ़ाइल देखें',
 ];

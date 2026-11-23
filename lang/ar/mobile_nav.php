@@ -10,4 +10,5 @@ return [
 	'account' => 'الحساب',
 	'sign_in' => 'تسجيل الدخول',
 	'choose_country' => 'اختر دولة',
+	'public_profile' => 'عرض الملف العام',
 ];

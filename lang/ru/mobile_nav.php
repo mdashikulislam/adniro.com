@@ -10,4 +10,5 @@ return [
 	'account' => 'Профиль',
 	'sign_in' => 'Войти',
 	'choose_country' => 'Выбрать страну',
+	'public_profile' => 'Открыть публичный профиль',
 ];

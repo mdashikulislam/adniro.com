@@ -10,4 +10,5 @@ return [
 	'account' => 'Account',
 	'sign_in' => 'Accedi',
 	'choose_country' => 'Scegli un paese',
+	'public_profile' => 'Vedi profilo pubblico',
 ];

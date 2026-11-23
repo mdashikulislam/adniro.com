@@ -10,4 +10,5 @@ return [
 	'account' => 'Account',
 	'sign_in' => 'Sign in',
 	'choose_country' => 'Choose a country',
+	'public_profile' => 'View public profile',
 ];
