@@ -76,7 +76,14 @@ After the new code is on the server:
 bash deploy/deploy.sh
 ```
 
-It puts the site in maintenance mode, installs Composer packages without dev tools, runs migrations (which also apply settings and page changes), caches routes, views and events, restarts the workers and the live chat's socket server, and brings the site back up.
+It puts the site in maintenance mode, installs the Composer packages, runs migrations (which also apply settings and page changes), caches routes, views and events, restarts the workers and the live chat's socket server, and brings the site back up.
+
+Two things it does on purpose:
+
+- **It installs the development packages too.** `config/scribe.php` (the API documentation) needs one of them; with `composer install --no-dev` no artisan command runs at all. They do nothing on a live site with `APP_DEBUG=false`.
+- **Run as root, it runs artisan as the owner of `storage/`** (the web server's user, `www-data`), so compiled views, the day's log and the cache stay writable for the site. Composer and git stay with root.
+
+Right after a deploy `/health` can say `scheduler: fail` for up to a minute: the deploy empties the cache, and the scheduler writes its mark again at its next run.
 
 Config is deliberately **not** cached: LaraClassifier reads several `.env` values at runtime with `env()`, and they would be lost.
 

@@ -18,25 +18,50 @@ if grep -q '^APP_DEBUG=true' .env; then
 	echo "Warning: APP_DEBUG=true in .env; set it to false on a live site" >&2
 fi
 
-php artisan down --retry=60 || true
-trap 'php artisan up' EXIT
+# Artisan runs as the owner of storage/ (the web server's user) when this script is run as root: what it
+# writes there (compiled views, the day's log, the cache) then stays writable for the site. Composer and git
+# stay with whoever runs the script.
+STORAGE_OWNER="$(stat -c '%U' storage 2>/dev/null || stat -f '%Su' storage)"
+RUN_AS=""
+if [ "$(id -u)" = "0" ] && [ "$STORAGE_OWNER" != "root" ]; then
+	RUN_AS="$STORAGE_OWNER"
+fi
 
-composer install --no-dev --optimize-autoloader --no-interaction
-php artisan migrate --force
+artisan() {
+	if [ -n "$RUN_AS" ]; then
+		sudo -u "$RUN_AS" php artisan "$@"
+	else
+		php artisan "$@"
+	fi
+}
 
-php artisan optimize:clear
-php artisan route:cache
-php artisan view:cache
-php artisan event:cache
-php artisan storage:link 2>/dev/null || true
+artisan down --retry=60 || true
+trap 'artisan up' EXIT
+
+# With the development packages, on purpose: config/scribe.php (the API documentation) needs one of them
+# (knuckleswtf/scribe), and without it no artisan command runs at all. They do nothing on a live site with
+# APP_DEBUG=false.
+composer install --optimize-autoloader --no-interaction
+if [ -n "$RUN_AS" ]; then
+	chown -R "$RUN_AS" bootstrap/cache # composer's "package:discover" wrote there as root
+fi
+
+artisan migrate --force
+
+# This empties the cache too: /health says "scheduler: fail" until the scheduler's next run, a minute at most
+artisan optimize:clear
+artisan route:cache
+artisan view:cache
+artisan event:cache
+artisan storage:link 2>/dev/null || true
 
 # Workers pick up the new code after their current job
-php artisan queue:restart
+artisan queue:restart
 
 # The live chat's socket server loads the code once, at start. This asks it to stop; systemd
 # (deploy/reverb/adniro-reverb.service) starts it again with the new code. Open chats reconnect by themselves.
 if grep -q '^BROADCAST_DRIVER=reverb' .env; then
-	php artisan reverb:restart
+	artisan reverb:restart
 fi
 
 echo "Deployed. Check: curl -s https://$(grep -E '^APP_URL=' .env | sed -E 's#^APP_URL=https?://##')/health"
