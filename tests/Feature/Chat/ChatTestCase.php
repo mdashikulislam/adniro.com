@@ -55,6 +55,12 @@ abstract class ChatTestCase extends TestCase
 		return $thread->fresh('participants');
 	}
 
+	/** A conversation's page: its coded address (ChatLink). */
+	protected function chatPage(ChatThread $thread): string
+	{
+		return \App\Services\Chat\ChatLink::url((int)$thread->id);
+	}
+
 	protected function unreadOf(int $threadId, int $userId): int
 	{
 		return (int)\DB::table('threads_participants')->where('thread_id', $threadId)->where('user_id', $userId)->value('unread_count');

@@ -86,7 +86,7 @@ class ChatPagesTest extends ChatTestCase
 		$thread = $this->conversation(['Is this still available?', 'Yes, it is.']);
 
 		// Act
-		$response = $this->actingAs($this->buyer)->get('/chat/' . $thread->id);
+		$response = $this->actingAs($this->buyer)->get($this->chatPage($thread));
 
 		// Assert
 		$response->assertOk()->assertSee('is-chat-open', false);
@@ -100,7 +100,7 @@ class ChatPagesTest extends ChatTestCase
 		// The site's "verified" rule (a confirmed email address), as on the listing page
 		$this->assertTrue($state['open']['thread']['other']['verified']);
 		\DB::table('users')->where('id', self::SELLER_ID)->update(['email_verified_at' => null]);
-		$again = $this->chatState($this->actingAs($this->buyer)->get('/chat/' . $thread->id)->getContent());
+		$again = $this->chatState($this->actingAs($this->buyer)->get($this->chatPage($thread))->getContent());
 		$this->assertFalse($again['open']['thread']['other']['verified']);
 		$this->assertNotEmpty($again['text']['verified']);
 		// The pinned listing has a label only before the first message about it ("Asking about")
@@ -116,7 +116,7 @@ class ChatPagesTest extends ChatTestCase
 		ChatMessages::send($thread, self::SELLER_ID, '</script><img src=x onerror=alert(1)>');
 
 		// Act
-		$html = $this->actingAs($this->buyer)->get('/chat/' . $thread->id)->assertOk()->getContent();
+		$html = $this->actingAs($this->buyer)->get($this->chatPage($thread))->assertOk()->getContent();
 
 		// Assert
 		$this->assertStringNotContainsString('</script><img src=x', $html);
@@ -143,7 +143,7 @@ class ChatPagesTest extends ChatTestCase
 		$thread = $this->conversation();
 
 		// Act & Assert
-		$this->actingAs($this->buyer)->get('/chat/new/' . $this->listing->id)->assertRedirect('/chat/' . $thread->id);
+		$this->actingAs($this->buyer)->get('/chat/new/' . $this->listing->id)->assertRedirect($this->chatPage($thread));
 	}
 
 	public function test_chat_with_seller_on_another_listing_opens_the_same_conversation_about_that_listing(): void

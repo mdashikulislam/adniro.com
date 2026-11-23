@@ -12,6 +12,7 @@ use App\Http\Controllers\Web\Front\Chat\ChatTidyController;
 use App\Http\Controllers\Web\Front\Chat\ChatToolsController;
 use App\Http\Controllers\Web\Front\Chat\EmailSellerController;
 use App\Services\Chat\ChatEmailChoice;
+use App\Services\Chat\ChatLink;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,7 +26,10 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 	->group(function () {
 		// Pages
 		Route::get('/', [ChatController::class, 'index'])->name('chat.index');
-		Route::get('{thread}', [ChatController::class, 'show'])->name('chat.show');
+		// A conversation's page has a code in its address, not its number (ChatLink). An old address with the
+		// number is sent on to the coded one
+		Route::get('{key}', [ChatController::class, 'show'])->where('key', ChatLink::KEY_PATTERN)->name('chat.show');
+		Route::get('{thread}', [ChatController::class, 'legacy'])->name('chat.show.legacy');
 		Route::get('new/{post}', [ChatController::class, 'draft'])->name('chat.new');
 
 		// The first message about a listing

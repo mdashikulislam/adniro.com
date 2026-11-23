@@ -133,7 +133,7 @@ class ChatToolsTest extends ChatTestCase
 		$thread = $this->conversation(['Is this still available?']);
 
 		// Act
-		$html = $this->actingAs($this->seller)->get('/chat/' . $thread->id)->assertOk()->getContent();
+		$html = $this->actingAs($this->seller)->get($this->chatPage($thread))->assertOk()->getContent();
 
 		// Assert
 		preg_match('~<script type="application/json" id="adnChatState">(.*?)</script>~s', $html, $match);

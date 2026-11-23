@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Services\Chat\ChatAccess;
 use App\Services\Chat\ChatConversations;
 use App\Services\Chat\ChatEmailChoice;
+use App\Services\Chat\ChatLink;
 use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatOffers;
 use App\Services\Chat\ChatPhotos;
@@ -32,16 +33,26 @@ class ChatController extends FrontController
 		return $this->page($request);
 	}
 
-	public function show(Request $request, int $thread): View
+	public function show(Request $request, string $key): View
 	{
 		$userId = (int)$request->user()->id;
-		$chatThread = ChatAccess::threadFor($thread, $userId)->load(ChatPresenter::THREAD_RELATIONS);
+		$threadId = ChatLink::threadIdFrom($key);
+		abort_if($threadId === null, 404);
+		$chatThread = ChatAccess::threadFor($threadId, $userId)->load(ChatPresenter::THREAD_RELATIONS);
 
 		return $this->page($request, [
 			'open' => ['thread' => ChatPresenter::thread($chatThread, $userId)] + ChatMessages::history($chatThread, $userId),
 		]);
 	}
 
+	/** An old address with the conversation's number: on to its coded address, for its participants only. */
+	public function legacy(Request $request, int $thread): RedirectResponse
+	{
+		$chatThread = ChatAccess::threadFor($thread, (int)$request->user()->id);
+
+		return redirect()->to(ChatLink::url((int)$chatThread->id), 301);
+	}
+	
 	/**
 	 * "Chat with seller" on a listing. The two people have one conversation, whatever the listing: if it exists
 	 * it opens, with this listing ready to be the subject of the next message; if not, nothing is saved until
@@ -72,7 +83,7 @@ class ChatController extends FrontController
 
 		// Already talking about this listing, or no longer allowed to write: just the conversation
 		if ($reason !== null || (int)$existing->post_id === (int)$listing->id) {
-			return redirect()->route('chat.show', ['thread' => $existing->id]);
+			return redirect()->to(ChatLink::url((int)$existing->id));
 		}
 
 		$chatThread = ChatAccess::threadFor((int)$existing->id, $userId)->load(ChatPresenter::THREAD_RELATIONS);
@@ -120,7 +131,6 @@ class ChatController extends FrontController
 			],
 			'urls'          => [
 				'inbox'    => route('chat.index'),
-				'thread'   => route('chat.show', ['thread' => '__ID__']),
 				'threads'  => route('chat.api.threads'),
 				'open'     => route('chat.api.thread', ['thread' => '__ID__']),
 				'messages' => route('chat.api.messages', ['thread' => '__ID__']),

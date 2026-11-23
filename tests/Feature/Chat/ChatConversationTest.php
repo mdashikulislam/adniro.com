@@ -181,7 +181,7 @@ class ChatConversationTest extends ChatTestCase
 		// Assert: nothing is cut. It is shown as text, never as HTML (the pages below prove the escaping)
 		$price->assertCreated()->assertJsonPath('message.body', 'Can you do <500 for both? I <3 this & that');
 		$markup->assertCreated()->assertJsonPath('message.body', '<script>alert(1)</script><b>Hello</b>');
-		$this->actingAs($this->seller)->get('/chat/' . $thread->id)->assertOk()->assertDontSee('<script>alert(1)</script>', false);
+		$this->actingAs($this->seller)->get($this->chatPage($thread))->assertOk()->assertDontSee('<script>alert(1)</script>', false);
 	}
 
 	public function test_an_empty_or_too_long_message_is_refused(): void

@@ -114,7 +114,7 @@ class ChatDeleteTest extends ChatTestCase
 			->assertJsonCount(1, 'messages')->assertJsonPath('messages.0.body', 'Can I come today?');
 		$this->actingAs($this->seller)->getJson('/chat/api/threads/' . $thread->id . '/messages?after=0')
 			->assertJsonCount(1, 'messages')->assertJsonPath('messages.0.body', 'Can I come today?');
-		$this->actingAs($this->seller)->get('/chat/' . $thread->id)->assertOk()->assertDontSee('sofa bed')->assertSee('Can I come today?');
+		$this->actingAs($this->seller)->get($this->chatPage($thread))->assertOk()->assertDontSee('sofa bed')->assertSee('Can I come today?');
 		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id)->assertJsonCount(3, 'messages');
 	}
 
@@ -151,7 +151,7 @@ class ChatDeleteTest extends ChatTestCase
 		// Assert: the buyer gets the new message without the old quote, and the old photo does not open
 		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id)
 			->assertJsonCount(1, 'messages')->assertJsonPath('messages.0.body', 'Still interested?')->assertJsonPath('messages.0.reply_to', null);
-		$this->actingAs($this->buyer)->get('/chat/' . $thread->id)->assertOk()->assertDontSee('small scratch');
+		$this->actingAs($this->buyer)->get($this->chatPage($thread))->assertOk()->assertDontSee('small scratch');
 		$this->actingAs($this->buyer)->get('/chat/files/' . $photoId)->assertNotFound();
 		$this->actingAs($this->buyer)->getJson('/chat/api/threads/' . $thread->id . '/messages?before=' . ($photoId + 1))->assertJsonCount(0, 'messages');
 		// The seller keeps everything

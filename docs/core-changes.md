@@ -660,7 +660,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (405)
+## Added (406)
 
 Files that are not part of LaraClassifier.
 
@@ -827,6 +827,7 @@ Files that are not part of LaraClassifier.
 - `app/Services/Chat/ChatConversations.php`
 - `app/Services/Chat/ChatDigest.php`
 - `app/Services/Chat/ChatEmailChoice.php`
+- `app/Services/Chat/ChatLink.php`
 - `app/Services/Chat/ChatLive.php`
 - `app/Services/Chat/ChatMessages.php`
 - `app/Services/Chat/ChatOffers.php`

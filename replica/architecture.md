@@ -365,6 +365,10 @@ Not done: A10 (the old attachment's direct link), which needs a change on the li
   (`front/post/show/partials/chat-quick.blade.php`, `chat-quick.js`, `POST chat/listings/{post}`, the route
   the chat page uses). The page's own "Chat with seller" buttons are unchanged: they go to the chat. A guest
   gets the sign-in pop-up. The card's style is in `resources/css/front/custom.css`, built into `public/dist/front/`.
+- **Coded addresses.** A conversation's page is `/chat/<12 letters and digits>` (`ChatLink`, Hashids keyed
+  from `APP_KEY`), not `/chat/<its number>`: the address no longer shows how many conversations there are.
+  Access is unchanged (`ChatAccess`); an old numbered address is sent on to the coded one for its two
+  people. The data routes under `chat/api` still use the number: they are not addresses anyone sees.
 - **Screen readers and keyboard.** The list of chats and the message log are no longer live regions (they
   are redrawn at every change, which read everything out again). One hidden status line says what is new:
   the message that arrived in the open chat, "New message from…" elsewhere, how many chats a search found.

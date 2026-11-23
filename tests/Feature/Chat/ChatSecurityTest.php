@@ -24,7 +24,7 @@ class ChatSecurityTest extends ChatTestCase
 
 		// Act & Assert
 		$this->get('/chat')->assertRedirect();
-		$this->get('/chat/' . $thread->id)->assertRedirect();
+		$this->get($this->chatPage($thread))->assertRedirect();
 		$this->postJson('/chat/api/threads/' . $thread->id . '/messages', ['body' => 'Hello'])->assertUnauthorized();
 		$this->assertSame(1, DB::table('threads_messages')->where('thread_id', $thread->id)->count());
 	}
@@ -38,7 +38,7 @@ class ChatSecurityTest extends ChatTestCase
 
 		// Act & Assert: as if it did not exist
 		$this->actingAs($this->outsider);
-		$this->get('/chat/' . $thread->id)->assertNotFound();
+		$this->get($this->chatPage($thread))->assertNotFound();
 		$this->getJson($api)->assertNotFound();
 		$this->getJson($api . '/messages')->assertNotFound();
 		$this->postJson($api . '/messages', ['body' => 'Send the money first.'])->assertNotFound();
@@ -47,6 +47,49 @@ class ChatSecurityTest extends ChatTestCase
 		$this->getJson('/chat/api/threads')->assertJsonCount(0, 'threads');
 		$this->assertSame(1, DB::table('threads_messages')->where('thread_id', $thread->id)->count());
 		$this->assertSame(2, DB::table('threads_participants')->where('thread_id', $thread->id)->count());
+	}
+
+	public function test_a_conversations_address_carries_a_code_not_its_number(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+		$key = \App\Services\Chat\ChatLink::key($thread->id);
+
+		// Act
+		$page = $this->actingAs($this->buyer)->get('/chat/' . $key);
+		$listed = $this->actingAs($this->buyer)->getJson('/chat/api/threads')->json('threads.0.url');
+
+		// Assert: twelve letters and digits that are not the number, used everywhere the page is linked
+		$page->assertOk();
+		$this->assertMatchesRegularExpression('/^[A-Za-z0-9]{12}$/', $key);
+		$this->assertStringNotContainsString((string)$thread->id, $key);
+		$this->assertSame('/chat/' . $key, $listed);
+		$this->assertSame($thread->id, \App\Services\Chat\ChatLink::threadIdFrom($key));
+	}
+
+	public function test_an_old_numbered_address_still_works_for_the_two_people_only(): void
+	{
+		// Arrange
+		$thread = $this->conversation();
+
+		// Act & Assert: on to the coded address for a participant; "not found" for anyone else
+		$this->actingAs($this->buyer)->get('/chat/' . $thread->id)->assertStatus(301)->assertRedirect($this->chatPage($thread));
+		$this->actingAs($this->outsider)->get('/chat/' . $thread->id)->assertNotFound();
+	}
+
+	public function test_a_made_up_code_finds_nothing(): void
+	{
+		// Arrange: a real conversation exists
+		$thread = $this->conversation();
+		$key = \App\Services\Chat\ChatLink::key($thread->id);
+
+		// Act & Assert: changed by one character, or not a code at all
+		$changed = substr($key, 0, -1) . (substr($key, -1) === 'a' ? 'b' : 'a');
+		$this->actingAs($this->buyer)->get('/chat/' . $changed)->assertNotFound();
+		$this->actingAs($this->buyer)->get('/chat/abcdefghijkl')->assertNotFound();
+		$this->assertNull(\App\Services\Chat\ChatLink::threadIdFrom('abcdefghijkl'));
+		// And the outsider cannot open the real one by its code either
+		$this->actingAs($this->outsider)->get('/chat/' . $key)->assertNotFound();
 	}
 
 	public function test_the_live_channels_are_open_to_the_right_people_only(): void

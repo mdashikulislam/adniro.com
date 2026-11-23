@@ -316,7 +316,7 @@
 		return request('GET', urlFor(URLS.open, threadId)).then(function (data) {
 			showOpen(data);
 			if (push) {
-				window.history.pushState({thread: threadId}, '', urlFor(URLS.thread, threadId));
+				window.history.pushState({thread: threadId}, '', data.thread.url); // its coded address
 			}
 			return true;
 		}).catch(function (error) {
@@ -619,6 +619,14 @@
 		}
 	}
 
+	/** The conversation whose page is at this address: the open one, or one in the list. */
+	function threadAt(path) {
+		var all = (store.open && store.open.thread ? [store.open.thread] : []).concat(store.threads);
+		return all.filter(function (thread) {
+			return thread.url && new URL(thread.url, window.location.origin).pathname === path;
+		})[0] || null;
+	}
+
 	/* ---------- Events ---------- */
 	els.list.addEventListener('click', function (event) {
 		var row = event.target.closest('.adn-chat-row');
@@ -639,9 +647,13 @@
 	});
 
 	window.addEventListener('popstate', function () {
-		var match = window.location.pathname.match(/\/chat\/(\d+)$/);
-		if (match) {
-			openThread(Number(match[1]), false);
+		// A conversation's address carries a code: the conversation is found by it among the ones listed
+		var path = window.location.pathname;
+		var known = /\/chat\/[A-Za-z0-9]+$/.test(path) ? threadAt(path) : null;
+		if (known) {
+			openThread(known.id, false);
+		} else if (/\/chat\/[A-Za-z0-9]+$/.test(path)) {
+			window.location.reload();
 		} else if (/\/chat\/new\//.test(window.location.pathname)) {
 			window.location.reload();
 		} else {

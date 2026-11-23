@@ -54,8 +54,9 @@ class ChatPresenter
 
 		return [
 			'id'            => (int)$thread->id,
-			// Addresses are relative: this is also pushed to the other person, who may be on another host name
-			'url'           => route('chat.show', ['thread' => $thread->id], false),
+			// The page's address carries a code, not the number (ChatLink). Relative: this is also pushed to the
+			// other person, who may be on another host name
+			'url'           => ChatLink::url((int)$thread->id),
 			'other'         => self::person($other?->user, $otherId),
 			'post'          => self::post($thread->post) ?? self::deletedListing($thread->subject),
 			'last'          => self::lastLine($last, $viewerId, (int)($me->cleared_message_id ?? 0)),
