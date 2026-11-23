@@ -24,6 +24,8 @@ class ChatLive
 			'user_id'      => $userId,
 			'unread_total' => ChatUnread::total($userId),
 			'unread_url'   => route('chat.api.unread'),
+			// For the pop-up shown when a message arrives on another page
+			'text'         => ['photo' => trans('chat.js.photo'), 'dismiss' => trans('chat.dismiss')],
 			'live'         => self::isEnabled() ? self::connection() : null,
 		];
 	}

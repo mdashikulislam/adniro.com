@@ -42,7 +42,8 @@ class ChatPresenter
 
 		return [
 			'id'            => (int)$thread->id,
-			'url'           => route('chat.show', ['thread' => $thread->id]),
+			// Addresses are relative: this is also pushed to the other person, who may be on another host name
+			'url'           => route('chat.show', ['thread' => $thread->id], false),
 			'other'         => self::person($other?->user, $otherId),
 			'post'          => self::post($thread->post),
 			'last'          => $last === null ? null : [
@@ -84,8 +85,8 @@ class ChatPresenter
 			'type'        => $isImage ? ChatMessage::TYPE_IMAGE : ChatMessage::TYPE_TEXT,
 			'body'        => (string)$message->body,
 			'image'       => !$isImage ? null : [
-				'url'   => route('chat.file', ['message' => $message->id]),
-				'thumb' => route('chat.file', ['message' => $message->id, 'size' => 'thumb']),
+				'url'   => route('chat.file', ['message' => $message->id], false),
+				'thumb' => route('chat.file', ['message' => $message->id, 'size' => 'thumb'], false),
 			],
 			'post'        => empty($message->post_id) ? null : self::post($message->post),
 			'reply_to'    => empty($message->reply_to_id) ? null : self::quote($message->replyTo),

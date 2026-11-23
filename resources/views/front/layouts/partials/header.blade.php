@@ -182,6 +182,8 @@
 				@endif
 			@endif
 			@include('front.layouts.partials.mobile-account-menu')
+			{{-- adniro: chats, with the unread badge (tablets; phones use the app bar) --}}
+			@include('front.layouts.partials.chat-head-link', ['variant' => 'compact'])
 
 			{{-- Toggle Nav (Mobile) --}}
 			<button class="navbar-toggler float-end"
@@ -220,6 +222,8 @@
 				</ul>
 				
 				<ul class="navbar-nav ms-auto">
+					{{-- adniro: chats, with the unread badge, always in view --}}
+					@include('front.layouts.partials.chat-head-link', ['variant' => 'nav'])
 					@include('front.layouts.partials.navs.menus.header')
 					
 					{{-- Currency Exchange Dropdown --}}

@@ -175,6 +175,7 @@ class ChatPagesTest extends ChatTestCase
 		$this->assertStringNotContainsString('chat-live.js', $html);
 		$this->assertStringNotContainsString('pusher', $html);
 		$this->assertStringNotContainsString('data-adn-chat-badge', $html);
+		$this->assertStringNotContainsString('adn-head-chat', $html);
 	}
 
 	public function test_members_get_the_unread_badge_and_live_settings_on_every_page(): void
@@ -192,6 +193,11 @@ class ChatPagesTest extends ChatTestCase
 		$this->assertSame(1, $live['unread_total']);
 		$this->assertNull($live['live'], 'No live server is configured in tests: nothing to connect to.');
 		$this->assertStringContainsString('<span class="badge rounded-pill text-bg-danger" data-adn-chat-badge>1</span>', $html);
+		// The chat icon in the header, always in view, and what the new-message pop-up needs
+		$this->assertMatchesRegularExpression('/<a href="[^"]*\/chat" class="adn-head-chat"[^>]*>\s*<i class="bi bi-chat-dots"[^>]*><\/i><span class="adn-head-chat-badge" data-adn-chat-badge>1<\/span>/', $html);
+		$this->assertStringContainsString('adn-head-chat is-compact d-none d-md-inline-flex d-xl-none', $html);
+		$this->assertSame(['photo' => 'Photo', 'dismiss' => 'Dismiss'], $live['text']);
+		$this->assertStringContainsString('assets/css/chat-live.css', $html);
 		$this->assertStringNotContainsString('timerNewMessagesChecking', $html);
 	}
 

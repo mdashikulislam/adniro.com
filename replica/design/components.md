@@ -154,8 +154,27 @@ Report dialog (C5)
 Block confirm
   content   SweetAlert2 confirm (the site's one dialog style): "Block {name}?" + what it does
 
+Chat icon in the header (G)
+  where     signed-in members only: in the menu bar from 1200px, beside the account button from 768px;
+            phones use the app bar's Chats tab
+  content   chat-dots icon in a 42px rounded button (as the header's other buttons), the unread count on its
+            corner: white on red (5.46:1), a 2px ring in the page colour, hidden at 0, "99+" above 99
+  states    default, hover and focus-visible (primary tint), pressed (scale .96)
+
+New-message pop-up (G)
+  when      a message arrives while the member is on any page but the chat page; never for their own messages
+  content   top corner under the header (the app bar and the cookie banner are at the bottom): avatar 40,
+            the sender's name (sm/700), up to two lines of the message ("Photo" for a photo), a close button (40px)
+  action    the whole card opens that conversation
+  rules     at most three at once; each leaves after 7s (the countdown waits while it is hovered, and while
+            the tab is not being looked at); text is inserted as text, never as HTML
+  a11y      role="status", aria-live="polite"; the close button is labelled "Dismiss"
+
+Browser tab (G)
+  content   "(2) " before the page title while there are unread messages
+
 Unread badge (G)
-  where     the header account menu's Chats entry, and the Chats tab of the phone app bar
+  where     the header's chat icon, the account menu's Chats entry, and the Chats tab of the phone app bar
   tokens    pill, bg danger (header, as today) / accent-strong (app bar), text on-accent, xs/700, tabular numbers
   states    hidden at 0, "9+" from 10; updates live
   a11y      "Chats, 3 unread" on the link

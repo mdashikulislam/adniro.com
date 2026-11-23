@@ -21,6 +21,7 @@ return [
 	'remove_photo'   => 'إزالة الصورة',
 	'cancel_reply'   => 'إلغاء الرد',
 	'new_line_hint'  => ':keys لسطر جديد',
+	'dismiss'        => 'إغلاق',
 	'quick_replies_label' => 'ردود سريعة',
 	'view_listing'   => 'عرض الإعلان',
 	'block'          => 'حظر',

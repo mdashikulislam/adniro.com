@@ -21,6 +21,7 @@ return [
 	'remove_photo'   => 'फ़ोटो हटाएँ',
 	'cancel_reply'   => 'जवाब रद्द करें',
 	'new_line_hint'  => 'नई लाइन के लिए :keys',
+	'dismiss'        => 'बंद करें',
 	'quick_replies_label' => 'त्वरित उत्तर',
 	'view_listing'   => 'विज्ञापन देखें',
 	'block'          => 'ब्लॉक करें',

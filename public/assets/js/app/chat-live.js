@@ -1,7 +1,9 @@
 /*
  * adniro: the live side of the chat, on every page for signed-in members (front/layouts/partials/chat-live.blade.php).
  *
- * - Keeps the unread badge ([data-adn-chat-badge]) in the header menu and the phone app bar up to date.
+ * - Keeps the unread count up to date: on every badge ([data-adn-chat-badge]: the header's chat icon, the
+ *   account menu, the phone app bar) and in front of the page title, so it shows on the browser tab.
+ * - Shows a small pop-up when a message arrives while the member is on another page.
  * - When a live server is configured (Laravel Reverb), loads the two socket libraries after the page has
  *   finished, opens one connection, listens on the member's own private channel and passes what arrives on as
  *   window events for the chat page: adn:chat:message, adn:chat:read, adn:chat:state.
@@ -20,13 +22,112 @@
 	var IDLE_DISCONNECT_MS = 5 * 60 * 1000;
 	var IDLE_START_TIMEOUT_MS = 3000;
 	var BADGE_MAX = 99;
+	var TOAST_MS = 7000;
+	var TOAST_MAX = 3;
 
+	var pageTitle = document.title.replace(/^\(\d+\+?\)\s+/, '');
+
+	/** The unread total: on every badge, and in front of the page's title so it shows on the browser tab. */
 	function setUnread(total) {
 		var count = Math.max(0, Number(total) || 0);
+		var label = count > BADGE_MAX ? BADGE_MAX + '+' : String(count);
 		document.querySelectorAll('[data-adn-chat-badge]').forEach(function (badge) {
-			badge.textContent = count > BADGE_MAX ? BADGE_MAX + '+' : String(count);
+			badge.textContent = label;
 			badge.hidden = count === 0;
 		});
+		document.title = count > 0 ? '(' + label + ') ' + pageTitle : pageTitle;
+	}
+
+	/* ---------- A pop-up when a message arrives on another page ---------- */
+	function toastHolder() {
+		var holder = document.getElementById('adnChatToasts');
+		if (!holder) {
+			holder = document.createElement('div');
+			holder.id = 'adnChatToasts';
+			holder.className = 'adn-chat-toasts';
+			holder.setAttribute('role', 'status');
+			holder.setAttribute('aria-live', 'polite');
+			document.body.appendChild(holder);
+		}
+		return holder;
+	}
+
+	function avatarFor(person) {
+		var avatar = document.createElement('span');
+		avatar.className = 'adn-chat-toast-avatar';
+		avatar.setAttribute('aria-hidden', 'true');
+		if (person.photo) {
+			var image = document.createElement('img');
+			image.src = person.photo;
+			image.alt = '';
+			avatar.appendChild(image);
+		} else {
+			avatar.textContent = (person.name || '?').trim().charAt(0).toUpperCase();
+		}
+		return avatar;
+	}
+
+	/** "Sam: Is this still available?", linking to the conversation. Text goes in as text, never as HTML. */
+	function showToast(detail) {
+		// Not for my own messages, and not on the chat page: its inbox already shows the new message
+		if (detail.message.user_id === config.user_id || document.getElementById('adnChat')) {
+			return;
+		}
+
+		var holder = toastHolder();
+		var toast = document.createElement('div');
+		toast.className = 'adn-chat-toast';
+
+		var link = document.createElement('a');
+		link.className = 'adn-chat-toast-link';
+		link.href = detail.thread.url;
+		link.appendChild(avatarFor(detail.thread.other));
+		var text = document.createElement('span');
+		text.className = 'adn-chat-toast-text';
+		var name = document.createElement('strong');
+		name.textContent = detail.thread.other.name;
+		var body = document.createElement('span');
+		body.textContent = detail.message.type === 'image' ? config.text.photo : detail.message.body;
+		text.appendChild(name);
+		text.appendChild(body);
+		link.appendChild(text);
+		toast.appendChild(link);
+
+		var close = document.createElement('button');
+		close.type = 'button';
+		close.className = 'adn-chat-toast-close';
+		close.setAttribute('aria-label', config.text.dismiss);
+		var closeIcon = document.createElement('i');
+		closeIcon.className = 'bi bi-x-lg';
+		closeIcon.setAttribute('aria-hidden', 'true');
+		close.appendChild(closeIcon);
+		toast.appendChild(close);
+
+		var timer = null;
+		var remove = function () {
+			window.clearTimeout(timer);
+			toast.remove();
+		};
+		var startTimer = function () {
+			window.clearTimeout(timer);
+			timer = window.setTimeout(remove, TOAST_MS);
+		};
+		close.addEventListener('click', remove);
+		toast.addEventListener('mouseenter', function () {
+			window.clearTimeout(timer);
+		});
+		toast.addEventListener('mouseleave', startTimer);
+
+		holder.appendChild(toast);
+		while (holder.children.length > TOAST_MAX) {
+			holder.firstElementChild.remove();
+		}
+		// It waits for the tab to be looked at before it starts counting down
+		if (document.hidden) {
+			document.addEventListener('visibilitychange', startTimer, {once: true});
+		} else {
+			startTimer();
+		}
 	}
 
 	function emit(name, detail) {
@@ -35,6 +136,7 @@
 
 	var api = {connected: false, setUnread: setUnread, join: null};
 	window.AdnChatLive = api;
+	setUnread(config.unread_total);
 
 	if (!config.live) {
 		return;
@@ -92,6 +194,7 @@
 		echo.private('chat.user.' + config.user_id)
 			.listen('.chat.message', function (detail) {
 				setUnread(detail.unread_total);
+				showToast(detail);
 				emit('message', detail);
 			})
 			.listen('.chat.read', function (detail) {

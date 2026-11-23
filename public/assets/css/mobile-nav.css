@@ -318,6 +318,87 @@
 	transition: background-color .2s ease, color .2s ease, transform .15s ease;
 }
 
+/*
+ * The header's chat icon for signed-in members (front/layouts/partials/chat-head-link.blade.php), with the
+ * unread count kept live by assets/js/app/chat-live.js. In the menu bar from 1200px, beside the account
+ * button from 768px; phones use the app bar's Chats tab.
+ */
+.adn-head-chat-item {
+	align-items: center;
+	margin-inline-end: .5rem;
+}
+
+.adn-head-chat {
+	position: relative;
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 14px;
+	font-size: 1.15rem;
+	color: var(--bs-emphasis-color);
+	background-color: var(--bs-body-bg);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+	text-decoration: none;
+	transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+/* Between the account button (which keeps 8px after it) and the menu button */
+.adn-head-chat.is-compact {
+	margin-inline-end: .5rem;
+}
+
+.adn-head-chat:hover,
+.adn-head-chat:focus-visible {
+	color: var(--bs-primary);
+	border-color: rgba(var(--bs-primary-rgb), .45);
+	background-color: rgba(var(--bs-primary-rgb), .06);
+}
+
+.adn-head-chat:focus-visible {
+	outline: 2px solid var(--bs-primary);
+	outline-offset: 2px;
+}
+
+.adn-head-chat:active {
+	transform: scale(.96);
+}
+
+/* White on this red: 5.46:1 */
+.adn-head-chat-badge {
+	position: absolute;
+	top: -7px;
+	inset-inline-end: -7px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 5px;
+	border: 2px solid var(--bs-body-bg);
+	border-radius: 999px;
+	box-sizing: border-box;
+	font-size: .6875rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	background-color: #c62f2f;
+	font-variant-numeric: tabular-nums;
+}
+
+.adn-head-chat-badge[hidden] {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-head-chat {
+		transition: none;
+	}
+}
+
 /* The Chats tab's unread count (live: assets/js/app/chat-live.js). White on the deeper teal: 5.47:1 */
 .adn-appbar-icon {
 	position: relative;

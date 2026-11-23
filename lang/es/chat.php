@@ -21,6 +21,7 @@ return [
 	'remove_photo'   => 'Quitar la foto',
 	'cancel_reply'   => 'Cancelar respuesta',
 	'new_line_hint'  => ':keys para una nueva línea',
+	'dismiss'        => 'Cerrar',
 	'quick_replies_label' => 'Respuestas rápidas',
 	'view_listing'   => 'Ver anuncio',
 	'block'          => 'Bloquear',
