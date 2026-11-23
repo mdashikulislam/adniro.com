@@ -201,7 +201,6 @@ return [
 		'pick_title'      => 'Pick a chat to start',
 		'pick_text'       => 'Your conversations with buyers and sellers are on the left.',
 		'unavailable'     => 'No longer available',
-		'last_enquiry'    => 'Last enquiry',
 		'asking_about'    => 'Asking about',
 		'reply'           => 'Reply',
 		'replying_to'     => 'Replying to :name',

@@ -201,7 +201,6 @@ return [
 		'pick_title'      => 'Chat auswählen',
 		'pick_text'       => 'Deine Unterhaltungen mit Käufern und Verkäufern findest du links.',
 		'unavailable'     => 'Nicht mehr verfügbar',
-		'last_enquiry'    => 'Letzte Anfrage',
 		'asking_about'    => 'Anfrage zu',
 		'reply'           => 'Antworten',
 		'replying_to'     => 'Antwort an :name',

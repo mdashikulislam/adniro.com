@@ -210,7 +210,8 @@
 				els.listing.removeAttribute('href');
 			}
 			els.viewListing.parentNode.hidden = !(post.available && post.url);
-			els.listingLabel.textContent = label;
+			els.listingLabel.textContent = label || '';
+			els.listingLabel.hidden = !label;
 			els.listingTitle.textContent = post.title;
 			els.listingPrice.textContent = post.available ? post.price : T.unavailable;
 

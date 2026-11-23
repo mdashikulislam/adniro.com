@@ -138,7 +138,7 @@
 						<a class="adn-chat-listing" data-chat-listing>
 							<span class="adn-chat-listing-photo" data-chat-listing-photo aria-hidden="true"><i class="bi bi-image"></i></span>
 							<span class="adn-chat-listing-text">
-								{{-- "Last enquiry", or "Asking about" before the first message about this listing --}}
+								{{-- Only "Asking about", before the first message about this listing; otherwise no label --}}
 								<span class="adn-chat-listing-label" data-chat-listing-label></span>
 								<strong class="adn-chat-own-dir" data-chat-listing-title dir="auto"></strong>
 								<span data-chat-listing-price></span>

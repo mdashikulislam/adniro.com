@@ -201,7 +201,6 @@ return [
 		'pick_title'      => 'Choisissez une discussion',
 		'pick_text'       => 'Vos conversations avec les acheteurs et les vendeurs sont à gauche.',
 		'unavailable'     => 'Plus disponible',
-		'last_enquiry'    => 'Dernière demande',
 		'asking_about'    => 'Votre demande concerne',
 		'reply'           => 'Répondre',
 		'replying_to'     => 'Réponse à :name',

@@ -201,7 +201,6 @@ return [
 		'pick_title'      => 'اختر محادثة للبدء',
 		'pick_text'       => 'محادثاتك مع المشترين والبائعين موجودة على اليسار.',
 		'unavailable'     => 'لم يعد متاحاً',
-		'last_enquiry'    => 'آخر استفسار',
 		'asking_about'    => 'استفسار عن',
 		'reply'           => 'رد',
 		'replying_to'     => 'الرد على :name',

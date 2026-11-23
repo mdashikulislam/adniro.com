@@ -201,7 +201,6 @@ return [
 		'pick_title'      => 'Elige un chat para empezar',
 		'pick_text'       => 'Tus conversaciones con compradores y vendedores están a la izquierda.',
 		'unavailable'     => 'Ya no está disponible',
-		'last_enquiry'    => 'Última consulta',
 		'asking_about'    => 'Consulta sobre',
 		'reply'           => 'Responder',
 		'replying_to'     => 'Respondiendo a :name',

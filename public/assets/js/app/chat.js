@@ -112,9 +112,10 @@
 	var live = kit.live;
 	var toast = kit.toast;
 	var avatarInto = kit.avatarInto;
-	// The bar says why the listing is there: the last one asked about, or the one about to be asked about
+	// The bar shows the listing the conversation is about, with no label. Only a listing about to be asked
+	// about (opened from another listing's "Chat with seller") says so, since it is not the one talked about yet
 	var renderListing = function (post) {
-		kit.listingInto(els, post, store.open && (store.open.about || store.open.draft) ? T.asking_about : T.last_enquiry);
+		kit.listingInto(els, post, store.open && (store.open.about || store.open.draft) ? T.asking_about : '');
 	};
 
 	var ctx = {
