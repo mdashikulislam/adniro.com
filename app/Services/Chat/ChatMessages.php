@@ -216,6 +216,7 @@ class ChatMessages
 	 *
 	 * Across a block nobody learns what the other has read: the member's own unread count is cleared, but
 	 * "seen" stays where it was, so a blocked person's messages never turn "seen" when the chat is opened.
+	 * A member who turned "seen" off (ChatPrivacy) is recorded as usual and only not told about.
 	 */
 	public static function markRead(ChatThread $thread, int $userId, int $messageId): int
 	{
@@ -259,7 +260,9 @@ class ChatMessages
 
 		if ($changed) {
 			ChatUnread::forget($userId);
-			ChatBroadcaster::messagesRead($thread, $userId, $readUpTo, $isSeenHidden);
+			// With "seen" turned off by either of them, only the reader's own tabs are told
+			$onlyToReader = $isSeenHidden || ($otherId > 0 && !ChatPrivacy::isSeenShared($userId, $otherId));
+			ChatBroadcaster::messagesRead($thread, $userId, $readUpTo, $onlyToReader);
 		}
 
 		return $readUpTo;
@@ -295,14 +298,15 @@ class ChatMessages
 
 		// Everyone else has one more to read. The sender's own read state is not touched: sending is not
 		// reading, and they may not have seen the other person's latest messages yet.
+		// A conversation that was deleted or archived comes back to both lists with a new message.
 		ChatParticipant::query()
 			->where('thread_id', $thread->id)
 			->where('user_id', '!=', $senderId)
-			->update(['unread_count' => DB::raw('unread_count + 1'), 'deleted_at' => null]);
+			->update(['unread_count' => DB::raw('unread_count + 1'), 'deleted_at' => null, 'archived_at' => null]);
 		ChatParticipant::query()
 			->where('thread_id', $thread->id)
 			->where('user_id', $senderId)
-			->update(['deleted_at' => null]);
+			->update(['deleted_at' => null, 'archived_at' => null]);
 
 		return $message;
 	}

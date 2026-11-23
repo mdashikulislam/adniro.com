@@ -8,11 +8,13 @@
  *    is visible.
  * Everything written to the page goes through textContent: message text is never treated as HTML.
  *
- * Parts, loaded before this file: chat-kit.js (helpers), chat-inbox.js (the list), chat-log.js (the messages),
- * chat-presence.js (online and typing), chat-reply.js (replying to one message), chat-safety.js (block and
- * report), chat-delete.js (taking a message back, deleting a chat), chat-drafts.js (text not sent yet),
- * chat-guard.js (a question before a risky message), chat-settings.js (emails, sound, notifications),
- * chat-photo.js, chat-offers.js (offers), chat-tools.js (quick and saved replies, away message, mark as sold).
+ * Parts, loaded before this file: chat-kit.js (helpers), chat-inbox.js (the list, its filters and search),
+ * chat-log.js (the messages), chat-presence.js (online and typing), chat-reply.js (replying to one message),
+ * chat-safety.js (block and report), chat-delete.js (taking a message back, deleting a chat), chat-drafts.js
+ * (text not sent yet), chat-guard.js (a question before a risky message), chat-settings.js (emails, sound,
+ * notifications), chat-photo.js and chat-attach.js (photos to send), chat-viewer.js (a photo, full size),
+ * chat-offers.js (offers), chat-tools.js (quick and saved replies, away message, mark as sold), chat-tidy.js
+ * (archive, mute, mark unread), chat-privacy.js (online, seen, blocked people).
  */
 (function (window, document) {
 	'use strict';
@@ -34,7 +36,7 @@
 	var LOAD_OLDER_PX = 60;
 	var COUNTER_FROM = 200;
 	var INPUT_MAX_PX = 132;
-	var PHOTO = {maxSide: 1600, quality: 0.82};
+	var SEND_TURN_MAX_MS = 20000;
 
 	var body = document.body;
 
@@ -68,9 +70,8 @@
 		typing: $('[data-chat-typing]'),
 		newBtn: $('[data-chat-new]'),
 		quick: $('[data-chat-quick]'),
-		photoPreview: $('[data-chat-photo-preview]'),
-		photoImg: $('[data-chat-photo-img]'),
-		photoRemove: $('[data-chat-photo-remove]'),
+		tray: $('[data-chat-tray]'),
+		drop: $('[data-chat-drop]'),
 		replying: $('[data-chat-replying]'),
 		replyingName: $('[data-chat-replying-name]'),
 		replyingBody: $('[data-chat-replying-body]'),
@@ -91,8 +92,8 @@
 		nextCursor: boot.inbox.next_cursor,
 		pagesLoaded: 1,
 		filter: boot.filter || '',
+		search: '',
 		open: null,
-		photo: null,
 		presence: null,
 		typingTimer: null,
 		typingSentAt: 0,
@@ -118,15 +119,13 @@
 
 	var ctx = {
 		T: T, URLS: URLS, ME: ME, LIMITS: boot.limits, root: root, els: els, store: store, kit: kit,
-		TOOLS: boot.tools,
+		TOOLS: boot.tools, PRIVACY: boot.privacy,
 		QUICK: {buyer: boot.quick_replies, seller: boot.seller_quick_replies}
 	};
 
 	var inbox = window.AdnChatInbox(ctx);
 	var renderInbox = inbox.render;
-	var inboxMessage = inbox.message;
 	var loadInbox = inbox.load;
-	var showSkeleton = inbox.skeleton;
 	var upsertThread = inbox.upsert;
 	var patchThread = inbox.patch;
 
@@ -191,6 +190,7 @@
 		els.deleteChat.parentNode.hidden = !thread;
 		els.blockLabel.textContent = thread && thread.blocked_by_me ? els.block.dataset.unblockLabel : els.block.dataset.blockLabel;
 		tools.refresh();
+		tidy.refresh();
 	}
 
 	function showError(message) {
@@ -198,19 +198,9 @@
 		els.error.hidden = !message;
 	}
 
-	function clearPhoto() {
-		if (store.photo) {
-			URL.revokeObjectURL(store.photo.preview);
-		}
-		store.photo = null;
-		els.photoPreview.hidden = true;
-		els.photoInput.value = '';
-		updateSendButton();
-	}
-
 	function updateSendButton() {
 		var text = els.input.value;
-		els.send.disabled = !(text.trim() || store.photo);
+		els.send.disabled = !(text.trim() || attach.count());
 
 		var left = boot.limits.body_max - text.length;
 		els.count.hidden = left > COUNTER_FROM;
@@ -220,6 +210,13 @@
 	function growInput() {
 		els.input.style.height = 'auto';
 		els.input.style.height = Math.min(els.input.scrollHeight, INPUT_MAX_PX) + 'px';
+		// What is typed sets its own direction (Arabic on an English page, or the reverse); empty, the box
+		// follows the page, so the placeholder sits where the page's language puts it
+		if (els.input.value) {
+			els.input.setAttribute('dir', 'auto');
+		} else {
+			els.input.removeAttribute('dir');
+		}
 	}
 
 	/* ---------- Opening and closing a conversation ---------- */
@@ -229,7 +226,8 @@
 		if (!open || !open.thread || document.hidden) {
 			return;
 		}
-		var lastId = lastIdFromOther();
+		// A conversation marked unread with nothing from the other person in view is read by its last message
+		var lastId = lastIdFromOther() || (open.thread.unread > 0 ? lastServerId() : 0);
 		if (lastId <= open.readSent) {
 			return;
 		}
@@ -282,7 +280,7 @@
 		renderListing(open.about ? open.about.post : (data.thread ? data.thread.post : data.draft.post));
 		hideTyping();
 		showError('');
-		clearPhoto();
+		attach.clear();
 		reply.clear();
 		els.input.value = drafts.load(open); // what was typed here earlier and not sent
 		growInput();
@@ -317,9 +315,35 @@
 			if (push) {
 				window.history.pushState({thread: threadId}, '', urlFor(URLS.thread, threadId));
 			}
+			return true;
 		}).catch(function (error) {
 			toast(error.message || T.load_error, 'error');
+			return false;
 		});
+	}
+
+	/**
+	 * After a chat is picked from the list, the keyboard goes where the member will use it next: the message
+	 * box on a computer, the person's name on a phone (the box would bring the keyboard up over the messages)
+	 * or when nothing can be written.
+	 */
+	function focusConversation() {
+		var open = store.open;
+		if (!open) {
+			return;
+		}
+		var writesHere = open.canSend && !window.matchMedia('(pointer: coarse)').matches;
+		(writesHere ? els.input : els.name).focus({preventScroll: true});
+	}
+
+	/** Back to the list: the conversation closes and the keyboard returns to its row. */
+	function leaveConversation(threadId) {
+		closeOpen();
+		window.history.pushState({}, '', URLS.inbox);
+		fitToKeyboard();
+		if (threadId) {
+			inbox.focus(threadId, false);
+		}
 	}
 
 	function loadOlder() {
@@ -372,20 +396,24 @@
 		}
 	}
 
-	function deliver(local) {
-		var open = store.open;
+	/**
+	 * Sends one message of a conversation: the one on screen, or the one it was written in when the member
+	 * has since gone back to the list or opened another chat. What was sent is sent either way; only the
+	 * screen is left alone when it shows something else.
+	 */
+	function deliver(local, conversation) {
+		var open = conversation || store.open;
 		local.state = 'sending';
 		local.error = null;
-		redrawMessage(local);
+		if (store.open === open) {
+			redrawMessage(local);
+		}
 
 		// A new conversation is created by its first message: later ones wait for it
 		if (!open.thread && open.starting) {
-			open.starting.then(function () {
-				if (store.open === open) {
-					deliver(local);
-				}
+			return open.starting.then(function () {
+				return deliver(local, open);
 			});
-			return;
 		}
 
 		var form = new FormData();
@@ -417,6 +445,22 @@
 				open.starting = null;
 			});
 		}
+		return sending;
+	}
+
+	/**
+	 * Messages leave one after the other, so several photos and a text arrive in the order they were sent.
+	 * One that gets no answer does not hold the others back for ever: after a while the next one leaves.
+	 */
+	function deliverInTurn(local) {
+		var open = store.open;
+		var previous = open.sending || Promise.resolve();
+		var waited = new Promise(function (resolve) {
+			window.setTimeout(resolve, SEND_TURN_MAX_MS);
+		});
+		open.sending = Promise.race([previous, waited]).then(function () {
+			return deliver(local, open); // also when the member has left this conversation meanwhile
+		});
 	}
 
 	function sendMessage(text, photo) {
@@ -425,7 +469,8 @@
 			return;
 		}
 		// The listing this message is sent from: the first one of a new conversation, or of a new subject
-		var firstOfDraft = open.draft && !open.thread && !open.starting ? open.draft : null;
+		var firstOfDraft = open.draft && !open.thread && !open.starting && !open.startQueued ? open.draft : null;
+		open.startQueued = open.startQueued || !!firstOfDraft; // several sent together: only the first is "the first"
 		var topic = open.about || firstOfDraft;
 		var local = {
 			id: null,
@@ -446,13 +491,12 @@
 		appendMessage(local, true);
 		scrollToBottom();
 		tools.renderQuick();
-		deliver(local);
+		deliverInTurn(local);
 	}
 
 	function submitComposer() {
 		var text = els.input.value.trim();
-		var photo = store.photo;
-		if (!text && !photo) {
+		if (!text && !attach.count()) {
 			return;
 		}
 		showError('');
@@ -466,12 +510,10 @@
 				els.input.focus();
 				return;
 			}
-			if (photo && store.photo === photo) {
-				store.photo = null; // the message keeps the preview, so it is not revoked here
-				els.photoPreview.hidden = true;
-				els.photoInput.value = '';
+			// Each photo is its own message; the messages keep the previews
+			attach.take().forEach(function (photo) {
 				sendMessage('', photo);
-			}
+			});
 			if (text) {
 				drafts.clear(open);
 				sendMessage(text, null);
@@ -480,31 +522,6 @@
 			growInput();
 			updateSendButton();
 			els.input.focus();
-		});
-	}
-
-	function pickPhoto(file) {
-		showError('');
-		if (!file) {
-			return;
-		}
-		if (!/^image\//.test(file.type)) {
-			showError(T.error_photo_type);
-			return;
-		}
-
-		window.AdnChatPhoto.shrink(file, PHOTO).then(function (blob) {
-			if (blob.size > boot.limits.photo_max_kb * 1024) {
-				showError(T.error_photo_size);
-				return;
-			}
-			clearPhoto();
-			store.photo = {blob: blob, preview: URL.createObjectURL(blob)};
-			els.photoImg.src = store.photo.preview;
-			els.photoPreview.hidden = false;
-			updateSendButton();
-		}).catch(function () {
-			showError(T.error_photo_read);
 		});
 	}
 
@@ -544,6 +561,10 @@
 		upsertThread(detail.thread);
 		var open = store.open;
 		if (!open || !open.thread || open.thread.id !== detail.message.thread_id) {
+			// In the open conversation the message itself is read out (chat-log.js); elsewhere, who wrote
+			if (detail.message.user_id !== ME && !detail.thread.muted) {
+				kit.announce(fill(T.new_message_from, {name: detail.thread.other.name}));
+			}
 			return;
 		}
 		open.thread = Object.assign({}, detail.thread, {read_up_to: Math.max(detail.thread.read_up_to, open.thread.read_up_to)});
@@ -597,40 +618,21 @@
 
 	/* ---------- Events ---------- */
 	els.list.addEventListener('click', function (event) {
-		var more = event.target.closest('[data-chat-more]');
-		if (more) {
-			more.disabled = true;
-			loadInbox('append').catch(function (error) {
-				more.disabled = false;
-				toast(error.message, 'error');
-			});
-			return;
-		}
 		var row = event.target.closest('.adn-chat-row');
 		if (!row || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) {
 			return;
 		}
 		event.preventDefault();
-		openThread(Number(row.dataset.threadId), true);
-	});
-
-	els.filters.forEach(function (button) {
-		button.addEventListener('click', function () {
-			store.filter = button.dataset.chatFilter;
-			showSkeleton();
-			loadInbox('replace').catch(function () {
-				inboxMessage(T.inbox_error, function () {
-					button.click();
-				});
-			});
+		openThread(Number(row.dataset.threadId), true).then(function (opened) {
+			if (opened) {
+				focusConversation();
+			}
 		});
 	});
 
 	els.back.addEventListener('click', function (event) {
 		event.preventDefault();
-		closeOpen();
-		window.history.pushState({}, '', URLS.inbox);
-		fitToKeyboard();
+		leaveConversation(store.open && store.open.thread ? store.open.thread.id : 0);
 	});
 
 	window.addEventListener('popstate', function () {
@@ -663,14 +665,6 @@
 			submitComposer();
 		}
 	});
-
-	els.photoBtn.addEventListener('click', function () {
-		els.photoInput.click();
-	});
-	els.photoInput.addEventListener('change', function () {
-		pickPhoto(els.photoInput.files[0]);
-	});
-	els.photoRemove.addEventListener('click', clearPhoto);
 
 	els.messages.addEventListener('click', function (event) {
 		var retry = event.target.closest('[data-chat-retry]');
@@ -741,9 +735,33 @@
 		log: log,
 		inbox: inbox,
 		close: function () {
-			closeOpen();
-			window.history.pushState({}, '', URLS.inbox);
-			fitToKeyboard();
+			leaveConversation(0);
+		}
+	});
+	var attach = window.AdnChatAttach(ctx, {
+		showError: showError,
+		changed: function () {
+			updateSendButton();
+			// The row of photos takes room from the messages: the last one stays in view
+			if (store.open && isNearBottom()) {
+				scrollToBottom();
+			}
+		}
+	});
+	window.AdnChatViewer(ctx);
+	var tidy = window.AdnChatTidy(ctx, {inbox: inbox, close: leaveConversation});
+	window.AdnChatPrivacy(ctx, {
+		// Online and "seen" both changed what this conversation shows: it is loaded again
+		changed: function () {
+			if (store.open && store.open.thread) {
+				openThread(store.open.thread.id, false);
+			}
+		},
+		unblocked: function (userId) {
+			loadInbox('refresh').catch(function () {});
+			if (store.open && store.open.thread && store.open.other.id === userId) {
+				openThread(store.open.thread.id, false);
+			}
 		}
 	});
 	els.photoBtn.hidden = !boot.limits.photos;

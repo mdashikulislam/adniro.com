@@ -81,9 +81,16 @@ Pinned listing card (C3, C4)
   tokens    bg bg, border-bottom border, 12px padding
   a11y      one link, "View listing: {title}"
 
-Safety note (C3, C4)
-  content   shield icon, the existing safety line and "Safety tips" link, shown once at the top of the log
-  tokens    bg warning-bg, text warning-text, radius md, sm
+Safety card (C3, C4)
+  where     once at the top of the log, as wide as the messages; a white card (radius 16, soft teal shadow)
+            with a 3px line across its top running from the site's teal into amber
+  head      a teal gradient shield badge (40px, radius 13, white icon) · "Stay safe" (16/800) · at the end a
+            "Safety tips →" pill (accent-soft, accent-text), shown when the site has a safety page
+  tips      three tiles side by side (surface, radius 12), each a round icon and one habit: meet in a public
+            place · check the item before you pay · never send a deposit or share codes; a short list on phones
+  foot      an amber strip with a lock: "Adniro will never ask you for a code, a password or a payment in a
+            chat." (warning-bg, warning-text, 700)
+  a11y      role="note" with the title as its name; icons are decoration
 
 Listing reference (C3)
   when      a message was sent from a listing ("Chat with seller"): two people have one conversation, so this
@@ -271,6 +278,71 @@ Unread badge (G)
 
 Chats tab (G, phone app bar)
   content   chat-dots icon (filled when active), "Chats"; takes Saved's place; Saved moves to the account menu
+
+Inbox search (round 4)
+  where     under the title, above the filters; full width, pill, 40px, surface, a magnifier at the start
+  states    empty (placeholder "Search by name or listing"), typing (a clear button at the end), focus (bg +
+            2px accent ring), searching (three skeleton rows), nothing found ("No chats found." + a hint)
+  rules     starts at two characters, a short moment after the last key; looks in every chat, archived or not,
+            so no filter is on while it runs; a filter, the clear button or Escape ends it
+  a11y      role="search", a spoken label; the number found is said once ("Chats found: 3")
+
+Inbox filter (round 4)
+  variants  All, Unread (with the count), Archived: three equal pills on their own row
+  empty     Archived: "No archived chats."
+
+Row menu (round 4)
+  where     a round "…" button at the end of each row: on a computer it appears on hover or focus, over the
+            time, which steps aside; on a touch screen it is always there, quieter, with room kept for it
+  content   Mark as unread / Mark as read · Mute / Unmute · Archive / Move back to chats (each says what it
+            would do now); the open conversation's own menu has the same three, above Block
+  marks     a muted chat shows a small crossed bell beside its time; a chat found by a search outside the
+            list shows an "Archived" tag
+  after     a toast says what happened ("Chat archived. A new message brings it back."); the keyboard goes
+            back to the row's button; marking the open chat unread closes it
+  a11y      the button names the person ("More actions for the chat with Sam"); the list is not redrawn while
+            a menu is open
+
+Privacy and blocked people dialog (round 4)
+  where     the last link of the chat settings (shield icon)
+  content   Bootstrap modal: two switches, each with what it does and that it works both ways ("Show when I'm
+            online", "Show when I've read messages"), then "People you blocked": avatar, name, Unblock
+  states    a switch saves as it moves and goes back if saving fails; the list: loading, empty ("You haven't
+            blocked anyone."), error
+  a11y      each Unblock button names the person
+
+Photos to send (round 4)
+  where     a row of 64px thumbnails above the message box, each with a round remove button at its corner
+  from      the photo button (several at once), a paste into the message box, a drop on the conversation
+  rules     up to six at a time; each is shrunk before it is shown; one that cannot be read is skipped with a
+            word why; Send sends them in order, then the text
+  drop      while photos are dragged over the conversation: a dashed accent frame and a pill "Drop photos
+            here to send them"
+  a11y      the row is a list with a spoken label; each remove button says which photo it removes
+
+Photo viewer (round 4)
+  what      a tap on a photo opens it on the page, full screen, on a near-black ground
+  bar       who sent it and when · "2 of 5" · open in a new tab · close (44px round buttons)
+  moves     previous and next buttons at the sides, the arrow keys, a swipe; they stop at the first and the
+            last photo of the conversation
+  loading   the small photo shows at once, the full one takes its place (a small spinner meanwhile)
+  closes    the close button, Escape, a tap beside the photo; the keyboard returns to the photo it came from
+  a11y      a <dialog>: the browser keeps the focus inside; the photo's text says who sent it
+
+Mixed directions (round 4)
+  message   the text reads and lines up in the direction of what is written, line by line; the time and the
+            tick stay in the same corner of every bubble
+  one line  a name, a title or a preview that is cut short is cut at its end in its own direction, and stays
+            on the side the page's language puts it
+  typing    the message box follows what is typed; empty, it follows the page
+
+For screen readers (round 4)
+  said      one hidden polite status line: the message that arrives in the open chat ("Sam: …"), "New message
+            from Sam" for another chat (not a muted one), the number of chats a search found
+  not said  the list of chats and the messages are not live regions: they are redrawn too often
+  focus     opening a chat: the message box on a computer, the person's name (a heading) on a phone or when
+            nothing can be written; Back: the chat's row; the list keeps the keyboard's place when redrawn
+  keys      up and down arrows move through the list of chats; Escape gives up a reply
 ```
 
 ## States every screen has

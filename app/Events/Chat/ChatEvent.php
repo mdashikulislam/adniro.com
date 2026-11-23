@@ -6,7 +6,8 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
 /*
- * A chat change pushed to one member's private channel (adniro): a new message, or messages read.
+ * A chat change pushed to one member's private channel (adniro): a new message, messages read, a message
+ * taken back, or the member's own privacy choices changed in another tab.
  * Sent at once (no queue); the live server is on the same machine.
  */
 class ChatEvent implements ShouldBroadcastNow
@@ -14,6 +15,7 @@ class ChatEvent implements ShouldBroadcastNow
 	public const MESSAGE = 'chat.message';
 	public const READ = 'chat.read';
 	public const UNSENT = 'chat.unsent';
+	public const PRIVACY = 'chat.privacy';
 	public const CHANNEL_PREFIX = 'chat.user.';
 
 	public function __construct(

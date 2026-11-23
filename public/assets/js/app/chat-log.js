@@ -1,6 +1,8 @@
 /*
  * adniro: the message log of an open chat conversation (assets/js/app/chat.js): bubbles, day separators,
  * ticks (sending, sent, seen), and adding or completing a message without redrawing the rest.
+ * A message from the other person is also said to screen readers, once, when it arrives (the log itself is
+ * not a live region: it is redrawn too often).
  */
 (function (window, document) {
 	'use strict';
@@ -16,11 +18,18 @@
 		var els = ctx.els;
 		var store = ctx.store;
 		var el = ctx.kit.el;
+		var ownDir = ctx.kit.ownDir;
 		var icon = ctx.kit.icon;
 		var sameDay = ctx.kit.sameDay;
 		var dayLabel = ctx.kit.dayLabel;
 		var timeOf = ctx.kit.timeOf;
 		var linkified = ctx.kit.linkified;
+
+		// Whether the member is reading the latest messages: set by their own scrolling, not by the log growing
+		var isAtBottom = true;
+		els.log.addEventListener('scroll', function () {
+			isAtBottom = isNearBottom();
+		}, {passive: true});
 
 		function isSeen(message) {
 			return !!message.id && !!store.open.thread && message.id <= store.open.thread.read_up_to;
@@ -56,7 +65,7 @@
 			ref.appendChild(photo);
 
 			var text = el('span', 'adn-chat-ref-text');
-			text.appendChild(el('strong', '', post.title));
+			text.appendChild(ownDir(el('strong', '', post.title)));
 			text.appendChild(el('span', '', post.available ? post.price : T.unavailable));
 			ref.appendChild(text);
 
@@ -68,8 +77,8 @@
 			var node = el('button', 'adn-chat-quote');
 			node.type = 'button';
 			node.dataset.chatQuote = quote.id;
-			node.appendChild(el('strong', '', quote.user_id === ME ? T.you : store.open.other.name));
-			node.appendChild(el('span', '', ctx.kit.lineText(quote.type, quote.text)));
+			node.appendChild(ownDir(el('strong', '', quote.user_id === ME ? T.you : store.open.other.name)));
+			node.appendChild(ownDir(el('span', '', ctx.kit.lineText(quote.type, quote.text))));
 			return node;
 		}
 
@@ -108,7 +117,14 @@
 				node.appendChild(listingRef(message.post));
 			}
 
+			var meta = el('span', 'adn-chat-meta');
+			meta.appendChild(el('time', '', timeOf(date)));
+			if (mine && message.state !== 'failed') {
+				meta.appendChild(tickFor(message));
+			}
+
 			var bubble = el('div', 'adn-chat-bubble');
+			var metaHome = bubble;
 			bubble.appendChild(el('span', 'visually-hidden', (mine ? T.you : store.open.other.name) + ': '));
 			if (message.reply_to) {
 				bubble.appendChild(quoteNode(message.reply_to));
@@ -123,14 +139,17 @@
 				bubble.appendChild(ctx.offers.node(message)); // chat-offers.js
 			} else if (message.type === 'image' && message.image) {
 				bubble.classList.add('is-photo');
+				// Opens in the viewer (chat-viewer.js); as a link it still opens in a new tab when asked to
 				var link = el('a');
 				link.href = message.image.url;
 				link.target = '_blank';
 				link.rel = 'noopener';
+				link.dataset.chatPhotoOpen = node.dataset.key;
 				var image = el('img');
 				image.src = message.image.thumb;
-				image.alt = T.photo;
+				image.alt = mine ? T.photo_mine : ctx.kit.fill(T.photo_from, {name: store.open.other.name});
 				image.loading = 'lazy';
+				image.addEventListener('load', keepAtBottom); // it takes its height only now
 				link.appendChild(image);
 				bubble.appendChild(link);
 			} else {
@@ -141,15 +160,15 @@
 					auto.appendChild(el('span', '', T.auto_reply));
 					bubble.appendChild(auto);
 				}
-				bubble.appendChild(linkified(message.body));
+				// The text takes its own direction, line by line: Arabic on an English page, or the reverse,
+				// reads and lines up the right way. The time stays where it is on every bubble.
+				var text = el('div', 'adn-chat-text');
+				text.dir = 'auto';
+				text.appendChild(linkified(message.body));
+				bubble.appendChild(text);
+				metaHome = text;
 			}
-
-			var meta = el('span', 'adn-chat-meta');
-			meta.appendChild(el('time', '', timeOf(date)));
-			if (mine && message.state !== 'failed') {
-				meta.appendChild(tickFor(message));
-			}
-			bubble.appendChild(meta);
+			metaHome.appendChild(meta);
 
 			// The bubble, with a Reply button beside it once the message is saved
 			var line = el('div', 'adn-chat-line');
@@ -217,6 +236,7 @@
 			}
 			els.log.scrollTop += line.getBoundingClientRect().top - els.log.getBoundingClientRect().top - NEW_LINE_GAP_PX;
 			els.newBtn.hidden = true;
+			isAtBottom = isNearBottom();
 		}
 
 		function renderLog() {
@@ -242,6 +262,14 @@
 		function scrollToBottom() {
 			els.log.scrollTop = els.log.scrollHeight;
 			els.newBtn.hidden = true;
+			isAtBottom = true;
+		}
+
+		/** A photo that finishes loading makes the log taller: the member who was at the last message stays there. */
+		function keepAtBottom() {
+			if (isAtBottom) {
+				scrollToBottom();
+			}
 		}
 
 		function appendMessage(message, animate) {
@@ -312,6 +340,20 @@
 			return true;
 		}
 
+		/** One sentence for screen readers: who, and what they sent. */
+		function spoken(message) {
+			var what = message.body;
+			if (message.unsent) {
+				what = T.message_deleted;
+			} else if (message.offer) {
+				var line = message.type === 'offer' ? 'offer' : 'offer_' + message.offer.status;
+				what = ctx.kit.lineText(line, message.offer.amount);
+			} else if (message.type === 'image') {
+				what = T.photo;
+			}
+			return store.open.other.name + ': ' + what;
+		}
+
 		/** Adds a message from the server, or completes the one this tab is still sending. */
 		function upsertMessage(message) {
 			var existing = findMessage(message);
@@ -333,6 +375,9 @@
 				appendMessage(message, true);
 			}
 			ctx.offers.applied(message);
+			if (message.user_id !== ME) {
+				ctx.kit.announce(spoken(message));
+			}
 			if (stick) {
 				scrollToBottom();
 			} else {

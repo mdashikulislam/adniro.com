@@ -1,6 +1,7 @@
 /*
  * adniro: who is online and who is typing in the open conversation (assets/js/app/chat.js). Both come from the
  * conversation's presence channel (chat-live.js); without a live connection neither is shown.
+ * A member who turned "online" off in their privacy choices does not join it: they are not shown, and see nobody.
  */
 (function (window) {
 	'use strict';
@@ -57,7 +58,7 @@
 			leave();
 			var open = store.open;
 			var connection = ctx.kit.live();
-			if (!open || !open.thread || !open.thread.can_send || !connection || !connection.join) {
+			if (!open || !open.thread || !open.thread.can_send || !connection || !connection.join || !ctx.PRIVACY.online) {
 				return;
 			}
 

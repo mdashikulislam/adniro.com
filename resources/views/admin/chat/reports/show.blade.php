@@ -109,7 +109,8 @@
 									'status' => trans('chat_admin.offer_status_' . $message->offer_status),
 								]) }}</strong></div>
 							@else
-								<div style="white-space: pre-wrap; overflow-wrap: anywhere;">{{ $message->body }}</div>
+								{{-- dir="auto": a message in another script than the admin panel's reads the right way --}}
+								<div dir="auto" style="white-space: pre-wrap; overflow-wrap: anywhere; unicode-bidi: plaintext; text-align: start;">{{ $message->body }}</div>
 							@endif
 							@if ($message->is_auto)
 								<div class="small text-muted mt-1">{{ trans('chat_admin.automatic_reply') }}</div>

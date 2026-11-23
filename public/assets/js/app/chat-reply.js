@@ -103,6 +103,13 @@
 			}
 		});
 		els.replyingCancel.addEventListener('click', clear);
+		// Escape in the message box gives the reply up, like the cancel button
+		els.input.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape' && store.open && store.open.replyTo) {
+				event.preventDefault();
+				clear();
+			}
+		});
 
 		return {take: take, clear: clear};
 	};

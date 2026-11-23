@@ -147,3 +147,8 @@
 		transition: none;
 	}
 }
+
+/* A name or a message with dir="auto": read in its own direction, kept on the page's side */
+.adn-chat-own-dir {
+	text-align: match-parent;
+}

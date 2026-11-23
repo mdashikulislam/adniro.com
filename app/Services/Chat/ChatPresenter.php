@@ -23,17 +23,27 @@ class ChatPresenter
 	/** @param iterable<ChatThread> $threads */
 	public static function threads(iterable $threads, int $viewerId): array
 	{
+		// Asked once for the whole list: who blocked whom, and who does not share "seen"
 		$blocks = ChatAccess::blocksOf($viewerId);
+		$people = [$viewerId];
+		foreach ($threads as $thread) {
+			$people[] = (int)($thread->otherParticipant($viewerId)?->user_id ?? 0);
+		}
+		$hidingSeen = ChatPrivacy::hidingSeen($people);
+
 		$out = [];
 		foreach ($threads as $thread) {
-			$out[] = self::thread($thread, $viewerId, $blocks);
+			$out[] = self::thread($thread, $viewerId, $blocks, $hidingSeen);
 		}
 
 		return $out;
 	}
 
-	/** @param array{blocked: array<int, int>, blockers: array<int, int>}|null $blocks from ChatAccess::blocksOf() */
-	public static function thread(ChatThread $thread, int $viewerId, ?array $blocks = null): array
+	/**
+	 * @param array{blocked: array<int, int>, blockers: array<int, int>}|null $blocks from ChatAccess::blocksOf()
+	 * @param array<int, int>|null $hidingSeen from ChatPrivacy::hidingSeen()
+	 */
+	public static function thread(ChatThread $thread, int $viewerId, ?array $blocks = null, ?array $hidingSeen = null): array
 	{
 		$blocks ??= ChatAccess::blocksOf($viewerId);
 		$me = $thread->participantFor($viewerId);
@@ -49,7 +59,11 @@ class ChatPresenter
 			'post'          => self::post($thread->post) ?? self::deletedListing($thread->subject),
 			'last'          => self::lastLine($last, $viewerId, (int)($me->cleared_message_id ?? 0)),
 			'unread'        => (int)($me->unread_count ?? 0),
-			'read_up_to'    => (int)($other->last_read_message_id ?? 0),
+			// How far the other person has read: not told when either of them turned "seen" off
+			'read_up_to'    => ChatPrivacy::readUpTo($thread, $viewerId, $hidingSeen),
+			// The member's own list: neither is seen by the other person (ChatTidy)
+			'archived'      => (bool)$me?->isArchived(),
+			'muted'         => (bool)$me?->isMuted(),
 			'blocked_by_me' => in_array($otherId, $blocks['blocked'], true),
 			'can_send'      => ChatSettings::isEnabled() && $otherId > 0 && $other?->user !== null
 				&& !in_array($otherId, $blocks['blocked'], true)

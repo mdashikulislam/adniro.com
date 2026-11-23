@@ -5,7 +5,8 @@
  * - A short sound, on unless the member turned it off.
  * - A browser notification when the site is in another tab or behind another window, only once the member
  *   has turned it on in the chat settings and allowed it in the browser.
- * Neither happens for a message in the conversation the member is looking at, nor for their own messages.
+ * Neither happens for a message in the conversation the member is looking at, nor for their own messages,
+ * nor in a chat they muted.
  * With several tabs open, one of them alerts: the tabs agree through localStorage.
  *
  * The two choices are kept in this browser (localStorage): a sound or a notification belongs to a device, not
@@ -170,7 +171,8 @@
 
 	function onMessage(detail) {
 		var message = detail.message;
-		if (!message || message.user_id === ME) {
+		// Never for my own messages, nor for a chat I muted
+		if (!message || message.user_id === ME || detail.thread.muted) {
 			return;
 		}
 		// Being read right now: no alert here, and none from the other tabs

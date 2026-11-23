@@ -6,7 +6,9 @@ use App\Http\Controllers\Web\Front\Chat\ChatEmailController;
 use App\Http\Controllers\Web\Front\Chat\ChatFileController;
 use App\Http\Controllers\Web\Front\Chat\ChatMessageController;
 use App\Http\Controllers\Web\Front\Chat\ChatOfferController;
+use App\Http\Controllers\Web\Front\Chat\ChatPrivacyController;
 use App\Http\Controllers\Web\Front\Chat\ChatSafetyController;
+use App\Http\Controllers\Web\Front\Chat\ChatTidyController;
 use App\Http\Controllers\Web\Front\Chat\ChatToolsController;
 use App\Http\Controllers\Web\Front\Chat\EmailSellerController;
 use App\Services\Chat\ChatEmailChoice;
@@ -66,6 +68,10 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 			Route::post('threads/{thread}/read', [ChatMessageController::class, 'read'])
 				->middleware('throttle:60,1')
 				->name('chat.api.read');
+			// My own list: archive, mute, mark as unread or read
+			Route::put('threads/{thread}/tidy', [ChatTidyController::class, 'update'])
+				->middleware('throttle:60,1')
+				->name('chat.api.tidy');
 			Route::get('unread', [ChatMessageController::class, 'unread'])->name('chat.api.unread');
 			Route::put('settings', [ChatEmailController::class, 'update'])
 				->middleware('throttle:30,1')
@@ -77,6 +83,12 @@ Route::middleware(['auth', 'twoFactor', 'banned.user', 'no.http.cache'])
 			Route::post('listings/{post}/sold', [ChatToolsController::class, 'sold'])
 				->middleware('throttle:10,1')
 				->name('chat.api.sold');
+
+			// What others see of me (online, seen), and the people I blocked
+			Route::get('privacy', [ChatPrivacyController::class, 'show'])->name('chat.api.privacy');
+			Route::put('privacy', [ChatPrivacyController::class, 'update'])
+				->middleware('throttle:30,1')
+				->name('chat.api.privacy.save');
 
 			Route::post('users/{user}/block', [ChatSafetyController::class, 'block'])
 				->middleware('throttle:30,1')

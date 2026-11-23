@@ -1,10 +1,12 @@
 /*
  * adniro: small helpers shared by the live chat scripts (assets/js/app/chat.js): building elements, requests
- * to the chat's data routes, dates, and links in message text. Text always goes in through textContent.
+ * to the chat's data routes, dates, links in message text, and a sentence for screen readers. Text always goes
+ * in through textContent.
  */
 (function (window, document) {
 	'use strict';
 
+	var ANNOUNCE_AFTER_MS = 60;
 	var URL_PATTERN = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g;
 
 	/** @param {Object<string, string>} T the chat texts (lang/<locale>/chat.php, "js") */
@@ -33,6 +35,40 @@
 				node.textContent = text;
 			}
 			return node;
+		}
+
+		/**
+		 * Text a member wrote (a name, a title, a message), kept apart from the page's own direction: an Arabic
+		 * name on an English page, or the reverse, does not reorder the words and punctuation around it.
+		 */
+		function bdi(text) {
+			return el('bdi', '', text);
+		}
+
+		/**
+		 * The same for a line of its own that may be cut short ("…"): the line takes the direction of what is
+		 * written in it, so it is cut at its end and not at its beginning, and stays on the page's side
+		 * (.adn-chat-own-dir).
+		 */
+		function ownDir(node) {
+			node.dir = 'auto';
+			node.classList.add('adn-chat-own-dir');
+			return node;
+		}
+
+		var announcer = document.querySelector('[data-chat-announce]');
+		var announceTimer = null;
+
+		/** Says one short sentence to screen readers. Emptied first, so the same sentence is said again. */
+		function announce(text) {
+			if (!announcer) {
+				return;
+			}
+			window.clearTimeout(announceTimer);
+			announcer.textContent = '';
+			announceTimer = window.setTimeout(function () {
+				announcer.textContent = text;
+			}, ANNOUNCE_AFTER_MS);
 		}
 
 		function icon(name, className) {
@@ -212,6 +248,9 @@
 			fill: fill,
 			urlFor: urlFor,
 			el: el,
+			bdi: bdi,
+			ownDir: ownDir,
+			announce: announce,
 			icon: icon,
 			uuid: uuid,
 			request: request,

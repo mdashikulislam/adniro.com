@@ -11,6 +11,7 @@ use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatOffers;
 use App\Services\Chat\ChatPhotos;
 use App\Services\Chat\ChatPresenter;
+use App\Services\Chat\ChatPrivacy;
 use App\Services\Chat\ChatSafety;
 use App\Services\Chat\ChatSettings;
 use App\Services\Chat\ChatTools;
@@ -85,7 +86,7 @@ class ChatController extends FrontController
 	{
 		$user = $request->user();
 		$userId = (int)$user->id;
-		$filter = $request->query('filter') === ChatConversations::FILTER_UNREAD ? ChatConversations::FILTER_UNREAD : null;
+		$filter = ChatConversations::filterFrom($request->query('filter'));
 
 		$chatState = array_merge([
 			'me'            => ['id' => $userId, 'name' => (string)$user->name],
@@ -100,6 +101,8 @@ class ChatController extends FrontController
 			'seller_quick_replies' => array_values((array)trans('chat.seller_quick_replies')),
 			// The member's away message and saved replies
 			'tools'         => ChatTools::of($userId),
+			// What the member lets others see: online and typing, and what they have read
+			'privacy'       => ChatPrivacy::of($userId),
 			'safety'        => ChatSafety::browserPatterns(),
 			// Turned off in Admin > Settings > Chat: conversations can be read, nothing can be sent
 			'paused'        => !ChatSettings::isEnabled(),
@@ -113,6 +116,7 @@ class ChatController extends FrontController
 				'body_max'       => ChatMessages::BODY_MAX,
 				'photo_max_kb'   => ChatPhotos::MAX_UPLOAD_KB,
 				'history_page'   => ChatMessages::PAGE_SIZE,
+				'search_min'     => ChatConversations::SEARCH_MIN,
 			],
 			'urls'          => [
 				'inbox'    => route('chat.index'),
@@ -129,6 +133,8 @@ class ChatController extends FrontController
 				'offer'    => route('chat.offer', ['post' => '__ID__']),
 				'offer_answer' => route('chat.api.offer.answer', ['thread' => '__ID__', 'message' => '__MESSAGE__']),
 				'tools'    => route('chat.api.tools'),
+				'tidy'     => route('chat.api.tidy', ['thread' => '__ID__']),
+				'privacy'  => route('chat.api.privacy'),
 				'sold'     => route('chat.api.sold', ['post' => '__ID__']),
 				'browse'   => urlGen()->searchWithoutQuery(),
 			],
@@ -138,6 +144,7 @@ class ChatController extends FrontController
 				'offer_invalid' => trans('chat.error_offer_amount'),
 				'sold_confirm'  => trans('chat.mark_sold'),
 				'saved_replies' => trans('chat.saved_replies'),
+				'unblock'       => trans('chat.unblock'),
 			],
 		], $state);
 

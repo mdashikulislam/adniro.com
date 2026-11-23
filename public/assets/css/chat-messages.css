@@ -31,32 +31,6 @@
 	color: var(--adn-chat-muted);
 }
 
-.adn-chat-safety {
-	display: flex;
-	align-items: flex-start;
-	gap: .5rem;
-	max-width: 520px;
-	margin: 0 auto .75rem;
-	padding: .55rem .7rem;
-	border-radius: var(--adn-chat-radius-md);
-	font-size: .8125rem;
-	line-height: 1.4;
-	color: var(--adn-chat-warning-text);
-	background-color: var(--adn-chat-warning-bg);
-	text-wrap: pretty;
-}
-
-.adn-chat-safety i {
-	margin-top: .1rem;
-	font-size: 1rem;
-}
-
-.adn-chat-safety a {
-	color: inherit;
-	font-weight: 700;
-	text-decoration: underline;
-}
-
 .adn-chat-day {
 	display: flex;
 	justify-content: center;
@@ -117,12 +91,24 @@
 	text-decoration: underline;
 }
 
+/*
+ * A message's text takes its direction from what is written, line by line (dir="auto" + plaintext): Arabic
+ * on an English page, or the reverse, reads and lines up the right way. The time is inside it, but keeps the
+ * page's own direction and side, so it sits in the same corner of every bubble.
+ */
+.adn-chat-text {
+	unicode-bidi: plaintext;
+	text-align: start;
+}
+
 .adn-chat-meta {
 	display: inline-flex;
 	align-items: center;
 	gap: .2rem;
-	float: inline-end;
+	float: right;
 	margin: .45rem 0 0 .6rem;
+	direction: ltr;
+	unicode-bidi: isolate;
 	font-size: .6875rem;
 	font-weight: 500;
 	line-height: 1;
@@ -131,8 +117,10 @@
 	white-space: nowrap;
 }
 
-[dir="rtl"] .adn-chat-meta {
+html[dir="rtl"] .adn-chat-meta {
+	float: left;
 	margin: .45rem .6rem 0 0;
+	direction: rtl;
 }
 
 .adn-chat-msg.is-mine .adn-chat-meta {
@@ -482,23 +470,6 @@ div.adn-chat-ref .adn-chat-ref-text span {
 }
 
 /* ---------- Composer ---------- */
-.adn-chat-photo-preview {
-	position: relative;
-	flex: 0 0 auto;
-	width: 64px;
-	height: 64px;
-	margin: .5rem .75rem 0;
-}
-
-.adn-chat-photo-preview img {
-	width: 64px;
-	height: 64px;
-	border-radius: var(--adn-chat-radius-md);
-	object-fit: cover;
-	outline: 1px solid rgba(0, 0, 0, .1);
-	outline-offset: -1px;
-}
-
 .adn-chat-photo-remove {
 	position: absolute;
 	top: -8px;

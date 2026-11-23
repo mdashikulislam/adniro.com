@@ -11,6 +11,7 @@ use App\Services\Chat\ChatAccess;
 use App\Services\Chat\ChatConversations;
 use App\Services\Chat\ChatMessages;
 use App\Services\Chat\ChatPresenter;
+use App\Services\Chat\ChatPrivacy;
 use App\Services\Chat\ChatUnread;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,10 +24,11 @@ class ChatMessageController extends Controller
 {
 	public function threads(Request $request): JsonResponse
 	{
-		$filter = $request->query('filter') === ChatConversations::FILTER_UNREAD ? ChatConversations::FILTER_UNREAD : null;
+		$filter = ChatConversations::filterFrom($request->query('filter'));
 		$cursor = is_string($request->query('cursor')) ? $request->query('cursor') : null;
+		$search = ChatConversations::searchFrom($request->query('q'));
 
-		return response()->json(ChatConversations::inbox((int)$request->user()->id, $filter, $cursor));
+		return response()->json(ChatConversations::inbox((int)$request->user()->id, $filter, $cursor, $search));
 	}
 
 	/** A conversation with its latest messages, to open it without loading a new page. */
@@ -46,7 +48,7 @@ class ChatMessageController extends Controller
 
 		if ($request->filled('after')) {
 			return response()->json(ChatMessages::after($chatThread, $userId, (int)$request->query('after')) + [
-				'read_up_to' => (int)($chatThread->otherParticipant($userId)?->last_read_message_id ?? 0),
+				'read_up_to' => ChatPrivacy::readUpTo($chatThread, $userId),
 			]);
 		}
 

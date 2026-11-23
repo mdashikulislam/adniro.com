@@ -54,6 +54,15 @@ translations), and the warning before sending (B5) still knows English "pay outs
   agreement between two people, shown to both.
 - **"Mark as sold" takes the listing offline**, the way My listings does: the site has no separate "sold" state.
 
+**Round 4 is built on local as well, with tests: B9 (find and tidy the inbox), B11 (privacy choices), B12
+(photos), B13 (screen readers and keyboard) and B15 (mixed languages).** Limits, on purpose:
+- **The search looks at names and at the listing last talked about**, not inside messages.
+- **A new message brings an archived chat back.** An archive that swallowed new messages would hide buyers.
+- **Both privacy choices work both ways**: a member who hides "online" or "seen" does not see it of others.
+- **Several photos are several messages**, sent in order; there is no album bubble.
+- **Screen readers were checked by reading the page's structure, not with a screen reader.** Section C's
+  "tests in a real browser" would be the place to add one.
+
 | # | missing | why it matters | seen on | size |
 | --- | --- | --- | --- | --- |
 | B1 | **Delete a conversation (for me) and delete my own message** | A message sent to the wrong person stays for good; an inbox can never be cleaned. | Vinted and Kleinanzeigen: delete for yourself only (verified) | M |

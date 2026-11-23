@@ -64,6 +64,17 @@ class ChatBroadcaster
 		}
 	}
 
+	/**
+	 * The member changed what others see of them: every tab and device of theirs is told at once, so none
+	 * goes on showing them online. Nobody else is told.
+	 *
+	 * @param array{online: bool, seen: bool} $privacy
+	 */
+	public static function privacyChanged(int $userId, array $privacy): void
+	{
+		self::push(new ChatEvent(ChatEvent::PRIVACY, $userId, ['privacy' => $privacy]));
+	}
+
 	private static function push(ChatEvent $event): void
 	{
 		try {

@@ -61,6 +61,14 @@
 	display: none !important;
 }
 
+/*
+ * A line written by a member (a name, a title, the start of a message) with dir="auto": it reads in its own
+ * direction and is cut short at its end, but stays on the side the page's language puts it.
+ */
+.adn-chat-own-dir {
+	text-align: match-parent;
+}
+
 .adn-chat-inbox-head {
 	display: flex;
 	align-items: center;
@@ -285,11 +293,31 @@
 
 .adn-chat-row-listing,
 .adn-chat-row-last {
-	overflow: hidden;
 	font-size: .8125rem;
 	color: var(--adn-chat-muted);
+}
+
+/* "You: " and then the start of the message, which is cut short in its own direction */
+.adn-chat-row-last {
+	display: flex;
+	gap: .25em;
+	min-width: 0;
+}
+
+.adn-chat-row-you {
+	flex: 0 0 auto;
+}
+
+.adn-chat-row-listing,
+.adn-chat-row-snippet {
+	min-width: 0;
+	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.adn-chat-row-snippet {
+	flex: 1 1 auto;
 }
 
 .adn-chat-row-listing {
@@ -465,10 +493,14 @@
 }
 
 .adn-chat-head-status {
-	min-height: 14px;
 	font-size: .6875rem;
 	font-weight: 500;
 	color: var(--adn-chat-muted);
+}
+
+/* Nothing to say (not online, not typing): the line is gone, and the name sits level with the avatar */
+.adn-chat-head-status:empty {
+	display: none;
 }
 
 .adn-chat-head-status.is-online {

@@ -657,7 +657,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (372)
+## Added (398)
 
 Files that are not part of LaraClassifier.
 
@@ -703,7 +703,11 @@ Files that are not part of LaraClassifier.
 - `app/Http/Controllers/Web/Front/Chat/ChatEmailController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatFileController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatMessageController.php`
+- `app/Http/Controllers/Web/Front/Chat/ChatOfferController.php`
+- `app/Http/Controllers/Web/Front/Chat/ChatPrivacyController.php`
 - `app/Http/Controllers/Web/Front/Chat/ChatSafetyController.php`
+- `app/Http/Controllers/Web/Front/Chat/ChatTidyController.php`
+- `app/Http/Controllers/Web/Front/Chat/ChatToolsController.php`
 - `app/Http/Controllers/Web/Front/Chat/EmailSellerController.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/Concerns/AiJsonResponses.php`
 - `app/Http/Controllers/Web/Front/Post/ListingAssistant/ListingAssistantController.php`
@@ -722,7 +726,9 @@ Files that are not part of LaraClassifier.
 - `app/Http/Requests/Admin/BlogCategoryRequest.php`
 - `app/Http/Requests/Admin/BlogPostRequest.php`
 - `app/Http/Requests/Front/Chat/EmailSellerRequest.php`
+- `app/Http/Requests/Front/Chat/MakeChatOfferRequest.php`
 - `app/Http/Requests/Front/Chat/ReportChatRequest.php`
+- `app/Http/Requests/Front/Chat/SaveChatToolsRequest.php`
 - `app/Http/Requests/Front/Chat/SendChatMessageRequest.php`
 
 ### app/Jobs
@@ -738,6 +744,7 @@ Files that are not part of LaraClassifier.
 - `app/Models/BlogPost.php`
 - `app/Models/Chat/ChatMessage.php`
 - `app/Models/Chat/ChatParticipant.php`
+- `app/Models/Chat/ChatPreference.php`
 - `app/Models/Chat/ChatThread.php`
 - `app/Models/Chat/ThreadReport.php`
 - `app/Models/Chat/UserBlock.php`
@@ -817,10 +824,14 @@ Files that are not part of LaraClassifier.
 - `app/Services/Chat/ChatEmailChoice.php`
 - `app/Services/Chat/ChatLive.php`
 - `app/Services/Chat/ChatMessages.php`
+- `app/Services/Chat/ChatOffers.php`
 - `app/Services/Chat/ChatPhotos.php`
 - `app/Services/Chat/ChatPresenter.php`
+- `app/Services/Chat/ChatPrivacy.php`
 - `app/Services/Chat/ChatSafety.php`
 - `app/Services/Chat/ChatSettings.php`
+- `app/Services/Chat/ChatTidy.php`
+- `app/Services/Chat/ChatTools.php`
 - `app/Services/Chat/ChatUnread.php`
 - `app/Services/ListingAssistant/AiPostLimit.php`
 - `app/Services/ListingAssistant/CatalogBuilder.php`
@@ -910,6 +921,8 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_23_000700_let_members_delete_chats_and_messages.php`
 - `database/migrations/2026_11_23_000800_add_chat_setting.php`
 - `database/migrations/2026_11_23_000900_let_admins_close_chat_reports.php`
+- `database/migrations/2026_11_23_001000_add_offers_and_seller_tools_to_chat.php`
+- `database/migrations/2026_11_24_000100_add_inbox_tools_and_privacy_to_chat.php`
 
 ### database/seeders
 
@@ -1030,6 +1043,9 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/chat-live.css`
 - `public/assets/css/chat-marks.css`
 - `public/assets/css/chat-messages.css`
+- `public/assets/css/chat-offers.css`
+- `public/assets/css/chat-photos.css`
+- `public/assets/css/chat-tidy.css`
 - `public/assets/css/chat.css`
 - `public/assets/css/listing-form-ai.css`
 - `public/assets/css/listing-form-panel.css`
@@ -1037,6 +1053,8 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/listing-form.css`
 - `public/assets/css/mobile-nav.css`
 - `public/assets/js/app/ai.formbox.js`
+- `public/assets/js/app/chat-alerts.js`
+- `public/assets/js/app/chat-attach.js`
 - `public/assets/js/app/chat-delete.js`
 - `public/assets/js/app/chat-drafts.js`
 - `public/assets/js/app/chat-guard.js`
@@ -1044,11 +1062,16 @@ Files that are not part of LaraClassifier.
 - `public/assets/js/app/chat-kit.js`
 - `public/assets/js/app/chat-live.js`
 - `public/assets/js/app/chat-log.js`
+- `public/assets/js/app/chat-offers.js`
 - `public/assets/js/app/chat-photo.js`
 - `public/assets/js/app/chat-presence.js`
+- `public/assets/js/app/chat-privacy.js`
 - `public/assets/js/app/chat-reply.js`
 - `public/assets/js/app/chat-safety.js`
 - `public/assets/js/app/chat-settings.js`
+- `public/assets/js/app/chat-tidy.js`
+- `public/assets/js/app/chat-tools.js`
+- `public/assets/js/app/chat-viewer.js`
 - `public/assets/js/app/chat.js`
 - `public/assets/js/app/consent.js`
 - `public/assets/js/app/email-seller.js`
@@ -1122,8 +1145,11 @@ Files that are not part of LaraClassifier.
 - `resources/views/front/blog/show.blade.php`
 - `resources/views/front/chat/emails-off.blade.php`
 - `resources/views/front/chat/index.blade.php`
+- `resources/views/front/chat/partials/privacy-dialog.blade.php`
 - `resources/views/front/chat/partials/report-dialog.blade.php`
 - `resources/views/front/chat/partials/safety.blade.php`
+- `resources/views/front/chat/partials/tools-dialog.blade.php`
+- `resources/views/front/chat/partials/viewer.blade.php`
 - `resources/views/front/common/consent/banner.blade.php`
 - `resources/views/front/common/consent/tracking.blade.php`
 - `resources/views/front/common/json-ld.blade.php`

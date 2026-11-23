@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Chat;
 
+use App\Services\Chat\ChatPrivacy;
 use App\Services\Chat\ChatMessages;
 use Illuminate\Support\Facades\DB;
 
@@ -34,6 +35,49 @@ class ChatPagesTest extends ChatTestCase
 		$response->assertSee('assets/css/chat.css', false)->assertSee('assets/css/chat-messages.css', false);
 		// Enter sends on a computer: the message box says how to make a new line
 		$response->assertSee('<span class="adn-chat-hint" id="adnChatHint"><kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span>', false);
+	}
+
+	public function test_the_chat_page_brings_the_inbox_tools_privacy_and_photo_parts(): void
+	{
+		// Arrange
+		$this->conversation();
+		ChatPrivacy::save(self::SELLER_ID, false, true);
+
+		// Act
+		$response = $this->actingAs($this->seller)->get('/chat');
+
+		// Assert: search, the three filters, the privacy dialog, the photo tray and the viewer
+		$html = $response->assertOk()->getContent();
+		$state = $this->chatState($html);
+		$this->assertSame(['online' => false, 'seen' => true], $state['privacy']);
+		$this->assertSame(2, $state['limits']['search_min']);
+		$this->assertStringContainsString('/chat/api/privacy', $state['urls']['privacy']);
+		foreach (['mark_unread', 'mute', 'archive', 'unarchive', 'empty_search', 'blocked_none', 'new_message_from', 'viewer_count', 'unblock'] as $text) {
+			$this->assertNotEmpty($state['text'][$text], $text);
+		}
+		foreach (['data-chat-search', 'data-chat-filter="archived"', 'id="adnChatPrivacy"', 'data-chat-privacy-seen checked', 'data-chat-tray', 'data-chat-drop', '<dialog class="adn-chat-viewer"'] as $part) {
+			$response->assertSee($part, false);
+		}
+		$response->assertDontSee('data-chat-privacy-online checked', false);
+		foreach (['chat-tidy', 'chat-privacy', 'chat-attach', 'chat-viewer'] as $script) {
+			$response->assertSee('assets/js/app/' . $script . '.js', false);
+		}
+		$response->assertSee('assets/css/chat-tidy.css', false)->assertSee('assets/css/chat-photos.css', false);
+		// Several photos can be picked at once
+		$this->assertMatchesRegularExpression('~<input type="file"[^>]* multiple [^>]*data-chat-photo-input~', $html);
+	}
+
+	public function test_the_chat_page_speaks_to_screen_readers_once_and_not_at_every_redraw(): void
+	{
+		// Act
+		$html = $this->actingAs($this->seller)->get('/chat')->assertOk()->getContent();
+
+		// Assert: one polite status line; the list and the messages, which are redrawn, are not live regions
+		$this->assertMatchesRegularExpression('~<div class="visually-hidden" role="status" aria-live="polite" data-chat-announce>~', $html);
+		$this->assertMatchesRegularExpression('~<div class="adn-chat-list" data-chat-list></div>~', $html);
+		$this->assertMatchesRegularExpression('~<div class="adn-chat-log" data-chat-log role="region" aria-label="Messages" tabindex="0">~', $html);
+		// The open conversation's name is a heading that can take the focus; it reads in its own direction
+		$this->assertMatchesRegularExpression('~<h2 class="adn-chat-head-name adn-chat-own-dir" data-chat-name tabindex="-1" dir="auto">~', $html);
 	}
 
 	public function test_a_conversation_page_opens_with_its_latest_messages(): void
@@ -161,7 +205,9 @@ class ChatPagesTest extends ChatTestCase
 		$html = $this->actingAs($this->buyer)->get('/chat/new/' . $this->listing->id)->assertOk()->getContent();
 
 		// Assert
-		$this->assertStringContainsString('Stay safe:', $html);
+		foreach (['Stay safe', 'Meet in a public place', 'Check the item before you pay', 'Never send a deposit or share codes sent to your phone', 'Adniro will never ask you for a code, a password or a payment in a chat.'] as $line) {
+			$this->assertStringContainsString($line, $html);
+		}
 		$this->assertMatchesRegularExpression('/adn-chat-safety.*anti-scam/s', $html);
 	}
 

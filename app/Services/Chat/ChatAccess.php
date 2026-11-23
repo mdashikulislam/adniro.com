@@ -33,13 +33,16 @@ class ChatAccess
 		return ChatThread::query()->whereKey($threadId)->forUser($userId)->exists();
 	}
 
-	/** Online status and typing are shown to the two participants, and to neither once one has blocked the other. */
+	/**
+	 * Online status and typing are shown to the two participants, and to neither once one has blocked the
+	 * other. A member who turned "online" off is not let in at all: they are not shown, and see nobody.
+	 */
 	public static function canSeePresence(int $threadId, int $userId): bool
 	{
 		$thread = ChatThread::query()->whereKey($threadId)->forUser($userId)->with('participants')->first();
 		$otherId = (int)($thread?->otherParticipant($userId)?->user_id ?? 0);
 
-		return $thread !== null && $otherId > 0 && !self::isBlockedBetween($userId, $otherId);
+		return $thread !== null && $otherId > 0 && !self::isBlockedBetween($userId, $otherId) && ChatPrivacy::showsOnline($userId);
 	}
 
 	public static function hasBlocked(int $blockerId, int $blockedId): bool

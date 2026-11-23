@@ -1,0 +1,260 @@
+/*
+ * adniro: live chat, photos (front/chat/index.blade.php): the photos waiting to be sent above the message box,
+ * the mark shown while photos are dragged over the conversation, and the viewer that shows a photo full size
+ * (front/chat/partials/viewer.blade.php). Colours and sizes come from chat.css.
+ */
+
+/* ---------- Photos waiting to be sent ---------- */
+.adn-chat-tray {
+	display: flex;
+	flex: 0 0 auto;
+	gap: .75rem;
+	margin: 0;
+	padding: .75rem .75rem .25rem;
+	overflow-x: auto;
+	list-style: none;
+	scrollbar-width: thin;
+}
+
+.adn-chat-tray-item {
+	position: relative;
+	flex: 0 0 auto;
+	width: 64px;
+	height: 64px;
+	animation: adnChatRise var(--adn-chat-base) var(--adn-chat-ease);
+}
+
+.adn-chat-tray-item img {
+	width: 64px;
+	height: 64px;
+	border-radius: var(--adn-chat-radius-md);
+	object-fit: cover;
+	outline: 1px solid rgba(0, 0, 0, .1);
+	outline-offset: -1px;
+}
+
+.adn-chat-tray .adn-chat-photo-remove:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- Dropping photos onto the conversation ---------- */
+.adn-chat-open {
+	position: relative;
+}
+
+.adn-chat-drop {
+	position: absolute;
+	inset: .5rem;
+	z-index: 5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2px dashed var(--adn-chat-accent);
+	border-radius: var(--adn-chat-radius-panel);
+	background-color: color-mix(in srgb, var(--adn-chat-accent-soft) 92%, transparent);
+	pointer-events: none; /* the drop lands on the conversation underneath */
+}
+
+.adn-chat-drop span {
+	display: inline-flex;
+	align-items: center;
+	gap: .6rem;
+	padding: .7rem 1.1rem;
+	border-radius: 999px;
+	font-size: .95rem;
+	font-weight: 700;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-bg);
+	box-shadow: var(--adn-chat-shadow-panel);
+}
+
+/* A photo in a message opens the viewer */
+.adn-chat-bubble.is-photo a {
+	display: block;
+	border-radius: inherit;
+	cursor: zoom-in;
+}
+
+.adn-chat-bubble.is-photo a:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- The viewer ---------- */
+.adn-chat-viewer {
+	width: 100vw;
+	max-width: none;
+	height: 100vh;
+	height: 100dvh;
+	max-height: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	color: #fff;
+	background: rgba(10, 14, 18, .97);
+	overflow: hidden;
+}
+
+.adn-chat-viewer[open] {
+	display: flex;
+	flex-direction: column;
+	animation: adnChatViewerIn var(--adn-chat-base, 200ms) ease-out;
+}
+
+.adn-chat-viewer::backdrop {
+	background: rgba(10, 14, 18, .6);
+}
+
+.adn-chat-viewer-bar {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: .35rem;
+	padding: .5rem .5rem .5rem 1rem;
+	padding-top: max(.5rem, env(safe-area-inset-top));
+}
+
+[dir="rtl"] .adn-chat-viewer-bar {
+	padding: .5rem 1rem .5rem .5rem;
+}
+
+.adn-chat-viewer-info {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+	line-height: 1.3;
+}
+
+.adn-chat-viewer-info strong {
+	overflow: hidden;
+	font-size: .95rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adn-chat-viewer-info span,
+.adn-chat-viewer-count {
+	font-size: .75rem;
+	color: rgba(255, 255, 255, .72);
+	font-variant-numeric: tabular-nums;
+}
+
+.adn-chat-viewer-count {
+	margin-inline-end: .5rem;
+	font-size: .8125rem;
+	white-space: nowrap;
+}
+
+.adn-chat-viewer-btn {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	font-size: 1.1rem;
+	color: #fff;
+	background-color: rgba(255, 255, 255, .1);
+	text-decoration: none;
+	transition: background-color var(--adn-chat-fast, 120ms) ease, transform var(--adn-chat-fast, 120ms) ease;
+}
+
+.adn-chat-viewer-btn:hover {
+	color: #fff;
+	background-color: rgba(255, 255, 255, .2);
+}
+
+.adn-chat-viewer-btn:active {
+	transform: scale(.96);
+}
+
+.adn-chat-viewer-btn:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+.adn-chat-viewer-btn:disabled {
+	opacity: .3;
+	pointer-events: none;
+}
+
+.adn-chat-viewer-stage {
+	position: relative;
+	display: flex;
+	flex: 1 1 auto;
+	align-items: center;
+	justify-content: center;
+	min-height: 0;
+	padding: .5rem 1rem 1.25rem;
+	padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+	touch-action: pan-y;
+}
+
+.adn-chat-viewer-img {
+	max-width: 100%;
+	max-height: 100%;
+	border-radius: var(--adn-chat-radius-sm, 8px);
+	object-fit: contain;
+	outline: 1px solid rgba(255, 255, 255, .1);
+	outline-offset: -1px;
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+.adn-chat-viewer-nav {
+	position: absolute;
+	top: 50%;
+	z-index: 1;
+	margin-top: -22px;
+	background-color: rgba(10, 14, 18, .55);
+}
+
+.adn-chat-viewer-nav.is-prev {
+	inset-inline-start: .75rem;
+}
+
+.adn-chat-viewer-nav.is-next {
+	inset-inline-end: .75rem;
+}
+
+[dir="rtl"] .adn-chat-viewer-nav i {
+	transform: scaleX(-1);
+}
+
+.adn-chat-viewer-wait {
+	position: absolute;
+	width: 1.5rem;
+	height: 1.5rem;
+	color: #fff;
+	border-width: .15em;
+}
+
+.adn-chat-viewer [hidden] {
+	display: none !important;
+}
+
+@keyframes adnChatViewerIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-chat-tray-item,
+	.adn-chat-viewer[open] {
+		animation: none;
+	}
+
+	.adn-chat-viewer-btn {
+		transition: none;
+	}
+}

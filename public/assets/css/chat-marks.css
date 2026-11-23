@@ -1,7 +1,7 @@
 /*
  * adniro: live chat, the marks added to the message log after the first version (assets/css/chat-messages.css
- * has the bubbles themselves): a deleted message, the Delete button, the "New messages" line, and the last
- * line of the safety note. Colours and sizes are the tokens of assets/css/chat.css.
+ * has the bubbles themselves): a deleted message, the Delete button, the "New messages" line, and the safety
+ * note at the top of a conversation. Colours and sizes are the tokens of assets/css/chat.css.
  */
 
 /* Delete, beside my own recent messages: the same button, red when pointed at */
@@ -50,9 +50,187 @@
 	background-color: var(--adn-chat-accent-soft);
 }
 
-/* The safety note at the top of a conversation: its last line, "Adniro will never ask…" */
-.adn-chat-safety-never {
-	display: block;
-	margin-top: .2rem;
+/*
+ * The safety card at the top of a conversation (front/chat/partials/safety.blade.php), as wide as the
+ * messages: a teal shield and the title, a button to the safety tips, three habits side by side, and an
+ * amber foot with the promise that Adniro never asks for a code, a password or a payment in a chat.
+ */
+.adn-chat-page {
+	--adn-chat-warning-border: #f0dc9c;
+	--adn-chat-safety-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 14px 28px -18px rgba(15, 118, 110, .45);
+}
+
+[data-bs-theme="dark"] .adn-chat-page {
+	--adn-chat-warning-border: #5c4c1d;
+	--adn-chat-safety-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 14px 28px -18px rgba(0, 0, 0, .7);
+}
+
+.adn-chat-safety {
+	position: relative;
+	margin: 0 0 1rem;
+	border: 1px solid var(--adn-chat-border);
+	border-radius: 16px;
+	font-size: .8125rem;
+	line-height: 1.4;
+	color: var(--adn-chat-text);
+	background-color: var(--adn-chat-bg);
+	box-shadow: var(--adn-chat-safety-shadow);
+	overflow: hidden;
+}
+
+/* A thin line of the site's teal running into the foot's amber */
+.adn-chat-safety::before {
+	content: "";
+	position: absolute;
+	inset: 0 0 auto;
+	height: 3px;
+	background: linear-gradient(90deg, var(--adn-chat-accent), #2dd4bf 55%, #f5c84b);
+}
+
+.adn-chat-safety-head {
+	display: flex;
+	align-items: center;
+	gap: .7rem;
+	padding: .95rem .9rem .7rem;
+}
+
+.adn-chat-safety-badge {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 13px;
+	font-size: 1.2rem;
+	color: #fff;
+	background: linear-gradient(140deg, #14b8a6, var(--adn-chat-accent-strong));
+	box-shadow: 0 6px 14px -6px rgba(15, 118, 110, .7), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+.adn-chat-safety-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 1rem;
+	font-weight: 800;
+	letter-spacing: -.01em;
+	text-wrap: balance;
+}
+
+/* The link carries the site's own link classes, whose colour is "important": so is this one */
+.adn-chat-safety .adn-chat-safety-link a {
+	display: inline-flex;
+	align-items: center;
+	gap: .35rem;
+	min-height: 36px;
+	padding: .3rem .85rem;
+	border-radius: 999px;
+	font-weight: 700;
+	color: var(--adn-chat-accent-text) !important;
+	background-color: var(--adn-chat-accent-soft);
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color var(--adn-chat-fast) ease, transform var(--adn-chat-fast) ease;
+}
+
+.adn-chat-safety .adn-chat-safety-link a::after {
+	content: "\2192";
+	transition: transform var(--adn-chat-fast) ease;
+}
+
+[dir="rtl"] .adn-chat-safety .adn-chat-safety-link a::after {
+	content: "\2190";
+}
+
+.adn-chat-safety .adn-chat-safety-link a:hover {
+	background-color: color-mix(in srgb, var(--adn-chat-accent) 22%, var(--adn-chat-bg));
+}
+
+.adn-chat-safety .adn-chat-safety-link a:hover::after {
+	transform: translateX(2px);
+}
+
+[dir="rtl"] .adn-chat-safety .adn-chat-safety-link a:hover::after {
+	transform: translateX(-2px);
+}
+
+.adn-chat-safety .adn-chat-safety-link a:active {
+	transform: scale(.96);
+}
+
+.adn-chat-safety .adn-chat-safety-link a:focus-visible {
+	outline: 2px solid var(--adn-chat-accent);
+	outline-offset: 2px;
+}
+
+/* Three habits, side by side */
+.adn-chat-safety-tips {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: .5rem;
+	margin: 0;
+	padding: 0 .9rem .9rem;
+	list-style: none;
+}
+
+.adn-chat-safety-tips li {
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	padding: .6rem .65rem;
+	border-radius: var(--adn-chat-radius-md);
 	font-weight: 600;
+	background-color: var(--adn-chat-surface);
+	text-wrap: pretty;
+}
+
+.adn-chat-safety-tips i {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	font-size: .9rem;
+	color: var(--adn-chat-accent-text);
+	background-color: var(--adn-chat-bg);
+	box-shadow: 0 0 0 1px var(--adn-chat-border);
+}
+
+.adn-chat-safety-never {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	margin: 0;
+	padding: .6rem .9rem;
+	border-top: 1px solid var(--adn-chat-warning-border);
+	font-weight: 700;
+	color: var(--adn-chat-warning-text);
+	background-color: var(--adn-chat-warning-bg);
+	text-wrap: pretty;
+}
+
+.adn-chat-safety-never i {
+	flex: 0 0 auto;
+	font-size: .95rem;
+}
+
+/* Narrow screens: the habits become a short list */
+@media (max-width: 575.98px) {
+	.adn-chat-safety-tips {
+		grid-template-columns: minmax(0, 1fr);
+		gap: .35rem;
+	}
+
+	.adn-chat-safety-tips li {
+		padding: .45rem .55rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.adn-chat-safety .adn-chat-safety-link a,
+	.adn-chat-safety .adn-chat-safety-link a::after {
+		transition: none;
+	}
 }

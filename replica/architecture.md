@@ -336,5 +336,41 @@ Not done: A10 (the old attachment's direct link), which needs a change on the li
   agree through localStorage). Both choices are kept in the browser. A tab of a member with notifications on
   no longer disconnects after five minutes in the background.
 
+**Round 4 of the audit (B9, B11, B12, B13, B15), built on local:**
+
+- **Finding and tidying the inbox.** A search box (`?q=`, two characters or more) looks at the other
+  person's name and at the listing last talked about, in all of the member's chats, archived or not. Three
+  filters: All (not archived), Unread, Archived. Each row has its own menu, and the open conversation's menu
+  has the same three choices: mark as unread or read, mute, archive (`PUT chat/api/threads/{thread}/tidy`,
+  `ChatTidy`). All three are the member's own (`threads_participants.archived_at`, `muted_until`,
+  `unread_count`): the other person sees none of it. A new message brings an archived chat back for both.
+  A muted chat gets no sound, notification, pop-up or email; its unread count still shows. "Mark as unread"
+  counts as one unread message until the chat is opened, leaves "seen" as it was, and sends no email.
+- **Privacy** (`ChatPrivacy`, `chat_preferences.shows_online` / `shows_seen`, `GET`/`PUT chat/api/privacy`).
+  Both choices work both ways. "Online" off: the member is not let into a conversation's presence channel,
+  so they are not shown online or typing and see nobody. "Seen" off: how far each person has read is still
+  recorded (unread counts need it) but told to neither (`read_up_to` is 0, and the "read" event goes to the
+  reader's own tabs only). A change is told to the member's other tabs and devices at once (`chat.privacy`
+  on their own channel), so none goes on showing them online. The same dialog lists the people the member
+  blocked, to unblock them.
+- **Photos.** Up to six at a time: picked together, pasted into the message box, or dragged onto the
+  conversation (`chat-attach.js`). Each is still its own message; messages now leave one after the other, so
+  they arrive in the order they were sent. A photo opens in a viewer on the page (`chat-viewer.js`, a
+  `<dialog>`): arrow keys, buttons or a swipe go through the conversation's photos; a link opens the full
+  photo in a new tab. What was sent is still delivered when the member leaves the chat before it has gone.
+- **Safety card.** The reminder at the top of a conversation is a full-width card: three habits side by
+  side, a link to the safety tips, and the promise that Adniro never asks for a code or a payment in a chat.
+- **Screen readers and keyboard.** The list of chats and the message log are no longer live regions (they
+  are redrawn at every change, which read everything out again). One hidden status line says what is new:
+  the message that arrived in the open chat, "New message from…" elsewhere, how many chats a search found.
+  Opening a chat moves the keyboard to the message box (to the person's name on a phone, so the keyboard does
+  not come up by itself); Back returns it to the chat's row. The list keeps the keyboard's place when it is
+  redrawn, waits while one of its menus is open, and answers to the up and down arrows. Escape gives up a
+  reply.
+- **Mixed languages.** A message's text takes its direction from what is written, line by line
+  (`dir="auto"`, `unicode-bidi: plaintext`); the time stays in the same corner of every bubble. Names, titles
+  and previews that are cut short read in their own direction and stay on the page's side
+  (`.adn-chat-own-dir`). The message box follows what is typed.
+
 Design: `replica/design/` (tokens, 27 colour pairs with 0 failing AA, and the component specs).
 
