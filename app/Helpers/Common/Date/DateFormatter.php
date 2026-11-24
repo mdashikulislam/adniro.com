@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Web\Front\Account\AccountBaseController;
 use App\Http\Controllers\Web\Front\HomeController;
 use App\Http\Controllers\Web\Front\Post\Show\ShowController;
+use App\Http\Controllers\Web\Front\RecentlyViewedController; // adniro
 use App\Http\Controllers\Web\Front\Search\SearchController;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
@@ -132,6 +133,8 @@ class DateFormatter
 					&& (
 						routeActionHas(getClassNamespaceName(SearchController::class))
 						|| routeActionHas(HomeController::class)
+						// adniro: the homepage's "Recently viewed" cards are fetched from their own address
+						|| routeActionHas(RecentlyViewedController::class)
 						|| routeActionHas(getClassNamespaceName(AccountBaseController::class))
 					)
 				)

@@ -139,6 +139,22 @@ class RecentlyViewedSectionTest extends TestCase
 		$this->assertCount(4, $json['ids']);
 	}
 
+	public function test_the_cards_date_reads_like_on_the_other_listing_cards(): void
+	{
+		// Arrange: "2 days ago" on the listing cards (Listings List > Date from now)
+		config(['settings.listings_list.date_from_now' => '1']);
+		$post = $this->stockListing('Grey corner sofa', ['created_at' => now()->subDays(2)]);
+
+		// Act
+		$html = (string)$this->getJson('listings/recently-viewed?ids=' . $post->id)->assertOk()->json('html');
+		config(['settings.listings_list.date_from_now' => '0']);
+		$fullDate = (string)$this->getJson('listings/recently-viewed?again=1&ids=' . $post->id)->assertOk()->json('html');
+
+		// Assert: the elapsed time, and the full date only when the setting is off
+		$this->assertMatchesRegularExpression('~listing-card-date">.*?>2 days ago</span>~s', $html);
+		$this->assertDoesNotMatchRegularExpression('~listing-card-date">.*?days ago~s', $fullDate);
+	}
+
 	public function test_out_of_range_options_are_kept_within_the_limits(): void
 	{
 		// Arrange
