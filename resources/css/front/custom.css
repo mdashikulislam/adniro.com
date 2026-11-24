@@ -1375,12 +1375,35 @@
 		font-size: .88rem;
 	}
 	
+	/*
+	 * adniro: the posted date stays on phones (it was hidden). The price is a little smaller to leave it room,
+	 * and when the two still do not fit side by side, the date goes under the price.
+	 */
+	.listing-card-footer {
+		flex-wrap: wrap;
+		gap: .15rem .3rem;
+	}
+	
 	.listing-card-price {
-		font-size: 1rem;
+		font-size: .92rem;
+	}
+	
+	.listing-card-price-text {
+		gap: .2rem;
+		font-size: .7rem;
+	}
+	
+	.listing-card-price-text::before {
+		font-size: .74rem;
+	}
+	
+	.listing-card-footer-right {
+		margin-left: auto;
 	}
 	
 	.listing-card-date {
-		display: none;
+		gap: .2rem;
+		font-size: .66rem;
 	}
 	
 	.listing-card-location {
@@ -1391,6 +1414,13 @@
 	.listing-card .listing-fav.btn {
 		width: 30px;
 		height: 30px;
+	}
+}
+
+/* adniro: on the narrowest phones "Contact us" drops its icon, so the date still fits beside it */
+@media (max-width: 399.98px) {
+	.listing-card-price-text::before {
+		content: none;
 	}
 }
 
