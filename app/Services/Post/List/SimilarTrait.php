@@ -31,6 +31,12 @@ trait SimilarTrait
 {
 	use CategoryTrait, LocationTrait, SidebarTrait;
 	
+	/*
+	 * adniro: part of the similar listings' cache key. They are now loaded with the excerpt and the seller, which
+	 * the listing card shows; lists cached before that have neither and must not be served any more.
+	 */
+	private const SIMILAR_CARD_COLUMNS = 'excerpt,seller';
+	
 	/**
 	 * @param array $params
 	 * @return \Illuminate\Http\JsonResponse
@@ -138,6 +144,7 @@ trait SimilarTrait
 				'locale'     => $locale,
 				'categoryId' => $post->category_id,
 				'limit'      => $postsLimit,
+				'card'       => self::SIMILAR_CARD_COLUMNS, // adniro
 			];
 			
 			$posts = caching()->remember(Post::class, $cacheParams, function () use ($post, $postsLimit) {
@@ -157,6 +164,7 @@ trait SimilarTrait
 				'cityId'   => $post->city_id,
 				'distance' => $distance,
 				'limit'    => $postsLimit,
+				'card'     => self::SIMILAR_CARD_COLUMNS, // adniro
 			];
 			
 			$posts = caching()->remember(Post::class, $cacheParams, function () use ($post, $distance, $postsLimit) {
