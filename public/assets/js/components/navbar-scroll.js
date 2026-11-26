@@ -128,6 +128,7 @@ const DEFAULT_NAVBAR_CONFIG = {
  */
 const NAVBAR_CSS_CLASSES = {
 	STUCK: 'navbar-stuck',
+	STICKY: 'navbar-sticky', // adniro: hidden (moved up, transparent) until "navbar-stuck" is added
 	FIXED_TOP: 'fixed-top',
 };
 
@@ -180,15 +181,36 @@ class NavbarScrollController {
 	 * @param {NavbarScrollConfig} config - Configuration object for navbar behavior
 	 */
 	constructor(config) {
-		this.config = config;
+		// adniro: with the animations off nothing ever adds "navbar-stuck", so a header given "navbar-sticky"
+		// (the scrolled header gets it when its own animation setting is on) stayed hidden for as long as the
+		// page was scrolled down. Without animations the header is simply always in view.
+		this.config = config.animationEnabled ? config : NavbarScrollController.withoutHidingClass(config);
 		this.elements = {};
 		this.scrollThreshold = 0;
 		this.isThrottling = false;
+		this.isFixedStateActive = false; // adniro
 		this.eventListeners = new Map();
 		
 		// Bind methods to preserve context
 		this.handleScroll = this.handleScroll.bind(this);
 		this.throttledScrollHandler = this.throttledScrollHandler.bind(this);
+	}
+	
+	/**
+	 * adniro: a copy of the configuration whose headers never get the class that hides them
+	 * @param {NavbarScrollConfig} config
+	 * @returns {NavbarScrollConfig}
+	 */
+	static withoutHidingClass(config) {
+		const strip = (classes) => (typeof classes === 'string')
+			? classes.split(/\s+/).filter(name => name !== NAVBAR_CSS_CLASSES.STICKY).join(' ')
+			: classes;
+		
+		return {
+			...config,
+			default: {...config.default, cssClasses: strip(config.default.cssClasses)},
+			fixed: {...config.fixed, cssClasses: strip(config.fixed.cssClasses)},
+		};
 	}
 	
 	/**
@@ -413,6 +435,8 @@ class NavbarScrollController {
 	activateFixedState() {
 		const {navbar} = this.elements;
 		
+		this.isFixedStateActive = true; // adniro
+		
 		// Apply fixed state theme and styling
 		this.applyThemeConfiguration(this.config.fixed);
 		if (!navbar.classList.contains(NAVBAR_CSS_CLASSES.FIXED_TOP)) {
@@ -443,6 +467,13 @@ class NavbarScrollController {
 		const {navbar} = this.elements;
 		
 		if (scrollPosition <= navbarHeight) {
+			// adniro: back at the top, the default header is put back here too. A jump straight to the top (a tap
+			// on the iPhone's status bar, a hard flick) can skip the positions in between, the only ones that
+			// put it back, and the header then kept its scrolled look at the top of the page.
+			if (this.isFixedStateActive) {
+				this.deactivateFixedState();
+			}
+			
 			// Only add visible class if animations are enabled
 			if (this.config.animationEnabled) {
 				navbar.classList.add(NAVBAR_CSS_CLASSES.STUCK);
@@ -457,6 +488,8 @@ class NavbarScrollController {
 	 */
 	deactivateFixedState() {
 		const {navbar} = this.elements;
+		
+		this.isFixedStateActive = false; // adniro
 		
 		// Apply default state theme and styling
 		this.applyThemeConfiguration(this.config.default);
