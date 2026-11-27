@@ -77,6 +77,34 @@
 	text-decoration: none;
 }
 
+/* A member's own photo fills the button, which turns into a circle */
+.adn-mhead-btn.has-photo {
+	overflow: hidden;
+	border-radius: 50%;
+}
+
+.adn-mhead-photo,
+.adn-account-menu-avatar.has-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.adn-account-menu-avatar.has-photo {
+	overflow: hidden;
+	background: var(--bs-tertiary-bg);
+}
+
+.adn-account-menu-avatar.has-photo img {
+	outline: 1px solid rgba(0, 0, 0, .1);
+	outline-offset: -1px;
+}
+
+[data-bs-theme="dark"] .adn-account-menu-avatar.has-photo img {
+	outline-color: rgba(255, 255, 255, .1);
+}
+
 .adn-mhead-btn:hover,
 .adn-mhead-btn:focus-visible,
 #mainNavbar .navbar-toggler:hover {

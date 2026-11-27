@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\Feature\Concerns\SeedsStockData;
 use Tests\TestCase;
 
@@ -17,6 +18,7 @@ class MobileNavTest extends TestCase
 	use RefreshDatabase, SeedsStockData;
 
 	private const MEMBER_ID = 60;
+	private const PHOTO_PATH = 'avatars/us/60/me.jpg';
 
 	protected function setUp(): void
 	{
@@ -58,6 +60,35 @@ class MobileNavTest extends TestCase
 		$this->assertStringContainsString('href="' . url('account/saved-posts') . '"', $menu);
 		$this->assertSame(1, substr_count($menu, 'href="' . urlGen()->signOut() . '"'));
 		$this->assertGreaterThan(strrpos($menu, urlGen()->accountOverview()), strpos($menu, 'adn-account-menu-logout'));
+	}
+
+	public function test_the_header_account_button_shows_the_members_photo_in_a_circle(): void
+	{
+		// Arrange
+		$member = $this->stockMember(self::MEMBER_ID);
+		DB::table('users')->where('id', self::MEMBER_ID)->update(['photo_path' => self::PHOTO_PATH]);
+
+		// Act
+		$menu = $this->accountMenu($this->actingAs($member->fresh())->get('/')->assertOk()->getContent());
+
+		// Assert: the photo in the button and at the top of its menu, in place of the icon and the initial
+		$this->assertMatchesRegularExpression('~<button[^>]*class="adn-mhead-btn has-photo"[^>]*>\s*<img src="[^"]+" alt="" class="adn-mhead-photo"~', $menu);
+		$this->assertMatchesRegularExpression('~<span class="adn-account-menu-avatar has-photo"[^>]*>\s*<img src="[^"]+" alt=""~', $menu);
+		$this->assertStringNotContainsString('bi-person-check', $menu);
+	}
+
+	public function test_the_header_account_button_keeps_its_icon_for_a_member_without_a_photo(): void
+	{
+		// Arrange
+		$member = $this->stockMember(self::MEMBER_ID);
+
+		// Act
+		$menu = $this->accountMenu($this->actingAs($member)->get('/')->assertOk()->getContent());
+
+		// Assert
+		$this->assertStringContainsString('<i class="bi bi-person-check" aria-hidden="true"></i>', $menu);
+		$this->assertStringNotContainsString('has-photo', $menu);
+		$this->assertStringNotContainsString('<img', $menu);
 	}
 
 	public function test_the_header_account_menu_offers_log_in_and_sign_up_to_a_guest(): void
