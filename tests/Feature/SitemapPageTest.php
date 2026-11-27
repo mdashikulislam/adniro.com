@@ -101,6 +101,46 @@ class SitemapPageTest extends TestCase
 		$this->assertStringNotContainsString('id="browseLocations"', $html);
 	}
 
+	public function test_the_page_ends_with_a_share_bar_of_round_brand_buttons(): void
+	{
+		// Arrange
+		config(['settings.social_share' => ['facebook' => '1', 'twitter' => '1', 'whatsapp' => '1']]);
+
+		// Act
+		$html = $this->page();
+		$bar = substr($html, (int)strpos($html, '<section class="sm-share"'));
+		$bar = substr($bar, 0, (int)strpos($bar, '</section>'));
+
+		// Assert: a title, then the three networks switched on, with the plain glyphs that suit a round button
+		$this->assertStringContainsString('<h2 class="sm-share-title" id="sitemapShareTitle">Share this page</h2>', $bar);
+		$this->assertSame(3, preg_match_all('~<a class="[a-z-]+ text-decoration-none" title="Share on [^"]+"~', $bar));
+		$this->assertStringContainsString('<i class="fa-brands fa-facebook-f"></i>', $bar);
+		$this->assertStringContainsString('<i class="fa-brands fa-x-twitter"></i>', $bar);
+		$this->assertStringContainsString('<i class="fa-brands fa-whatsapp"></i>', $bar);
+		$this->assertStringNotContainsString('fa-square-', $bar);
+	}
+
+	public function test_no_share_bar_when_sharing_is_off(): void
+	{
+		// Arrange
+		config(['settings.social_share' => ['facebook' => '0', 'twitter' => '0']]);
+
+		// Act & Assert
+		$this->assertStringNotContainsString('sm-share', $this->page());
+	}
+
+	public function test_other_pages_keep_the_square_share_icons(): void
+	{
+		// Arrange
+		config(['settings.social_share' => ['facebook' => '1']]);
+
+		// Act
+		$html = view('front.layouts.partials.social.horizontal')->render();
+
+		// Assert
+		$this->assertStringContainsString('<i class="fa-brands fa-square-facebook"></i>', $html);
+	}
+
 	public function test_the_page_brings_its_own_stylesheet_and_search_script(): void
 	{
 		// Act

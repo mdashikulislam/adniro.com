@@ -24,4 +24,5 @@ return [
 	'found' => 'Risultati: :count',
 	'no_results_title' => 'Nessun risultato per «:query»',
 	'no_results_hint' => 'Controlla l\'ortografia o prova una parola più corta.',
+	'share_title' => 'Condividi questa pagina',
 ];

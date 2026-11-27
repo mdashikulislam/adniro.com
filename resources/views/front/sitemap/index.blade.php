@@ -23,6 +23,7 @@
  * - Cities: the homepage's "Choose a city" tiles (.city-chip, styled in custom.css), from A to Z (they arrive
  *   biggest first). As many as Admin > Settings > Pagination allows ("cities_limit").
  * - Blog: its topics and latest articles, when there are any.
+ * - Share: a bar with the site's share links as round buttons.
 --}}
 @extends('front.layouts.master')
 
@@ -262,7 +263,14 @@
 				</div>
 			</div>
 
-			@include('front.layouts.partials.social.horizontal')
+			{{-- Share: the site's share links (social-share.js) as round buttons in each network's colour --}}
+			@if (isSocialSharesEnabled())
+				<section class="sm-share" aria-labelledby="sitemapShareTitle">
+					<span class="sm-share-icon" aria-hidden="true"><i class="bi bi-share-fill"></i></span>
+					<h2 class="sm-share-title" id="sitemapShareTitle">{{ trans('sitemap.share_title') }}</h2>
+					@include('front.layouts.partials.social.horizontal', ['socialIconStyle' => 'plain'])
+				</section>
+			@endif
 		</div>
 	</div>
 @endsection

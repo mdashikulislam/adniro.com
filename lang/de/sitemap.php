@@ -24,4 +24,5 @@ return [
 	'found' => ':count gefunden',
 	'no_results_title' => 'Nichts passt zu „:query“',
 	'no_results_hint' => 'Prüfen Sie die Schreibweise oder versuchen Sie ein kürzeres Wort.',
+	'share_title' => 'Diese Seite teilen',
 ];

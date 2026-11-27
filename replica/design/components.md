@@ -443,6 +443,16 @@ Cities (the homepage's "Choose a city" tiles: ".city-chip" in custom.css, nothin
   last      no "More cities" tile here: the page lists its cities itself
   states    as on the homepage: hover lifts the tile 2px, tints it and fills the pin's tile
 
+Share bar (".sm-share", around the site's shared share links)
+  look      a 22px-cornered bar on a 5% teal wash with a glow in the far corner and a teal hairline border
+  parts     a teal gradient tile with a share icon, "Share this page", then one round 46px button a network
+  button    white with a 1px border, the network's plain glyph in its own colour (no squares here)
+  states    hover or focus: the button fills with its network's colour, darkened 28% so the white glyph
+            stays clear on the light greens and blues, lifts 3px and gets a glow of that colour; pressed: .96
+  dark      buttons on a 6% white surface; X is drawn in white and fills white with a black glyph
+  phones    the buttons take their own line, spread across the bar
+  a11y      a <section> with its heading; every link keeps its "Share on …" title; links from social-share.js
+
 Nothing found (".sm-empty")
   look      a dashed teal frame, a search icon in a 72px circle, “Nothing matches “…””, a hint, and a teal
             "Clear search" pill that empties the field and puts the cursor back in it

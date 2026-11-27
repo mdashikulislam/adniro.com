@@ -959,3 +959,161 @@ a.sm-stat:hover .sm-stat-arrow {
 #sitemapResults {
 	scroll-margin-top: var(--sm-header-clear);
 }
+
+/* ---------- Share: a bar of round buttons in each network's colour ---------- */
+.sm-share {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .85rem 1rem;
+	align-items: center;
+	margin-block-start: 3rem;
+	padding: 1.1rem 1.35rem;
+	border: 1px solid var(--sm-accent-line);
+	border-radius: 22px;
+	/* a wash of the site's teal with a glow in the far corner, as on the cards' heads elsewhere */
+	background:
+		radial-gradient(60% 160% at 100% 0%, rgba(var(--sm-accent-rgb), .16), transparent 62%),
+		rgba(var(--sm-accent-rgb), .05);
+}
+
+.sm-share-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border-radius: 14px;
+	font-size: 1.1rem;
+	color: #fff;
+	background: linear-gradient(145deg, var(--bs-primary), #0f766e);
+	box-shadow: 0 8px 16px -8px rgba(var(--sm-accent-rgb), .7), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+.sm-share-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: .01em;
+	color: var(--sm-text);
+}
+
+/* the shared share links (front/layouts/partials/social/horizontal.blade.php) */
+.sm-share .social-media.social-share {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .55rem;
+	align-items: center;
+	margin: 0 !important;
+}
+
+/* its own share glyph: the bar has one */
+.sm-share .social-media.social-share > span {
+	display: none;
+}
+
+/* each link's colour is its network's (social-media/css/social-media.css): the glyph at rest, the fill on hover */
+.sm-share .social-media.social-share a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 46px;
+	height: 46px;
+	border: 1px solid var(--sm-border);
+	border-radius: 50%;
+	background-color: var(--sm-surface);
+	box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+	cursor: pointer;
+	transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.sm-share .social-media.social-share i {
+	font-size: 1.15rem !important;
+	line-height: 1;
+	transition: color .2s ease;
+}
+
+.sm-share .social-media.social-share a:hover,
+.sm-share .social-media.social-share a:focus-visible {
+	border-color: transparent;
+	/* darkened a little, so the white glyph stays clear on the light greens and blues */
+	background-color: color-mix(in srgb, currentColor 72%, #000);
+	box-shadow: 0 12px 20px -10px currentColor;
+	transform: translateY(-3px);
+}
+
+.sm-share .social-media.social-share a:hover i,
+.sm-share .social-media.social-share a:focus-visible i {
+	color: #fff;
+}
+
+.sm-share .social-media.social-share a:active {
+	transform: translateY(-1px) scale(.96);
+}
+
+/* Snapchat's yellow takes a dark glyph */
+.sm-share .social-media.social-share a.snapchat {
+	color: #c9a400 !important;
+}
+
+/* X is black: on the dark page it is drawn in white, and fills white with a black glyph */
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter {
+	color: #fff !important;
+}
+
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter:hover,
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter:focus-visible {
+	background-color: #fff;
+}
+
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter:hover i,
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter:focus-visible i {
+	color: #000;
+}
+
+[data-bs-theme="dark"] .sm-share .social-media.social-share a {
+	border-color: rgba(255, 255, 255, .12);
+	background-color: rgba(255, 255, 255, .06);
+	box-shadow: none;
+}
+
+@media (max-width: 575.98px) {
+	.sm-share {
+		margin-block-start: 2.25rem;
+		padding: 1rem;
+		border-radius: 18px;
+	}
+
+	.sm-share-title {
+		font-size: 1.1rem;
+	}
+
+	/* the buttons on their own line, across the bar */
+	.sm-share .social-media.social-share {
+		flex: 1 1 100%;
+		justify-content: space-between;
+		gap: .4rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sm-share .social-media.social-share a:hover,
+	.sm-share .social-media.social-share a:focus-visible,
+	.sm-share .social-media.social-share a:active {
+		transform: none;
+	}
+}
+
+[data-bs-theme="dark"] .sm-share .social-media.social-share a:hover,
+[data-bs-theme="dark"] .sm-share .social-media.social-share a:focus-visible {
+	border-color: transparent;
+	background-color: color-mix(in srgb, currentColor 72%, #000);
+}
+
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter:hover,
+[data-bs-theme="dark"] .sm-share .social-media.social-share a.x-twitter:focus-visible {
+	background-color: #fff;
+}

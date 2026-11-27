@@ -24,4 +24,5 @@ return [
 	'found' => ':count found',
 	'no_results_title' => 'Nothing matches “:query”',
 	'no_results_hint' => 'Check the spelling or try a shorter word.',
+	'share_title' => 'Share this page',
 ];

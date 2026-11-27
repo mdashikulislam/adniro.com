@@ -24,4 +24,5 @@ return [
 	'found' => ':count मिले',
 	'no_results_title' => '“:query” से कुछ मेल नहीं खाता',
 	'no_results_hint' => 'वर्तनी जाँचें या कोई छोटा शब्द आज़माएँ।',
+	'share_title' => 'यह पेज शेयर करें',
 ];

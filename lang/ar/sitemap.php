@@ -24,4 +24,5 @@ return [
 	'found' => 'النتائج: :count',
 	'no_results_title' => 'لا شيء يطابق «:query»',
 	'no_results_hint' => 'تحقق من الإملاء أو جرّب كلمة أقصر.',
+	'share_title' => 'شارك هذه الصفحة',
 ];
