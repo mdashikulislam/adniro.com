@@ -482,7 +482,11 @@ function getUrlHost(?string $url): ?string
 }
 
 /**
- * Add rel="nofollow" to links in string
+ * Add rel="nofollow ugc" to links in string
+ *
+ * adniro: every outside link is marked, including one that already has a rel. The HTML cleaner gives
+ * rel="noreferrer noopener" to links that open in a new tab, and a link with any rel used to be left
+ * followed. "ugc" tells search engines the link was written by a user.
  *
  * @param string|null $html
  * @param string|null $skip
@@ -491,16 +495,57 @@ function getUrlHost(?string $url): ?string
 function noFollowLinks(?string $html, string $skip = null): string
 {
 	$callback = function ($mach) use ($skip) {
-		$link = $mach[1] ?? null;
-		$orig = $mach[0] ?? null;
-		$isSkipped = (!empty($skip) && str_contains($link, $skip));
-		$hasNoFollow = str_contains($link, 'rel=');
+		$link = $mach[1] ?? '';
+		$orig = $mach[0] ?? '';
 		
-		return (!$isSkipped && !$hasNoFollow) ? $link . ' rel="nofollow">' : $orig;
+		if (isLinkTagOnHost($link, $skip)) {
+			return $orig;
+		}
+		
+		if (preg_match('#\srel\s*=\s*(["\'])(.*?)\1#is', $link, $rel)) {
+			$values = preg_split('/\s+/', trim($rel[2]), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+			$values = array_values(array_unique(array_merge($values, ['nofollow', 'ugc'])));
+			
+			return str_replace($rel[0], ' rel="' . implode(' ', $values) . '"', $link) . '>';
+		}
+		
+		return $link . ' rel="nofollow ugc">';
 	};
 	$html = preg_replace_callback("#(<a[^>]+?)>#is", $callback, strval($html));
 	
 	return castToString($html);
+}
+
+/**
+ * Is an opening <a ...> tag (without its closing ">") a link to a page of the given host?
+ *
+ * adniro: the address decides. The host appearing somewhere else in the tag, for example in another
+ * website's query string, does not make the link the site's own. Addresses without a host ("/us/contact")
+ * are the site's own when a host is given.
+ *
+ * @param string $linkTag
+ * @param string|null $host
+ * @return bool
+ */
+function isLinkTagOnHost(string $linkTag, ?string $host): bool
+{
+	if (empty($host)) {
+		return false;
+	}
+	
+	if (!preg_match('#\shref\s*=\s*(["\'])(.*?)\1#is', $linkTag, $href)) {
+		return true; // not a link to anywhere
+	}
+	
+	$url = trim(html_entity_decode($href[2], ENT_QUOTES));
+	$linkHost = parse_url(str_starts_with($url, '//') ? 'http:' . $url : $url, PHP_URL_HOST);
+	if (empty($linkHost)) {
+		return !preg_match('#^[a-z][a-z0-9+.-]*:#i', $url); // relative address, not "mailto:" and the like
+	}
+	
+	$withoutWww = fn (string $name) => preg_replace('/^www\./', '', strtolower($name));
+	
+	return $withoutWww($linkHost) === $withoutWww($host);
 }
 
 /**
@@ -521,12 +566,12 @@ function urlsToLinks(?string $str, array $attributes = []): string
 	$str = ' ' . $str;
 	
 	$pattern = '`([^"=\'>])((http|https|ftp)://[^\s<]+[^\s<\.)])`i';
-	$replacement = '$1<a rel="nofollow" href="$2"' . $attrs . ' target="_blank">$2</a>';
+	$replacement = '$1<a rel="nofollow ugc" href="$2"' . $attrs . ' target="_blank">$2</a>'; // adniro: "ugc" added
 	$str = preg_replace($pattern, $replacement, $str);
 	
 	$str = substr($str, 1);
 	
-	// Add rel="nofollow" to links
+	// Add rel="nofollow ugc" to links
 	$httpHost = request()->server('HTTP_HOST');
 	$parse = parse_url('http' . '://' . $httpHost);
 	$str = noFollowLinks($str, $parse['host']);

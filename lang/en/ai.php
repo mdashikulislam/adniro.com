@@ -283,6 +283,11 @@ return [
 	'rule_enforce_off'            => 'Released when enforce mode was switched off',
 	'rule_admin_approved'         => 'Approved by an admin',
 	'rule_admin_rejected'         => 'Rejected by an admin',
+	'rule_cleanup_prohibited'      => 'Clean-up: prohibited content',
+	'rule_cleanup_crypto_software' => 'Clean-up: crypto or exchange software advert',
+	'rule_cleanup_price_template'  => 'Clean-up: "price in" template for another country',
+	'rule_cleanup_wrong_country'   => 'Clean-up: filed under the wrong country',
+	'rule_cleanup_duplicate'       => 'Clean-up: copy of a newer listing',
 	'rule_none'                   => '',
 	
 	// Settings: AI listing assistant (the AI box in the listing form)

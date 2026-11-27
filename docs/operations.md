@@ -24,6 +24,12 @@ Emails, thumbnails and AI checks run in the background once the queue is on Redi
 
 Two workers run: one for emails, SMS, general jobs and thumbnails (`mail,sms,default,thumbs`), and one for AI checks (`ai`), so a slow AI call never delays an email. `deploy.sh` restarts them after each deploy.
 
+**AI checks without Supervisor.** The AI checks always go to the `ai` queue on Redis, also when the queue driver is `sync`. A server that runs no Supervisor still needs that one worker, or moderation in enforce mode leaves every new listing waiting until the sweep hands it to the admins an hour later. `deploy/ai-worker/adniro-ai-worker.service` runs it under systemd; the file's header has the install steps.
+
+## 2a. Listings clean-up
+
+`php artisan listings:clean-up` lists the live listings that break a fixed rule: prohibited content, crypto and exchange software adverts, "price in <place>" templates and listings filed under the wrong country, and the older copies of a repeated listing. Nothing changes until `--apply` is added. Then each listing gets the moderation status "rejected" with a recorded decision; nothing is deleted and the owners are not emailed. A hidden listing can be approved again in Admin > AI > Moderation, and a listing an admin approved by hand is never hidden by a later run. `--rule=` limits the run to some rules, `--except=12,34` leaves listings out. Back up the database before a run with `--apply`.
+
 ## 2b. Live chat (Laravel Reverb)
 
 The chat works without this step: it then checks for new messages every 10 seconds while a chat is open.

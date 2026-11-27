@@ -1,0 +1,34 @@
+# adniro: the worker that runs the AI checks of new and edited listings (the "ai" queue on Redis),
+# kept running by systemd. Without it, moderation in enforce mode leaves every new listing waiting:
+# after an hour the sweep hands it to the admins instead.
+#
+# Install (as root):
+#   cp deploy/ai-worker/adniro-ai-worker.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now adniro-ai-worker
+# After each deploy:  nothing to do: deploy/deploy.sh runs "queue:restart", the worker stops after its
+#                     current check and systemd starts it again with the new code.
+# Logs:               journalctl -u adniro-ai-worker -n 50
+#
+# Use this OR the "adniro-ai" program of deploy/supervisor/adniro-workers.conf, not both.
+# --timeout is the moderation job's own time-out (App\Jobs\Ai\ModeratePost); TimeoutStopSec is above it,
+# so a check that is running can finish when the service is stopped.
+
+[Unit]
+Description=Adniro AI checks (queue worker)
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/adniro.com
+ExecStart=/usr/bin/php artisan queue:work redis --queue=ai --sleep=3 --tries=3 --timeout=300 --max-time=3600
+Restart=always
+RestartSec=3
+TimeoutStopSec=360
+# Never more than a small share of the machine: pages come first
+MemoryMax=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

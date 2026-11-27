@@ -95,7 +95,8 @@ trait ShowFieldValueTrait
 					if ($field->type == 'url') {
 						$value = addHttp($field->default_value);
 						if (doesRequestIsFromWebClient()) {
-							$value = '<a href="' . $value . '" target="_blank" rel="nofollow">' . $value . '</a>';
+							// adniro: "ugc" added, like the links in a listing's description
+							$value = '<a href="' . $value . '" target="_blank" rel="nofollow ugc">' . $value . '</a>';
 						}
 						$iField['value'] = $value;
 					}

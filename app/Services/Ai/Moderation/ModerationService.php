@@ -184,6 +184,34 @@ class ModerationService
 	}
 	
 	/**
+	 * Clean-up of listings that are already live ("php artisan listings:clean-up"): the listing is
+	 * hidden by a fixed rule and the decision is recorded. Applied in any mode. The owner is not
+	 * emailed, because a clean-up hides hundreds of listings at once; they see the reason on the listing.
+	 * An admin can approve it again in the queue, and an edit by the owner is checked as usual.
+	 */
+	public function rejectByRule(Post $post, string $rule, array $categories = []): PostModeration
+	{
+		$hash = ContentHash::for($post);
+		
+		$row = $this->record([
+			'post_id'        => $post->getKey(),
+			'trigger'        => ModerationTrigger::CLEANUP,
+			'mode'           => $this->mode(),
+			'source'         => 'system',
+			'content_hash'   => $hash,
+			'decided_status' => ModerationStatus::REJECTED,
+			'rule'           => $rule,
+			'categories'     => array_values(array_filter($categories, fn ($code) => is_string($code) && Policy::severity($code) !== null)),
+			'locale'         => $this->localeFor($post),
+			'policy_version' => Policy::VERSION,
+		]);
+		
+		$this->apply($post, ModerationStatus::REJECTED, $hash, $row, notifyOwner: false);
+		
+		return $row;
+	}
+	
+	/**
 	 * Hand a listing to the admins, with a recorded reason (sweep timeout and similar).
 	 */
 	public function handOver(Post $post, string $rule, array $attributes = []): PostModeration
@@ -498,9 +526,9 @@ class ModerationService
 	/**
 	 * Write a decision to the listing. save() goes through the model events, so cached queries are
 	 * cleared and the "listing is online" email goes out when it becomes approved.
-	 * A rejection is emailed once per decision.
+	 * A rejection is emailed once per decision, unless the caller says the owner is not to be told.
 	 */
-	private function apply(Post $post, string $status, ?string $hash, ?PostModeration $row, array $extra = []): void
+	private function apply(Post $post, string $status, ?string $hash, ?PostModeration $row, array $extra = [], bool $notifyOwner = true): void
 	{
 		$previousStatus = $post->moderation_status;
 		
@@ -527,7 +555,7 @@ class ModerationService
 			$row->save();
 		}
 		
-		if ($status === ModerationStatus::REJECTED && is_null($row->notified_at) && $this->notifyOwnerOfRejection($post, $row)) {
+		if ($notifyOwner && $status === ModerationStatus::REJECTED && is_null($row->notified_at) && $this->notifyOwnerOfRejection($post, $row)) {
 			$row->notified_at = now();
 			$row->save();
 		}

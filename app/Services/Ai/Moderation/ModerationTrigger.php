@@ -16,4 +16,5 @@ final class ModerationTrigger
 	public const CHANGED_DURING_CHECK = 'changed';
 	public const SWEEP = 'sweep';
 	public const RERUN = 'rerun';
+	public const CLEANUP = 'cleanup';
 }

@@ -5,7 +5,7 @@ Built files (`public/dist`, `mix-manifest.json`), lock files and tests are left 
 
 **Before upgrading LaraClassifier:** run the script again, upgrade on a branch, then check every file in "Changed" and "Deleted" with `git diff d33de74a -- <file>`. Changes from the AI and professional-site work carry an `adniro` comment; earlier changes (marked "no marker comment") usually don't, so compare those carefully. Files in "Added" are ours and normally survive an upgrade.
 
-## Changed (269)
+## Changed (271)
 
 Stock files we edited.
 
@@ -29,6 +29,7 @@ Stock files we edited.
 - `app/Helpers/Common/Date/DateFormatter.php`
 - `app/Helpers/Common/Files/Thumbnail.php` (no marker comment)
 - `app/Helpers/Common/Functions/helpers.php` (no marker comment)
+- `app/Helpers/Common/Functions/php.php`
 - `app/Helpers/Common/Functions/referrer.php` (no marker comment)
 - `app/Helpers/Common/Functions/referrer/reserved-usernames.php` (no marker comment)
 - `app/Helpers/Services/Functions/admin.php`
@@ -126,6 +127,7 @@ Stock files we edited.
 - `app/Services/Post/List/SearchTrait.php`
 - `app/Services/Post/List/SimilarTrait.php`
 - `app/Services/Post/Show/DetailedTrait.php`
+- `app/Services/Post/Show/ShowFieldValueTrait.php`
 - `app/Services/Post/ShowTrait.php`
 - `app/Services/Post/StoreTrait.php`
 - `app/Services/Section/SectionDataTrait.php`
@@ -668,7 +670,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (422)
+## Added (426)
 
 Files that are not part of LaraClassifier.
 
@@ -680,6 +682,7 @@ Files that are not part of LaraClassifier.
 - `app/Console/Commands/AiModerationSweep.php`
 - `app/Console/Commands/AiPing.php`
 - `app/Console/Commands/ChatUnreadDigest.php`
+- `app/Console/Commands/ListingsCleanUp.php`
 - `app/Console/Commands/ListingsWarmCounts.php`
 - `app/Console/Commands/UsersGenerateUsernames.php`
 
@@ -860,6 +863,8 @@ Files that are not part of LaraClassifier.
 - `app/Services/ListingAssistant/LimitStatus.php`
 - `app/Services/ListingAssistant/ListingAssistantService.php`
 - `app/Services/ListingAssistant/LocationResolver.php`
+- `app/Services/ListingCleanUp/CleanUpRules.php`
+- `app/Services/ListingCleanUp/ListingCleanUp.php`
 - `app/Services/ListingForm/ListingFormState.php`
 - `app/Services/ListingForm/PanelState.php`
 - `app/Services/ListingForm/PriceHint.php`
@@ -948,6 +953,10 @@ Files that are not part of LaraClassifier.
 ### database/seeders
 
 - `database/seeders/CategoryIconsSeeder.php`
+
+### deploy/ai-worker
+
+- `deploy/ai-worker/adniro-ai-worker.service`
 
 ### deploy/core-changes.php
 
