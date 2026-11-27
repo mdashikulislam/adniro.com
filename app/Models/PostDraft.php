@@ -15,6 +15,7 @@ class PostDraft extends Model
 	public const DRAFTED = 'drafted';
 	public const UNUSABLE = 'unusable';
 	public const FAILED = 'failed';
+	public const POSTED = 'posted'; // a listing was published from it (App\Services\ListingAssistant\DraftUse)
 	
 	protected $table = 'post_drafts';
 	

@@ -48,6 +48,10 @@
 		$aiBoxExamples = ['phone', 'car', 'home', 'furniture'];
 	@endphp
 	<div class="col-12 mb-4 ai-assistant-wrap">
+		@if ($aiBoxOn)
+			{{-- The draft this form was filled from (set by ai.formbox.js, read by App\Services\ListingAssistant\DraftUse) --}}
+			<input type="hidden" name="ai_draft" id="aiDraft" value="{{ old('ai_draft', session('postInput.ai_draft')) }}">
+		@endif
 		<div class="ai-assistant card" id="aiAssistant"
 		     data-url="{{ url('posts/create/assistant/fill') }}"
 		     data-wysiwyg="{{ in_array(config('settings.listing_form.wysiwyg_editor'), ['none', '', null], true) ? '0' : '1' }}"
@@ -188,7 +192,7 @@
 	@endPushOnce
 	@if ($aiBoxOn)
 		@pushOnce('after_scripts_stack', 'ai_formbox_js')
-			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=7"></script>
+			<script src="{{ url('assets/js/app/ai.formbox.js') }}?v=8"></script>
 		@endPushOnce
 	@endif
 @endif

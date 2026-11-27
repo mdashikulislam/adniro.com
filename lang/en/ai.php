@@ -103,6 +103,10 @@ return [
 	'eval_moderation' => 'Moderation',
 	'eval_listing_assistant'  => 'Listing assistant',
 	
+	// Admin > Listings: the label on a listing whose form the AI listing assistant filled in
+	'made_with_ai'         => 'Made with AI',
+	'made_with_ai_hint'    => 'The AI listing assistant filled in this listing\'s form. The seller could still change it before publishing.',
+	
 	// Admin dashboard: AI spend widget
 	'spend_title'          => 'AI usage',
 	'spend_settings'       => 'AI settings',

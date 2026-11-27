@@ -206,6 +206,7 @@ class Post extends BaseModel implements Feedable
 			'archived_manually_at'  => NullableDateTimeCast::class,
 			'deletion_mail_sent_at' => NullableDateTimeCast::class,
 			'moderated_at'          => NullableDateTimeCast::class, // adniro:ai
+			'made_with_ai'          => 'boolean', // adniro:ai
 		];
 		
 		$versionIntroducingTwoFactor = (config('larapen.core.item.slug') == 'jobclass') ? '16.0.0' : '17.0.0';

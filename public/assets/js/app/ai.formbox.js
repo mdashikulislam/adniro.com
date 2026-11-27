@@ -403,8 +403,17 @@
 			}, {cityHtml: (document.getElementById('cityId') || {}).innerHTML}),
 			tags: tags ? Array.prototype.map.call(tags.options, function (o) {
 				return {value: o.value, text: o.text, selected: o.selected};
-			}) : null
+			}) : null,
+			draft: (document.getElementById('aiDraft') || {}).value || ''
 		};
+	}
+
+	/* The form's hidden field naming the draft it was filled from, so the published listing is marked as made with AI */
+	function setDraft(draftToken) {
+		var field = document.getElementById('aiDraft');
+		if (field) {
+			field.value = draftToken || '';
+		}
 	}
 
 	function restore() {
@@ -468,6 +477,7 @@
 				fire(cityEl);
 			}
 		}
+		setDraft(s.draft);
 		snapshot = null;
 		undoButton.classList.add('d-none');
 		resultEl.classList.add('d-none');
@@ -528,6 +538,7 @@
 
 	function apply(data, transcript, photosAdded) {
 		snapshot = takeSnapshot();
+		setDraft(lastDraft);
 
 		if (data.category) {
 			var current = (q('#categoryId') || {}).value;

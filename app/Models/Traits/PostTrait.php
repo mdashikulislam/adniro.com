@@ -41,6 +41,14 @@ trait PostTrait
 			$out .= '</span>';
 		}
 		
+		// adniro:ai - the form was filled in by the AI listing assistant
+		if (!empty($this->made_with_ai)) {
+			$out .= '<br>';
+			$out .= '<span class="badge bg-info" data-bs-toggle="tooltip" title="' . e(trans('ai.made_with_ai_hint')) . '">';
+			$out .= '<i class="fa-solid fa-wand-magic-sparkles"></i> ' . e(trans('ai.made_with_ai'));
+			$out .= '</span>';
+		}
+		
 		return $out;
 	}
 	

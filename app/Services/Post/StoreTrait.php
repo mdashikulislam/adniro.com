@@ -19,6 +19,7 @@ namespace App\Services\Post;
 use App\Http\Resources\PostResource;
 use App\Models\City;
 use App\Models\Post;
+use App\Services\ListingAssistant\DraftUse;
 use App\Services\Post\Store\AutoRegistrationTrait;
 use App\Services\Post\Store\StoreFieldValueTrait;
 use Illuminate\Http\Request;
@@ -112,6 +113,13 @@ trait StoreTrait
 			$post->reviewed_at = now();
 		}
 		
+		// adniro:ai - a listing whose form was filled in by the AI listing assistant is marked, for the admin's lists
+		$aiDraftUse = app(DraftUse::class);
+		$aiDraft = $aiDraftUse->find($request->input(DraftUse::FIELD), $authUser);
+		if (!empty($aiDraft)) {
+			$post->made_with_ai = true;
+		}
+		
 		// Save
 		try {
 			
@@ -119,6 +127,11 @@ trait StoreTrait
 			
 		} catch (Throwable $e) {
 			return apiResponse()->error($e->getMessage());
+		}
+		
+		// adniro:ai - one draft, one listing
+		if (!empty($aiDraft)) {
+			$aiDraftUse->markPublished($aiDraft, $post);
 		}
 		
 		// Get the API response data
