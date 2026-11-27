@@ -125,7 +125,7 @@ class AiFormBoxTest extends TestCase
 		$this->assertStringContainsString('Never guess what a photo cannot show', $request->instructions);
 		$this->assertStringNotContainsString('Use only what the person said. Do not invent', $request->instructions);
 		$this->assertSame(\App\Services\ListingAssistant\DraftPrompt::VERSION, $request->meta['prompt']);
-		$this->assertSame('2026-11-21.2', \App\Services\ListingAssistant\DraftPrompt::VERSION);
+		$this->assertSame('2026-11-27.1', \App\Services\ListingAssistant\DraftPrompt::VERSION);
 	}
 
 	public function test_the_description_is_a_full_listing_without_guessed_facts(): void
@@ -134,12 +134,28 @@ class AiFormBoxTest extends TestCase
 		$this->actingAs($this->user(7))->post(self::FILL_URL, ['photos' => [UploadedFile::fake()->image('phone.jpg', 800, 600)]], ['Accept' => 'application/json'])
 			->assertOk();
 
-		// Assert: an opening line, the model's standard features as a list, then the condition
+		// Assert: an opening paragraph, the seller's facts as a list, the model's specification sheet, then the condition
 		$instructions = $this->ai->lastRequest->instructions;
 		$this->assertStringContainsString('Key features:', $instructions);
+		$this->assertStringContainsString('"Specifications:"', $instructions);
 		$this->assertStringContainsString('the same on every unit of that model', $instructions);
 		$this->assertStringContainsString('Leave out anything that differs between units', $instructions);
 		$this->assertStringNotContainsString('two to six short sentences', $instructions);
+	}
+
+	public function test_the_description_is_as_complete_as_the_known_facts_allow(): void
+	{
+		// Act
+		$this->actingAs($this->user(7))->postJson(self::FILL_URL, ['text' => 'iPhone 13 blue with box, 420 dollars, Springfield'])->assertOk();
+
+		// Assert: thorough with what is known, a full specification sheet for a known model, and still no guesses
+		$instructions = $this->ai->lastRequest->instructions;
+		$this->assertStringContainsString('as complete as the known facts allow', $instructions);
+		$this->assertStringContainsString('up to fourteen', $instructions);
+		$this->assertStringContainsString('never pad it with guesses', $instructions);
+		$this->assertStringContainsString('leave this part out', $instructions, 'no specification sheet for things without a model');
+		$this->assertStringNotContainsString('A short, honest draft is better than a long one', $instructions);
+		$this->assertStringNotContainsString('three to six lines', $instructions);
 	}
 
 	public function test_a_new_fill_replaces_the_box_photos_but_keeps_the_sellers_own(): void
