@@ -91,15 +91,14 @@ class SitemapPageTest extends TestCase
 		$this->assertStringNotContainsString('sm-letter', $html, 'no more rows by letter');
 	}
 
-	public function test_the_last_tile_opens_the_window_with_every_city(): void
+	public function test_the_cities_have_no_more_cities_tile(): void
 	{
 		// Act
 		$html = $this->page();
 
-		// Assert: the homepage's "More cities" tile, and the window it opens
-		$this->assertMatchesRegularExpression('~<a href="#browseLocations"\s+class="[^"]*city-chip city-chip-more"\s+data-bs-toggle="modal"~', $html);
-		$this->assertStringContainsString('<span class="city-chip-name">More cities</span>', $html);
-		$this->assertStringContainsString('id="browseLocations"', $html);
+		// Assert: the page lists its cities itself, so the homepage's last tile and its window are left out
+		$this->assertStringNotContainsString('city-chip-more', $html);
+		$this->assertStringNotContainsString('id="browseLocations"', $html);
 	}
 
 	public function test_the_page_brings_its_own_stylesheet_and_search_script(): void

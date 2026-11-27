@@ -21,7 +21,7 @@
  * - Categories: cards on a grid, each as wide as its list is long (App\Helpers\Common\SitemapBento), with the
  *   category's icon and every sub-category: nothing is folded behind "View more", it is a sitemap.
  * - Cities: the homepage's "Choose a city" tiles (.city-chip, styled in custom.css), from A to Z (they arrive
- *   biggest first), ending with its "More cities" tile, which opens the window with every city.
+ *   biggest first). As many as Admin > Settings > Pagination allows ("cities_limit").
  * - Blog: its topics and latest articles, when there are any.
 --}}
 @extends('front.layouts.master')
@@ -66,14 +66,6 @@
 
 @section('search')
 	@parent
-@endsection
-
-{{-- The window with every city, opened by the "More cities" tile --}}
-@section('modal_location')
-	@parent
-	@if ($cities->isNotEmpty())
-		@include('front.layouts.partials.modal.location')
-	@endif
 @endsection
 
 @section('content')
@@ -216,19 +208,6 @@
 									</a>
 								</div>
 							@endforeach
-							{{-- Every other city: the window the homepage's tile opens (not while searching) --}}
-							<div class="col sm-more-cities">
-								<a href="#browseLocations"
-								   class="{{ linkClass('body-emphasis') }} city-chip city-chip-more"
-								   data-bs-toggle="modal"
-								   data-admin-code="0"
-								   data-city-id="0"
-								>
-									<span class="city-chip-icon" aria-hidden="true"><i class="bi bi-grid-3x3-gap-fill"></i></span>
-									<span class="city-chip-name">{{ t('more_cities') }}</span>
-									<i class="bi bi-arrow-right city-chip-arrow" aria-hidden="true"></i>
-								</a>
-							</div>
 						</div>
 					</section>
 				@endif

@@ -649,8 +649,6 @@ a.sm-stat:hover .sm-stat-arrow {
 	font-size: 1.5rem;
 }
 
-/* while searching, only cities: the tile that opens every other city waits */
-.sm-page.is-filtering .sm-more-cities,
 .sm-page [data-sm-holder][hidden] {
 	display: none;
 }
