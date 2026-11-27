@@ -119,6 +119,31 @@
 	}
 }
 
+/*
+ * No menu button when its menu would open empty. An entry counts as shown at a width unless Bootstrap's
+ * display classes hide it there: "d-none d-md-block" starts at 768px, "d-none d-xl-*" at 1200px, where
+ * there is no button. The country (.flag-menu) is hidden above. The account button then ends the row.
+ */
+@media (max-width: 767.98px) {
+	#mainNavbar:not(:has(#navbarNav .navbar-nav > :not(.d-none, .flag-menu))) .navbar-toggler {
+		display: none;
+	}
+
+	#mainNavbar:not(:has(#navbarNav .navbar-nav > :not(.d-none, .flag-menu))) .adn-mhead-account {
+		margin-inline-end: 0;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+	#mainNavbar:not(:has(#navbarNav .navbar-nav > :is(:not(.d-none), .d-md-block):not(.flag-menu))) .navbar-toggler {
+		display: none;
+	}
+
+	#mainNavbar:not(:has(#navbarNav .navbar-nav > :is(:not(.d-none), .d-md-block):not(.flag-menu))) .adn-mhead-account {
+		margin-inline-end: 0;
+	}
+}
+
 @media (max-width: 399.98px) {
 	#mainNavbar .navbar-brand .main-logo {
 		height: 30px;
