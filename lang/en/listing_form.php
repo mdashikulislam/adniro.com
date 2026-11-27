@@ -21,7 +21,7 @@ return [
 	'section_photos_sub'      => 'Listings with clear photos get far more replies.',
 	'section_what'            => 'What are you selling?',
 	'section_what_sub'        => 'Pick a category, then give it a clear title and description.',
-	'section_details'         => 'Details',
+	'section_details'         => 'Additional Details',
 	'section_details_sub'     => 'Facts buyers look for in this category.',
 	'section_price_location'  => 'Price and location',
 	'section_price_location_sub' => 'A fair price and the right city help buyers find you.',

@@ -21,7 +21,7 @@ return [
 	'section_photos_sub'      => 'Gli annunci con foto chiare ricevono molte più risposte.',
 	'section_what'            => 'Cosa vendi?',
 	'section_what_sub'        => 'Scegli una categoria, poi scrivi un titolo e una descrizione chiari.',
-	'section_details'         => 'Dettagli',
+	'section_details'         => 'Dettagli aggiuntivi',
 	'section_details_sub'     => 'Le informazioni che gli acquirenti cercano in questa categoria.',
 	'section_price_location'  => 'Prezzo e luogo',
 	'section_price_location_sub' => 'Un prezzo giusto e la città giusta aiutano gli acquirenti a trovarti.',

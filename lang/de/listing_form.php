@@ -21,7 +21,7 @@ return [
 	'section_photos_sub'      => 'Anzeigen mit klaren Fotos erhalten viel mehr Antworten.',
 	'section_what'            => 'Was verkaufen Sie?',
 	'section_what_sub'        => 'Wählen Sie eine Kategorie und geben Sie einen klaren Titel und eine Beschreibung ein.',
-	'section_details'         => 'Details',
+	'section_details'         => 'Weitere Details',
 	'section_details_sub'     => 'Angaben, nach denen Käufer in dieser Kategorie suchen.',
 	'section_price_location'  => 'Preis und Ort',
 	'section_price_location_sub' => 'Ein fairer Preis und die richtige Stadt helfen Käufern, Sie zu finden.',

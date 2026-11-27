@@ -21,7 +21,7 @@ return [
 	'section_photos_sub'      => 'الإعلانات ذات الصور الواضحة تحصل على ردود أكثر بكثير.',
 	'section_what'            => 'ماذا تبيع؟',
 	'section_what_sub'        => 'اختر فئة، ثم اكتب عنوانًا ووصفًا واضحين.',
-	'section_details'         => 'التفاصيل',
+	'section_details'         => 'تفاصيل إضافية',
 	'section_details_sub'     => 'معلومات يبحث عنها المشترون في هذه الفئة.',
 	'section_price_location'  => 'السعر والموقع',
 	'section_price_location_sub' => 'سعر عادل ومدينة صحيحة يساعدان المشترين على الوصول إليك.',

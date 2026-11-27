@@ -21,7 +21,7 @@ return [
 	'section_photos_sub'      => 'साफ़ फ़ोटो वाले विज्ञापनों को कहीं ज़्यादा जवाब मिलते हैं।',
 	'section_what'            => 'आप क्या बेच रहे हैं?',
 	'section_what_sub'        => 'एक श्रेणी चुनें, फिर साफ़ शीर्षक और विवरण लिखें।',
-	'section_details'         => 'विवरण',
+	'section_details'         => 'अतिरिक्त विवरण',
 	'section_details_sub'     => 'इस श्रेणी में खरीदार जो जानकारी ढूँढते हैं।',
 	'section_price_location'  => 'कीमत और जगह',
 	'section_price_location_sub' => 'सही कीमत और सही शहर से खरीदारों को आप आसानी से मिलते हैं।',

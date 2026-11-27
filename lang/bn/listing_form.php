@@ -21,7 +21,7 @@ return [
 	'section_photos_sub'      => 'পরিষ্কার ছবির বিজ্ঞাপনে অনেক বেশি উত্তর আসে।',
 	'section_what'            => 'আপনি কী বিক্রি করছেন?',
 	'section_what_sub'        => 'একটি বিভাগ বেছে নিন, তারপর একটি স্পষ্ট শিরোনাম ও বিবরণ দিন।',
-	'section_details'         => 'বিস্তারিত',
+	'section_details'         => 'অতিরিক্ত বিবরণ',
 	'section_details_sub'     => 'এই বিভাগে ক্রেতারা যেসব তথ্য খোঁজেন।',
 	'section_price_location'  => 'দাম ও অবস্থান',
 	'section_price_location_sub' => 'সঠিক দাম ও সঠিক শহর ক্রেতাদের আপনাকে খুঁজে পেতে সাহায্য করে।',
