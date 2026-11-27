@@ -577,10 +577,10 @@ a.sm-stat:hover .sm-stat-arrow {
 .sm-link {
 	position: relative;
 	display: flex;
-	gap: .55rem;
+	gap: .6rem;
 	align-items: center;
-	min-height: 34px;
-	padding: .28rem .55rem;
+	min-height: 38px;
+	padding: .3rem .5rem;
 	border-radius: 9px;
 	font-size: .9rem;
 	line-height: 1.3;
@@ -589,15 +589,25 @@ a.sm-stat:hover .sm-stat-arrow {
 	transition: background-color .15s ease, color .15s ease;
 }
 
-/* a quiet dot that lights up with the link */
-.sm-cat-list .sm-link::before {
-	content: "";
+/* a sub-category's own icon, in a tile like the city tiles' pin (.city-chip-icon); it fills with the link */
+.sm-link-icon {
+	display: inline-flex;
 	flex: 0 0 auto;
-	width: 5px;
-	height: 5px;
-	border-radius: 50%;
-	background-color: rgba(var(--sm-accent-rgb), .35);
-	transition: background-color .15s ease, transform .15s ease;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 8px;
+	font-size: .8rem;
+	line-height: 1;
+	color: var(--sm-icon);
+	background-color: var(--sm-accent-soft);
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.sm-link-icon i {
+	display: block;
+	line-height: 1;
 }
 
 .sm-link-text {
@@ -628,10 +638,10 @@ a.sm-stat:hover .sm-stat-arrow {
 	background-color: rgba(var(--sm-accent-rgb), .07);
 }
 
-.sm-link:hover::before,
-.sm-link:focus-visible::before {
-	background-color: var(--sm-accent);
-	transform: scale(1.3);
+.sm-link:hover .sm-link-icon,
+.sm-link:focus-visible .sm-link-icon {
+	color: #fff;
+	background-color: #0f766e;
 }
 
 .sm-link:hover .sm-link-arrow,

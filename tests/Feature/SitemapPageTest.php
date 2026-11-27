@@ -65,6 +65,23 @@ class SitemapPageTest extends TestCase
 		$this->assertStringNotContainsString('long-list-home', $card, 'nothing is folded away');
 	}
 
+	public function test_every_sub_category_has_its_own_icon(): void
+	{
+		// Arrange: one sub-category with its own icon, one without
+		$parent = DB::table('categories')->whereNull('parent_id')->where('active', 1)->orderBy('lft')->first();
+		$children = DB::table('categories')->where('parent_id', $parent->id)->where('active', 1)->orderBy('lft')->pluck('id');
+		DB::table('categories')->where('id', $children[0])->update(['icon_class' => 'fa-solid fa-truck-pickup']);
+		DB::table('categories')->where('id', $children[1])->update(['icon_class' => null]);
+
+		// Act
+		$card = $this->categoryCard($this->page(), (int)$parent->id);
+
+		// Assert: an icon before every name; the site's folder icon where a sub-category has none
+		$this->assertSame($children->count(), substr_count($card, '<span class="sm-link-icon" aria-hidden="true">'));
+		$this->assertStringContainsString('<span class="sm-link-icon" aria-hidden="true"><i class="fa-solid fa-truck-pickup"></i></span>', $card);
+		$this->assertStringContainsString('<span class="sm-link-icon" aria-hidden="true"><i class="fa-solid fa-folder"></i></span>', $card);
+	}
+
 	public function test_each_card_says_how_wide_it_is_on_a_grid_of_four_three_and_two_columns(): void
 	{
 		// Act

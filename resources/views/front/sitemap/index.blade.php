@@ -19,7 +19,7 @@
  * - Head: the homepage hero in small (night gradient, white uppercase title, white pill search bar), with the
  *   page's figures on a bar that overlaps its lower edge. The search filters the page as one types.
  * - Categories: cards on a grid, each as wide as its list is long (App\Helpers\Common\SitemapBento), with the
- *   category's icon and every sub-category: nothing is folded behind "View more", it is a sitemap.
+ *   category's icon and every sub-category with its own: nothing is folded behind "View more", it is a sitemap.
  * - Cities: the homepage's "Choose a city" tiles (.city-chip, styled in custom.css), from A to Z (they arrive
  *   biggest first). As many as Admin > Settings > Pagination allows ("cities_limit").
  * - Blog: its topics and latest articles, when there are any.
@@ -148,7 +148,7 @@
 							@foreach ($cats as $index => $iCat)
 								@php
 									$catUrl = urlGen()->category($iCat);
-									$catIconClass = !empty($iCat->icon_class) ? $iCat->icon_class : 'bi bi-tag';
+									$catIconClass = $iCat->icon_class; // the model gives the site's folder icon when a category has none
 									$children = collect($iCat->children ?? []);
 									$spanStyle = $spansByColumns->map(fn ($spans, $columns) => "--sm-span-{$columns}: " . ($spans[$index] ?? 1))->implode('; ');
 								@endphp
@@ -173,6 +173,7 @@
 											@foreach ($children as $iSubCat)
 												<li class="sm-cat-item">
 													<a href="{{ urlGen()->category($iSubCat) }}" class="sm-link" data-sm-item>
+														<span class="sm-link-icon" aria-hidden="true"><i class="{{ $iSubCat->icon_class }}"></i></span>
 														<span class="sm-link-text">{{ $iSubCat->name }}</span>
 														<i class="bi bi-arrow-right-short sm-link-arrow" aria-hidden="true"></i>
 													</a>

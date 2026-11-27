@@ -431,9 +431,9 @@ Category card (".sm-cat")
   width     as wide as its list is long, on a grid of 4, 3, 2 then 1 columns; every row is full and the page
             is as short as it can be (App\Helpers\Common\SitemapBento); its links run in as many columns
   head      the category's icon in a 48px circle, its name (a link), "7 sub-categories", a round arrow link
-  list      every sub-category, 14.4px, a 5px dot before each
+  list      every sub-category, 14.4px, its own icon before it in a 26px tinted tile (as the city tiles' pin)
   states    card hover or focus inside: teal border, a soft lift, the icon circle fills; link hover or focus:
-            teal text on a 7% tint, the dot lights up, an arrow slides in; arrow link hover: fills and turns
+            teal text on a 7% tint, the icon's tile fills, an arrow slides in; arrow link hover: fills and turns
   tokens    text on bg; text-muted on bg 6:1; accent-strong on bg 5.5:1
 
 Cities (the homepage's "Choose a city" tiles: ".city-chip" in custom.css, nothing restyled)
