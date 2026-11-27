@@ -360,7 +360,7 @@ Stock files we edited.
 - `resources/views/front/sections/home/search-form.blade.php`
 - `resources/views/front/sections/home/search-form/form-fields.blade.php` (no marker comment)
 - `resources/views/front/sections/home/stats.blade.php` (no marker comment)
-- `resources/views/front/sitemap/index.blade.php` (no marker comment)
+- `resources/views/front/sitemap/index.blade.php`
 - `resources/views/helpers/forms/fields/captcha.blade.php` (no marker comment)
 - `resources/views/helpers/forms/fields/ckeditor.blade.php` (no marker comment)
 - `resources/views/helpers/forms/fields/color-picker.blade.php` (no marker comment)
@@ -667,7 +667,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (410)
+## Added (420)
 
 Files that are not part of LaraClassifier.
 
@@ -991,6 +991,7 @@ Files that are not part of LaraClassifier.
 - `lang/ar/chat_admin.php`
 - `lang/ar/listing_form.php`
 - `lang/ar/mobile_nav.php`
+- `lang/ar/sitemap.php`
 
 ### lang/bn
 
@@ -999,6 +1000,7 @@ Files that are not part of LaraClassifier.
 - `lang/bn/chat_admin.php`
 - `lang/bn/listing_form.php`
 - `lang/bn/mobile_nav.php`
+- `lang/bn/sitemap.php`
 
 ### lang/de
 
@@ -1007,6 +1009,7 @@ Files that are not part of LaraClassifier.
 - `lang/de/chat_admin.php`
 - `lang/de/listing_form.php`
 - `lang/de/mobile_nav.php`
+- `lang/de/sitemap.php`
 
 ### lang/en
 
@@ -1015,6 +1018,7 @@ Files that are not part of LaraClassifier.
 - `lang/en/chat_admin.php`
 - `lang/en/listing_form.php`
 - `lang/en/mobile_nav.php`
+- `lang/en/sitemap.php`
 
 ### lang/es
 
@@ -1023,6 +1027,7 @@ Files that are not part of LaraClassifier.
 - `lang/es/chat_admin.php`
 - `lang/es/listing_form.php`
 - `lang/es/mobile_nav.php`
+- `lang/es/sitemap.php`
 
 ### lang/fr
 
@@ -1031,6 +1036,7 @@ Files that are not part of LaraClassifier.
 - `lang/fr/chat_admin.php`
 - `lang/fr/listing_form.php`
 - `lang/fr/mobile_nav.php`
+- `lang/fr/sitemap.php`
 
 ### lang/hi
 
@@ -1039,6 +1045,7 @@ Files that are not part of LaraClassifier.
 - `lang/hi/chat_admin.php`
 - `lang/hi/listing_form.php`
 - `lang/hi/mobile_nav.php`
+- `lang/hi/sitemap.php`
 
 ### lang/it
 
@@ -1047,6 +1054,7 @@ Files that are not part of LaraClassifier.
 - `lang/it/chat_admin.php`
 - `lang/it/listing_form.php`
 - `lang/it/mobile_nav.php`
+- `lang/it/sitemap.php`
 
 ### lang/ru
 
@@ -1055,6 +1063,7 @@ Files that are not part of LaraClassifier.
 - `lang/ru/chat_admin.php`
 - `lang/ru/listing_form.php`
 - `lang/ru/mobile_nav.php`
+- `lang/ru/sitemap.php`
 
 ### public/assets
 
@@ -1072,6 +1081,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/css/listing-form-preview.css`
 - `public/assets/css/listing-form.css`
 - `public/assets/css/mobile-nav.css`
+- `public/assets/css/sitemap.css`
 - `public/assets/js/app/ai.formbox.js`
 - `public/assets/js/app/chat-alerts.js`
 - `public/assets/js/app/chat-attach.js`
