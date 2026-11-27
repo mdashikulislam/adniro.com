@@ -41,7 +41,10 @@
 	];
 	$descriptionLimits = ['{min}' => max(200, (int)config('settings.listing_form.description_min_length', 5))];
 	$photoLimits = ['{min}' => 3]; // strength-score.js PHOTOS_GOOD
-	$tips = collect(range(1, 5))->map(fn ($i) => t('sell_quickly_advice_' . $i));
+	// The five tips (sell_quickly_advice_1..5) and the Bootstrap icon that goes with what each one is about:
+	// title and description, category, photos, price, a last check
+	$tipIcons = ['card-text', 'grid', 'camera', 'tag', 'check2-circle'];
+	$tips = collect($tipIcons)->map(fn ($icon, $i) => ['icon' => $icon, 'text' => t('sell_quickly_advice_' . ($i + 1))]);
 	// The cover: the saved listing's first photo (edit), else the first photo already added in this create flow
 	// (back from the multi-step Photos step), as the Photos step shows it; never the site's default picture
 	$sessionCover = (string)collect((array)session('picturesInput', []))->first();
@@ -197,18 +200,23 @@
 			</div>
 		</section>
 
-		{{-- Tips to sell faster: on the details step only, where the seller writes the listing --}}
+		{{-- Tips to sell faster: on the details step only, where the seller writes the listing. Always in view:
+		     a tinted head, then the tips down a rail, each with its icon --}}
 		@unless ($onPhotosStep)
-			<details class="lf-panel-card lf-tips">
-				<summary class="lf-tips-summary">
-					<i class="bi bi-lightbulb" aria-hidden="true"></i> {{ trans('listing_form.tips') }}
-				</summary>
-				<ul class="lf-tips-list">
+			<section class="lf-panel-card lf-tips" aria-labelledby="lfTipsTitle">
+				<header class="lf-tips-head">
+					<span class="lf-tips-badge" aria-hidden="true"><i class="bi bi-lightbulb-fill"></i></span>
+					<h2 class="lf-panel-heading lf-tips-title" id="lfTipsTitle">{{ trans('listing_form.tips') }}</h2>
+				</header>
+				<ol class="lf-tips-list" role="list">
 					@foreach ($tips as $tip)
-						<li>{{ $tip }}</li>
+						<li class="lf-tips-item">
+							<span class="lf-tips-icon" aria-hidden="true"><i class="bi bi-{{ $tip['icon'] }}"></i></span>
+							<span class="lf-tips-text">{{ $tip['text'] }}</span>
+						</li>
 					@endforeach
-				</ul>
-			</details>
+				</ol>
+			</section>
 		@endunless
 
 	</div>

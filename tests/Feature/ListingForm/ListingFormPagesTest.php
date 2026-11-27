@@ -173,6 +173,26 @@ class ListingFormPagesTest extends TestCase
 		$this->assertTrue($more->hasAttribute('open'));
 	}
 
+	#[DataProvider('detailsPages')]
+	public function test_the_selling_tips_are_always_shown_each_with_its_icon(string $mode, bool $asOwner, string $url): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => $mode]);
+		$request = $asOwner ? $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID)) : $this;
+
+		// Act
+		$xpath = $this->formXPath($request->get(str_replace('{id}', (string)$this->postId, $url)));
+
+		// Assert: a plain card with a heading, not something to unfold, and five tips with an icon each
+		$this->assertSame(0, $xpath->query("//details[contains(@class, 'lf-tips')]")->length);
+		$card = $xpath->query("//section[contains(@class, 'lf-tips')][@aria-labelledby='lfTipsTitle']")->item(0);
+		$this->assertNotNull($card);
+		$this->assertSame('Tips to sell faster', trim($xpath->query(".//h2[@id='lfTipsTitle']", $card)->item(0)?->textContent ?? ''));
+		$this->assertSame(5, $xpath->query(".//ol[contains(@class, 'lf-tips-list')]/li", $card)->length);
+		$this->assertSame(5, $xpath->query(".//li/span[contains(@class, 'lf-tips-icon')][@aria-hidden='true']/i", $card)->length);
+		$this->assertSame(5, $xpath->query(".//li/span[contains(@class, 'lf-tips-text')][normalize-space()]", $card)->length);
+	}
+
 	public static function editPages(): array
 	{
 		return [

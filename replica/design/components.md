@@ -375,6 +375,28 @@ For screen readers (round 4)
   keys      up and down arrows move through the list of chats; Escape gives up a reply
 ```
 
+## Listing form: selling tips card
+
+```
+Selling tips (form/panel.blade.php, listing-form-panel.css ".lf-tips")
+  where     the listing form's side panel, details step only; in the bottom sheet on phones
+  shape     a panel card (radius 16, 1px border) that is always open: no <details>, nothing to unfold
+  head      a 36px teal tile (radius 12, primary to a darker primary, white filled lightbulb, soft teal
+            shadow) and the heading, on a teal wash: 5% tint plus a 16% glow from the top end corner,
+            closed by a 1px 14% teal line
+  list      an ordered list of five tips; each is a 32px icon tile (radius 10, 10% teal tint, dark teal
+            icon) and the tip in 14px text, first line level with the middle of the icon
+  rail      a 2px, 20% teal line from under one icon to just above the next (3px clear of each)
+  icons     one per tip, by what it is about: card-text, grid, camera, tag, check2-circle (Bootstrap Icons)
+  states    static: no hover, no focus stop, nothing moves
+  dark      icons 55% teal + white on an 18% tint; wash 7% + 20%; rail 30%
+  tokens    text on bg; accent-strong on accent-soft (icons, 4.91:1); on-accent on accent-strong (head tile,
+            5.47:1); the dark pairs of the same roles. All already in tokens.json: 27 pairs, 0 failing AA.
+  a11y      <section aria-labelledby> with an <h2>; a real list (role="list", since list-style is none);
+            every icon aria-hidden; the tip's text is the only thing read
+  copy      the site's own five tips (global.sell_quickly_advice_1..5), unchanged
+```
+
 ## States every screen has
 
 | screen | loading | empty | error |
