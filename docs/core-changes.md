@@ -667,7 +667,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (409)
+## Added (410)
 
 Files that are not part of LaraClassifier.
 
@@ -941,6 +941,7 @@ Files that are not part of LaraClassifier.
 - `database/migrations/2026_11_24_000200_add_public_profile_to_account_menu.php`
 - `database/migrations/2026_11_24_000300_fill_the_similar_listings_row.php`
 - `database/migrations/2026_11_27_000100_add_made_with_ai_to_posts_table.php`
+- `database/migrations/2026_11_27_000200_make_the_listing_details_fields_optional.php`
 
 ### database/seeders
 
