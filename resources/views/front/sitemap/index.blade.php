@@ -13,38 +13,56 @@
  * please review the full license details here: https://codecanyon.net/licenses/standard
 --}}
 {{--
- * adniro: the page redesigned (texts: lang/*/sitemap.php, styles: public/assets/css/sitemap.css).
- * A teal head with the page's figures and jump links; every category as a card with its icon and all of its
- * sub-categories (nothing folded behind "View more": it is a sitemap); the cities from A to Z under their
- * letter; then the blog's topics and latest articles when there are any.
+ * adniro: the page redesigned in the homepage's own language (spec: replica/design/components.md).
+ * Texts: lang/[locale]/sitemap.php. Styles: public/assets/css/sitemap.css. Search: public/assets/js/app/sitemap.js.
+ *
+ * - Head: the homepage hero in small (night gradient, white uppercase title, white pill search bar), with the
+ *   page's figures on a bar that overlaps its lower edge. The search filters the page as one types.
+ * - Categories: cards on a grid, each as wide as its list is long (App\Helpers\Common\SitemapBento), with the
+ *   category's icon and every sub-category: nothing is folded behind "View more", it is a sitemap.
+ * - Cities: from A to Z under their letter (they arrive biggest first), with a row of letters to jump to.
+ * - Blog: its topics and latest articles, when there are any.
 --}}
 @extends('front.layouts.master')
 
 @php
-	$cats = collect($cats ?? []);
+	use App\Helpers\Common\SitemapBento;
+
+	$cats = collect($cats ?? [])->values();
 	$cities = collect($cities ?? []);
 	$blogCategories = collect($blogCategories ?? []);
 	$blogPosts = collect($blogPosts ?? []);
+	$appName = (string)config('settings.app.name');
 	$countryName = (string)config('country.name');
 
-	$subCatCount = $cats->sum(fn ($cat) => $cat->children?->count() ?? 0);
+	// A title's words between two * are set in bold, like the homepage's section titles
+	$title = fn (string $text) => preg_replace('/\*(.+?)\*/u', '<span class="fw-bold">$1</span>', e($text));
 
-	// The cities from A to Z, under their first letter (they arrive biggest first)
+	// How wide each category card is on a grid of 4, 3 and 2 columns
+	$childCounts = $cats->map(fn ($cat) => collect($cat->children ?? [])->count());
+	$subCatCount = $childCounts->sum();
+	$spansByColumns = collect([4, 3, 2])->mapWithKeys(fn ($columns) => [$columns => SitemapBento::spans($childCounts->all(), $columns)]);
+
+	// The cities from A to Z, under their first letter
 	$cityGroups = $cities
 		->sortBy(fn ($city) => mb_strtolower((string)$city->name))
 		->groupBy(fn ($city) => mb_strtoupper(mb_substr((string)$city->name, 0, 1)));
 
-	// The parts of the page that have something to show: their figure in the head and their jump link
-	$parts = collect([
-		['id' => 'sitemap-categories', 'icon' => 'bi-grid', 'count' => $cats->count(), 'label' => trans('sitemap.stat_categories')],
-		['id' => 'sitemap-categories', 'icon' => 'bi-diagram-3', 'count' => $subCatCount, 'label' => trans('sitemap.stat_subcategories'), 'jump' => false],
-		['id' => 'sitemap-cities', 'icon' => 'bi-geo-alt', 'count' => $cities->count(), 'label' => trans('sitemap.stat_cities')],
-		['id' => 'sitemap-blog', 'icon' => 'bi-journal-text', 'count' => $blogPosts->count(), 'label' => trans('sitemap.stat_articles')],
-	])->filter(fn ($part) => $part['count'] > 0)->values();
+	// The figures on the head's bar; the ones with a part of the page to go to are links
+	$stats = collect([
+		['icon' => 'bi-grid', 'count' => $cats->count(), 'label' => trans('sitemap.stat_categories'), 'target' => 'sitemap-categories'],
+		['icon' => 'bi-diagram-3', 'count' => $subCatCount, 'label' => trans('sitemap.stat_subcategories'), 'target' => null],
+		['icon' => 'bi-geo-alt', 'count' => $cities->count(), 'label' => trans('sitemap.stat_cities'), 'target' => 'sitemap-cities'],
+		['icon' => 'bi-journal-text', 'count' => $blogPosts->count(), 'label' => trans('sitemap.stat_articles'), 'target' => 'sitemap-blog'],
+	])->filter(fn ($stat) => $stat['count'] > 0)->values();
 @endphp
 
 @push('after_styles_stack')
 	<link href="{{ url('assets/css/sitemap.css') }}?v={{ @filemtime(public_path('assets/css/sitemap.css')) }}" rel="stylesheet">
+@endpush
+
+@push('after_scripts_stack')
+	<script src="{{ url('assets/js/app/sitemap.js') }}?v={{ @filemtime(public_path('assets/js/app/sitemap.js')) }}" defer></script>
 @endpush
 
 @section('search')
@@ -54,109 +72,140 @@
 @section('content')
 	@include('front.common.spacer')
 	<div class="main-container">
-		<div class="container sm-page">
+		<div class="container sm-page" id="sitemapPage">
 
-			{{-- Head: what the page is, its figures, and links to its parts --}}
+			{{-- Head --}}
 			<header class="sm-hero">
-				<div class="sm-hero-main">
-					<span class="sm-hero-badge" aria-hidden="true"><i class="bi bi-signpost-split-fill"></i></span>
-					<div class="sm-hero-text">
-						<h1 class="sm-hero-title">{{ t('sitemap') }}</h1>
-						<p class="sm-hero-intro">{{ trans('sitemap.intro', ['app' => config('settings.app.name'), 'country' => $countryName]) }}</p>
-					</div>
+				<div class="sm-hero-decor" aria-hidden="true">
+					<i class="bi bi-geo-alt-fill sm-hero-pin sm-hero-pin--1"></i>
+					<i class="bi bi-geo-alt-fill sm-hero-pin sm-hero-pin--2"></i>
+					<i class="bi bi-geo-alt-fill sm-hero-pin sm-hero-pin--3"></i>
 				</div>
 
-				<div class="sm-stats">
-					@foreach ($parts as $part)
-						<div class="sm-stat">
-							<span class="sm-stat-icon" aria-hidden="true"><i class="bi {{ $part['icon'] }}"></i></span>
-							<span class="sm-stat-value">{{ $part['count'] }}</span>
-							<span class="sm-stat-label">{{ $part['label'] }}</span>
-						</div>
-					@endforeach
-				</div>
+				<div class="sm-hero-inner">
+					<p class="sm-hero-eyebrow">
+						<i class="bi bi-compass" aria-hidden="true"></i>
+						<span>{{ $appName }}</span>
+						<span class="sm-hero-eyebrow-dot" aria-hidden="true"></span>
+						<span>{{ $countryName }}</span>
+					</p>
+					<h1 class="sm-hero-title">{{ t('sitemap') }}</h1>
+					<p class="sm-hero-intro">{{ trans('sitemap.intro', ['app' => $appName, 'country' => $countryName]) }}</p>
 
-				<nav class="sm-jump" aria-label="{{ trans('sitemap.jump') }}">
-					<span class="sm-jump-label">{{ trans('sitemap.jump') }}</span>
-					@foreach ($parts->where('jump', '!==', false) as $part)
-						<a href="#{{ $part['id'] }}" class="sm-jump-link">
-							<i class="bi {{ $part['icon'] }}" aria-hidden="true"></i> {{ $part['label'] }}
-						</a>
-					@endforeach
-				</nav>
+					{{-- Shown by sitemap.js, which filters the page as one types --}}
+					<form class="sm-search" role="search" hidden
+					      data-sm-search
+					      data-found="{{ trans('sitemap.found') }}"
+					      data-none="{{ trans('sitemap.no_results_title') }}">
+						<label class="visually-hidden" for="sitemapSearch">{{ trans('sitemap.search_label') }}</label>
+						<i class="bi bi-search sm-search-icon" aria-hidden="true"></i>
+						<input type="search" id="sitemapSearch" class="sm-search-input" autocomplete="off" spellcheck="false"
+						       placeholder="{{ trans('sitemap.search_placeholder') }}" data-sm-search-input>
+						<button type="button" class="sm-search-clear" hidden data-sm-search-clear aria-label="{{ trans('sitemap.search_clear') }}">
+							<i class="bi bi-x-lg" aria-hidden="true"></i>
+						</button>
+						<button type="submit" class="sm-search-button">
+							<i class="bi bi-search" aria-hidden="true"></i>
+							<span>{{ trans('sitemap.search_button') }}</span>
+						</button>
+					</form>
+					<p class="sm-search-status" role="status" aria-live="polite" data-sm-search-status></p>
+				</div>
 			</header>
 
-			{{-- Categories: a card each, with every sub-category --}}
-			@if ($cats->isNotEmpty())
-				<section class="sm-section" id="sitemap-categories" aria-labelledby="sitemapCategoriesTitle">
-					<header class="sm-section-head">
-						<span class="sm-section-icon" aria-hidden="true"><i class="bi bi-grid-fill"></i></span>
-						<div class="sm-section-text">
-							<h2 class="sm-section-title" id="sitemapCategoriesTitle">{{ trans('sitemap.categories_title') }}</h2>
-							<p class="sm-section-sub">{{ trans('sitemap.categories_sub') }}</p>
-						</div>
-						<span class="sm-section-count">{{ $cats->count() }}</span>
-					</header>
+			{{-- The page's figures, over the head's lower edge --}}
+			<nav class="sm-stats" aria-label="{{ trans('sitemap.jump') }}">
+				@foreach ($stats as $stat)
+					@php
+						$statTag = $stat['target'] ? 'a' : 'div';
+					@endphp
+					<{{ $statTag }} @class(['sm-stat', 'sm-stat--plain' => !$stat['target']]) @if ($stat['target']) href="#{{ $stat['target'] }}" @endif>
+						<span class="sm-stat-icon" aria-hidden="true"><i class="bi {{ $stat['icon'] }}"></i></span>
+						<span class="sm-stat-text">
+							<span class="sm-stat-value">{{ $stat['count'] }}</span>
+							<span class="sm-stat-label">{{ $stat['label'] }}</span>
+						</span>
+						@if ($stat['target'])
+							<i class="bi bi-arrow-down-short sm-stat-arrow" aria-hidden="true"></i>
+						@endif
+					</{{ $statTag }}>
+				@endforeach
+			</nav>
 
-					<div class="sm-cats">
-						@foreach ($cats as $iCat)
-							@php
-								$catUrl = urlGen()->category($iCat);
-								$catIconClass = !empty($iCat->icon_class) ? $iCat->icon_class : 'bi bi-tag';
-								$children = collect($iCat->children ?? []);
-							@endphp
-							<article class="sm-cat" id="sitemap-cat-{{ $iCat->id }}">
-								<header class="sm-cat-head">
-									<span class="sm-cat-icon" aria-hidden="true"><i class="{{ $catIconClass }}"></i></span>
-									<h3 class="sm-cat-title"><a href="{{ $catUrl }}">{{ $iCat->name }}</a></h3>
+			<div id="sitemapResults">
+
+				{{-- Categories --}}
+				@if ($cats->isNotEmpty())
+					<section class="sm-section" id="sitemap-categories" aria-labelledby="sitemapCategoriesTitle" data-sm-section>
+						<header class="sm-section-head">
+							<h2 class="h4 mb-0 fw-lighter section-title" id="sitemapCategoriesTitle">{!! $title(trans('sitemap.categories_title')) !!}</h2>
+							<span class="sm-section-meta">
+								<i class="bi bi-grid" aria-hidden="true"></i> {{ $cats->count() }} {{ trans('sitemap.stat_categories') }}
+							</span>
+						</header>
+
+						<div class="sm-cats">
+							@foreach ($cats as $index => $iCat)
+								@php
+									$catUrl = urlGen()->category($iCat);
+									$catIconClass = !empty($iCat->icon_class) ? $iCat->icon_class : 'bi bi-tag';
+									$children = collect($iCat->children ?? []);
+									$spanStyle = $spansByColumns->map(fn ($spans, $columns) => "--sm-span-{$columns}: " . ($spans[$index] ?? 1))->implode('; ');
+								@endphp
+								<article class="sm-cat" id="sitemap-cat-{{ $iCat->id }}" style="{{ $spanStyle }}" data-sm-group>
+									<header class="sm-cat-head">
+										<span class="sm-cat-icon" aria-hidden="true"><i class="{{ $catIconClass }}"></i></span>
+										<div class="sm-cat-heading">
+											<h3 class="sm-cat-title">
+												<a href="{{ $catUrl }}" data-sm-item data-sm-heading>{{ $iCat->name }}</a>
+											</h3>
+											@if ($children->isNotEmpty())
+												<p class="sm-cat-meta">{{ trans_choice('sitemap.sub_count', $children->count(), ['count' => $children->count()]) }}</p>
+											@endif
+										</div>
+										<a href="{{ $catUrl }}" class="sm-cat-go" aria-label="{{ trans('sitemap.all_in', ['category' => $iCat->name]) }}"
+										   title="{{ trans('sitemap.all_in', ['category' => $iCat->name]) }}">
+											<i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+										</a>
+									</header>
 									@if ($children->isNotEmpty())
-										<span class="sm-cat-count">{{ $children->count() }}</span>
-										<span class="visually-hidden">{{ trans('sitemap.stat_subcategories') }}</span>
+										<ul class="sm-cat-list" role="list">
+											@foreach ($children as $iSubCat)
+												<li class="sm-cat-item">
+													<a href="{{ urlGen()->category($iSubCat) }}" class="sm-link" data-sm-item>
+														<span class="sm-link-text">{{ $iSubCat->name }}</span>
+														<i class="bi bi-arrow-right-short sm-link-arrow" aria-hidden="true"></i>
+													</a>
+												</li>
+											@endforeach
+										</ul>
 									@endif
-								</header>
-								@if ($children->isNotEmpty())
-									<ul class="sm-cat-list" role="list">
-										@foreach ($children as $iSubCat)
-											<li class="sm-cat-item">
-												<a href="{{ urlGen()->category($iSubCat) }}" class="sm-cat-link">
-													<i class="bi bi-chevron-right" aria-hidden="true"></i>
-													<span>{{ $iSubCat->name }}</span>
-												</a>
-											</li>
-										@endforeach
-									</ul>
-								@endif
-								<a href="{{ $catUrl }}" class="sm-cat-all">
-									{{ trans('sitemap.all_in', ['category' => $iCat->name]) }}
-									<i class="bi bi-arrow-right" aria-hidden="true"></i>
-								</a>
-							</article>
-						@endforeach
-					</div>
-				</section>
-			@endif
-
-			{{-- Cities: from A to Z, under their letter --}}
-			@if ($cities->isNotEmpty())
-				<section class="sm-section" id="sitemap-cities" aria-labelledby="sitemapCitiesTitle">
-					<header class="sm-section-head">
-						<span class="sm-section-icon" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
-						<div class="sm-section-text">
-							<h2 class="sm-section-title" id="sitemapCitiesTitle">{{ trans('sitemap.cities_title', ['country' => $countryName]) }}</h2>
-							<p class="sm-section-sub">{{ trans('sitemap.cities_sub') }}</p>
+								</article>
+							@endforeach
 						</div>
-						<span class="sm-section-count">{{ $cities->count() }}</span>
-					</header>
+					</section>
+				@endif
 
-					<div class="sm-panel">
-						<div class="sm-letters">
+				{{-- Cities --}}
+				@if ($cities->isNotEmpty())
+					<section class="sm-section" id="sitemap-cities" aria-labelledby="sitemapCitiesTitle" data-sm-section>
+						<header class="sm-section-head">
+							<h2 class="h4 mb-0 fw-lighter section-title" id="sitemapCitiesTitle">{!! $title(trans('sitemap.cities_title', ['country' => $countryName])) !!}</h2>
+							<nav class="sm-alphabet" aria-label="{{ trans('sitemap.letters') }}">
+								@foreach ($cityGroups->keys() as $letter)
+									<a href="#sitemap-letter-{{ $loop->index }}" class="sm-alphabet-link" data-sm-letter-link="{{ $loop->index }}">{{ $letter }}</a>
+								@endforeach
+							</nav>
+						</header>
+
+						<div class="sm-panel sm-letters">
 							@foreach ($cityGroups as $letter => $letterCities)
-								<div class="sm-letter-group">
+								<div class="sm-letter-row" id="sitemap-letter-{{ $loop->index }}" data-sm-group data-sm-letter="{{ $loop->index }}">
 									<h3 class="sm-letter">{{ $letter }}</h3>
-									<ul class="sm-city-list" role="list">
+									<ul class="sm-chips" role="list">
 										@foreach ($letterCities as $city)
 											<li>
-												<a href="{{ urlGen()->city($city) }}" class="sm-city" title="{{ t('Free Listings') . ' ' . $city->name }}">
+												<a href="{{ urlGen()->city($city) }}" class="sm-city" title="{{ t('Free Listings') . ' ' . $city->name }}" data-sm-item>
 													<i class="bi bi-geo-alt" aria-hidden="true"></i>
 													<span class="sm-city-name">{{ $city->name }}</span>
 												</a>
@@ -166,46 +215,58 @@
 								</div>
 							@endforeach
 						</div>
-					</div>
-				</section>
-			@endif
+					</section>
+				@endif
 
-			{{-- Blog: its topics, then the latest articles --}}
-			@if ($blogPosts->isNotEmpty())
-				<section class="sm-section" id="sitemap-blog" aria-labelledby="sitemapBlogTitle">
-					<header class="sm-section-head">
-						<span class="sm-section-icon" aria-hidden="true"><i class="bi bi-journal-text"></i></span>
-						<div class="sm-section-text">
-							<h2 class="sm-section-title" id="sitemapBlogTitle">{{ trans('sitemap.blog_title') }}</h2>
-							<p class="sm-section-sub">{{ trans('sitemap.blog_sub') }}</p>
-						</div>
-						<span class="sm-section-count">{{ $blogPosts->count() }}</span>
-					</header>
+				{{-- Blog --}}
+				@if ($blogPosts->isNotEmpty())
+					<section class="sm-section" id="sitemap-blog" aria-labelledby="sitemapBlogTitle" data-sm-section>
+						<header class="sm-section-head">
+							<h2 class="h4 mb-0 fw-lighter section-title" id="sitemapBlogTitle">{!! $title(trans('sitemap.blog_title')) !!}</h2>
+							<span class="sm-section-meta">
+								<i class="bi bi-journal-text" aria-hidden="true"></i> {{ $blogPosts->count() }} {{ trans('sitemap.stat_articles') }}
+							</span>
+						</header>
 
-					<div class="sm-panel">
-						@if ($blogCategories->isNotEmpty())
-							<div class="sm-topics">
-								@foreach ($blogCategories as $blogCategory)
-									<a href="{{ $blogCategory->url }}" class="sm-topic">
-										<i class="bi bi-folder2-open" aria-hidden="true"></i> {{ $blogCategory->name }}
-									</a>
+						<div class="sm-panel" data-sm-group>
+							@if ($blogCategories->isNotEmpty())
+								<ul class="sm-chips sm-topics" role="list">
+									@foreach ($blogCategories as $blogCategory)
+										<li>
+											<a href="{{ $blogCategory->url }}" class="sm-city" data-sm-item>
+												<i class="bi bi-folder2-open" aria-hidden="true"></i>
+												<span class="sm-city-name">{{ $blogCategory->name }}</span>
+											</a>
+										</li>
+									@endforeach
+								</ul>
+							@endif
+
+							<ul class="sm-posts" role="list">
+								@foreach ($blogPosts as $blogPost)
+									<li>
+										<a href="{{ $blogPost->url }}" class="sm-link" data-sm-item>
+											<i class="bi bi-file-earmark-text sm-link-lead" aria-hidden="true"></i>
+											<span class="sm-link-text">{{ str($blogPost->title)->limit(60) }}</span>
+											<i class="bi bi-arrow-right-short sm-link-arrow" aria-hidden="true"></i>
+										</a>
+									</li>
 								@endforeach
-							</div>
-						@endif
+							</ul>
+						</div>
+					</section>
+				@endif
 
-						<ul class="sm-posts" role="list">
-							@foreach ($blogPosts as $blogPost)
-								<li>
-									<a href="{{ $blogPost->url }}" class="sm-post">
-										<i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-										<span>{{ str($blogPost->title)->limit(60) }}</span>
-									</a>
-								</li>
-							@endforeach
-						</ul>
-					</div>
-				</section>
-			@endif
+				{{-- Shown by sitemap.js when a search finds nothing --}}
+				<div class="sm-empty" hidden data-sm-empty>
+					<span class="sm-empty-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
+					<p class="sm-empty-title" data-sm-empty-title></p>
+					<p class="sm-empty-hint">{{ trans('sitemap.no_results_hint') }}</p>
+					<button type="button" class="sm-empty-button" data-sm-search-clear>
+						<i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ trans('sitemap.search_clear') }}
+					</button>
+				</div>
+			</div>
 
 			@include('front.layouts.partials.social.horizontal')
 		</div>

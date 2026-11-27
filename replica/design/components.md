@@ -397,6 +397,60 @@ Selling tips (form/panel.blade.php, listing-form-panel.css ".lf-tips")
   copy      the site's own five tips (global.sell_quickly_advice_1..5), unchanged
 ```
 
+## Sitemap page
+
+Built from what the homepage already uses, measured on the page itself (2026-11-27): Roboto 14.4px for text,
+Roboto Condensed 700 for titles, the night-scene hero with a white uppercase title and a white pill search
+bar (999px, 6px padding, teal pill button), section titles with a 4px teal bar and one part in bold, category
+icons in 9% teal circles that fill with teal on hover, 14 to 16px card corners on a 1px #dee2e6 border.
+
+```
+Head (front/sitemap/index.blade.php ".sm-hero")
+  look      a 24px-cornered panel: deep blue-green night (#06202b to #0b3f47) with two teal glows, a faint
+            street grid that fades to the edges, three glowing map pins (none on phones)
+  content   a glass pill with the site and the country, the title in white uppercase (as .hero-title), one
+            light line of intro (as .hero-subtitle), the search bar, a line saying how many were found
+  tokens    on-night on night 16.8:1 and on night-end 11.6:1; on-night-accent on night 11.4:1
+
+Search (".sm-search", public/assets/js/app/sitemap.js)
+  what      filters the page as one types; hidden until its script runs, so the page is whole without it
+  parts     magnifier, field (52px, 46px on phones), a round clear button once there is text, the teal
+            "Find" pill, which scrolls to what was found (icon only on phones, the word kept for readers)
+  states    rest: white pill with a 1px white ring and a deep shadow; focus: 3px teal ring; typing: the
+            cards go one column wide; found: "8 found" under the bar; nothing found: the empty block
+  keys      Enter scrolls to the results, Escape clears
+  a11y      role="search", a hidden label, the count in a polite live region, clear buttons named
+
+Figures bar (".sm-stats")
+  look      a white 22px-cornered bar over the head's lower edge, never wider than the head less 3rem
+  cells     an icon circle, the number in Roboto Condensed 700, its name in small capitals; hairlines between
+  states    a cell that leads to a part of the page is a link: hover tints it, fills its icon and nudges
+            its arrow down; the sub-categories cell leads nowhere and is left out on phones
+
+Category card (".sm-cat")
+  width     as wide as its list is long, on a grid of 4, 3, 2 then 1 columns; every row is full and the page
+            is as short as it can be (App\Helpers\Common\SitemapBento); its links run in as many columns
+  head      the category's icon in a 48px circle, its name (a link), "7 sub-categories", a round arrow link
+  list      every sub-category, 14.4px, a 5px dot before each
+  states    card hover or focus inside: teal border, a soft lift, the icon circle fills; link hover or focus:
+            teal text on a 7% tint, the dot lights up, an arrow slides in; arrow link hover: fills and turns
+  tokens    text on bg; text-muted on bg 6:1; accent-strong on bg 5.5:1
+
+Cities (".sm-letters", ".sm-alphabet")
+  order     from A to Z under their letter, two columns of rows from 992px
+  row       the letter in a 40px circle, then the cities as pills with a pin (36px tall, 40px on phones)
+  jump      a row of small letter pills at the section's head; the row jumped to gets a filled letter
+  states    pill hover: teal text and border on a 7% tint, 1px lift
+
+Nothing found (".sm-empty")
+  look      a dashed teal frame, a search icon in a 72px circle, “Nothing matches “…””, a hint, and a teal
+            "Clear search" pill that empties the field and puts the cursor back in it
+
+Dark        cards, bar and pills take the page's dark surface and border; teal text and small icons turn
+            #5eead4 (10:1 on the page); the head keeps its night colours
+Motion      colour and shadow changes in 150 to 250ms, lifts of 1 to 2px; none with prefers-reduced-motion
+```
+
 ## States every screen has
 
 | screen | loading | empty | error |

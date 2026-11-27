@@ -2,6 +2,7 @@
 
 /*
  * The sitemap page people read (adniro): front/sitemap/index.blade.php.
+ * In a title, the words between two * are set in bold.
  */
 
 return [
@@ -11,11 +12,17 @@ return [
 	'stat_cities' => 'Cities',
 	'stat_articles' => 'Articles',
 	'jump' => 'Jump to',
-	'categories_title' => 'Browse by category',
-	'categories_sub' => 'Pick a category to see its listings.',
-	'cities_title' => 'Cities in :country',
-	'cities_sub' => 'Listings near you, from A to Z.',
-	'blog_title' => 'From the blog',
-	'blog_sub' => 'Guides and news, newest first.',
+	'categories_title' => 'Browse by *Category*',
+	'cities_title' => 'Cities in *:country*',
+	'blog_title' => 'From the *Blog*',
+	'sub_count' => '{1} :count sub-category|[2,*] :count sub-categories',
 	'all_in' => 'All in :category',
+	'letters' => 'Jump to a letter',
+	'search_label' => 'Search this page',
+	'search_placeholder' => 'Search categories and cities',
+	'search_button' => 'Find',
+	'search_clear' => 'Clear search',
+	'found' => ':count found',
+	'no_results_title' => 'Nothing matches “:query”',
+	'no_results_hint' => 'Check the spelling or try a shorter word.',
 ];

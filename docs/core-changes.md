@@ -667,7 +667,7 @@ Stock files removed from this site. An upgrade may bring them back.
 - `resources/views/front/account/messenger/threads/thread.blade.php`
 - `resources/views/front/account/messenger/threads/threads.blade.php`
 
-## Added (420)
+## Added (422)
 
 Files that are not part of LaraClassifier.
 
@@ -693,6 +693,7 @@ Files that are not part of LaraClassifier.
 - `app/Helpers/Common/ListingCardImage.php`
 - `app/Helpers/Common/ListingGrid.php`
 - `app/Helpers/Common/SiteHost.php`
+- `app/Helpers/Common/SitemapBento.php`
 - `app/Helpers/Services/ListingCounts.php`
 
 ### app/Http
@@ -1117,6 +1118,7 @@ Files that are not part of LaraClassifier.
 - `public/assets/js/app/listing-form/summary.js`
 - `public/assets/js/app/listing-form/undo-stack.js`
 - `public/assets/js/app/listing-form/validate.js`
+- `public/assets/js/app/sitemap.js`
 - `public/assets/plugins/jquery/3.7.1/jquery.min.js`
 - `public/assets/plugins/laravel-echo/2.2.6/echo.iife.js`
 - `public/assets/plugins/pusher-js/8.4.0/pusher.min.js`

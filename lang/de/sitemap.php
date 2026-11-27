@@ -2,6 +2,7 @@
 
 /*
  * The sitemap page people read (adniro): front/sitemap/index.blade.php.
+ * In a title, the words between two * are set in bold.
  */
 
 return [
@@ -11,11 +12,17 @@ return [
 	'stat_cities' => 'Städte',
 	'stat_articles' => 'Artikel',
 	'jump' => 'Springen zu',
-	'categories_title' => 'Nach Kategorie stöbern',
-	'categories_sub' => 'Wählen Sie eine Kategorie, um ihre Anzeigen zu sehen.',
-	'cities_title' => 'Städte in :country',
-	'cities_sub' => 'Anzeigen in Ihrer Nähe, von A bis Z.',
-	'blog_title' => 'Aus dem Blog',
-	'blog_sub' => 'Ratgeber und Neuigkeiten, die neuesten zuerst.',
+	'categories_title' => 'Nach *Kategorie* stöbern',
+	'cities_title' => 'Städte in *:country*',
+	'blog_title' => 'Aus dem *Blog*',
+	'sub_count' => '{1} :count Unterkategorie|[2,*] :count Unterkategorien',
 	'all_in' => 'Alles in :category',
+	'letters' => 'Zu einem Buchstaben springen',
+	'search_label' => 'Diese Seite durchsuchen',
+	'search_placeholder' => 'Kategorien und Städte suchen',
+	'search_button' => 'Finden',
+	'search_clear' => 'Suche löschen',
+	'found' => ':count gefunden',
+	'no_results_title' => 'Nichts passt zu „:query“',
+	'no_results_hint' => 'Prüfen Sie die Schreibweise oder versuchen Sie ein kürzeres Wort.',
 ];

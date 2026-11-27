@@ -2,6 +2,7 @@
 
 /*
  * The sitemap page people read (adniro): front/sitemap/index.blade.php.
+ * In a title, the words between two * are set in bold.
  */
 
 return [
@@ -11,11 +12,17 @@ return [
 	'stat_cities' => 'शहर',
 	'stat_articles' => 'लेख',
 	'jump' => 'सीधे जाएँ',
-	'categories_title' => 'श्रेणी के अनुसार देखें',
-	'categories_sub' => 'विज्ञापन देखने के लिए कोई श्रेणी चुनें।',
-	'cities_title' => ':country के शहर',
-	'cities_sub' => 'आपके आस-पास के विज्ञापन, वर्णक्रम में।',
-	'blog_title' => 'ब्लॉग से',
-	'blog_sub' => 'गाइड और समाचार, नए पहले।',
+	'categories_title' => '*श्रेणी* के अनुसार देखें',
+	'cities_title' => '*:country* के शहर',
+	'blog_title' => '*ब्लॉग* से',
+	'sub_count' => '{1} :count उप-श्रेणी|[2,*] :count उप-श्रेणियाँ',
 	'all_in' => ':category में सब देखें',
+	'letters' => 'किसी अक्षर पर जाएँ',
+	'search_label' => 'इस पेज में खोजें',
+	'search_placeholder' => 'श्रेणियाँ और शहर खोजें',
+	'search_button' => 'खोजें',
+	'search_clear' => 'खोज हटाएँ',
+	'found' => ':count मिले',
+	'no_results_title' => '“:query” से कुछ मेल नहीं खाता',
+	'no_results_hint' => 'वर्तनी जाँचें या कोई छोटा शब्द आज़माएँ।',
 ];
