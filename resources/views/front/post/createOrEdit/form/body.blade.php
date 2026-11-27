@@ -15,7 +15,6 @@
 	$hasFinish = $isSingleStep || !$listingForm->isEdit;
 	$card = 'front.post.createOrEdit.form.section-card';
 	$section = 'front.post.createOrEdit.form.sections.';
-	$moreOpen = !empty(old('tags', $listingForm->tags)) || (isset($errors) && $errors->hasAny(['tags', 'tags.*', 'is_permanent']));
 @endphp
 @if ($lfV2)
 
@@ -40,7 +39,8 @@
 		@include($section . 'price-location')
 	@endcomponent
 
-	@component($card, ['key' => 'more', 'title' => trans('listing_form.section_more'), 'sub' => trans('listing_form.section_more_sub'), 'collapsible' => true, 'open' => $moreOpen])
+	{{-- Open when the page loads; the seller can fold it away --}}
+	@component($card, ['key' => 'more', 'title' => trans('listing_form.section_more'), 'sub' => trans('listing_form.section_more_sub'), 'collapsible' => true, 'open' => true])
 		@include($section . 'more')
 	@endcomponent
 

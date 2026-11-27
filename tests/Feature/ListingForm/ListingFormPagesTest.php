@@ -157,6 +157,22 @@ class ListingFormPagesTest extends TestCase
 		$this->assertNotNull($xpath->query("//*[@id='lfSection-details']//*[@id='cfContainer']")->item(0), 'the category fields load into this section');
 	}
 
+	#[DataProvider('detailsPages')]
+	public function test_more_options_is_open_when_the_page_loads(string $mode, bool $asOwner, string $url): void
+	{
+		// Arrange: nothing typed yet, no tags and no errors
+		config(['settings.listing_form.publication_form_type' => $mode]);
+		$request = $asOwner ? $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID)) : $this;
+
+		// Act
+		$xpath = $this->formXPath($request->get(str_replace('{id}', (string)$this->postId, $url)));
+
+		// Assert: open, and still a section the seller can fold away
+		$more = $xpath->query("//details[@id='lfSection-more']")->item(0);
+		$this->assertNotNull($more);
+		$this->assertTrue($more->hasAttribute('open'));
+	}
+
 	public static function editPages(): array
 	{
 		return [
