@@ -148,6 +148,37 @@ class AiPolishTest extends TestCase
 		$this->assertStringNotContainsStringIgnoringCase('quick post', $html);
 	}
 	
+	public function test_the_spend_widget_lists_every_kind_of_ai_cost_for_today_and_the_month(): void
+	{
+		// Arrange: on the 20th, so "earlier this month" is the same month whenever the tests run
+		$this->travelTo(now()->startOfMonth()->addDays(19)->setTime(12, 0));
+		$earlier = now()->subDays(5);
+		AiUsageLog::query()->create(['feature' => 'listing_writer', 'status' => 'ok', 'cost_usd' => 0.0125, 'created_at' => now()]);
+		AiUsageLog::query()->create(['feature' => 'listing_writer', 'status' => 'ok', 'cost_usd' => 0.02, 'created_at' => $earlier]);
+		AiUsageLog::query()->create(['feature' => 'transcription', 'status' => 'ok', 'cost_usd' => 0.004, 'created_at' => $earlier]);
+		AiUsageLog::query()->create(['feature' => 'image_check', 'status' => 'ok', 'cost_usd' => 0.3, 'created_at' => $earlier]);
+		AiUsageLog::query()->create(['feature' => 'moderation', 'status' => 'ok', 'cost_usd' => 9, 'created_at' => now()->subDays(40)]);
+		
+		// Act
+		$summary = app(AiSpend::class)->summary();
+		$rows = collect($summary['feature_rows'])->keyBy('feature');
+		$this->actingAs($this->admin());
+		$html = preg_replace('/\s+/', ' ', view('admin.ai.spend-widget')->render());
+		
+		// Assert: every feature has a row, then whatever else the log holds; each with today and the month
+		$this->assertSame(['moderation', 'listing_assistant', 'listing_writer', 'transcription', 'test', 'image_check'], $rows->keys()->all());
+		$this->assertSame(['calls' => 1, 'cost' => 0.0125], $rows['listing_writer']['today']);
+		$this->assertSame(2, $rows['listing_writer']['month']['calls']);
+		$this->assertEqualsWithDelta(0.0325, $rows['listing_writer']['month']['cost'], 0.000001);
+		$this->assertSame(['calls' => 0, 'cost' => 0.0], $rows['transcription']['today']);
+		$this->assertSame(['calls' => 0, 'cost' => 0.0], $rows['moderation']['month']);
+		$this->assertSame('Image Check', $rows['image_check']['label']);
+		$this->assertEqualsWithDelta(0.3365, $summary['month_cost'], 0.000001);
+		
+		$this->assertStringContainsString('<td>Writing help in the listing form</td> <td class="text-end">1 call · $0.0125</td> <td class="text-end">2 calls · $0.0325</td>', $html);
+		$this->assertStringContainsString('<td>Voice input (speech to text)</td> <td class="text-end">0 calls · $0.0000</td> <td class="text-end">1 call · $0.0040</td>', $html);
+	}
+	
 	// --- AI listing assistant evaluation and model list --------------------
 	
 	public function test_the_listing_assistant_evaluation_grades_categories_prices_and_non_listings(): void

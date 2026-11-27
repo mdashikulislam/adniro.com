@@ -41,13 +41,22 @@
 					</div>
 				@endif
 				
+				{{-- One row per kind of AI call, today and since the 1st of the month --}}
 				<table class="table table-sm mb-3">
+					<thead>
+						<tr class="small text-muted">
+							<th scope="col" class="fw-normal">{{ trans('ai.spend_col_feature') }}</th>
+							<th scope="col" class="fw-normal text-end">{{ trans('ai.spend_col_today') }}</th>
+							<th scope="col" class="fw-normal text-end">{{ trans('ai.spend_month') }}</th>
+						</tr>
+					</thead>
 					<tbody>
-						@foreach (['moderation', 'listing_assistant', 'test'] as $feature)
+						@foreach ($aiSpend['feature_rows'] as $row)
 							<tr>
-								<td>{{ trans('ai.spend_feature_' . $feature) }}</td>
-								<td class="text-end">{{ $aiSpend['features'][$feature]['calls'] ?? 0 }} {{ trans('ai.spend_calls_short') }}</td>
-								<td class="text-end">${{ number_format($aiSpend['features'][$feature]['cost'] ?? 0, 4) }}</td>
+								<td>{{ $row['label'] }}</td>
+								@foreach (['today', 'month'] as $period)
+									<td class="text-end">{{ trans_choice('ai.spend_calls_count', $row[$period]['calls'], ['count' => $row[$period]['calls']]) }} · ${{ number_format($row[$period]['cost'], 4) }}</td>
+								@endforeach
 							</tr>
 						@endforeach
 					</tbody>
