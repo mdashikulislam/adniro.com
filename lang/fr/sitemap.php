@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'Sur le *blog*',
 	'sub_count' => '{1} :count sous-catégorie|[2,*] :count sous-catégories',
 	'all_in' => 'Tout voir dans :category',
-	'letters' => 'Aller à une lettre',
 	'search_label' => 'Rechercher dans cette page',
 	'search_placeholder' => 'Rechercher une catégorie ou une ville',
 	'search_button' => 'Trouver',

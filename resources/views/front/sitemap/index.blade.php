@@ -20,7 +20,8 @@
  *   page's figures on a bar that overlaps its lower edge. The search filters the page as one types.
  * - Categories: cards on a grid, each as wide as its list is long (App\Helpers\Common\SitemapBento), with the
  *   category's icon and every sub-category: nothing is folded behind "View more", it is a sitemap.
- * - Cities: from A to Z under their letter (they arrive biggest first), with a row of letters to jump to.
+ * - Cities: the homepage's "Choose a city" tiles (.city-chip, styled in custom.css), from A to Z (they arrive
+ *   biggest first), ending with its "More cities" tile, which opens the window with every city.
  * - Blog: its topics and latest articles, when there are any.
 --}}
 @extends('front.layouts.master')
@@ -43,10 +44,8 @@
 	$subCatCount = $childCounts->sum();
 	$spansByColumns = collect([4, 3, 2])->mapWithKeys(fn ($columns) => [$columns => SitemapBento::spans($childCounts->all(), $columns)]);
 
-	// The cities from A to Z, under their first letter
-	$cityGroups = $cities
-		->sortBy(fn ($city) => mb_strtolower((string)$city->name))
-		->groupBy(fn ($city) => mb_strtoupper(mb_substr((string)$city->name, 0, 1)));
+	// The cities from A to Z
+	$citiesByName = $cities->sortBy(fn ($city) => mb_strtolower((string)$city->name))->values();
 
 	// The figures on the head's bar; the ones with a part of the page to go to are links
 	$stats = collect([
@@ -67,6 +66,14 @@
 
 @section('search')
 	@parent
+@endsection
+
+{{-- The window with every city, opened by the "More cities" tile --}}
+@section('modal_location')
+	@parent
+	@if ($cities->isNotEmpty())
+		@include('front.layouts.partials.modal.location')
+	@endif
 @endsection
 
 @section('content')
@@ -186,38 +193,46 @@
 					</section>
 				@endif
 
-				{{-- Cities --}}
+				{{-- Cities: the homepage's tiles --}}
 				@if ($cities->isNotEmpty())
 					<section class="sm-section" id="sitemap-cities" aria-labelledby="sitemapCitiesTitle" data-sm-section>
 						<header class="sm-section-head">
-							<h2 class="h4 mb-0 fw-lighter section-title" id="sitemapCitiesTitle">{!! $title(trans('sitemap.cities_title', ['country' => $countryName])) !!}</h2>
-							<nav class="sm-alphabet" aria-label="{{ trans('sitemap.letters') }}">
-								@foreach ($cityGroups->keys() as $letter)
-									<a href="#sitemap-letter-{{ $loop->index }}" class="sm-alphabet-link" data-sm-letter-link="{{ $loop->index }}">{{ $letter }}</a>
-								@endforeach
-							</nav>
+							<h2 class="h4 mb-0 fw-lighter section-title location-title" id="sitemapCitiesTitle">
+								<span class="location-title-icon" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+								<span class="fw-bold">{{ str_replace('*', '', trans('sitemap.cities_title', ['country' => $countryName])) }}</span>
+							</h2>
+							<span class="sm-section-meta">
+								<i class="bi bi-geo-alt" aria-hidden="true"></i> {{ $cities->count() }} {{ trans('sitemap.stat_cities') }}
+							</span>
 						</header>
-
-						<div class="sm-panel sm-letters">
-							@foreach ($cityGroups as $letter => $letterCities)
-								<div class="sm-letter-row" id="sitemap-letter-{{ $loop->index }}" data-sm-group data-sm-letter="{{ $loop->index }}">
-									<h3 class="sm-letter">{{ $letter }}</h3>
-									<ul class="sm-chips" role="list">
-										@foreach ($letterCities as $city)
-											<li>
-												<a href="{{ urlGen()->city($city) }}" class="sm-city" title="{{ t('Free Listings') . ' ' . $city->name }}" data-sm-item>
-													<i class="bi bi-geo-alt" aria-hidden="true"></i>
-													<span class="sm-city-name">{{ $city->name }}</span>
-												</a>
-											</li>
-										@endforeach
-									</ul>
+						
+						<div class="row row-cols-lg-4 row-cols-md-3 row-cols-2 g-2 city-list" data-sm-group>
+							@foreach ($citiesByName as $city)
+								<div class="col" data-sm-holder>
+									<a href="{{ urlGen()->city($city) }}" class="{{ linkClass('body-emphasis') }} city-chip"
+									   title="{{ t('Free Listings') . ' ' . $city->name }}" data-sm-item>
+										<span class="city-chip-icon" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>
+										<span class="city-chip-name">{{ $city->name }}</span>
+									</a>
 								</div>
 							@endforeach
+							{{-- Every other city: the window the homepage's tile opens (not while searching) --}}
+							<div class="col sm-more-cities">
+								<a href="#browseLocations"
+								   class="{{ linkClass('body-emphasis') }} city-chip city-chip-more"
+								   data-bs-toggle="modal"
+								   data-admin-code="0"
+								   data-city-id="0"
+								>
+									<span class="city-chip-icon" aria-hidden="true"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+									<span class="city-chip-name">{{ t('more_cities') }}</span>
+									<i class="bi bi-arrow-right city-chip-arrow" aria-hidden="true"></i>
+								</a>
+							</div>
 						</div>
 					</section>
 				@endif
-
+				
 				{{-- Blog --}}
 				@if ($blogPosts->isNotEmpty())
 					<section class="sm-section" id="sitemap-blog" aria-labelledby="sitemapBlogTitle" data-sm-section>
@@ -233,9 +248,9 @@
 								<ul class="sm-chips sm-topics" role="list">
 									@foreach ($blogCategories as $blogCategory)
 										<li>
-											<a href="{{ $blogCategory->url }}" class="sm-city" data-sm-item>
+											<a href="{{ $blogCategory->url }}" class="sm-topic" data-sm-item>
 												<i class="bi bi-folder2-open" aria-hidden="true"></i>
-												<span class="sm-city-name">{{ $blogCategory->name }}</span>
+												<span class="sm-topic-name">{{ $blogCategory->name }}</span>
 											</a>
 										</li>
 									@endforeach

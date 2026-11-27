@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'Aus dem *Blog*',
 	'sub_count' => '{1} :count Unterkategorie|[2,*] :count Unterkategorien',
 	'all_in' => 'Alles in :category',
-	'letters' => 'Zu einem Buchstaben springen',
 	'search_label' => 'Diese Seite durchsuchen',
 	'search_placeholder' => 'Kategorien und Städte suchen',
 	'search_button' => 'Finden',

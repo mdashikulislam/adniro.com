@@ -330,7 +330,6 @@ a.sm-stat:hover {
 /* as .cat-card-icon on the homepage */
 .sm-stat-icon,
 .sm-cat-icon,
-.sm-letter,
 .sm-empty-icon {
 	display: inline-flex;
 	flex: 0 0 auto;
@@ -345,7 +344,6 @@ a.sm-stat:hover {
 
 [data-bs-theme="dark"] .sm-stat-icon,
 [data-bs-theme="dark"] .sm-cat-icon,
-[data-bs-theme="dark"] .sm-letter,
 [data-bs-theme="dark"] .sm-empty-icon {
 	color: #5eead4;
 }
@@ -646,39 +644,15 @@ a.sm-stat:hover .sm-stat-arrow {
 	display: none;
 }
 
-/* ---------- Cities: from A to Z ---------- */
-.sm-alphabet {
-	display: flex;
-	flex-wrap: wrap;
-	gap: .3rem;
+/* ---------- Cities: the homepage's tiles (.city-chip, custom.css) ---------- */
+#sitemap-cities .location-title {
+	font-size: 1.5rem;
 }
 
-.sm-alphabet-link {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 32px;
-	height: 32px;
-	padding: 0 .4rem;
-	border: 1px solid var(--sm-accent-line);
-	border-radius: 999px;
-	font-family: var(--sm-display);
-	font-size: .9rem;
-	font-weight: 700;
-	color: var(--sm-accent-strong);
-	text-decoration: none;
-	background-color: rgba(var(--sm-accent-rgb), .06);
-	transition: background-color .15s ease, border-color .15s ease, color .15s ease;
-}
-
-.sm-alphabet-link[hidden] {
+/* while searching, only cities: the tile that opens every other city waits */
+.sm-page.is-filtering .sm-more-cities,
+.sm-page [data-sm-holder][hidden] {
 	display: none;
-}
-
-.sm-alphabet-link:hover {
-	border-color: #0f766e;
-	color: #fff;
-	background-color: #0f766e;
 }
 
 .sm-panel {
@@ -693,51 +667,16 @@ a.sm-stat:hover .sm-stat-arrow {
 	display: none;
 }
 
-.sm-letters {
-	columns: 2;
-	column-gap: 2.5rem;
-}
-
-.sm-letter-row {
-	display: flex;
-	gap: 1rem;
-	align-items: flex-start;
-	padding-block: .85rem;
-	border-block-end: 1px solid var(--sm-border);
-	break-inside: avoid;
-	scroll-margin-top: var(--sm-header-clear);
-}
-
-.sm-letter-row[hidden] {
-	display: none;
-}
-
-.sm-letter-row:target .sm-letter {
-	color: #fff;
-	background-color: #0f766e;
-}
-
-.sm-letter {
-	width: 2.5rem;
-	height: 2.5rem;
-	margin: 0;
-	font-family: var(--sm-display);
-	font-size: 1.15rem;
-	font-weight: 700;
-}
-
+/* ---------- Blog topics: pills ---------- */
 .sm-chips {
 	display: flex;
-	flex: 1 1 auto;
 	flex-wrap: wrap;
 	gap: .45rem;
-	min-width: 0;
 	margin: 0;
-	padding: .1rem 0 0;
 	list-style: none;
 }
 
-.sm-city {
+.sm-topic {
 	display: inline-flex;
 	gap: .4rem;
 	align-items: center;
@@ -753,26 +692,26 @@ a.sm-stat:hover .sm-stat-arrow {
 	transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
 }
 
-.sm-city .bi {
+.sm-topic .bi {
 	font-size: .82rem;
 	color: var(--sm-icon);
 }
 
-.sm-city:hover {
+.sm-topic:hover {
 	border-color: var(--sm-accent-line);
 	color: var(--sm-accent-strong);
 	background-color: rgba(var(--sm-accent-rgb), .07);
 	transform: translateY(-1px);
 }
 
-.sm-city-name {
+.sm-topic-name {
 	min-width: 0;
 	overflow-wrap: anywhere;
 }
 
 /* ---------- Blog ---------- */
 .sm-topics {
-	padding-block: 1rem;
+	padding: 1rem 0;
 	border-block-end: 1px solid var(--sm-border);
 }
 
@@ -870,10 +809,6 @@ a.sm-stat:hover .sm-stat-arrow {
 
 	.sm-cat {
 		--sm-span: var(--sm-span-2, 1);
-	}
-
-	.sm-letters {
-		columns: 1;
 	}
 
 	.sm-stat {
@@ -1000,17 +935,7 @@ a.sm-stat:hover .sm-stat-arrow {
 		padding-inline: .85rem;
 	}
 
-	.sm-letter-row {
-		gap: .7rem;
-	}
-
-	.sm-letter {
-		width: 2.2rem;
-		height: 2.2rem;
-		font-size: 1.05rem;
-	}
-
-	.sm-city {
+	.sm-topic {
 		min-height: 40px;
 	}
 }
@@ -1023,7 +948,7 @@ a.sm-stat:hover .sm-stat-arrow {
 
 	.sm-cat:hover,
 	.sm-cat:focus-within,
-	.sm-city:hover,
+	.sm-topic:hover,
 	.sm-cat .sm-cat-go:hover,
 	a.sm-stat:hover .sm-stat-icon,
 	.sm-cat:hover .sm-cat-icon,

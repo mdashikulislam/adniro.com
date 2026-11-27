@@ -17,7 +17,6 @@ return [
 	'blog_title' => '*ब्लॉग* से',
 	'sub_count' => '{1} :count उप-श्रेणी|[2,*] :count उप-श्रेणियाँ',
 	'all_in' => ':category में सब देखें',
-	'letters' => 'किसी अक्षर पर जाएँ',
 	'search_label' => 'इस पेज में खोजें',
 	'search_placeholder' => 'श्रेणियाँ और शहर खोजें',
 	'search_button' => 'खोजें',

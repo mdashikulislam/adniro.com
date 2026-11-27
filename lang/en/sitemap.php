@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'From the *Blog*',
 	'sub_count' => '{1} :count sub-category|[2,*] :count sub-categories',
 	'all_in' => 'All in :category',
-	'letters' => 'Jump to a letter',
 	'search_label' => 'Search this page',
 	'search_placeholder' => 'Search categories and cities',
 	'search_button' => 'Find',

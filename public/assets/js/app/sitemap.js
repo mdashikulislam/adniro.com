@@ -2,7 +2,7 @@
  * adniro: the search of the sitemap page (front/sitemap/index.blade.php).
  *
  * Filters the page as one types: every link is a [data-sm-item]; links live in groups ([data-sm-group]: a
- * category card, a letter's row of cities, the blog panel) and groups in sections ([data-sm-section]).
+ * category card, the grid of cities, the blog panel) and groups in sections ([data-sm-section]).
  * A category whose own name matches keeps all of its sub-categories. What matches nothing is hidden, and when
  * nothing at all matches, the "nothing matches" block shows. Without this script the page is simply complete.
  */
@@ -31,17 +31,16 @@
 		return value.normalize ? value.normalize('NFD').replace(/[̀-ͯ]/g, '') : value;
 	}
 
-	/* What a link hides with it: its list item when it has one, else itself */
+	/* What a link hides with it: its grid cell or list item when it has one, else itself */
 	function holder(item) {
-		var li = item.closest('li');
-		return li || item;
+		return item.closest('[data-sm-holder]') || item.closest('li') || item;
 	}
 
 	var groups = Array.prototype.slice.call(page.querySelectorAll('[data-sm-group]')).map(function (el) {
 		var items = Array.prototype.slice.call(el.querySelectorAll('[data-sm-item]')).map(function (item) {
 			return {el: item, text: plain(item.textContent), isHeading: item.hasAttribute('data-sm-heading')};
 		});
-		return {el: el, items: items, letter: el.getAttribute('data-sm-letter')};
+		return {el: el, items: items};
 	});
 
 	function show(el, visible) {
@@ -75,13 +74,6 @@
 
 			show(group.el, visibleInGroup > 0);
 			found += visibleInGroup;
-
-			if (group.letter !== null) {
-				var link = page.querySelector('[data-sm-letter-link="' + group.letter + '"]');
-				if (link) {
-					show(link, visibleInGroup > 0);
-				}
-			}
 		});
 
 		var anySection = false;

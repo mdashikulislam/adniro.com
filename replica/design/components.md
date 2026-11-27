@@ -436,11 +436,12 @@ Category card (".sm-cat")
             teal text on a 7% tint, the dot lights up, an arrow slides in; arrow link hover: fills and turns
   tokens    text on bg; text-muted on bg 6:1; accent-strong on bg 5.5:1
 
-Cities (".sm-letters", ".sm-alphabet")
-  order     from A to Z under their letter, two columns of rows from 992px
-  row       the letter in a 40px circle, then the cities as pills with a pin (36px tall, 40px on phones)
-  jump      a row of small letter pills at the section's head; the row jumped to gets a filled letter
-  states    pill hover: teal text and border on a 7% tint, 1px lift
+Cities (the homepage's "Choose a city" tiles: ".city-chip" in custom.css, nothing restyled)
+  title     the homepage's icon tile (34px, 10px corners, 10% teal) and the title in bold, no teal bar
+  grid      4 columns from 992px, 3 from 768px, 2 on phones, 8px apart; from A to Z
+  tile      10px corners on a 1px border, a pin in a 26px tinted tile, the city's name on one line
+  last      the dashed "More cities" tile, which opens the window with every city; not shown while searching
+  states    as on the homepage: hover lifts the tile 2px, tints it and fills the pin's tile
 
 Nothing found (".sm-empty")
   look      a dashed teal frame, a search icon in a 72px circle, “Nothing matches “…””, a hint, and a teal

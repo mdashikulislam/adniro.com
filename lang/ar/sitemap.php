@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'من *المدونة*',
 	'sub_count' => 'الفئات الفرعية: :count',
 	'all_in' => 'الكل في :category',
-	'letters' => 'انتقل إلى حرف',
 	'search_label' => 'ابحث في هذه الصفحة',
 	'search_placeholder' => 'ابحث عن فئة أو مدينة',
 	'search_button' => 'بحث',

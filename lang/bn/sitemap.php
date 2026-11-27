@@ -17,7 +17,6 @@ return [
 	'blog_title' => '*ব্লগ* থেকে',
 	'sub_count' => ':countটি সাব-ক্যাটাগরি',
 	'all_in' => ':category-এর সব দেখুন',
-	'letters' => 'একটি অক্ষরে যান',
 	'search_label' => 'এই পাতায় খুঁজুন',
 	'search_placeholder' => 'ক্যাটাগরি ও শহর খুঁজুন',
 	'search_button' => 'খুঁজুন',

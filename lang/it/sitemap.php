@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'Dal *blog*',
 	'sub_count' => '{1} :count sottocategoria|[2,*] :count sottocategorie',
 	'all_in' => 'Tutto in :category',
-	'letters' => 'Vai a una lettera',
 	'search_label' => 'Cerca in questa pagina',
 	'search_placeholder' => 'Cerca categorie e città',
 	'search_button' => 'Trova',

@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'Del *blog*',
 	'sub_count' => '{1} :count subcategoría|[2,*] :count subcategorías',
 	'all_in' => 'Todo en :category',
-	'letters' => 'Ir a una letra',
 	'search_label' => 'Buscar en esta página',
 	'search_placeholder' => 'Buscar categorías y ciudades',
 	'search_button' => 'Buscar',

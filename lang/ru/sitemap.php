@@ -17,7 +17,6 @@ return [
 	'blog_title' => 'Из *блога*',
 	'sub_count' => 'Подкатегорий: :count',
 	'all_in' => 'Всё в разделе «:category»',
-	'letters' => 'Перейти к букве',
 	'search_label' => 'Поиск по этой странице',
 	'search_placeholder' => 'Искать категории и города',
 	'search_button' => 'Найти',

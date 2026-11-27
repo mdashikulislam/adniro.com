@@ -77,17 +77,29 @@ class SitemapPageTest extends TestCase
 		}
 	}
 
-	public function test_cities_are_listed_from_a_to_z_under_their_letter(): void
+	public function test_cities_are_tiles_like_the_homepages_from_a_to_z(): void
 	{
 		// Act
 		$html = $this->page();
-		preg_match_all('~<h3 class="sm-letter"[^>]*>\s*(\S+)\s*</h3>~', $html, $letters);
-		preg_match_all('~<a href="[^"]+" class="sm-city"[^>]*>.*?<span class="sm-city-name">([^<]+)</span>~s', $html, $cities);
+		$section = substr($html, strpos($html, 'id="sitemap-cities"'));
+		preg_match_all('~<a href="[^"]+" class="[^"]*\bcity-chip"[^>]*data-sm-item>\s*<span class="city-chip-icon" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>\s*<span class="city-chip-name">([^<]+)</span>~', $section, $cities);
 
-		// Assert
-		$this->assertSame(['A', 'B', 'C'], $letters[1]);
-		$this->assertSame(3, preg_match_all('~<a href="#sitemap-letter-\d+" class="sm-alphabet-link"~', $html), 'a letter to jump to for each');
+		// Assert: the homepage's own grid and tiles, with its icon tile in the title
 		$this->assertSame(['Albany', 'Austin', 'Boston', 'Chicago'], $cities[1]);
+		$this->assertStringContainsString('class="row row-cols-lg-4 row-cols-md-3 row-cols-2 g-2 city-list"', $section);
+		$this->assertMatchesRegularExpression('~<h2 class="h4 mb-0 fw-lighter section-title location-title" id="sitemapCitiesTitle">\s*<span class="location-title-icon" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>\s*<span class="fw-bold">Cities in United States</span>~', $section);
+		$this->assertStringNotContainsString('sm-letter', $html, 'no more rows by letter');
+	}
+
+	public function test_the_last_tile_opens_the_window_with_every_city(): void
+	{
+		// Act
+		$html = $this->page();
+
+		// Assert: the homepage's "More cities" tile, and the window it opens
+		$this->assertMatchesRegularExpression('~<a href="#browseLocations"\s+class="[^"]*city-chip city-chip-more"\s+data-bs-toggle="modal"~', $html);
+		$this->assertStringContainsString('<span class="city-chip-name">More cities</span>', $html);
+		$this->assertStringContainsString('id="browseLocations"', $html);
 	}
 
 	public function test_the_page_brings_its_own_stylesheet_and_search_script(): void
@@ -121,7 +133,6 @@ class SitemapPageTest extends TestCase
 
 		// Assert
 		$this->assertStringContainsString('<h2 class="h4 mb-0 fw-lighter section-title" id="sitemapCategoriesTitle">Browse by <span class="fw-bold">Category</span></h2>', $html);
-		$this->assertStringContainsString('Cities in <span class="fw-bold">United States</span></h2>', $html);
 	}
 
 	private function page(): string
