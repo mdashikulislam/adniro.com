@@ -146,6 +146,48 @@ class MobileNavTest extends TestCase
 		$this->assertDoesNotMatchRegularExpression('/<body[^>]*class="[^"]*has-appbar/', $html);
 	}
 
+	public function test_the_burger_menu_leaves_out_what_the_app_bar_and_the_account_button_already_offer(): void
+	{
+		// Arrange
+		$member = $this->stockMember(self::MEMBER_ID);
+
+		// Act
+		$memberMenu = $this->burgerMenu($this->actingAs($member)->get('/')->assertOk()->getContent());
+
+		// Assert: "Create Listing" from 768px up (below, the app bar has "Post ad"), the account entry from 1200px up
+		$this->assertSame('nav-item d-none d-md-block', $this->burgerEntryClass($memberMenu, 'posts/create'));
+		$this->assertSame('nav-item d-none d-xl-block dropdown', $this->burgerEntryClass($memberMenu, 'Member ' . self::MEMBER_ID));
+	}
+
+	public function test_the_burger_menu_leaves_out_the_guests_log_in_entry_and_keeps_the_other_links(): void
+	{
+		// Act
+		$guestMenu = $this->burgerMenu($this->get('/')->assertOk()->getContent());
+
+		// Assert
+		$this->assertSame('nav-item d-none d-xl-block dropdown', $this->burgerEntryClass($guestMenu, 'Log In'));
+		$this->assertSame('nav-item', $this->burgerEntryClass($guestMenu, 'Browse Listings'));
+	}
+
+	/** The menu the burger button opens */
+	private function burgerMenu(string $html): string
+	{
+		$start = strpos($html, 'id="navbarNav"');
+		$this->assertNotFalse($start);
+
+		return substr($html, $start, strpos($html, '</nav>', $start) - $start);
+	}
+
+	/** The classes of the top-level entry whose link holds this text */
+	private function burgerEntryClass(string $menu, string $needle): string
+	{
+		$pattern = '~<li class="(nav-item[^"]*)">\s*<a\b(?:(?!</a>).)*?' . preg_quote($needle, '~') . '~s';
+		$this->assertMatchesRegularExpression($pattern, $menu);
+		preg_match($pattern, $menu, $match);
+
+		return trim(preg_replace('/\s+/', ' ', $match[1]));
+	}
+
 	private function accountMenu(string $html): string
 	{
 		$start = strpos($html, '<div class="dropdown adn-mhead-account');
