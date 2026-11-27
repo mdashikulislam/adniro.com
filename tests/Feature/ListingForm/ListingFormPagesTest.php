@@ -140,6 +140,23 @@ class ListingFormPagesTest extends TestCase
 		$this->assertSame('true', $xpath->query("//input[@name='title']")->item(0)?->getAttribute('aria-required'));
 	}
 
+	#[DataProvider('detailsPages')]
+	public function test_the_fields_of_the_category_sit_under_additional_details_on_create_and_edit_pages(string $mode, bool $asOwner, string $url): void
+	{
+		// Arrange
+		config(['settings.listing_form.publication_form_type' => $mode]);
+		$request = $asOwner ? $this->actingAs(\App\Models\User::query()->find(self::OWNER_ID)) : $this;
+
+		// Act
+		$xpath = $this->formXPath($request->get(str_replace('{id}', (string)$this->postId, $url)));
+
+		// Assert
+		$section = $xpath->query("//*[@id='lfSection-details']")->item(0);
+		$this->assertNotNull($section);
+		$this->assertStringContainsString('Additional Details', $section->textContent);
+		$this->assertNotNull($xpath->query("//*[@id='lfSection-details']//*[@id='cfContainer']")->item(0), 'the category fields load into this section');
+	}
+
 	public static function editPages(): array
 	{
 		return [
