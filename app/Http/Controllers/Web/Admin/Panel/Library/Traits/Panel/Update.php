@@ -50,20 +50,7 @@ trait Update
 		}
 		
 		if ($item->isDirty()) {
-			// Retrieve the custom 'was_manually_changed' attribute
-			// Then delete it from the object before saving (since no DB column exists for it)
-			// That will be set back after the object is saved.
-			$wasManuallyChanged = false;
-			if (isset($item->was_manually_changed)) {
-				$wasManuallyChanged = $item->was_manually_changed;
-				unset($item->was_manually_changed);
-			}
-			
-			// Save the entry
-			$item->save();
-			
-			// Set back the 'was_manually_changed' attribute
-			$item->setAttribute('was_manually_changed', $wasManuallyChanged);
+			$this->saveWithoutManualChangeFlag($item);
 		}
 		
 		/*

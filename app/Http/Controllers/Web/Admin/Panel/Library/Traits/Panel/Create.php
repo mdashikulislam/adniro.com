@@ -170,8 +170,28 @@ trait Create
 		}
 	}
 	
+	/**
+	 * Save the item without writing the in-memory 'was_manually_changed' flag (no DB column exists for it).
+	 * The flag is set by syncPivot() and read by updateCrud(), so it is put back after the save.
+	 *
+	 * @param \Illuminate\Database\Eloquent\Model $item
+	 * @return void
+	 */
+	protected function saveWithoutManualChangeFlag(Model $item): void
+	{
+		$hasFlag = array_key_exists('was_manually_changed', $item->getAttributes());
+		$wasManuallyChanged = $hasFlag && $item->getAttributes()['was_manually_changed'];
+		unset($item->was_manually_changed);
+
+		$item->save();
+
+		if ($hasFlag) {
+			$item->setAttribute('was_manually_changed', $wasManuallyChanged);
+		}
+	}
+
 	// PRIVATE
-	
+
 	/**
 	 * Create any existing one-to-one relations for the current model from the form data.
 	 *
@@ -206,10 +226,11 @@ trait Create
 			if ($relation instanceof BelongsTo) {
 				$modelInstance = $model::find($relationData['values'])->first();
 				if ($modelInstance != null) {
-					$relation->associate($modelInstance)->save();
+					$relation->associate($modelInstance);
 				} else {
-					$relation->dissociate()->save();
+					$relation->dissociate();
 				}
+				$this->saveWithoutManualChangeFlag($item);
 			} else if ($relation instanceof HasOne) {
 				if ($item->{$relationMethod} != null) {
 					$item->{$relationMethod}->update($relationData['values']);
