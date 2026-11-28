@@ -482,3 +482,50 @@ Motion      colour and shadow changes in 150 to 250ms, lifts of 1 to 2px; none w
 
 No logo, icon, illustration, sound or copy from another product. Icons are Bootstrap Icons (MIT); the
 bubble shape, ticks and two-pane layout are common chat patterns, drawn here in Adniro's own colours.
+
+## Pricing page (P1)
+
+`/pricing`: `front/pages/pricing.blade.php` and `pricing/*.blade.php`, styles in `public/assets/css/pricing.css`
+(roles `--pr-*`, the same values as the sitemap page), copy in `lang/*/pricing.php`. Every card is drawn
+from the package's admin options; nothing about a plan is written in the view.
+
+```
+Head (P1)
+  parts     eyebrow pill "Pricing", h1 with the bold words in a mint-to-gold gradient, intro, highlight pills
+  tokens    the sitemap head's night teal; diagonal light lines masked to the centre; three floating sparks
+  data      highlights: cheapest price_formatted, longest promotion_time, most pictures_limit (or the global
+            photo limit); a pill is left out when its figure is 0
+  a11y      sparks aria-hidden; highlights are a list labelled "At a glance"
+
+Plan card (P1)
+  variants  default, featured (recommended = 1), free (price 0)
+  parts     tier icon, short_name (h3), chip ("N-day boost" from promotion_time, else "Standard listing"),
+            price_formatted + "per listing" (or "per <interval>" for subscriptions), call to action, features
+  tokens    surface, radius 22px, border; a paid card's ribbon colour (Bootstrap name, allow-listed) tints its
+            icon and a soft glow along the top; free and uncoloured plans are slate
+  featured  night gradient card, mint-to-gold border, "Most popular" badge over the top edge, raised 12px
+            (not below 1200px), solid mint button with night text (11.4:1)
+  icons     by price rank: free bi-tag, then bi-lightning-charge, bi-rocket-takeoff, bi-gem, bi-trophy
+  states    hover lifts 4px with a teal shadow; focus-visible 2px teal ring; none move with reduced motion
+  cta       "Post for free" / "Choose <plan>": the listing form with ?packageId=, or the sign-in pop-up for
+            guests who cannot post; subscriptions go to the account's subscription page
+  a11y      real links; features are a list labelled "What <plan> includes"; icons aria-hidden
+
+Grid (P1)
+  columns   as many as there are plans, up to 4; 4 plans: 2 columns below 1200px, 1 below 768px
+  overlap   the cards rise 4.75rem (3rem on phones) over the head's lower edge; with tabs, the tabs do
+  empty     a card with a box icon, "No plans to show right now" and a link to post for free
+
+Tabs (P1, only when promotion and subscription packages are both active)
+  look      a glass segmented control over the head; the active tab is white with night text
+
+How a boost works (P1)
+  parts     three steps (post, pick a plan, reach more buyers), numbered, joined by a dashed line on wide
+            screens, stacked on phones
+
+Help (P1)
+  parts     soft teal panel, "Not sure which plan fits?", Contact us button (#0f766e, 5.47:1)
+```
+
+Contrast, measured in the browser: outline button text 5.47:1 (light) and 10.4:1 (dark), muted text 6.0:1
+and 7.1:1, feature text 11.9:1 in dark. All pass AA.
