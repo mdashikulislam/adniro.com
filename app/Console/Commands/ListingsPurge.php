@@ -30,6 +30,7 @@ use App\Models\Scopes\VerifiedScope;
 use App\Notifications\PostArchived;
 use App\Notifications\PostDeleted;
 use App\Notifications\PostWilBeDeleted;
+use App\Services\Ai\Moderation\ModerationStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Throwable;
@@ -106,6 +107,8 @@ class ListingsPurge extends Command
 				->withoutAppends()
 				->withoutGlobalScopes([VerifiedScope::class, ReviewedScope::class])
 				->inCountry($country->code)
+				// adniro: rejected listings wait for an admin's decision; the purge never archives or deletes them
+				->where('moderation_status', '!=', ModerationStatus::REJECTED)
 				->columnIsEmpty('is_permanent')
 				->whereHas('category', fn ($q) => $q->columnIsEmpty('is_for_permanent'));
 			
