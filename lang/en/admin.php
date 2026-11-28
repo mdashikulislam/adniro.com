@@ -1358,6 +1358,8 @@ return [
 	'robots_txt_sep_value' => '<h3>Robots.txt File</h3>',
 	'robots_txt_info_value' => 'The "robots.txt" file is available at: <a href=":domain/robots.txt" target="_blank">:domain/robots.txt</a>.',
 	'robots_txt_label' => 'Robots.txt file content',
+	'ads_txt_label' => 'ads.txt file content',
+	'ads_txt_hint' => 'The lines your ad networks give you (Google AdSense, Adsterra...), one per line. They are served at :url. Leave empty while you show no ads.',
 	'robots_txt_hint' => 'Please enter one statement per line. For more information about the statements please check out these links:
 	<ul class="mb-0">
 	<li><a href="https://support.google.com/webmasters/answer/6062596?hl=en" target="_blank">https://support.google.com/webmasters/answer/6062596?hl=en</a></li>

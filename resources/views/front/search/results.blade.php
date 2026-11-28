@@ -7,9 +7,10 @@
 	$totalPosts = (int)data_get($apiResult, 'meta.total', 0);
 	$tags = (array)data_get($apiExtra, 'tags');
 	
-	// No canonical tag on empty result pages
+	// No canonical tag, and no ads, on empty result pages
 	if (empty($posts) || $totalPosts <= 0) {
 		view()->share('hideCanonical', true);
+		view()->share('hideAds', true);
 	}
 
 	$postTypes ??= [];

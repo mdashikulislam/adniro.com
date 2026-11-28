@@ -119,6 +119,16 @@ class SeoSetting extends BaseSetting
 			'tab'     => $tabName,
 		];
 		
+		// adniro: ads.txt, served at /ads.txt by AdsTxtController
+		$fields[] = [
+			'name'       => 'ads_txt',
+			'label'      => trans('admin.ads_txt_label'),
+			'type'       => 'textarea',
+			'attributes' => ['rows' => '4', 'placeholder' => 'google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0'],
+			'hint'       => trans('admin.ads_txt_hint', ['url' => url('ads.txt')]),
+			'tab'        => $tabName,
+		];
+
 		$fields[] = [
 			'name'  => 'no_index',
 			'type'  => 'custom_html',

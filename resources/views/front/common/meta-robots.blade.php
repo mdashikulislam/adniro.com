@@ -45,8 +45,8 @@
 	)
 	<meta name="robots" content="noindex,nofollow">
 	<meta name="googlebot" content="noindex">
-@elseif ($noIndexLowContentPages || $noIndexNoResultPages || $noIndexBlogSearchPages || $noIndexFiltersOnEntriesPages)
-	{{-- Thin/empty/filtered results pages: keep them crawlable (their links followed) but out of the index --}}
+@elseif ($noIndexLowContentPages || $noIndexNoResultPages || $noIndexBlogSearchPages || $noIndexFiltersOnEntriesPages || \App\Helpers\Common\AdPlacement::noIndexThisPage())
+	{{-- Thin/empty/filtered results pages, forms and private pages: keep them crawlable (their links followed) but out of the index --}}
 	<meta name="robots" content="noindex,follow">
 	<meta name="googlebot" content="noindex">
 @endif

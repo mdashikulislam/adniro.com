@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\Front\AdsTxtController;
 use App\Http\Controllers\Web\Front\Blog\BlogController;
 use App\Http\Controllers\Web\Front\Browsing\Category\CategoryController as BrowsingCategoryController;
 use App\Http\Controllers\Web\Front\Browsing\Location\AutoCompleteController;
@@ -62,6 +63,9 @@ if (!$isDomainmappingAvailable) {
 
 // favicon.ico, app icons and manifest (adniro)
 require __DIR__ . '/front/site-icons.php';
+
+// ads.txt for ad networks (adniro)
+Route::get('ads.txt', [AdsTxtController::class, 'show'])->name('site.ads_txt');
 
 // adniro: live chat
 require __DIR__ . '/front/chat.php';
